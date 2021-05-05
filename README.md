@@ -3,6 +3,8 @@
 
 Read res1d and xns11 files.
 
+For other MIKE files (Dfs0, Dfs1, Dfs2, Dfsu,...) use the related package [MIKE IO](https://github.com/DHI/mikeio)
+
 ## Requirements
 * Windows operating system
 * Python x64 3.6, 3.7 or 3.8 
@@ -36,7 +38,7 @@ Or development version:
 >>>  query = QueryDataReach("WaterLevel", "104l1", 34.4131)
 >>>  df = res1d.read(query)
 ```
-For more Res1D examples see this [notebook](notebooks/Res1D.ipynb)
+For more Res1D examples see this [notebook](https://nbviewer.jupyter.org/github/DHI/mikeio1d/blob/main/notebooks/Res1D.ipynb)
 
 ### Read Xns11 file Return Pandas DataFrame
 ```python
