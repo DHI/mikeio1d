@@ -7,7 +7,7 @@ from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
 from mikeio1d.dotnet import from_dotnet_datetime, to_numpy, to_dotnet_datetime
 
 from System import Enum, DateTime
-from DHI.Mike1D.ResultDataAccess import ResultData, ResultDataQuery
+from DHI.Mike1D.ResultDataAccess import ResultData, ResultDataQuery, Filter, DataItemFilterName
 from DHI.Mike1D.Generic import Connection, Diagnostics, PredefinedQuantity
 
 NAME_DELIMITER = ":"
@@ -65,7 +65,7 @@ class QueryDataReach(QueryData):
     quantity: str
         e.g. 'WaterLevel' or 'Discharge'. Call mike1d_quantities() to get all quantities.
     name: str, optional
-        Reachname
+        Reach name
 
     Examples
     --------
@@ -113,11 +113,11 @@ class QueryDataNode(QueryData):
     quantity: str
         e.g. 'WaterLevel' or 'Discharge'. Call mike1d_quantities() to get all quantities.
     name: str, optional
-        Nodename
+        Node name
 
     Examples
     --------
-    `QueryDataNode('WaterLevel', 'reach1')` is a valid query.
+    `QueryDataNode('WaterLevel', 'node1')` is a valid query.
     """
 
     def __init__(self, quantity, name=None, validate=True):
@@ -128,14 +128,58 @@ class QueryDataNode(QueryData):
         return self.from_dotnet_to_python(values)
 
 
+class QueryDataCatchment(QueryData):
+    """A query object that declares what catchment data to extract from a .res1d file.
+
+    Parameters
+    ----------
+    quantity: str
+        e.g. 'TotalRunoff'. Call mike1d_quantities() to get all quantities.
+    name: str, optional
+        Catchment name
+
+    Examples
+    --------
+    `QueryDataCatchment('TotalRunoff', 'catchment1')` is a valid query.
+    """
+
+    def __init__(self, quantity, name=None, validate=True):
+        super().__init__(quantity, name, validate)
+
+    def get_values(self, res1d):
+        values = res1d.query.GetCatchmentValues(self._name, self._quantity)
+        return self.from_dotnet_to_python(values)
+
+
 class Res1D:
-    def __init__(self, file_path=None, put_chainage_in_col_name=True):
+
+    def __init__(self,
+                 file_path=None,
+                 lazy_load=False,
+                 put_chainage_in_col_name=True,
+                 reaches=None,
+                 nodes=None,
+                 catchments=None):
+
         self.file_path = file_path
+        self._put_chainage_in_col_name = put_chainage_in_col_name
+        self._lazy_load = lazy_load
+
+        self._reaches = reaches if reaches else []
+        self._nodes = nodes if nodes else []
+        self._catchments = catchments if catchments else []
+
+        self._use_filter = (reaches is not None or
+                            nodes is not None or
+                            catchments is not None)
+
         self._time_index = None
         self._start_time = None
         self._end_time = None
-        self._put_chainage_in_col_name = put_chainage_in_col_name
+
         self._load_file()
+
+    #region File loading
 
     def _load_file(self):
         if not os.path.exists(self.file_path):
@@ -143,8 +187,52 @@ class Res1D:
 
         self._data = ResultData()
         self._data.Connection = Connection.Create(self.file_path)
-        self._data.Load(Diagnostics())
+        self._diagnostics = Diagnostics("Loading file")
+
+        if self._lazy_load:
+            self._data.Connection.BridgeName = "res1dlazy"
+
+        if self._use_filter:
+            self._setup_filter()
+
+            for reach in self._reaches:
+                self._add_reach(reach)
+            for node in self._nodes:
+                self._add_node(node)
+            for catchment in self._catchments:
+                self._add_catchment(catchment)
+
+            self._data.LoadData(self._diagnostics)
+        else:
+            self._data.Load(self._diagnostics)
+
         self._query = ResultDataQuery(self._data)
+
+    def _setup_filter(self):
+        """
+        Setup the filter for result data object.
+        """
+        if not self._use_filter:
+            return
+
+        self._data.LoadHeader(True, self._diagnostics)
+
+        self._data_filter = Filter()
+        self._data_subfilter = DataItemFilterName(self._data)
+        self._data_filter.AddDataItemFilter(self._data_subfilter)
+
+        self._data.Parameters.Filter = self._data_filter
+
+    def _add_reach(self, reach_id):
+        self._data_subfilter.Reaches.Add(reach_id)
+
+    def _add_node(self, node_id):
+        self._data_subfilter.Nodes.Add(node_id)
+
+    def _add_catchment(self, catchment_id):
+        self._data_subfilter.Catchments.Add(catchment_id)
+
+    #endregion File loading
 
     def read(self, queries=None):
         """
