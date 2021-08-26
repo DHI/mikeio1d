@@ -53,6 +53,15 @@ class QueryData:
     def name(self):
         return self._name
 
+    def _check_invalid_quantity(self, res1d):
+        if self._quantity not in res1d.quantities:
+            raise InvalidQuantity(f"Undefined quantity {self._quantity}. "
+                                  f"Allowed quantities are: {', '.join(res1d.quantities)}.")
+
+    def _check_invalid_values(self, values):
+        if values is None:
+            raise NoDataForQuery(str(self))
+
     def __repr__(self):
         return NAME_DELIMITER.join([self._quantity, self._name])
 
@@ -89,12 +98,12 @@ class QueryDataReach(QueryData):
             raise ValueError("Argument 'chainage' cannot be set if name is None.")
 
     def get_values(self, res1d):
-        if self._quantity not in res1d.quantities:
-            raise InvalidQuantity(f"Undefined quantity {self._quantity}. "
-                                  f"Allowed quantities are: {', '.join(res1d.quantities)}.")
+        self._check_invalid_quantity(res1d)
+
         values = res1d.query.GetReachValues(self._name, self._chainage, self._quantity)
-        if values is None:
-            raise NoDataForQuery(str(self))
+
+        self._check_invalid_values(values)
+
         return self.from_dotnet_to_python(values)
 
     @property
@@ -124,7 +133,12 @@ class QueryDataNode(QueryData):
         super().__init__(quantity, name, validate)
 
     def get_values(self, res1d):
+        self._check_invalid_quantity(res1d)
+
         values = res1d.query.GetNodeValues(self._name, self._quantity)
+
+        self._check_invalid_values(values)
+
         return self.from_dotnet_to_python(values)
 
 
@@ -147,7 +161,12 @@ class QueryDataCatchment(QueryData):
         super().__init__(quantity, name, validate)
 
     def get_values(self, res1d):
+        self._check_invalid_quantity(res1d)
+
         values = res1d.query.GetCatchmentValues(self._name, self._quantity)
+
+        self._check_invalid_values(values)
+
         return self.from_dotnet_to_python(values)
 
 
@@ -460,6 +479,9 @@ class Res1D:
         public string ProjectionString { get; set; }
         """
         return self._data
+
+    def get_catchment_values(self, catchment_id, quantity):
+        return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
 
     def get_node_values(self, node_id, quantity):
         return to_numpy(self.query.GetNodeValues(node_id, quantity))
