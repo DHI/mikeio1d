@@ -1,8 +1,5 @@
 import os.path
-import clr
 import pandas as pd
-import numpy as np
-
 
 from .dotnet import from_dotnet_datetime, to_numpy, to_dotnet_datetime
 from .query import QueryData, QueryDataCatchment, QueryDataNode, QueryDataReach

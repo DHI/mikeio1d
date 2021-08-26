@@ -17,7 +17,7 @@ def test_query_validate():
     # Bad chainage type
     with pytest.raises(TypeError):
         QueryData("topoid1", "reach1", chainage="BadChainage")
-    
+
     # Cannot set a chainage with no reach
     with pytest.raises(ValueError):
         QueryData("topoid1", None, 10)
@@ -78,7 +78,7 @@ def test_read_single_query_as_list(file, query, expected_bottom):
 def test_read_single_query(file, query, expected_bottom):
     geometry = read(file, query)
     assert pytest.approx(round(geometry[geometry.columns[1]].min(), 3)) == expected_bottom
- 
+
 
 def test_read_bad_queries(file):
     """Querying data not available in the file must return an error"""
@@ -87,7 +87,7 @@ def test_read_bad_queries(file):
     with pytest.raises(DataNotFoundInFile) as excinfo:
         read(file, [QueryData("bad_topoid")])
     assert "bad_topoid" in str(excinfo.value)
- 
+
     # Bad reach name
     with pytest.raises(DataNotFoundInFile) as excinfo:
         read(file, [QueryData("topoid1", "bad_reach_name")])
