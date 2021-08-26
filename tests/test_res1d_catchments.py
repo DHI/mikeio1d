@@ -1,10 +1,9 @@
 import os
 import pytest
 import numpy as np
-import pandas as pd
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
-from mikeio1d.res1d import Res1D, mike1d_quantities, QueryDataCatchment
+from mikeio1d.res1d import Res1D, QueryDataCatchment
 from mikeio1d.dotnet import to_numpy
 
 
@@ -77,9 +76,10 @@ def test_get_catchment_values(test_file):
 
 def test_dotnet_methods(test_file):
     res1d = test_file
-    result_specs = res1d.data.ResultSpecs
-    catchments = res1d.data.Catchments
-    values = res1d.query.GetCatchmentValues("20_2_2", "TotalRunOff")
+    # Just try to access the properties and methods in .net
+    res1d.data.ResultSpecs
+    res1d.data.Catchments
+    res1d.query.GetCatchmentValues("20_2_2", "TotalRunOff")
 
 
 def test_res1d_filter(test_file_path):
@@ -91,5 +91,5 @@ def test_res1d_filter(test_file_path):
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
-    #with pytest.raises(Exception):
-    #    assert res1d.read(QueryDataCatchment("TotalRunOff", "100_16_16"))
+    # with pytest.raises(Exception):
+    #     assert res1d.read(QueryDataCatchment("TotalRunOff", "100_16_16"))

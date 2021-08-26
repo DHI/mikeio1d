@@ -1,18 +1,12 @@
 from collections import defaultdict, namedtuple
-from contextlib import contextmanager
 import functools
 
-import clr
 import os.path
 import pandas as pd
 
-clr.AddReference("DHI.Mike1D.CrossSectionModule")
 from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
-
-clr.AddReference("DHI.Mike1D.Generic")
 from DHI.Mike1D.Generic import Connection, Diagnostics, Location
 
-clr.AddReference("System")
 
 class BaseXns11Error(Exception):
     """Base class for Xns11 errors."""
@@ -29,7 +23,7 @@ class FileNotOpenedError(BaseXns11Error):
 def read(file_path, queries):
     """Read the requested data from the xns11 file and
     return a Pandas DataFrame.
-    
+
     Parameters
     ----------
     file_path: str
@@ -54,11 +48,11 @@ def open(file_path):
     ----------
     file_path: str
         full path and file name to the xns11 file.
-    
+
     Returns
     -------
     Xns11
-    
+
     Examples
     --------
     >>> with open("file.xns11") as x11:
@@ -77,10 +71,11 @@ def _not_closed(prop):
                 f"{prop.__name__} property."
             )
         return prop(self, *args, **kwargs)
-    return wrapper        
+    return wrapper
 
 
 class Xns11:
+
     def __init__(self, file_path=None):
         self.file_path = file_path
         self.file = None
@@ -116,7 +111,7 @@ class Xns11:
     def _topoids(self):
         if self.__topoids:
             return self.__topoids
-        return list(self.file.GetReachTopoIdEnumerable()) 
+        return list(self.file.GetReachTopoIdEnumerable())
 
     @property
     @_not_closed
@@ -144,8 +139,8 @@ class Xns11:
     def _topoid_in_reach(self, reach):
         """A list of the topo-ID contained in a reach."""
         return [
-            r.TopoId 
-            for r in list(self.file.GetReachTopoIdEnumerable()) 
+            r.TopoId
+            for r in list(self.file.GetReachTopoIdEnumerable())
             if reach.ReachId == r.ReachId
             ]
 
@@ -197,7 +192,7 @@ class Xns11:
                         # Look for the targeted reach
                         if q.reach_name != reach.ReachId:
                             continue
-                        # Raise an error if the combination reach and topo-id does not exist        
+                        # Raise an error if the combination reach and topo-id does not exist
                         topoid_names_in_reach = self._topoid_in_reach(self, reach)
                         if q.topoid_name not in topoid_names_in_reach:
                             raise DataNotFoundInFile(
@@ -243,7 +238,7 @@ class Xns11:
             q_topoid_name = q.topoid_name
             q_reach_name = q.reach_name
             for reach, reach_name in zip(self._reaches, self.reach_names):
-                if q_reach_name is not None: # When reach_name is set
+                if q_reach_name is not None:  # When reach_name is set
                     if reach_name != q_reach_name:
                         continue
                 topoid_in_reach = self._topoid_in_reach(self, reach)
@@ -262,9 +257,11 @@ class Xns11:
         return built_queries
 
     def _find_points(self, queries, chainage_tolerance=0.1):
-        """From a list of queries returns a dictionary with the required
+        """
+        From a list of queries returns a dictionary with the required
         information for each requested point to extract its geometry
-        later on."""
+        later on.
+        """
 
         PointInfo = namedtuple('PointInfo', ['index', 'value'])
 
@@ -274,14 +271,13 @@ class Xns11:
             for reach_idx, curr_reach in enumerate(self._reaches):
                 # Look for the targed reach and topo-id
                 if (
-                    q.reach_name != curr_reach.ReachId 
+                    q.reach_name != curr_reach.ReachId
                     or q.topoid_name != curr_reach.TopoId
                 ):
-                    continue    
+                    continue
                 reach_info = PointInfo(reach_idx, q.reach_name)
-                for topoid_reach_idx, topoid_reach in enumerate(
-                    self._topoid_in_reach(self, curr_reach)
-                    ):
+                topo_pair = self._topoid_in_reach(self, curr_reach)
+                for topoid_reach_idx, topoid_reach in enumerate(topo_pair):
                     if q.topoid_name != topoid_reach:
                         continue
                     topoid_info = PointInfo(topoid_reach_idx, topoid_reach)
@@ -323,7 +319,7 @@ class Xns11:
 class QueryData:
     """A query object that declares what data should be
     extracted from a .xns11 file.
-    
+
     Parameters
     ----------
     topoid_name: str
@@ -332,13 +328,13 @@ class QueryData:
         Reach name, consider all the reaches if None
     chainage: float, optional
         chainage, considers all the chainages if None
-    
+
     Examples
     --------
     `QueryData('topoid1', 'reach1', 10)` is a valid query.
     `QueryData('topoid1', 'reach1')` requests all the points
     for `topoid1` of `reach1`.
-    `QueryData('topoid1')` requests all the points for `topid1` 
+    `QueryData('topoid1')` requests all the points for `topid1`
     of the file.
     """
 
