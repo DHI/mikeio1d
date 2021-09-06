@@ -132,6 +132,7 @@ class Res1D:
         """ Get all time series values in given data_item. """
         name = data_set.Name if hasattr(data_set, "Name") else data_set.Id
         if data_item.IndexList is None:
+            name = "" if name is None else name
             col_name = col_name_delimiter.join([data_item.Quantity.Id, name])
             yield data_item.CreateTimeSeriesData(0), col_name
         else:
