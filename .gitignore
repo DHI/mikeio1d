@@ -128,4 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# SublimeText project
+project/
+
 tmp/

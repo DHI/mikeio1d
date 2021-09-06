@@ -1,7 +1,7 @@
 import datetime
 import numpy as np
 import ctypes
-import clr
+
 import System
 from System.Runtime.InteropServices import GCHandle, GCHandleType
 
@@ -49,19 +49,19 @@ def asNumpyArray(x):
     Parameters
     ----------
     x : System.Array
-        
+
     Returns
     -------
     np.ndarray
-        
+
     Notes
     -----
-    Given a CLR `System.Array` returns a `numpy.ndarray`.  See _MAP_NET_NP for 
+    Given a CLR `System.Array` returns a `numpy.ndarray`.  See _MAP_NET_NP for
     the mapping of CLR types to Numpy dtypes.
     """
     dims = np.empty(x.Rank, dtype=int)
-    for I in range(x.Rank):
-        dims[I] = x.GetLength(I)
+    for i in range(x.Rank):
+        dims[i] = x.GetLength(i)
     netType = x.GetType().GetElementType().Name
 
     try:
@@ -93,10 +93,10 @@ def to_dotnet_array(x):
     Returns
     -------
     System.Array
-        
+
     Notes
     -----
-    Given a `numpy.ndarray` returns a CLR `System.Array`.  See _MAP_NP_NET for 
+    Given a `numpy.ndarray` returns a CLR `System.Array`.  See _MAP_NP_NET for
     the mapping of Numpy dtypes to CLR types.
     """
     dims = x.shape
@@ -145,11 +145,11 @@ def to_numpy(src):
     Parameters
     ----------
     src : System.Array
-        
+
     Returns
     -------
     np.ndarray
-        
+
     """
 
     src_hndl = GCHandle.Alloc(src, GCHandleType.Pinned)
