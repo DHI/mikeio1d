@@ -38,6 +38,23 @@ class Res1D:
 
         self._load_file()
 
+    def __repr__(self):
+        out = ["<mikeio1d.Res1D>"]
+
+        if self.file_path:
+            out.append(f"Start time: {str(self.start_time)}")
+            out.append(f"End time: {str(self.end_time)}")
+            out.append(f"# Timesteps: {str(self.data.NumberOfTimeSteps)}")
+            out.append(f"# Catchments: {self.data.Catchments.get_Count()}")
+            out.append(f"# Nodes: {self.data.Nodes.get_Count()}")
+            out.append(f"# Reaches: {self.data.Reaches.get_Count()}")
+
+            out.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
+            for i, quantity in enumerate(self.data.Quantities):
+                out.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
+
+        return str.join("\n", out)
+
     #region File loading
 
     def _load_file(self):
