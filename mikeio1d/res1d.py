@@ -18,7 +18,8 @@ class Res1D:
                  put_chainage_in_col_name=True,
                  reaches=None,
                  nodes=None,
-                 catchments=None):
+                 catchments=None,
+                 header_load=False):
 
         self.file_path = file_path
         self._put_chainage_in_col_name = put_chainage_in_col_name
@@ -36,7 +37,9 @@ class Res1D:
         self._start_time = None
         self._end_time = None
 
-        self._load_file()
+        self._load_header()
+        if not header_load:
+            self._load_file()
 
     def __repr__(self):
         out = ["<mikeio1d.Res1D>"]
@@ -57,16 +60,23 @@ class Res1D:
 
     #region File loading
 
-    def _load_file(self):
+    def _load_header(self):
         if not os.path.exists(self.file_path):
             raise FileExistsError(f"File {self.file_path} does not exist.")
 
         self._data = ResultData()
         self._data.Connection = Connection.Create(self.file_path)
-        self._diagnostics = Diagnostics("Loading file")
+        self._diagnostics = Diagnostics("Loading header")
 
         if self._lazy_load:
             self._data.Connection.BridgeName = "res1dlazy"
+
+        if self._use_filter:
+            self._data.LoadHeader(True, self._diagnostics)
+        else:
+            self._data.LoadHeader(self._diagnostics)
+
+    def _load_file(self):
 
         if self._use_filter:
             self._setup_filter()
@@ -90,8 +100,6 @@ class Res1D:
         """
         if not self._use_filter:
             return
-
-        self._data.LoadHeader(True, self._diagnostics)
 
         self._data_filter = Filter()
         self._data_subfilter = DataItemFilterName(self._data)
@@ -119,6 +127,7 @@ class Res1D:
         queries: A single query or a list of queries.
         Default is None = reads all data.
         """
+
         if queries is None:
             return self.read_all()
 
