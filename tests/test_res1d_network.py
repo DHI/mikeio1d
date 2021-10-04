@@ -150,3 +150,12 @@ def test_res1d_filter(test_file_path):
     # with pytest.raises(Exception):
     #     assert res1d.read(QueryDataReach("WaterLevel", "100l1", 10))
     #     assert res1d.read(QueryDataNode("WaterLevel", "3"))
+
+
+def test_res1d_filter_readall(test_file_path):
+    # Make sure read all can be used with filters
+    nodes = ["1", "2"]
+    reaches = ["9l1"]
+    res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+
+    res1d.read()
