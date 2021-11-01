@@ -93,3 +93,11 @@ def test_res1d_filter(test_file_path):
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
     # with pytest.raises(Exception):
     #     assert res1d.read(QueryDataCatchment("TotalRunOff", "100_16_16"))
+
+
+def test_res1d_filter_readall(test_file_path):
+    # Make sure readall works with filters
+    catchments = ["20_2_2", "22_8_8"]
+    res1d = Res1D(test_file_path, catchments=catchments)
+
+    res1d.read()
