@@ -141,8 +141,15 @@ class Res1D:
 
     def read_all(self):
         """ Read all data from res1d file to dataframe. """
+
         df = pd.DataFrame(index=self.time_index)
         for data_set in self.data.DataSets:
+
+            # Skip filtered data sets
+            name = Res1D.get_data_set_name(data_set)
+            if self._use_filter and name not in self._catchments + self._reaches + self._nodes:
+                continue
+
             for data_item in data_set.DataItems:
                 for values, col_name in Res1D.get_values(
                     data_set, data_item, NAME_DELIMITER, self._put_chainage_in_col_name
@@ -156,7 +163,7 @@ class Res1D:
         data_set, data_item, col_name_delimiter=":", put_chainage_in_col_name=True
     ):
         """ Get all time series values in given data_item. """
-        name = data_set.Name if hasattr(data_set, "Name") else data_set.Id
+        name = Res1D.get_data_set_name(data_set)
         if data_item.IndexList is None:
             name = "" if name is None else name
             col_name = col_name_delimiter.join([data_item.Quantity.Id, name])
@@ -172,6 +179,7 @@ class Res1D:
                 col_name_i = col_name_delimiter.join(
                     [data_item.Quantity.Id, name, postfix]
                 )
+
                 yield data_item.CreateTimeSeriesData(i), col_name_i
 
     @property
@@ -347,6 +355,26 @@ class Res1D:
         """
         return self._data
 
+    @property
+    def catchments(self):
+        """ Catchments in res1d file. """
+        return {Res1D.get_data_set_name(catchment): catchment for catchment in self._data.Catchments}
+
+    @property
+    def reaches(self):
+        """ Reaches in res1d file. """
+        return {Res1D.get_data_set_name(reach): reach for reach in self._data.Reaches}
+
+    @property
+    def nodes(self):
+        """ Nodes in res1d file. """
+        return {Res1D.get_data_set_name(node): node for node in self._data.Nodes}
+
+    @property
+    def global_data(self):
+        """ Global data items in res1d file. """
+        return {Res1D.get_data_set_name(gdat): gdat for gdat in self._data.GlobalData.DataItems}
+
     def get_catchment_values(self, catchment_id, quantity):
         return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
 
@@ -368,3 +396,7 @@ class Res1D:
 
     def get_reach_sum_values(self, reach_name, quantity):
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
+
+    @staticmethod
+    def get_data_set_name(data_set):
+        return data_set.Name if hasattr(data_set, "Name") else data_set.Id
