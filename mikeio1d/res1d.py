@@ -133,16 +133,18 @@ class Res1D:
 
         queries = queries if isinstance(queries, list) else [queries]
 
-        df = pd.DataFrame(index=self.time_index)
+        dfs = []
         for query in queries:
+            df = pd.DataFrame(index=self.time_index)
             df[str(query)] = query.get_values(self)
+            dfs.append(df)
 
-        return df
+        return pd.concat(dfs, axis=1)
 
     def read_all(self):
         """ Read all data from res1d file to dataframe. """
 
-        df = pd.DataFrame(index=self.time_index)
+        dfs = []
         for data_set in self.data.DataSets:
 
             # Skip filtered data sets
@@ -154,9 +156,11 @@ class Res1D:
                 for values, col_name in Res1D.get_values(
                     data_set, data_item, NAME_DELIMITER, self._put_chainage_in_col_name
                 ):
+                    df = pd.DataFrame(index=self.time_index)
                     df[col_name] = values
+                    dfs.append(df)
 
-        return df.reindex(sorted(df.columns), axis=1)
+        return pd.concat(dfs, axis=1)
 
     @staticmethod
     def get_values(
