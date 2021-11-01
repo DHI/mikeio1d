@@ -36,3 +36,5 @@ clr.AddReference("System.Runtime.InteropServices")
 clr.AddReference("DHI.Mike1D.Generic")
 clr.AddReference("DHI.Mike1D.ResultDataAccess")
 clr.AddReference("DHI.Mike1D.CrossSectionModule")
+
+from .res1d import Res1D

@@ -18,7 +18,8 @@ class Res1D:
                  put_chainage_in_col_name=True,
                  reaches=None,
                  nodes=None,
-                 catchments=None):
+                 catchments=None,
+                 header_load=False):
 
         self.file_path = file_path
         self._put_chainage_in_col_name = put_chainage_in_col_name
@@ -36,20 +37,46 @@ class Res1D:
         self._start_time = None
         self._end_time = None
 
-        self._load_file()
+        self._load_header()
+        if not header_load:
+            self._load_file()
+
+    def __repr__(self):
+        out = ["<mikeio1d.Res1D>"]
+
+        if self.file_path:
+            out.append(f"Start time: {str(self.start_time)}")
+            out.append(f"End time: {str(self.end_time)}")
+            out.append(f"# Timesteps: {str(self.data.NumberOfTimeSteps)}")
+            out.append(f"# Catchments: {self.data.Catchments.get_Count()}")
+            out.append(f"# Nodes: {self.data.Nodes.get_Count()}")
+            out.append(f"# Reaches: {self.data.Reaches.get_Count()}")
+
+            out.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
+            for i, quantity in enumerate(self.data.Quantities):
+                out.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
+
+        return str.join("\n", out)
 
     #region File loading
 
-    def _load_file(self):
+    def _load_header(self):
         if not os.path.exists(self.file_path):
             raise FileExistsError(f"File {self.file_path} does not exist.")
 
         self._data = ResultData()
         self._data.Connection = Connection.Create(self.file_path)
-        self._diagnostics = Diagnostics("Loading file")
+        self._diagnostics = Diagnostics("Loading header")
 
         if self._lazy_load:
             self._data.Connection.BridgeName = "res1dlazy"
+
+        if self._use_filter:
+            self._data.LoadHeader(True, self._diagnostics)
+        else:
+            self._data.LoadHeader(self._diagnostics)
+
+    def _load_file(self):
 
         if self._use_filter:
             self._setup_filter()
@@ -73,8 +100,6 @@ class Res1D:
         """
         if not self._use_filter:
             return
-
-        self._data.LoadHeader(True, self._diagnostics)
 
         self._data_filter = Filter()
         self._data_subfilter = DataItemFilterName(self._data)
@@ -102,35 +127,47 @@ class Res1D:
         queries: A single query or a list of queries.
         Default is None = reads all data.
         """
+
         if queries is None:
             return self.read_all()
 
         queries = queries if isinstance(queries, list) else [queries]
 
-        df = pd.DataFrame(index=self.time_index)
+        dfs = []
         for query in queries:
+            df = pd.DataFrame(index=self.time_index)
             df[str(query)] = query.get_values(self)
+            dfs.append(df)
 
-        return df
+        return pd.concat(dfs, axis=1)
 
     def read_all(self):
         """ Read all data from res1d file to dataframe. """
-        df = pd.DataFrame(index=self.time_index)
+
+        dfs = []
         for data_set in self.data.DataSets:
+
+            # Skip filtered data sets
+            name = Res1D.get_data_set_name(data_set)
+            if self._use_filter and name not in self._catchments + self._reaches + self._nodes:
+                continue
+
             for data_item in data_set.DataItems:
                 for values, col_name in Res1D.get_values(
                     data_set, data_item, NAME_DELIMITER, self._put_chainage_in_col_name
                 ):
+                    df = pd.DataFrame(index=self.time_index)
                     df[col_name] = values
+                    dfs.append(df)
 
-        return df.reindex(sorted(df.columns), axis=1)
+        return pd.concat(dfs, axis=1)
 
     @staticmethod
     def get_values(
         data_set, data_item, col_name_delimiter=":", put_chainage_in_col_name=True
     ):
         """ Get all time series values in given data_item. """
-        name = data_set.Name if hasattr(data_set, "Name") else data_set.Id
+        name = Res1D.get_data_set_name(data_set)
         if data_item.IndexList is None:
             name = "" if name is None else name
             col_name = col_name_delimiter.join([data_item.Quantity.Id, name])
@@ -146,6 +183,7 @@ class Res1D:
                 col_name_i = col_name_delimiter.join(
                     [data_item.Quantity.Id, name, postfix]
                 )
+
                 yield data_item.CreateTimeSeriesData(i), col_name_i
 
     @property
@@ -321,6 +359,26 @@ class Res1D:
         """
         return self._data
 
+    @property
+    def catchments(self):
+        """ Catchments in res1d file. """
+        return {Res1D.get_data_set_name(catchment): catchment for catchment in self._data.Catchments}
+
+    @property
+    def reaches(self):
+        """ Reaches in res1d file. """
+        return {Res1D.get_data_set_name(reach): reach for reach in self._data.Reaches}
+
+    @property
+    def nodes(self):
+        """ Nodes in res1d file. """
+        return {Res1D.get_data_set_name(node): node for node in self._data.Nodes}
+
+    @property
+    def global_data(self):
+        """ Global data items in res1d file. """
+        return {Res1D.get_data_set_name(gdat): gdat for gdat in self._data.GlobalData.DataItems}
+
     def get_catchment_values(self, catchment_id, quantity):
         return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
 
@@ -342,3 +400,7 @@ class Res1D:
 
     def get_reach_sum_values(self, reach_name, quantity):
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
+
+    @staticmethod
+    def get_data_set_name(data_set):
+        return data_set.Name if hasattr(data_set, "Name") else data_set.Id
