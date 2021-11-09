@@ -7,6 +7,7 @@ setuptools.setup(
     name="mikeio1d",
     version="0.1.0",
     install_requires=[
+        "wheel", # used by pythonnet on 3.9 (no wheel for 3.9 https://pypi.org/project/pythonnet/#files)
         "pythonnet",
         "numpy",
         "pandas",
@@ -41,6 +42,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: Microsoft :: Windows",
         "Topic :: Scientific/Engineering",
     ],
