@@ -16,6 +16,12 @@ From PyPI:
 
 `pip install mikeio1d`
 
+For Python 3.9 one additional step is until pythonnet have a wheel available for 3.9
+
+`pip install wheel` # do this before you install mikeio1d
+
+`pip install mikeio1d`
+
 Or development version:
 
 `pip install https://github.com/DHI/mikeio1d/archive/main.zip`
