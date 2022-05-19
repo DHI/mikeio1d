@@ -1,4 +1,7 @@
 import setuptools
+from scripts.nuget_retriever import NuGetRetriever
+
+NuGetRetriever.install()
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
