@@ -15,14 +15,14 @@ class Res1D:
     def __init__(self,
                  file_path=None,
                  lazy_load=False,
-                 put_chainage_in_col_name=True,
+                 header_load=False,
                  reaches=None,
                  nodes=None,
                  catchments=None,
-                 header_load=False):
+                 col_name_delimiter=NAME_DELIMITER,
+                 put_chainage_in_col_name=True):
 
         self.file_path = file_path
-        self._put_chainage_in_col_name = put_chainage_in_col_name
         self._lazy_load = lazy_load
 
         self._reaches = reaches if reaches else []
@@ -37,9 +37,14 @@ class Res1D:
         self._start_time = None
         self._end_time = None
 
+        self._queries = []
+
         self._load_header()
         if not header_load:
             self._load_file()
+
+        self._col_name_delimiter = col_name_delimiter
+        self._put_chainage_in_col_name = put_chainage_in_col_name
 
     def __repr__(self):
         out = ["<mikeio1d.Res1D>"]
@@ -153,38 +158,46 @@ class Res1D:
                 continue
 
             for data_item in data_set.DataItems:
-                for values, col_name in Res1D.get_values(
-                    data_set, data_item, NAME_DELIMITER, self._put_chainage_in_col_name
-                ):
+                values_name_pair = self.get_values(data_set, data_item)
+
+                for values, col_name in values_name_pair:
                     df = pd.DataFrame(index=self.time_index)
                     df[col_name] = values
                     dfs.append(df)
 
         return pd.concat(dfs, axis=1)
 
-    @staticmethod
-    def get_values(
-        data_set, data_item, col_name_delimiter=":", put_chainage_in_col_name=True
-    ):
+    def get_values(self, data_set, data_item):
         """ Get all time series values in given data_item. """
-        name = Res1D.get_data_set_name(data_set)
         if data_item.IndexList is None:
-            name = "" if name is None else name
-            col_name = col_name_delimiter.join([data_item.Quantity.Id, name])
-            yield data_item.CreateTimeSeriesData(0), col_name
+            return self.get_scalar_value(data_set, data_item)
         else:
-            chainages = data_set.GetChainages(data_item)
-            for i in range(0, data_item.NumberOfElements):
-                if put_chainage_in_col_name:
-                    postfix = f"{chainages[i]:g}"
-                else:
-                    postfix = str(i)
+            return self.get_vector_values(data_set, data_item)
 
-                col_name_i = col_name_delimiter.join(
-                    [data_item.Quantity.Id, name, postfix]
-                )
+    def get_scalar_value(self, data_set, data_item):
+        name = Res1D.get_data_set_name(data_set)
+        quantity_id = data_item.Quantity.Id
+        col_name = self._col_name_delimiter.join([quantity_id, name])
+        element_index = 0
 
-                yield data_item.CreateTimeSeriesData(i), col_name_i
+        yield data_item.CreateTimeSeriesData(element_index), col_name
+
+    def get_vector_values(self, data_set, data_item):
+        name = Res1D.get_data_set_name(data_set)
+        chainages = data_set.GetChainages(data_item)
+
+        for i in range(data_item.NumberOfElements):
+            quantity_id = data_item.Quantity.Id
+            postfix = f"{chainages[i]:g}" if self._put_chainage_in_col_name else str(i)
+            col_name_i = self._col_name_delimiter.join([quantity_id, name, postfix])
+
+            yield data_item.CreateTimeSeriesData(i), col_name_i
+
+    @staticmethod
+    def get_data_set_name(data_set):
+        name = data_set.Name if hasattr(data_set, "Name") else data_set.Id
+        name = "" if name is None else name
+        return name
 
     @property
     def time_index(self):
@@ -218,144 +231,20 @@ class Res1D:
     @property
     def query(self):
         """
-        Object to use for querying the loaded res1d data.
-        Returns a C# ResultDataQuery object that has the following methods
-        //
-        // Summary:
-        //     Find element in dataItem that is closest to chainage
-        public int FindClosestElement(IRes1DReach reach, double chainage, IDataItem dataItem);
-        //
-        // Summary:
-        //     Find data item in dataSet which quantity matches the given quantityId.
-        //     Returns null if none found
-        public IDataItem FindDataItem(IRes1DDataSet dataSet, string quantityId);
-        //
-        // Summary:
-        //     Get time series values for quantityId of catchment with id catchmentId. If catchment
-        //     or quantity could not be found, null is returned.
-        public float[] GetCatchmentValues(string catchmentId, string quantityId);
-        //
-        // Summary:
-        //     Get result file datetimes.
-        public DateTime[] GetDateTimes();
-        //
-        // Summary:
-        //     Get result file datetimes as strings.
-        public string[] GetDateTimesAsStrings(string format = "u");
-        //
-        // Summary:
-        //     Get time series values for the node with the id nodeId and quantity with id quantityId.
-        //     If node or quantity could not be found, null is returned.
-        public float[] GetNodeValues(string nodeId, string quantityId);
-        //
-        // Summary:
-        //     Get time series values at the end of of the reach with name reachName and quantity
-        //     with id quantityId. If reach or quantity could not be found, null is returned.
-        public float[] GetReachEndValues(string reachName, string quantityId);
-        //
-        // Summary:
-        //     Get time series values at the start of of the reach with name reachName and quantity
-        //     with id quantityId. If reach or quantity could not be found, null is returned.
-        public float[] GetReachStartValues(string reachName, string quantityId);
-        //
-        // Summary:
-        //     Get time series values summing up quantity for all grid points in reach. This
-        //     is useful for quantities like water volumes.
-        public float[] GetReachSumValues(string reachName, string quantityId);
-        //
-        // Summary:
-        //     Get value at the element that is closest to chainage in reach with name reachName
-        //     and quantity with id quantityId, at time time, interpolated if required. If reach
-        //     or quantity could not be found, null is returned.
-        public float GetReachValue(string reachName, double chainage, string quantityId, DateTime time);
-        //
-        // Summary:
-        //     Get time series values at the element that is closest to chainage in reach with
-        //     name reachName and quantity with id quantityId. If reach or quantity could not
-        //     be found, null is returned.
-        public float[] GetReachValues(string reachName, double chainage, string quantityId);
+        .NET object ResultDataQuery to use for querying the loaded res1d data.
+
+        More information about ResultDataQuery class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
         """
         return self._query
 
     @property
     def data(self):
         """
-        Object with the loaded res1d data.
-        Returns a C# ResultData object that has the following methods:
-        // Summary:
-        //     Data coverage start
-        public DateTime StartTime { get; set; }
-        //
-        // Summary:
-        //     Data coverage end
-        public DateTime EndTime { get; set; }
-        //
-        // Summary:
-        //     Number of time steps
-        public int NumberOfTimeSteps { get; }
-        //
-        // Summary:
-        //     Time axis for the data.
-        public IListDateTimes TimesList { get; set; }
-        public ResultTypes ResultType { get; set; }
-        //
-        // Summary:
-        //     List of the contained quantities. Note: This is a derived property
-        public IQuantities Quantities { get; }
-        //
-        // Summary:
-        //     List of the contained quantities. Note: This is a derived property
-        public IListstrings StructureTypes { get; }
-        //
-        // Summary:
-        //     Get an iterator that iterates over all data items
-        public IEnumerable<IDataItem> DataItems { get; }
-        //
-        // Summary:
-        //     Get an iterator that iterates over all data sets
-        public IEnumerable<IRes1DDataSet> DataSets { get; }
-        //
-        // Summary:
-        //     List of nodes
-        public IRes1DNodes Nodes { get; set; }
-        //
-        // Summary:
-        //     Unit system of the simulation that produced the result data object.
-        //     When creating a result data object and storing: Properties of ResultData objects
-        //     (coordinates, bottom levels etc.) must always be set in SI units.
-        //     When loading a result data object from storage: The DHI.Mike1D.ResultDataAccess.IResultDataParameters.UnitSystem
-        //     and DHI.Mike1D.ResultDataAccess.IResultDataParameters.ConvertGeometry can be
-        //     used to change units of data and properties in the Result Data object. This property
-        //     will maintain the original value and will not be changed by updating the DHI.Mike1D.ResultDataAccess.IResultDataParameters
-        public UnitSystem UnitSystem { get; set; }
-        //
-        // Summary:
-        //     List of branches
-        public IRes1DReaches Reaches { get; set; }
-        //
-        // Summary:
-        //     Global data. Valid for entire network
-        public IRes1DGlobalData GlobalData { get; set; }
-        //
-        // Summary:
-        //     Static data on the network.
-        //     Used for user defined markers from MIKE 11 and Critical Levels in MU.
-        public IList<INetworkDataDouble> NetworkDatas { get; }
-        public float DeleteValue { get; set; }
-        public double SecondsBetweenFileFlush { get; set; }
-        //
-        // Summary:
-        //     Result specification
-        public ResultSpecification ResultSpecs { get; set; }
-        public LoadStatus LoadStatus { get; }
-        //
-        // Summary:
-        //     List of catchments
-        public IRes1DCatchments Catchments { get; set; }
-        //
-        // Summary:
-        //     A WKT string for a spatial reference system.
-        public string ProjectionString { get; set; }
+        .NET object ResultData with the loaded res1d data.
+
+        More information about ResultData class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm
         """
         return self._data
 
@@ -379,6 +268,8 @@ class Res1D:
         """ Global data items in res1d file. """
         return {Res1D.get_data_set_name(gdat): gdat for gdat in self._data.GlobalData.DataItems}
 
+    #region Query wrappers
+
     def get_catchment_values(self, catchment_id, quantity):
         return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
 
@@ -401,6 +292,4 @@ class Res1D:
     def get_reach_sum_values(self, reach_name, quantity):
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
 
-    @staticmethod
-    def get_data_set_name(data_set):
-        return data_set.Name if hasattr(data_set, "Name") else data_set.Id
+    #endregion Query wrapper

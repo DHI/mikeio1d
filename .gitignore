@@ -16,8 +16,10 @@ eggs/
 .eggs/
 lib/
 lib64/
+nuget/
 parts/
 sdist/
+tmp/
 var/
 wheels/
 pip-wheel-metadata/
@@ -131,4 +133,8 @@ dmypy.json
 # SublimeText project
 project/
 
-tmp/
+# mikeio1d/bin folder
+mikeio1d/bin/*.dll
+mikeio1d/bin/*.pfs
+mikeio1d/bin/*.ubg
+mikeio1d/bin/*.xml

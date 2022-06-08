@@ -1,4 +1,12 @@
 import setuptools
+from scripts.nuget_retriever import NuGetRetriever
+
+# Try to download NuGet packages if the download script is present
+try:
+    from scripts.nuget_retriever import NuGetRetriever
+    NuGetRetriever.install()
+except:
+    print("NuGetRetriever not found: packages are not downloaded.")
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
