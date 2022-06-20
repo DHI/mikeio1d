@@ -13,9 +13,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.1.0",
+    version="0.2.0",
     install_requires=[
-        "pythonnet",
+        "pythonnet>=3.0.0a2",
         "numpy",
         "pandas",
     ],
@@ -33,7 +33,6 @@ setuptools.setup(
     author="Henrik Andersson",
     author_email="jan@dhigroup.com",
     description="A package that uses the DHI MIKE1D .NET libraries to read res1d and xns11 files.",
-    platform="windows_x64",
     license="MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -49,6 +48,8 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: Microsoft :: Windows",
         "Topic :: Scientific/Engineering",
     ],
