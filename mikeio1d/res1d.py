@@ -1,13 +1,28 @@
 import os.path
 import pandas as pd
 
-from .dotnet import from_dotnet_datetime, to_numpy, to_dotnet_datetime
-from .query import QueryData, QueryDataCatchment, QueryDataNode, QueryDataReach
-from .various import mike1d_quantities, NAME_DELIMITER
+from .dotnet import from_dotnet_datetime
+from .dotnet import to_dotnet_datetime
+from .dotnet import to_numpy
+from .dotnet import pythonnet_implementation as impl
+
+from .query import QueryData
+from .query import QueryDataCatchment
+from .query import QueryDataNode
+from .query import QueryDataReach
+
+from .various import mike1d_quantities
+from .various import NAME_DELIMITER
 
 from System import DateTime
-from DHI.Mike1D.ResultDataAccess import ResultData, ResultDataQuery, Filter, DataItemFilterName
-from DHI.Mike1D.Generic import Connection, Diagnostics
+
+from DHI.Mike1D.ResultDataAccess import ResultData
+from DHI.Mike1D.ResultDataAccess import ResultDataQuery
+from DHI.Mike1D.ResultDataAccess import Filter
+from DHI.Mike1D.ResultDataAccess import DataItemFilterName
+
+from DHI.Mike1D.Generic import Connection
+from DHI.Mike1D.Generic import Diagnostics
 
 
 class Res1D:
@@ -152,6 +167,8 @@ class Res1D:
         dfs = []
         for data_set in self.data.DataSets:
 
+            data_set = impl(data_set)
+
             # Skip filtered data sets
             name = Res1D.get_data_set_name(data_set)
             if self._use_filter and name not in self._catchments + self._reaches + self._nodes:
@@ -251,22 +268,22 @@ class Res1D:
     @property
     def catchments(self):
         """ Catchments in res1d file. """
-        return {Res1D.get_data_set_name(catchment): catchment for catchment in self._data.Catchments}
+        return { Res1D.get_data_set_name(catchment): impl(catchment) for catchment in self._data.Catchments }
 
     @property
     def reaches(self):
         """ Reaches in res1d file. """
-        return {Res1D.get_data_set_name(reach): reach for reach in self._data.Reaches}
+        return { Res1D.get_data_set_name(reach): impl(reach) for reach in self._data.Reaches }
 
     @property
     def nodes(self):
         """ Nodes in res1d file. """
-        return {Res1D.get_data_set_name(node): node for node in self._data.Nodes}
+        return { Res1D.get_data_set_name(node): impl(node) for node in self._data.Nodes }
 
     @property
     def global_data(self):
         """ Global data items in res1d file. """
-        return {Res1D.get_data_set_name(gdat): gdat for gdat in self._data.GlobalData.DataItems}
+        return { Res1D.get_data_set_name(gdat): impl(gdat) for gdat in self._data.GlobalData.DataItems }
 
     #region Query wrappers
 
