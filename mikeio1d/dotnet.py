@@ -163,3 +163,23 @@ def to_numpy(src):
             src_hndl.Free()
 
     return d
+
+
+def pythonnet_implementation(clr_object):
+    """
+    Retrieve actual .NET object implementation.
+    Relevant for pythonnet versions 3.0 and above.
+
+    Parameters
+    ----------
+    clr_object : Common Language Runtime (CLR) object
+
+    Returns
+    -------
+    CLR object having the type of the actual implementation of the object
+
+    """
+    if hasattr(clr_object, '__implementation__'):
+        return clr_object.__implementation__
+
+    return clr_object

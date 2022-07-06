@@ -35,7 +35,7 @@ class NuGetRetriever:
     bin_dir_name = r'mikeio1d\bin'
 
     # Default version of DHI NuGet packages to retrieve
-    version_default = '20.0.0'
+    version_default = '20.1.0'
 
     # DHI NuGet packages to install
     package_names = [
@@ -49,10 +49,13 @@ class NuGetRetriever:
         'DHI.Mike1D.HDParameterDataAccess',
         'DHI.Mike1D.Generic',
         'DHI.Mike1D.ResultDataAccess',
+        'GeoAPI',
     ]
 
+    version_map = { 'GeoAPI': '1.7.4' }
+
     # Builds to include
-    include_builds = ['netstandard2.0', 'net47', 'win-x64']
+    include_builds = ['netstandard2.0', 'net45', 'net47', 'win-x64']
 
     # Files with these extensions copy
     extensions = ['*.dll', '*.pfs', '*.ubg', '*.xml']
@@ -74,10 +77,11 @@ class NuGetRetriever:
             os.mkdir(path)
 
     def generate_package_infos(self):
-        version, path = self.version, self.path
+        path = self.path
         package_infos = []
 
         for package_name in self.package_names:
+            version = self.version_map.get(package_name, self.version)
             package_info = NuGetPackageInfo(package_name, version, path)
             package_infos.append(package_info)
 
