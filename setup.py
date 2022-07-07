@@ -15,7 +15,8 @@ setuptools.setup(
     name="mikeio1d",
     version="0.2.0",
     install_requires=[
-        "pythonnet>=3.0.0a2",
+        'pythonnet<=2.5.2; python_version < "3.9.0"',
+        'pythonnet>=3.0.0a2; python_version >= "3.9.0"',
         "numpy",
         "pandas",
     ],
