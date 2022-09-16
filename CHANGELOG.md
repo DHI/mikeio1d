@@ -24,7 +24,7 @@
 
 - .NET and native DHI libraries from source control
 
-## [1.0] - 2021-05-05
+## [0.1] - 2021-05-05
 
 ### Added
 
