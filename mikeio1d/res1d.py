@@ -1,5 +1,6 @@
 import os.path
 import pandas as pd
+import datetime
 
 from .dotnet import from_dotnet_datetime
 from .dotnet import to_dotnet_datetime
@@ -20,6 +21,7 @@ from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
 from DHI.Mike1D.ResultDataAccess import Filter
 from DHI.Mike1D.ResultDataAccess import DataItemFilterName
+from DHI.Mike1D.ResultDataAccess import ResultTypes
 
 from DHI.Mike1D.Generic import Connection
 from DHI.Mike1D.Generic import Diagnostics
@@ -136,6 +138,11 @@ class Res1D:
     def _add_catchment(self, catchment_id):
         self._data_subfilter.Catchments.Add(catchment_id)
 
+    def _is_lts_result_file(self):
+        # For pythonnet version > 3.0 it is possible to call
+        # return self._data.ResultType.Equals(ResultTypes.LTSEvents)
+        return int(self._data.ResultType) == int(ResultTypes.LTSEvents)
+
     #endregion File loading
 
     def read(self, queries=None):
@@ -159,7 +166,9 @@ class Res1D:
             df[str(query)] = query.get_values(self)
             dfs.append(df)
 
-        return pd.concat(dfs, axis=1)
+        df = pd.concat(dfs, axis=1)
+        self._update_time_quantities(df)
+        return df
 
     def read_all(self):
         """ Read all data from res1d file to dataframe. """
@@ -182,7 +191,21 @@ class Res1D:
                     df[col_name] = values
                     dfs.append(df)
 
-        return pd.concat(dfs, axis=1)
+        df = pd.concat(dfs, axis=1)
+        self._update_time_quantities(df)
+        return df
+
+    def _update_time_quantities(self, df):
+        if not self._is_lts_result_file():
+            return
+
+        simulation_start = from_dotnet_datetime(self._data.StartTime)
+        for label in df:
+            time_suffix = f'Time{self._col_name_delimiter}'
+            if time_suffix in label:
+                seconds_after_simulation_start_array = df[label].to_numpy()
+                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
+                df[label] = times
 
     def get_values(self, data_set, data_item):
         """ Get all time series values in given data_item. """
@@ -222,8 +245,24 @@ class Res1D:
         if self._time_index is not None:
             return self._time_index
 
+        if self._is_lts_result_file():
+            return self.lts_event_index
+
         time_stamps = [from_dotnet_datetime(t) for t in self.data.TimesList]
         self._time_index = pd.DatetimeIndex(time_stamps)
+        return self._time_index
+
+    @property
+    def lts_event_index(self):
+        """ pandas.DatetimeIndex of the LTS event index. """
+        if self._time_index is not None:
+            return self._time_index
+
+        number_of_event_entries = len(self._data.TimesList)
+        event_index = [i for i in range(number_of_event_entries)]
+
+        self._time_index = pd.Index(event_index)
+
         return self._time_index
 
     @property
@@ -297,6 +336,9 @@ class Res1D:
         return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
+        if self._is_lts_result_file():
+            raise NotImplementedError('The method is not implemented for LTS event statistics.')
+
         time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
         return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
 
