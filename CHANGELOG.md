@@ -10,11 +10,12 @@
 - More detailed information about result files in __repr__
 - Dictionaries containing catchment, node, reach, and global result item classes
 - Support for reading SWMM and EPANET result files by upgrading to MIKE 1D v20.1.0
+- Support for reading LTS result files
 
 ### Changed
 
 - Use MIKE 1D NuGet packages v20.1.0
-- Use pythonnet v3.0.0a2
+- Use pythonnet v3.0.1
 
 ### Fixed
 
