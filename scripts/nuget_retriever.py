@@ -54,9 +54,10 @@ class NuGetRetriever:
         'DHI.Mike1D.Generic',
         'DHI.Mike1D.ResultDataAccess',
         'GeoAPI',
+        'NetTopologySuite',
     ]
 
-    version_map = { 'GeoAPI': '1.7.4' }
+    version_map = { 'GeoAPI': '1.7.4', 'NetTopologySuite': '1.14.0' }
 
     # Builds to include
     include_builds = ['netstandard2.0', 'net45', 'net47', 'win-x64']
