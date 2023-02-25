@@ -83,7 +83,13 @@ class QueryDataReach(QueryData):
     def get_values(self, res1d):
         self._check_invalid_quantity(res1d)
 
-        values = res1d.query.GetReachValues(self._name, self._chainage, self._quantity)
+        name = self._name
+        chainage = self._chainage
+        quantity = self._quantity
+
+        values = ( res1d.query.GetReachValues(name, chainage, quantity)
+                   if chainage is not None else
+                   res1d.query.GetReachStartValues(name, quantity) )
 
         self._check_invalid_values(values)
 
@@ -94,7 +100,13 @@ class QueryDataReach(QueryData):
         return self._chainage
 
     def __repr__(self):
-        return NAME_DELIMITER.join([self._quantity, self._name, f"{self._chainage:g}"])
+        name = self._name
+        chainage = self._chainage
+        quantity = self._quantity
+
+        return ( NAME_DELIMITER.join([quantity, name, f'{chainage:g}'])
+                 if chainage is not None else
+                 NAME_DELIMITER.join([quantity, name]) )
 
 
 class QueryDataNode(QueryData):
