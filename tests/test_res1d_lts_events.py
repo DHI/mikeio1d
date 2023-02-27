@@ -17,7 +17,7 @@ def test_file_path():
 
 @pytest.fixture(params=[False])
 def test_file(test_file_path, request):
-    return Res1D(test_file_path, request.param)
+    return Res1D(test_file_path, lazy_load=request.param)
 
 
 def test_file_does_not_exist():

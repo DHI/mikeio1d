@@ -10,29 +10,28 @@ from mikeio1d.dotnet import to_numpy
 @pytest.fixture
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
-    # File taken from TestSuite: RainfallRunoff\SWQ\DemoSWQ1BaseMixedRRAD.res1d
-    return os.path.join(test_folder_path, "testdata", "Catchments.res1d")
+    return os.path.join(test_folder_path, "testdata", "Swmm.out")
 
 
-@pytest.fixture(params=[True, False])
+@pytest.fixture(params=[False])
 def test_file(test_file_path, request):
     return Res1D(test_file_path, lazy_load=request.param)
 
 
 def test_read(test_file):
     df = test_file.read()
-    assert len(df) == 108
+    assert len(df) == 36
 
 
 def test_quantities(test_file):
     quantities = test_file.quantities
-    assert len(quantities) == 5
+    assert len(quantities) == 36
 
 
 @pytest.mark.parametrize("query,expected", [
-    (QueryDataCatchment("TotalRunOff", "20_2_2"), True),
-    (QueryDataCatchment("ZinkRR", "22_8_8"), True),
-    (QueryDataCatchment("TotalRunOff", "wrong_catchment_name"), False)
+    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"), True),
+    (QueryDataCatchment("SWMM_SUBCATCH_EVAP", "6"), True),
+    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "wrong_catchment_name"), False)
 ])
 def test_valid_catchment_data_queries(test_file, query, expected):
     res1d = test_file
@@ -50,8 +49,8 @@ def test_valid_catchment_data_queries(test_file, query, expected):
 
 
 @pytest.mark.parametrize("query,expected_max", [
-    (QueryDataCatchment("TotalRunOff", "20_2_2"), 0.236),
-    (QueryDataCatchment("TotalRunOff", "22_8_8"), 0.231)
+    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"), 6.562),
+    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"), 1.495)
 ])
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
@@ -59,8 +58,8 @@ def test_read_reach_with_queries(test_file, query, expected_max):
 
 
 @pytest.mark.parametrize("quantity,catchment_id,expected_max", [
-    ("TotalRunoff", "20_2_2", 0.236),
-    ("TotalRunoff", "22_8_8", 0.231)
+    ("SWMM_SUBCATCH_RUNOFF", "5", 6.562),
+    ("SWMM_SUBCATCH_RUNOFF", "6", 1.495)
 ])
 def test_read_catchment(test_file, quantity, catchment_id, expected_max):
     data = test_file.query.GetCatchmentValues(catchment_id, quantity)
@@ -71,7 +70,7 @@ def test_read_catchment(test_file, quantity, catchment_id, expected_max):
 
 
 def test_time_index(test_file):
-    assert len(test_file.time_index) == 108
+    assert len(test_file.time_index) == 36
 
 
 def test_start_time(test_file):
@@ -79,8 +78,8 @@ def test_start_time(test_file):
 
 
 def test_get_catchment_values(test_file):
-    values = test_file.get_catchment_values("20_2_2", "TotalRunOff")
-    assert len(values) == 108
+    values = test_file.get_catchment_values("5", "SWMM_SUBCATCH_RUNOFF")
+    assert len(values) == 36
 
 
 def test_dotnet_methods(test_file):
@@ -88,25 +87,26 @@ def test_dotnet_methods(test_file):
     # Just try to access the properties and methods in .net
     res1d.data.ResultSpecs
     res1d.data.Catchments
-    res1d.query.GetCatchmentValues("20_2_2", "TotalRunOff")
+    res1d.query.GetCatchmentValues("5", "SWMM_SUBCATCH_RUNOFF")
 
 
 def test_res1d_filter(test_file_path):
-    catchments = ["20_2_2", "22_8_8"]
+    catchments = ["5", "6"]
     res1d = Res1D(test_file_path, catchments=catchments)
 
-    res1d.read(QueryDataCatchment("TotalRunOff", "20_2_2"))
-    res1d.read(QueryDataCatchment("TotalRunOff", "22_8_8"))
+    res1d.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"))
+    res1d.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"))
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
     # with pytest.raises(Exception):
-    #     assert res1d.read(QueryDataCatchment("TotalRunOff", "100_16_16"))
+    #     assert res1d.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "10xyz"))
 
 
 def test_res1d_filter_readall(test_file_path):
     # Make sure readall works with filters
-    catchments = ["20_2_2", "22_8_8"]
+    catchments = ["5", "6"]
     res1d = Res1D(test_file_path, catchments=catchments)
 
-    res1d.read()
+    # Does not work on MIKE 1D side, giving System.NullReferenceException
+    # >>> res1d.read()
