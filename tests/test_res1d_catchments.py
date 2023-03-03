@@ -29,6 +29,35 @@ def test_quantities(test_file):
     assert len(quantities) == 5
 
 
+def test_repr(test_file):
+    res1d = test_file
+    res1d_repr = res1d.__repr__()
+    res1d_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 1994-08-07 16:35:00\n' +
+        'End time: 1994-08-07 18:35:00\n'
+        '# Timesteps: 108\n' +
+        '# Catchments: 31\n' +
+        '# Nodes: 0\n' +
+        '# Reaches: 0\n' +
+        '# Globals: 0\n' +
+        '0 - TotalRunOff <m^3/s>\n' +
+        '1 - ActualRainfall <m/s>\n' +
+        '2 - ZinkLoadRR <kg/s>\n' +
+        '3 - ZinkMassAccumulatedRR <kg>\n' +
+        '4 - ZinkRR <mg/l>'
+    )
+    assert res1d_repr == res1d_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    res1d = test_file
+    assert len(res1d.catchments) == 31
+    assert len(res1d.nodes) == 0
+    assert len(res1d.reaches) == 0
+    assert len(res1d.global_data) == 0
+
+
 @pytest.mark.parametrize("query,expected", [
     (QueryDataCatchment("TotalRunOff", "20_2_2"), True),
     (QueryDataCatchment("ZinkRR", "22_8_8"), True),

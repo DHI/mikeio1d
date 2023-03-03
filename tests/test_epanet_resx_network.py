@@ -30,6 +30,35 @@ def test_quantities(test_file):
     assert len(quantities) == 5
 
 
+def test_repr(test_file):
+    epanet_resx = test_file
+    epanet_resx_repr = epanet_resx.__repr__()
+    epanet_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 2022-10-13 00:00:00\n' +
+        'End time: 2022-10-14 00:00:00\n'
+        '# Timesteps: 25\n' +
+        '# Catchments: 0\n' +
+        '# Nodes: 2\n' +
+        '# Reaches: 1\n' +
+        '# Globals: 0\n' +
+        '0 - Volume <m^3>\n' +
+        '1 - Volume Percentage <%>\n' +
+        '2 - Pump efficiency <%>\n' +
+        '3 - Pump energy costs </kWh>\n' +
+        '4 - Pump energy <kW>'
+    )
+    assert epanet_resx_repr == epanet_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    epanet_resx = test_file
+    assert len(epanet_resx.catchments) == 0
+    assert len(epanet_resx.nodes) == 2
+    assert len(epanet_resx.reaches) == 1
+    assert len(epanet_resx.global_data) == 0
+
+
 @pytest.mark.parametrize("query,expected", [
     (QueryDataReach("Pump energy", "9"), True),
     (QueryDataReach("Pump energy", "10xyz"), False),

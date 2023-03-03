@@ -11,7 +11,7 @@ from mikeio1d.dotnet import to_numpy
 @pytest.fixture
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
-    # Original file name was Exam6Base.epanet_res
+    # Original file name was Exam6Base.swmm_out
     return os.path.join(test_folder_path, "testdata", "Swmm.out")
 
 
@@ -30,23 +30,83 @@ def test_quantities(test_file):
     assert len(quantities) == 36
 
 
+def test_repr(test_file):
+    swmm_out = test_file
+    swmm_out_repr = swmm_out.__repr__()
+    swmm_out_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 1998-01-01 01:00:00\n' +
+        'End time: 1998-01-02 12:00:00\n'
+        '# Timesteps: 36\n' +
+        '# Catchments: 8\n' +
+        '# Nodes: 14\n' +
+        '# Reaches: 13\n' +
+        '# Globals: 15\n' +
+        '0 - SWMM_NODE_DEPTH <ft>\n' +
+        '1 - SWMM_NODE_HEAD <ft>\n' +
+        '2 - SWMM_NODE_VOLUME <ft^3>\n' +
+        '3 - SWMM_NODE_LATFLOW <ft^3/s>\n' +
+        '4 - SWMM_NODE_INFLOW <ft^3/s>\n' +
+        '5 - SWMM_NODE_OVERFLOW <ft^3/s>\n' +
+        '6 - SWMM_NODE_QUAL <mu-g/l>\n' +
+        '7 - SWMM_LINK_FLOW <ft^3/s>\n' +
+        '8 - SWMM_LINK_DEPTH <ft>\n' +
+        '9 - SWMM_LINK_VELOCITY <ft/s>\n' +
+        '10 - SWMM_LINK_Froude_Number <()>\n' +
+        '11 - SWMM_LINK_CAPACITY <()>\n' +
+        '12 - SWMM_LINK_QUAL <mu-g/l>\n' +
+        '13 - SWMM_SUBCATCH_RAINFALL <in/h>\n' +
+        '14 - SWMM_SUBCATCH_SNOWDEPTH <in>\n' +
+        '15 - SWMM_SUBCATCH_EVAP <in>\n' +
+        '16 - SWMM_SUBCATCH_INFIL <in/h>\n' +
+        '17 - SWMM_SUBCATCH_RUNOFF <ft^3/s>\n' +
+        '18 - SWMM_SUBCATCH_GW_FLOW <ft^3/s>\n' +
+        '19 - SWMM_SUBCATCH_GW_ELEV <ft>\n' +
+        '20 - SWMM_SUBCATCH_SOIL_MOIST <()>\n' +
+        '21 - SWMM_SUBCATCH_WASHOFF <mu-g/l>\n' +
+        '22 - SWMM_SYS_TEMPERATURE <deg F>\n' +
+        '23 - SWMM_SYS_RAINFALL <in/h>\n' +
+        '24 - SWMM_SYS_SNOWDEPTH <in>\n' +
+        '25 - SWMM_SYS_INFIL <in/h>\n' +
+        '26 - SWMM_SYS_RUNOFF <ft^3/s>\n' +
+        '27 - SWMM_SYS_DWFLOW <ft^3/s>\n' +
+        '28 - SWMM_SYS_GWFLOW <ft^3/s>\n' +
+        '29 - SWMM_SYS_INFLOW <ft^3/s>\n' +
+        '30 - SWMM_SYS_EXFLOW <ft^3/s>\n' +
+        '31 - SWMM_SYS_FLOODING <ft^3/s>\n' +
+        '32 - SWMM_SYS_OUTFLOW <ft^3/s>\n' +
+        '33 - SWMM_SYS_STORAGE <ft^3>\n' +
+        '34 - SWMM_SYS_EVAP <->\n' +
+        '35 - SWMM_SYS_PET <->'
+    )
+    assert swmm_out_repr == swmm_out_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    swmm_out = test_file
+    assert len(swmm_out.catchments) == 8
+    assert len(swmm_out.nodes) == 14
+    assert len(swmm_out.reaches) == 13
+    assert len(swmm_out.global_data) == 14
+
+
 @pytest.mark.parametrize("query,expected", [
     (QueryDataReach("SWMM_LINK_FLOW", "10"), True),
     (QueryDataReach("SWMM_LINK_FLOW", "10xyz"), False),
     (QueryDataReach("SWMM_LINK_FLOW", "wrong_reach_name"), False)
 ])
 def test_valid_reach_data_queries(test_file, query, expected):
-    epanet_res = test_file
+    swmm_out = test_file
 
     with pytest.raises(InvalidQuantity):
         invalid_query = QueryDataReach("InvalidQuantity", "10")
-        assert epanet_res.read(invalid_query)
+        assert swmm_out.read(invalid_query)
 
     if expected:
-        epanet_res.read(query)
+        swmm_out.read(query)
     else:
         with pytest.raises(Exception):
-            assert epanet_res.read(query)
+            assert swmm_out.read(query)
 
 
 @pytest.mark.parametrize("query,expected_max", [
@@ -119,43 +179,43 @@ def test_get_reach_value(test_file):
 
 
 def test_dotnet_methods(test_file):
-    epanet_res = test_file
-    epanet_res.data.ResultSpecs
-    epanet_res.data.Nodes
+    swmm_out = test_file
+    swmm_out.data.ResultSpecs
+    swmm_out.data.Nodes
 
-    assert pytest.approx(0.003947457) == epanet_res.query.GetNodeValues("9", "SWMM_NODE_DEPTH")[20]
+    assert pytest.approx(0.003947457) == swmm_out.query.GetNodeValues("9", "SWMM_NODE_DEPTH")[20]
 
     # Does not work from MIKE 1D side.
-    # >>> epanet_res.query.GetReachValue("10", 0, "SWMM_LINK_FLOW", epanet_res.data.StartTime)
-    # >>> epanet_res.query.GetReachValues("10", 0, "SWMM_LINK_FLOW")
+    # >>> swmm_out.query.GetReachValue("10", 0, "SWMM_LINK_FLOW", swmm_out.data.StartTime)
+    # >>> swmm_out.query.GetReachValues("10", 0, "SWMM_LINK_FLOW")
 
-    assert pytest.approx(0.000736411) == epanet_res.query.GetReachEndValues("10", "SWMM_LINK_FLOW")[20]
-    assert pytest.approx(0.000736411) == epanet_res.query.GetReachStartValues("10", "SWMM_LINK_FLOW")[20]
-    assert pytest.approx(0.000736411) == epanet_res.query.GetReachSumValues("10", "SWMM_LINK_FLOW")[20]
+    assert pytest.approx(0.000736411) == swmm_out.query.GetReachEndValues("10", "SWMM_LINK_FLOW")[20]
+    assert pytest.approx(0.000736411) == swmm_out.query.GetReachStartValues("10", "SWMM_LINK_FLOW")[20]
+    assert pytest.approx(0.000736411) == swmm_out.query.GetReachSumValues("10", "SWMM_LINK_FLOW")[20]
 
 
-def test_epanet_res_filter(test_file_path):
+def test_swmm_out_filter(test_file_path):
     nodes = ["9", "10"]
     reaches = ["10"]
-    epanet_res = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    swmm_out = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
-    epanet_res.read(QueryDataReach("SWMM_LINK_FLOW", "10"))
-    epanet_res.read(QueryDataNode("SWMM_NODE_DEPTH", "9"))
-    epanet_res.read(QueryDataNode("SWMM_NODE_DEPTH", "10"))
+    swmm_out.read(QueryDataReach("SWMM_LINK_FLOW", "10"))
+    swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "9"))
+    swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "10"))
 
     # Currently Mike1D raises System.ArgumentOutOfRangeException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
     with pytest.raises(Exception):
-        assert epanet_res.read(QueryDataReach("SWMM_LINK_FLOW", "10xyz"))
+        assert swmm_out.read(QueryDataReach("SWMM_LINK_FLOW", "10xyz"))
 
     with pytest.raises(NoDataForQuery):
-        assert epanet_res.read(QueryDataNode("SWMM_NODE_DEPTH", "10xyz"))
+        assert swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "10xyz"))
 
 
-def test_epanet_res_filter_readall(test_file_path):
+def test_swmm_out_filter_readall(test_file_path):
     # Make sure read all can be used with filters
     nodes = ["9", "10"]
     reaches = ["10"]
-    epanet_res = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    swmm_out = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
-    epanet_res.read()
+    swmm_out.read()

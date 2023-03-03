@@ -34,17 +34,17 @@ def test_quantities(test_file):
     (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "wrong_catchment_name"), False)
 ])
 def test_valid_catchment_data_queries(test_file, query, expected):
-    res1d = test_file
+    swmm_out = test_file
 
     with pytest.raises(InvalidQuantity):
         invalid_query = QueryDataCatchment("InvalidQuantity", "20_2_2")
-        assert res1d.read(invalid_query)
+        assert swmm_out.read(invalid_query)
 
     if expected:
-        res1d.read(query)
+        swmm_out.read(query)
     else:
         with pytest.raises(NoDataForQuery):
-            assert res1d.read(query)
+            assert swmm_out.read(query)
         pass
 
 
@@ -83,30 +83,30 @@ def test_get_catchment_values(test_file):
 
 
 def test_dotnet_methods(test_file):
-    res1d = test_file
+    swmm_out = test_file
     # Just try to access the properties and methods in .net
-    res1d.data.ResultSpecs
-    res1d.data.Catchments
-    res1d.query.GetCatchmentValues("5", "SWMM_SUBCATCH_RUNOFF")
+    swmm_out.data.ResultSpecs
+    swmm_out.data.Catchments
+    swmm_out.query.GetCatchmentValues("5", "SWMM_SUBCATCH_RUNOFF")
 
 
-def test_res1d_filter(test_file_path):
+def test_swmm_out_filter(test_file_path):
     catchments = ["5", "6"]
-    res1d = Res1D(test_file_path, catchments=catchments)
+    swmm_out = Res1D(test_file_path, catchments=catchments)
 
-    res1d.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"))
-    res1d.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"))
+    swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"))
+    swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"))
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
     # with pytest.raises(Exception):
-    #     assert res1d.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "10xyz"))
+    #     assert swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "10xyz"))
 
 
-def test_res1d_filter_readall(test_file_path):
+def test_swmm_out_filter_readall(test_file_path):
     # Make sure readall works with filters
     catchments = ["5", "6"]
-    res1d = Res1D(test_file_path, catchments=catchments)
+    swmm_out = Res1D(test_file_path, catchments=catchments)
 
     # Does not work on MIKE 1D side, giving System.NullReferenceException
-    # >>> res1d.read()
+    # >>> swmm_out.read()
