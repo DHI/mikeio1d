@@ -40,6 +40,32 @@ def test_quantities(test_file):
     assert len(quantities) == 2
 
 
+def test_repr(test_file):
+    res1d = test_file
+    res1d_repr = res1d.__repr__()
+    res1d_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 1994-08-07 16:35:00\n' +
+        'End time: 1994-08-07 18:35:00\n'
+        '# Timesteps: 110\n' +
+        '# Catchments: 0\n' +
+        '# Nodes: 119\n' +
+        '# Reaches: 118\n' +
+        '# Globals: 0\n'
+        '0 - WaterLevel <m>\n' +
+        '1 - Discharge <m^3/s>'
+    )
+    assert res1d_repr == res1d_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    res1d = test_file
+    assert len(res1d.catchments) == 0
+    assert len(res1d.nodes) == 119
+    assert len(res1d.reaches) == 118
+    assert len(res1d.global_data) == 0
+
+
 @pytest.mark.parametrize("query,expected", [
     (QueryDataReach("WaterLevel", "104l1", 34.4131), True),
     (QueryDataReach("WaterLevel", "104l1", 42424242), False),
