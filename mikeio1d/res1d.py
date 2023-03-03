@@ -294,7 +294,15 @@ class Res1D:
 
     @staticmethod
     def get_data_set_name(data_set):
-        name = data_set.Name if hasattr(data_set, "Name") else data_set.Id
+        name = None
+
+        if hasattr(data_set, "Name"):
+            name = data_set.Name
+        elif hasattr(data_set, "Id"):
+            name = data_set.Id
+        elif data_set.Quantity is not None:
+            name = data_set.Quantity.Id
+
         name = "" if name is None else name
         return name
 
