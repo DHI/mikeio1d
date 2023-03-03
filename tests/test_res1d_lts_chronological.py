@@ -18,7 +18,7 @@ def test_file_path():
 
 @pytest.fixture(params=[False])
 def test_file(test_file_path, request):
-    return Res1D(test_file_path, request.param)
+    return Res1D(test_file_path, lazy_load=request.param)
 
 
 def test_file_does_not_exist():
@@ -34,6 +34,51 @@ def test_read(test_file):
 def test_quantities(test_file):
     quantities = test_file.quantities
     assert len(quantities) == 21
+
+
+def test_repr(test_file):
+    res1d = test_file
+    res1d_repr = res1d.__repr__()
+    res1d_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 1957-01-01 00:00:00\n' +
+        'End time: 1963-01-01 00:00:00\n'
+        '# Timesteps: 73\n' +
+        '# Catchments: 0\n' +
+        '# Nodes: 16\n' +
+        '# Reaches: 17\n' +
+        '# Globals: 9\n' +
+        '0 - DischargeIntegratedMonthly <m^3>\n' +
+        '1 - DischargeIntegratedMonthlyCount <()>\n' +
+        '2 - DischargeIntegratedMonthlyDuration <h>\n' +
+        '3 - Component_1TransportIntegratedMonthly <kg>\n' +
+        '4 - Component_1TransportIntegratedMonthlyCount <()>\n' +
+        '5 - Component_1TransportIntegratedMonthlyDuration <h>\n' +
+        '6 - Component_2TransportIntegratedMonthly <kg>\n' +
+        '7 - Component_2TransportIntegratedMonthlyCount <()>\n' +
+        '8 - Component_2TransportIntegratedMonthlyDuration <h>\n' +
+        '9 - SurchargeIntegratedMonthly <m^3>\n' +
+        '10 - SurchargeIntegratedMonthlyCount <()>\n' +
+        '11 - SurchargeIntegratedMonthlyDuration <h>\n' +
+        '12 - DischargeIntegratedMonthlyOutlets <m^3>\n' +
+        '13 - DischargeIntegratedMonthlyWeirs <m^3>\n' +
+        '14 - DischargeIntegratedMonthlyTotalOutflow <m^3>\n' +
+        '15 - Component_1TransportIntegratedMonthlyTotalEmission <kg>\n' +
+        '16 - Component_2TransportIntegratedMonthlyTotalEmission <kg>\n' +
+        '17 - Component_1TransportIntegratedMonthlyOutlets <kg>\n' +
+        '18 - Component_2TransportIntegratedMonthlyOutlets <kg>\n' +
+        '19 - Component_1TransportIntegratedMonthlyWeirs <kg>\n' +
+        '20 - Component_2TransportIntegratedMonthlyWeirs <kg>'
+    )
+    assert res1d_repr == res1d_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    res1d = test_file
+    assert len(res1d.catchments) == 0
+    assert len(res1d.nodes) == 16
+    assert len(res1d.reaches) == 17
+    assert len(res1d.global_data) == 9
 
 
 @pytest.mark.parametrize("query,expected", [

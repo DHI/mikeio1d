@@ -81,6 +81,7 @@ class Res1D:
                  put_chainage_in_col_name=True):
 
         self.file_path = file_path
+        self._file_extension = os.path.splitext(file_path)[-1]
         self._lazy_load = lazy_load
 
         self._reaches = reaches if reaches else []
@@ -151,9 +152,10 @@ class Res1D:
             for catchment in self._catchments:
                 self._add_catchment(catchment)
 
-            self._data.LoadData(self._diagnostics)
-        else:
+        if self._file_extension.lower() == '.resx':
             self._data.Load(self._diagnostics)
+        else:
+            self._data.LoadData(self._diagnostics)
 
         self._query = ResultDataQuery(self._data)
 
@@ -292,7 +294,15 @@ class Res1D:
 
     @staticmethod
     def get_data_set_name(data_set):
-        name = data_set.Name if hasattr(data_set, "Name") else data_set.Id
+        name = None
+
+        if hasattr(data_set, "Name"):
+            name = data_set.Name
+        elif hasattr(data_set, "Id"):
+            name = data_set.Id
+        elif data_set.Quantity is not None:
+            name = data_set.Quantity.Id
+
         name = "" if name is None else name
         return name
 

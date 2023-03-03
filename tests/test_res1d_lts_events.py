@@ -17,7 +17,7 @@ def test_file_path():
 
 @pytest.fixture(params=[False])
 def test_file(test_file_path, request):
-    return Res1D(test_file_path, request.param)
+    return Res1D(test_file_path, lazy_load=request.param)
 
 
 def test_file_does_not_exist():
@@ -33,6 +33,54 @@ def test_read(test_file):
 def test_quantities(test_file):
     quantities = test_file.quantities
     assert len(quantities) == 24
+
+
+def test_repr(test_file):
+    res1d = test_file
+    res1d_repr = res1d.__repr__()
+    res1d_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 1957-01-01 00:00:00\n' +
+        'End time: 1963-01-01 00:00:00\n'
+        '# Timesteps: 10\n' +
+        '# Catchments: 0\n' +
+        '# Nodes: 16\n' +
+        '# Reaches: 17\n' +
+        '# Globals: 0\n' +
+        '0 - WaterLevelMaximum <m>\n' +
+        '1 - WaterLevelMaximumTime <sec>\n' +
+        '2 - DischargeIntegrated <m^3>\n' +
+        '3 - DischargeIntegratedTime <sec>\n' +
+        '4 - DischargeMaximum <m^3/s>\n' +
+        '5 - DischargeMaximumTime <sec>\n' +
+        '6 - DischargeDuration <h>\n' +
+        '7 - DischargeDurationTime <sec>\n' +
+        '8 - Component_1Maximum <kg/m^3>\n' +
+        '9 - Component_1MaximumTime <sec>\n' +
+        '10 - Component_2Maximum <kg/m^3>\n' +
+        '11 - Component_2MaximumTime <sec>\n' +
+        '12 - Component_1TransportIntegrated <kg>\n' +
+        '13 - Component_1TransportIntegratedTime <sec>\n' +
+        '14 - Component_2TransportIntegrated <kg>\n' +
+        '15 - Component_2TransportIntegratedTime <sec>\n' +
+        '16 - SurchargeMaximum <m^3/s>\n' +
+        '17 - SurchargeMaximumTime <sec>\n' +
+        '18 - SurchargeIntegrated <m^3>\n' +
+        '19 - SurchargeIntegratedTime <sec>\n' +
+        '20 - SurchargeDuration <h>\n' +
+        '21 - SurchargeDurationTime <sec>\n' +
+        '22 - FlowVelocityMaximum <m/s>\n' +
+        '23 - FlowVelocityMaximumTime <sec>'
+    )
+    assert res1d_repr == res1d_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    res1d = test_file
+    assert len(res1d.catchments) == 0
+    assert len(res1d.nodes) == 16
+    assert len(res1d.reaches) == 17
+    assert len(res1d.global_data) == 0
 
 
 @pytest.mark.parametrize("query,expected", [

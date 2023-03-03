@@ -14,7 +14,11 @@ class NuGetPackageInfo:
 
     def __init__(self, name, version, path):
         nuget = NuGetRetriever.nuget_dir_name
+
         self.name = name
+        self.version = version
+        self.path = path
+
         self.dir_name = f'{path}/{nuget}/{name}.{version}'
         self.zip_name = f'{path}/{nuget}/{name}.{version}.zip'
         self.link = f'{self.root}{name}/{version}'
@@ -50,9 +54,10 @@ class NuGetRetriever:
         'DHI.Mike1D.Generic',
         'DHI.Mike1D.ResultDataAccess',
         'GeoAPI',
+        'NetTopologySuite',
     ]
 
-    version_map = { 'GeoAPI': '1.7.4' }
+    version_map = { 'GeoAPI': '1.7.4', 'NetTopologySuite': '1.14.0' }
 
     # Builds to include
     include_builds = ['netstandard2.0', 'net45', 'net47', 'win-x64']
@@ -92,6 +97,7 @@ class NuGetRetriever:
         print(f'  Downloading DHI NuGet packages into: {nuget_dir}')
 
         for info in self.package_infos:
+            print(f'    Downloading package: {info.name} {info.version}')
             urllib.request.urlretrieve(info.link, info.zip_name)
 
     def extract_packages(self):
@@ -109,6 +115,8 @@ class NuGetRetriever:
         files = self.create_file_list_to_copy()
 
         for source_file in files:
+            source_file_path_stripped = source_file.split(r'\nuget')[1]
+            print(f'    Copying file: {source_file_path_stripped}')
             _, file_name = os.path.split(source_file)
             destination_file = os.path.join(destination, file_name)
             shutil.copy2(source_file, destination_file)
