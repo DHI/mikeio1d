@@ -16,7 +16,7 @@ def test_file_path():
 
 @pytest.fixture(params=[True, False])
 def test_file(test_file_path, request):
-    return Res1D(test_file_path, request.param)
+    return Res1D(test_file_path, lazy_load=request.param)
 
 
 def test_read(test_file):
@@ -27,6 +27,35 @@ def test_read(test_file):
 def test_quantities(test_file):
     quantities = test_file.quantities
     assert len(quantities) == 5
+
+
+def test_repr(test_file):
+    res1d = test_file
+    res1d_repr = res1d.__repr__()
+    res1d_repr_ref = (
+        '<mikeio1d.Res1D>\n' +
+        'Start time: 1994-08-07 16:35:00\n' +
+        'End time: 1994-08-07 18:35:00\n'
+        '# Timesteps: 108\n' +
+        '# Catchments: 31\n' +
+        '# Nodes: 0\n' +
+        '# Reaches: 0\n' +
+        '# Globals: 0\n' +
+        '0 - TotalRunOff <m^3/s>\n' +
+        '1 - ActualRainfall <m/s>\n' +
+        '2 - ZinkLoadRR <kg/s>\n' +
+        '3 - ZinkMassAccumulatedRR <kg>\n' +
+        '4 - ZinkRR <mg/l>'
+    )
+    assert res1d_repr == res1d_repr_ref
+
+
+def test_data_item_dicts(test_file):
+    res1d = test_file
+    assert len(res1d.catchments) == 31
+    assert len(res1d.nodes) == 0
+    assert len(res1d.reaches) == 0
+    assert len(res1d.global_data) == 0
 
 
 @pytest.mark.parametrize("query,expected", [
@@ -47,6 +76,15 @@ def test_valid_catchment_data_queries(test_file, query, expected):
         with pytest.raises(NoDataForQuery):
             assert res1d.read(query)
         pass
+
+
+@pytest.mark.parametrize("query,expected_max", [
+    (QueryDataCatchment("TotalRunOff", "20_2_2"), 0.236),
+    (QueryDataCatchment("TotalRunOff", "22_8_8"), 0.231)
+])
+def test_read_reach_with_queries(test_file, query, expected_max):
+    data = test_file.read(query)
+    assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
 @pytest.mark.parametrize("quantity,catchment_id,expected_max", [
