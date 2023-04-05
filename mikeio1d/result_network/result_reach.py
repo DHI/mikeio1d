@@ -81,8 +81,9 @@ class ResultReach(ResultLocation):
             gridpoint = Res1DGridPoint()
             self.set_gridpoint(reach, gridpoint)
 
+        gridpoints = list(reach.GridPoints)
         for i in range(gridpoint_count):
-            gridpoint = reach.GridPoints[i]
+            gridpoint = gridpoints[i]
             self.set_gridpoint(reach, gridpoint)
 
     def set_gridpoint(self, reach, gridpoint):
