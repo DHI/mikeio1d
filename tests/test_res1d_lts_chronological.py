@@ -5,7 +5,8 @@ import pandas as pd
 import datetime
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
-from mikeio1d.res1d import Res1D, mike1d_quantities, QueryDataReach, QueryDataNode
+from mikeio1d.res1d import Res1D, mike1d_quantities
+from mikeio1d.query import QueryDataReach, QueryDataNode, QueryDataGlobal
 from mikeio1d.dotnet import to_numpy
 
 
@@ -189,3 +190,33 @@ def test_res1d_filter_readall(test_file_path):
 
     # Release the .NET object
     res1d = None
+
+
+@pytest.mark.parametrize("query,expected_max", [
+    (QueryDataGlobal("DischargeIntegratedMonthlyOutlets"), 5562.719),
+    (QueryDataGlobal("DischargeIntegratedMonthlyWeirs"), 437.729),
+    (QueryDataGlobal("DischargeIntegratedMonthlyTotalOutflow"), 5971.352)
+])
+def test_read_global_items_with_queries(test_file, query, expected_max):
+    data = test_file.read(query)
+    assert pytest.approx(round(data.max().values[0], 3)) == expected_max
+
+
+def test_global_data_attributes(test_file):
+    res1d = test_file
+    global_data = res1d.global_data
+
+    global_data.DischargeIntegratedMonthlyOutlets.add()
+    global_data.DischargeIntegratedMonthlyWeirs.add()
+    global_data.DischargeIntegratedMonthlyTotalOutflow.add()
+
+    df = res1d.read()
+
+    actual_max = round(df["DischargeIntegratedMonthlyOutlets"].max(), 3)
+    assert pytest.approx(actual_max) == 5562.719
+
+    actual_max = round(df["DischargeIntegratedMonthlyWeirs"].max(), 3)
+    assert pytest.approx(actual_max) == 437.729
+
+    actual_max = round(df["DischargeIntegratedMonthlyTotalOutflow"].max(), 3)
+    assert pytest.approx(actual_max) == 5971.352

@@ -1,3 +1,4 @@
+from ..query import QueryDataGlobal
 from .result_location import ResultLocation
 
 
@@ -34,7 +35,7 @@ class ResultGlobalData(ResultLocation):
         self.set_quantity(self.global_datas, data_item)
 
     def add_query(self, data_item):
-        """
-        TODO: Needs an implementation when QueryDataGlobal is available.
-        """
-        pass
+        """ Add QueryDataGlobal to ResultNetwork.queries list."""
+        quantity_id = data_item.Quantity.Id
+        query = QueryDataGlobal(quantity_id)
+        self.res1d.result_network.add_query(query)
