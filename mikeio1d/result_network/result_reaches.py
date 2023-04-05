@@ -51,15 +51,7 @@ class ResultReaches(ResultLocations):
         Create a dict entry from reach name to IRes1DReach object
         or a list of IRes1DReach objects.
         """
-        reach = impl(reach)
-        if reach.Name in self:
-            value = self[reach.Name]
-            if not isinstance(value, list):
-                self[reach.Name] = [value]
-
-            self[reach.Name].append(reach)
-        else:
-            self[reach.Name] = reach
+        self.set_res1d_object_to_dict(reach.Name, reach)
 
     def get_or_create_result_reach(self, reach):
         """

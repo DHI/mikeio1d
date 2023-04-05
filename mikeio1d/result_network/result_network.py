@@ -2,6 +2,7 @@ from .result_nodes import ResultNodes
 from .result_reaches import ResultReaches
 from .result_catchments import ResultCatchments
 from .result_global_datas import ResultGlobalDatas
+from .result_structures import ResultStructures
 
 
 class ResultNetwork:
@@ -69,6 +70,7 @@ class ResultNetwork:
         self.nodes = ResultNodes(res1d)
         self.reaches = ResultReaches(res1d)
         self.catchments = ResultCatchments(res1d)
+        self.structures = ResultStructures(res1d)
         self.global_data = ResultGlobalDatas(res1d)
 
     def add_query(self, query):

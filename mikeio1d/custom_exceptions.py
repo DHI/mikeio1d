@@ -47,3 +47,8 @@ class NoDataForQuery(ValueError):
 class InvalidQuantity(ValueError):
     def __init__(self, message="Invalid quantity."):
         super().__init__(message)
+
+
+class InvalidStructure(ValueError):
+    def __init__(self, message="Invalid structure ID."):
+        super().__init__(message)
