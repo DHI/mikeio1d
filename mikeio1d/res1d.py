@@ -7,6 +7,8 @@ from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
 from .dotnet import pythonnet_implementation as impl
 
+from .result_network import ResultNetwork
+
 from .query import QueryData
 from .query import QueryDataCatchment
 from .query import QueryDataNode
@@ -61,7 +63,7 @@ class Res1D:
     Examples
     --------
     An example of reading the res1d file only for nodes with
-    ID 'node1', 'node2' and reaches with ID 'reach1', reach2:
+    ID 'node1', 'node2' and reaches with ID 'reach1', 'reach2':
     ```python
     >>> nodes = ['node1', 'node2']
     >>> reaches = ['reach1', 'reach2']
@@ -96,11 +98,12 @@ class Res1D:
         self._start_time = None
         self._end_time = None
 
-        self._queries = []
-
         self._load_header()
         if not header_load:
             self._load_file()
+
+        self.result_network = ResultNetwork(self)
+        self._queries = self.result_network.queries
 
         self._col_name_delimiter = col_name_delimiter
         self._put_chainage_in_col_name = put_chainage_in_col_name
@@ -214,9 +217,10 @@ class Res1D:
         ```
         """
 
-        if queries is None:
+        if queries is None and len(self._queries) == 0:
             return self.read_all()
 
+        queries = self._queries if queries is None else queries
         queries = queries if isinstance(queries, list) else [queries]
 
         dfs = []
@@ -253,6 +257,11 @@ class Res1D:
         df = pd.concat(dfs, axis=1)
         self._update_time_quantities(df)
         return df
+
+    def clear_queries(self):
+        """ Clear the current active list of queries. """
+        self.result_network.queries.clear()
+        self.result_network.queries_ids.clear()
 
     def _update_time_quantities(self, df):
         if not self._is_lts_result_file():
@@ -374,22 +383,22 @@ class Res1D:
     @property
     def catchments(self):
         """ Catchments in res1d file. """
-        return { Res1D.get_data_set_name(catchment): impl(catchment) for catchment in self._data.Catchments }
+        return self.result_network.catchments
 
     @property
     def reaches(self):
         """ Reaches in res1d file. """
-        return { Res1D.get_data_set_name(reach): impl(reach) for reach in self._data.Reaches }
+        return self.result_network.reaches
 
     @property
     def nodes(self):
         """ Nodes in res1d file. """
-        return { Res1D.get_data_set_name(node): impl(node) for node in self._data.Nodes }
+        return self.result_network.nodes
 
     @property
     def global_data(self):
         """ Global data items in res1d file. """
-        return { Res1D.get_data_set_name(gdat): impl(gdat) for gdat in self._data.GlobalData.DataItems }
+        return self.result_network.global_data
 
     #region Query wrappers
 

@@ -1,0 +1,49 @@
+from ..dotnet import pythonnet_implementation as impl
+from .result_locations import ResultLocations
+from .result_catchment import ResultCatchment
+from .various import make_proper_variable_name
+
+
+class ResultCatchments(ResultLocations):
+    """
+    Class for wrapping ResultData catchments.
+
+    By itself it is also a dict, which contains
+    mapping between catchment ID and IRes1DCatchment object.
+
+    Parameters
+    ----------
+    res1d : Res1D
+        Res1D object the catchments belong to.
+
+    Attributes
+    ----------
+    catchment_label : str
+        A label, which is appended if the catchment name starts
+        with a number. The value used is catchment_label = 'c_'
+    """
+
+    def __init__(self, res1d):
+        ResultLocations.__init__(self, res1d)
+        self.catchment_label = 'c_'
+        self.set_catchments()
+
+    def set_catchments(self):
+        """
+        Set attributes to the current ResultCatchments object based
+        on the catchment ID.
+        """
+        catchments_count = self.data.Catchments.Count
+        for catchment in self.data.Catchments:
+            self.set_res1d_catchment_to_dict(catchment)
+            result_catchment = ResultCatchment(catchment, self.res1d)
+            result_catchment_attribute_string = make_proper_variable_name(catchment.ID, self.catchment_label)
+            setattr(self, result_catchment_attribute_string, result_catchment)
+
+    def set_res1d_catchment_to_dict(self, catchment):
+        """
+        Create a dict entry from catchment ID to IRes1DCatchment object.
+        """
+        catchment_id = catchment.ID
+        catchment = impl(catchment)
+        self[catchment_id] = catchment
