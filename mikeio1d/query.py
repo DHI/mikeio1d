@@ -1,12 +1,23 @@
 import numpy as np
 
-from .custom_exceptions import NoDataForQuery, InvalidQuantity
+from .custom_exceptions import NoDataForQuery
+from .custom_exceptions import InvalidQuantity
+from .custom_exceptions import InvalidStructure
 from .various import NAME_DELIMITER
 
 
 class QueryData:
     """
     Base query class that declares what data to extract from a .res1d file.
+
+    Parameters
+    ----------
+    quantity: str
+        e.g. 'WaterLevel', 'Discharge', etc. Call res1d.quantities to get all quantities.
+    name: str
+        Name or ID of location under interest.
+    validate: bool
+        Flag specifying to validate the query.
     """
 
     def __init__(self, quantity, name=None, validate=True):
@@ -56,8 +67,12 @@ class QueryDataReach(QueryData):
     ----------
     quantity: str
         e.g. 'WaterLevel' or 'Discharge'. Call res1d.quantities to get all quantities.
-    name: str, optional
-        Reach name
+    name: str
+        Reach name.
+    chainage: float
+        Chainage value.
+    validate: bool
+        Flag specifying to validate the query.
 
     Examples
     --------
@@ -118,6 +133,8 @@ class QueryDataNode(QueryData):
         e.g. 'WaterLevel' or 'Discharge'. Call res1d.quantities to get all quantities.
     name: str, optional
         Node name
+    validate: bool
+        Flag specifying to validate the query.
 
     Examples
     --------
@@ -146,6 +163,8 @@ class QueryDataCatchment(QueryData):
         e.g. 'TotalRunoff'. Call res1d.quantities to get all quantities.
     name: str, optional
         Catchment name
+    validate: bool
+        Flag specifying to validate the query.
 
     Examples
     --------
@@ -172,6 +191,8 @@ class QueryDataGlobal(QueryData):
     ----------
     quantity: str
         e.g. 'TimeStep'. Call res1d.quantities to get all quantities.
+    validate: bool
+        Flag specifying to validate the query.
 
     Examples
     --------
@@ -193,3 +214,73 @@ class QueryDataGlobal(QueryData):
 
     def __repr__(self):
         return self._quantity
+
+
+class QueryDataStructure(QueryDataReach):
+    """A query object that declares what structure data to extract from a .res1d file.
+
+    Parameters
+    ----------
+    quantity: str
+        e.g. 'DischargeInStructure'. Call res1d.quantities to get all quantities.
+    name: str
+        Reach name where the structure is located.
+    chainage: float
+        Chainage value where the structure is located on reach.
+    validate: bool
+        Flag specifying to validate the query.
+
+    Examples
+    --------
+    `QueryDataStructure('DischargeInStructure', 'structure1')` is a valid query.
+    """
+
+    def __init__(self, quantity, structure=None, name=None, chainage=None, validate=True):
+        super().__init__(quantity, name, chainage, validate=validate)
+        self._structure = structure
+
+    def get_values(self, res1d):
+        self._check_invalid_quantity(res1d)
+
+        self._check_invalid_structure(res1d)
+        result_structure = res1d.structures[self._structure]
+
+        self._check_invalid_structure_quantity(result_structure)
+        data_item = result_structure.get_data_item(self._quantity)
+
+        values = data_item.CreateTimeSeriesData(0)
+
+        self._check_invalid_values(values)
+
+        self._update_location_info(result_structure)
+
+        return self.from_dotnet_to_python(values)
+
+    def _check_invalid_structure(self, res1d):
+        if self._structure not in res1d.structures:
+            raise InvalidStructure(str(self))
+
+    def _check_invalid_structure_quantity(self, result_structure):
+        if self._quantity not in result_structure.data_items_dict:
+            raise InvalidQuantity(str(self))
+
+    def _update_location_info(self, result_structure):
+        if self._name is None:
+            self._name = result_structure.reach.Name
+
+        if self._chainage is None:
+            self._chainage = result_structure.chainage
+
+    def __repr__(self):
+        structure = self._structure
+        name = self._name
+        chainage = self._chainage
+        quantity = self._quantity
+
+        if name is None and chainage is None:
+            return NAME_DELIMITER.join([quantity, structure])
+
+        if chainage is None:
+            return NAME_DELIMITER.join([quantity, structure, name])
+
+        return NAME_DELIMITER.join([quantity, structure, name, f'{chainage:g}'])

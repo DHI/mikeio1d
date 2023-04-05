@@ -226,7 +226,8 @@ class Res1D:
         dfs = []
         for query in queries:
             df = pd.DataFrame(index=self.time_index)
-            df[str(query)] = query.get_values(self)
+            values = query.get_values(self)
+            df[str(query)] = values
             dfs.append(df)
 
         df = pd.concat(dfs, axis=1)
@@ -292,6 +293,10 @@ class Res1D:
 
     def get_vector_values(self, data_set, data_item):
         name = Res1D.get_data_set_name(data_set)
+        item_id = data_item.ItemId
+        # Add item id if present before the name.
+        # Needed for unique identification of structures.
+        name = self._col_name_delimiter.join([item_id, name]) if item_id is not None else name
         chainages = data_set.GetChainages(data_item)
 
         for i in range(data_item.NumberOfElements):
@@ -394,6 +399,11 @@ class Res1D:
     def nodes(self):
         """ Nodes in res1d file. """
         return self.result_network.nodes
+
+    @property
+    def structures(self):
+        """ Structures in res1d file. """
+        return self.result_network.structures
 
     @property
     def global_data(self):
