@@ -37,13 +37,12 @@ class ResultCatchments(ResultLocations):
         for catchment in self.data.Catchments:
             self.set_res1d_catchment_to_dict(catchment)
             result_catchment = ResultCatchment(catchment, self.res1d)
-            result_catchment_attribute_string = make_proper_variable_name(catchment.ID, self.catchment_label)
+            result_catchment_attribute_string = make_proper_variable_name(catchment.Id, self.catchment_label)
             setattr(self, result_catchment_attribute_string, result_catchment)
 
     def set_res1d_catchment_to_dict(self, catchment):
         """
         Create a dict entry from catchment ID to IRes1DCatchment object.
         """
-        catchment_id = catchment.ID
         catchment = impl(catchment)
-        self[catchment_id] = catchment
+        self[catchment.Id] = catchment

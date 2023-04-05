@@ -48,8 +48,10 @@ class ResultStructure(ResultLocation):
         self.set_quantity(self, data_item)
 
         if self.chainage is None:
-            gridpoint_index = data_item.IndexList[0]
-            self.chainage = self.reach.GridPoints[gridpoint_index].Chainage
+            index_list = list(data_item.IndexList)
+            gridpoint_index = index_list[0]
+            gridpoints = list(self.reach.GridPoints)
+            self.chainage = gridpoints[gridpoint_index].Chainage
 
     def get_data_item(self, quantity_id):
         """ Retrieve a data item for given quantity id. """

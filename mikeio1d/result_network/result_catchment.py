@@ -22,6 +22,6 @@ class ResultCatchment(ResultLocation):
     def add_query(self, data_item):
         """ Add QueryDataCatchment to ResultNetwork.queries list."""
         quantity_id = data_item.Quantity.Id
-        catchment_id = self.catchment.ID
+        catchment_id = self.catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
         self.res1d.result_network.add_query(query)
