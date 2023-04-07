@@ -103,7 +103,8 @@ class ResultReach(ResultLocation):
         result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self.res1d)
         current_reach_result_gridpoints.append(result_gridpoint)
 
-        result_gridpoint_attribute_string = make_proper_variable_name(str(gridpoint.Chainage), self.chainage_label)
+        chainage_string = f'{gridpoint.Chainage:g}'
+        result_gridpoint_attribute_string = make_proper_variable_name(chainage_string, self.chainage_label)
         setattr(self, result_gridpoint_attribute_string, result_gridpoint)
 
     def set_gridpoint_data_items(self, reach):
