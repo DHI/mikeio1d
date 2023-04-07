@@ -206,13 +206,13 @@ def test_reach_attributes(test_file):
     res1d = test_file
     reaches = res1d.reaches
 
-    reaches.r_104l1.m_34_4130723326386.WaterLevel.add()
+    reaches.r_104l1.m_34_4131.WaterLevel.add()
 
-    reaches.r_9l1.m_10_0.WaterLevel.add()
+    reaches.r_9l1.m_10.WaterLevel.add()
 
-    reaches.r_100l1.m_23_8413574216414.Discharge.add()
+    reaches.r_100l1.m_23_8414.Discharge.add()
 
-    reaches.r_9l1.m_5_0.Discharge.add()
+    reaches.r_9l1.m_5.Discharge.add()
 
     df = res1d.read()
 
