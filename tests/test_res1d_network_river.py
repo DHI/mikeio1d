@@ -120,9 +120,9 @@ def test_global_data_attributes(test_file):
     res1d = test_file
     global_data = res1d.global_data
 
-    global_data.DischargeSensorSensorGauge1.add()
-    global_data.Gate_levelSensorSensorGateLevel.add()
-    global_data.VariableTwoTimeSensorGateLevel.add()
+    global_data.Discharge_Sensor_SensorGauge1.add()
+    global_data.Gate_level_Sensor_SensorGateLevel.add()
+    global_data.Variable_TwoTimeSensorGateLevel.add()
 
     df = res1d.read()
 
