@@ -19,6 +19,13 @@ class ResultNode(ResultLocation):
         self.node = node
         self.set_quantities()
 
+    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        """ Add node result quantity to result quantity maps. """
+        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+
+        nodes_result_quantity_map = self.res1d.result_network.nodes.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, nodes_result_quantity_map)
+
     def add_query(self, data_item):
         """ Add QueryDataNode to ResultNetwork.queries list."""
         quantity_id = data_item.Quantity.Id

@@ -19,6 +19,13 @@ class ResultCatchment(ResultLocation):
         self.catchment = catchment
         self.set_quantities()
 
+    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        """ Add catchment result quantity to result quantity maps. """
+        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+
+        catchment_result_quantity_map = self.res1d.result_network.catchments.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
+
     def add_query(self, data_item):
         """ Add QueryDataCatchment to ResultNetwork.queries list."""
         quantity_id = data_item.Quantity.Id

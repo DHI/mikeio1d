@@ -33,10 +33,11 @@ class ResultReach(ResultLocation):
     """
 
     def __init__(self, reaches, res1d):
-        self.res1d = res1d
+        data_items = []
+        ResultLocation.__init__(self, data_items, res1d)
+
         self.chainage_label = 'm_'
 
-        self.data_items = []
         self.result_gridpoints = []
         self.current_reach_result_gridpoints = None
 
@@ -100,7 +101,7 @@ class ResultReach(ResultLocation):
         """
         current_reach_result_gridpoints = self.current_reach_result_gridpoints
 
-        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self.res1d)
+        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d)
         current_reach_result_gridpoints.append(result_gridpoint)
 
         chainage_string = f'{gridpoint.Chainage:g}'

@@ -29,7 +29,10 @@ class ResultStructures(ResultLocations):
         ResultLocations.__init__(self, res1d)
         self.structure_label = 's_'
         self.result_structure_map = { }
+
+        res1d.result_network.structures = self
         self.set_structures()
+        self.set_quantity_collections()
 
     def set_structures(self):
         """

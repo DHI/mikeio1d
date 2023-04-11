@@ -26,7 +26,10 @@ class ResultNodes(ResultLocations):
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
         self.node_label = 'n_'
+
+        res1d.result_network.nodes = self
         self.set_nodes()
+        self.set_quantity_collections()
 
     def set_nodes(self):
         """

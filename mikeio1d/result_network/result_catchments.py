@@ -26,7 +26,10 @@ class ResultCatchments(ResultLocations):
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
         self.catchment_label = 'c_'
+
+        res1d.result_network.catchments = self
         self.set_catchments()
+        self.set_quantity_collections()
 
     def set_catchments(self):
         """

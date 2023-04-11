@@ -33,7 +33,10 @@ class ResultReaches(ResultLocations):
         ResultLocations.__init__(self, res1d)
         self.reach_label = 'r_'
         self.result_reach_map = { }
+
+        res1d.result_network.reaches = self
         self.set_reaches()
+        self.set_quantity_collections()
 
     def set_reaches(self):
         """
@@ -45,6 +48,12 @@ class ResultReaches(ResultLocations):
             result_reach = self.get_or_create_result_reach(reach)
             result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
             setattr(self, result_reach_attribute_string, result_reach)
+
+    def set_quantity_collections(self):
+        ResultLocations.set_quantity_collections(self)
+        for reach_name in self.result_reach_map:
+            result_reach = self.result_reach_map[reach_name]
+            ResultLocations.set_quantity_collections(result_reach)
 
     def set_res1d_reach_to_dict(self, reach):
         """
