@@ -22,6 +22,8 @@ class ResultStructure(ResultLocation):
         A dictionary from quantity id to a data item.
     chainage : float
         Chainage where the structure is located on the reach.
+    structure_id : str
+        Structure ID.
     """
 
     def __init__(self, reach, data_items, res1d):
@@ -30,6 +32,7 @@ class ResultStructure(ResultLocation):
 
         self.reach = reach
         self.chainage = None
+        self.structure_id = None
 
         self.data_items_dict = {}
         for data_item in data_items:
@@ -42,6 +45,9 @@ class ResultStructure(ResultLocation):
         structure_result_quantity_map = self.res1d.result_network.structures.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
 
+        query = QueryDataStructure(quantity_id, self.structure_id, self.reach.Name, self.chainage)
+        self.add_to_network_result_quantity_map(query, result_quantity)
+
     def add_res1d_structure_data_item(self, data_item):
         """
         Add a IDataItem to ResultStructure.
@@ -51,15 +57,18 @@ class ResultStructure(ResultLocation):
         data_item: IDataItem
             A MIKE 1D IDataItem object.
         """
-        self.data_items.append(data_item)
-        self.data_items_dict[data_item.Quantity.Id] = data_item
-        self.set_quantity(self, data_item)
+        if self.structure_id is None:
+            self.structure_id = data_item.ItemId
 
         if self.chainage is None:
             index_list = list(data_item.IndexList)
             gridpoint_index = index_list[0]
             gridpoints = list(self.reach.GridPoints)
             self.chainage = gridpoints[gridpoint_index].Chainage
+
+        self.data_items.append(data_item)
+        self.data_items_dict[data_item.Quantity.Id] = data_item
+        self.set_quantity(self, data_item)
 
     def get_data_item(self, quantity_id):
         """ Retrieve a data item for given quantity id. """

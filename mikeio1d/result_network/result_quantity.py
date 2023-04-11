@@ -13,12 +13,19 @@ class ResultQuantity:
         MIKE 1D IDataItem object.
     res1d : Res1D
         Res1D object the quantity belongs to.
+
+    Attributes
+    ----------
+    element_index : int
+        An integer (can be None) giving an element index into the data item
+        which gives the concrete time series for given location.
     """
 
     def __init__(self, result_location, data_item, res1d):
         self.result_location = result_location
         self.data_item = data_item
         self.res1d = res1d
+        self.element_index = None
 
     def add(self):
         """

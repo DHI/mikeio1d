@@ -22,6 +22,9 @@ class ResultLocation:
     result_quantity_map : dict
         Dictionary from quantity id to a list of ResultQuantity objects.
         For ResultLocation this list contains a single element.
+    element_indices : list
+        List of integers representing element index for entries in data_items.
+        For non grid point locations this is typically None.
     """
 
     def __init__(self, data_items, res1d):
@@ -29,15 +32,23 @@ class ResultLocation:
         self.res1d = res1d
         self.quantity_label = 'q_'
         self.result_quantity_map = {}
+        self.element_indices = None
 
     def set_quantities(self):
         """ Sets all quantity attributes. """
-        for data_item in self.data_items:
-            self.set_quantity(self, data_item)
+        element_indices = self.element_indices
+        data_items = list(self.data_items)
+        data_items_count = len(data_items)
+        for i in range(data_items_count):
+            data_item = data_items[i]
+            element_index = element_indices[i] if element_indices is not None else None
+            self.set_quantity(self, data_item, element_index)
 
-    def set_quantity(self, obj, data_item):
+    def set_quantity(self, obj, data_item, element_index=None):
         """ Sets a single quantity attribute on the obj. """
         result_quantity = ResultQuantity(self, data_item, self.res1d)
+        result_quantity.element_index = element_index
+
         quantity = data_item.Quantity
         quantity_id = quantity.Id
 
@@ -78,6 +89,21 @@ class ResultLocation:
             result_quantity_map[quantity_id].append(result_quantity)
         else:
             result_quantity_map[quantity_id] = [result_quantity]
+
+    def add_to_network_result_quantity_map(self, query, result_quantity):
+        """
+        Method for adding to a network result quantity map, which is a dictionary
+        from unique query label to a ResultQuantity object corresponding to that query.
+
+        Parameters
+        ----------
+        query : QueryData
+            One of the possible QueryData objects.
+        result_quantity : ResultQuantity
+            ResultQuantity object corresponding to a query label.
+        """
+        network_result_quantity_map = self.res1d.result_network.result_quantity_map
+        network_result_quantity_map[str(query)] = result_quantity
 
     def add_query(self, data_item):
         """ Base method for adding a query to ResultNetwork.queries list. """

@@ -32,6 +32,7 @@ class ResultGridPoint(ResultLocation):
         self.gridpoint = gridpoint
         self.result_reach = result_reach
         self.structure_data_items = []
+        self.element_indices = []
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """ Add grid point result quantity to result quantity maps. """
@@ -43,6 +44,9 @@ class ResultGridPoint(ResultLocation):
         reaches_result_quantity_map = self.res1d.result_network.reaches.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, reaches_result_quantity_map)
 
+        query = QueryDataReach(quantity_id, self.reach.Name, self.gridpoint.Chainage)
+        self.add_to_network_result_quantity_map(query, result_quantity)
+
     def add_query(self, data_item):
         """ Add QueryDataReach to ResultNetwork.queries list."""
         quantity_id = data_item.Quantity.Id
@@ -51,9 +55,10 @@ class ResultGridPoint(ResultLocation):
         query = QueryDataReach(quantity_id, reach_name, chainage)
         self.res1d.result_network.add_query(query)
 
-    def add_data_item(self, data_item):
+    def add_data_item(self, data_item, element_index):
         """ Adds data item to grid point data items list."""
         self.data_items.append(data_item)
+        self.element_indices.append(element_index)
 
     def add_structure_data_item(self, data_item):
         """ Adds data item to structure data items list."""
