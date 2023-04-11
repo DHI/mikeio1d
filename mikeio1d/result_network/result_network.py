@@ -60,6 +60,7 @@ class ResultNetwork:
         self.queries_ids = set()
         self.queries = []
 
+        self.res1d.result_network = self
         self.set_result_locations()
 
     def set_result_locations(self):

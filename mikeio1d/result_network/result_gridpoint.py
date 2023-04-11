@@ -25,12 +25,23 @@ class ResultGridPoint(ResultLocation):
         defined on the current grid point.
     """
 
-    def __init__(self, reach, gridpoint, data_items, res1d):
+    def __init__(self, reach, gridpoint, data_items, result_reach, res1d):
         empty_data_item_list = []
         ResultLocation.__init__(self, empty_data_item_list, res1d)
         self.reach = reach
         self.gridpoint = gridpoint
+        self.result_reach = result_reach
         self.structure_data_items = []
+
+    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        """ Add grid point result quantity to result quantity maps. """
+        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+
+        reach_result_quantity_map = self.result_reach.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, reach_result_quantity_map)
+
+        reaches_result_quantity_map = self.res1d.result_network.reaches.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, reaches_result_quantity_map)
 
     def add_query(self, data_item):
         """ Add QueryDataReach to ResultNetwork.queries list."""

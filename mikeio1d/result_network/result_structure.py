@@ -25,14 +25,22 @@ class ResultStructure(ResultLocation):
     """
 
     def __init__(self, reach, data_items, res1d):
-        self.reach = reach
-        self.res1d = res1d
+        data_items = []
+        ResultLocation.__init__(self, data_items, res1d)
 
+        self.reach = reach
         self.chainage = None
+
         self.data_items_dict = {}
-        self.data_items = []
         for data_item in data_items:
             self.add_res1d_structure_data_item(data_item)
+
+    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        """ Add structure result quantity to result quantity maps. """
+        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+
+        structure_result_quantity_map = self.res1d.result_network.structures.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
 
     def add_res1d_structure_data_item(self, data_item):
         """
