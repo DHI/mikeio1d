@@ -36,6 +36,9 @@ class ResultNetwork:
         Is a wrapper class object for all ResultData catchments.
     global_data : ResultGlobalDatas object
         Is a wrapper class object for all ResultData global data items.
+    result_quantity_map : dict
+        Dictionary from unique query label to a ResultQuantity object corresponding
+        to that query. The keys of this dictionary should represent all possible query labels.
 
     Examples
     --------
@@ -59,6 +62,8 @@ class ResultNetwork:
 
         self.queries_ids = set()
         self.queries = []
+
+        self.result_quantity_map = {}
 
         self.res1d.result_network = self
         self.set_result_locations()

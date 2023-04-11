@@ -120,10 +120,12 @@ class ResultReach(ResultLocation):
         """
         for data_item in reach.DataItems:
             # For SWMM and EPANET results IndexList is None.
-            index_list = [0] if data_item.IndexList is None else data_item.IndexList
-            for gridpoint_index in index_list:
+            index_list = [0] if data_item.IndexList is None else list(data_item.IndexList)
+            element_count = len(index_list)
+            for element_index in range(element_count):
+                gridpoint_index = index_list[element_index]
                 result_gridpoint = self.current_reach_result_gridpoints[gridpoint_index]
                 if data_item.ItemId is None:
-                    result_gridpoint.add_data_item(data_item)
+                    result_gridpoint.add_data_item(data_item, element_index)
                 else:
                     result_gridpoint.add_structure_data_item(data_item)
