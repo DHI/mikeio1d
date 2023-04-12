@@ -154,3 +154,14 @@ def test_catchment_attributes(test_file):
 
     actual_max = round(df["TotalRunOff:22_8_8"].max(), 3)
     assert pytest.approx(actual_max) == 0.231
+
+
+def test_all_catchments_attributes(test_file):
+    res1d = test_file
+    res1d.catchments.TotalRunOff.add()
+    df = res1d.read()
+
+    assert len(df.columns) == 31
+
+    max_runoff = round(df.max().max(), 3)
+    assert pytest.approx(max_runoff) ==0.469

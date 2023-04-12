@@ -134,3 +134,47 @@ def test_global_data_attributes(test_file):
 
     actual_max = round(df["Variable:TwoTimeSensorGateLevel"].max(), 3)
     assert pytest.approx(actual_max) == 107.54
+
+
+def test_all_nodes_attributes(test_file):
+    res1d = test_file
+    res1d.nodes.WaterLevel.add()
+    df = res1d.read()
+
+    assert len(df.columns) == 18
+
+    max_water_level = round(df.max().max(), 3)
+    assert pytest.approx(max_water_level) == 59.200
+
+
+def test_all_reach_attributes(test_file):
+    res1d = test_file
+    res1d.reaches.link_basin_left1_2.WaterLevel.add()
+    df = res1d.read()
+
+    assert len(df.columns) == 2
+
+    max_water_level = round(df.max().max(), 3)
+    assert pytest.approx(max_water_level) == 57.795
+
+
+def test_all_reaches_attributes(test_file):
+    res1d = test_file
+    res1d.reaches.WaterLevel.add()
+    df = res1d.read()
+
+    assert len(df.columns) == 110
+
+    max_water_level = round(df.max().max(), 3)
+    assert pytest.approx(max_water_level) == 59.2
+
+
+def test_all_structures_attributes(test_file):
+    res1d = test_file
+    res1d.structures.DischargeInStructure.add()
+    df = res1d.read()
+
+    assert len(df.columns) == 10
+
+    max_discharge = round(df.max().max(), 3)
+    assert pytest.approx(max_discharge) == 100.247
