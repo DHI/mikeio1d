@@ -286,7 +286,7 @@ class Res1D:
     def get_scalar_value(self, data_set, data_item):
         name = Res1D.get_data_set_name(data_set)
         quantity_id = data_item.Quantity.Id
-        col_name = self._col_name_delimiter.join([quantity_id, name])
+        col_name = self.get_col_name(quantity_id, name)
         element_index = 0
 
         yield data_item.CreateTimeSeriesData(element_index), col_name
@@ -301,8 +301,7 @@ class Res1D:
 
         for i in range(data_item.NumberOfElements):
             quantity_id = data_item.Quantity.Id
-            postfix = f"{chainages[i]:g}" if self._put_chainage_in_col_name else str(i)
-            col_name_i = self._col_name_delimiter.join([quantity_id, name, postfix])
+            col_name_i = self.get_col_name(quantity_id, name, chainages[i], i)
 
             yield data_item.CreateTimeSeriesData(i), col_name_i
 
@@ -319,6 +318,16 @@ class Res1D:
 
         name = "" if name is None else name
         return name
+
+    def get_col_name(self, quantity_id, name="", chainage=None, i=None):
+        if name == "":
+            return quantity_id
+
+        if chainage is None:
+            return self._col_name_delimiter.join([quantity_id, name])
+
+        postfix = f"{chainage:g}" if self._put_chainage_in_col_name else str(i)
+        return self._col_name_delimiter.join([quantity_id, name, postfix])
 
     @property
     def time_index(self):
