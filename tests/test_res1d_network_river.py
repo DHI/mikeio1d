@@ -178,3 +178,77 @@ def test_all_structures_attributes(test_file):
 
     max_discharge = round(df.max().max(), 3)
     assert pytest.approx(max_discharge) == 100.247
+
+
+def test_res1d_modification(test_file):
+    res1d = test_file
+
+    # Test the reading of all the data into data frame
+    df = res1d.read()
+    max_value = round(df.max().max(), 3)
+
+    # Check the overall maximum value
+    assert pytest.approx(max_value) == 107.54
+
+    # Test the modification of ResultData and
+    # saving the modified data to a new res1d file.
+    df2 = df.multiply(2.0)
+    file_path = res1d.data.Connection.FilePath.Path
+    file_path = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.mod.res1d')
+    res1d.modify(df2, file_path=file_path)
+
+    df_mod = res1d.read()
+    max_value_mod = round(df_mod.max().max(), 3)
+
+    # Check the overall new maximum value (should be the previous max value time two)
+    assert pytest.approx(max_value_mod) == 2.0 * max_value
+
+    # Test the reading of modified file
+    res1d_new = Res1D(file_path)
+    df_new = res1d.read()
+    max_value_new = round(df_mod.max().max(), 3)
+
+    # Check the overall new maximum value again
+    assert pytest.approx(max_value_new) == 2.0 * max_value
+
+
+def test_res1d_modification_filtered(test_file):
+    res1d = test_file
+
+    # Test the reading of all the data into data frame
+    df = res1d.read()
+    max_value = round(df.max().max(), 3)
+
+    df = df.drop(pd.date_range('2000-02-18 00:06:00', '2000-02-18 00:16:00', freq='10min'))
+    df = df.drop(pd.date_range('2000-02-18 00:56:00', '2000-02-18 12:06:00', freq='10min'))
+
+    # Test the modification of ResultData
+    df2 = df.multiply(2.0)
+    res1d.modify(df2)
+
+    df_mod = res1d.read()
+    max_value_mod = round(df_mod.max().max(), 3)
+
+    # Check the overall new maximum value (should be the previous max value time two)
+    assert pytest.approx(max_value_mod) == 2.0 * max_value
+
+    # Modify the res1d data again, but only for flow velocity in structure
+    res1d.structures.FlowVelocityInStructure.add()
+    df = res1d.read()
+
+    df = df.drop(pd.date_range('2000-02-18 00:06:00', '2000-02-18 00:16:00', freq='10min'))
+    df = df.drop(pd.date_range('2000-02-18 00:56:00', '2000-02-18 12:06:00', freq='10min'))
+
+    df2 = df.multiply(100.0)
+
+    # Check the max value of flow velocity
+    max_value_velocity = round(df2.max().max(), 3)
+    assert pytest.approx(max_value_velocity) == 418.842
+
+    res1d.modify(df2)
+    res1d.clear_queries()
+    df_mod = res1d.read()
+    max_value_mod = round(df_mod.max().max(), 3)
+
+    # Check the overall new maximum value, which should be determined by flow velocity
+    assert pytest.approx(max_value_mod) == max_value_velocity

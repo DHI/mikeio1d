@@ -8,6 +8,7 @@ from .dotnet import to_numpy
 from .dotnet import pythonnet_implementation as impl
 
 from .result_network import ResultNetwork
+from .result_network import ResultWriter
 
 from .query import QueryData
 from .query import QueryDataCatchment
@@ -103,6 +104,7 @@ class Res1D:
             self._load_file()
 
         self.result_network = ResultNetwork(self)
+        self.result_writer = ResultWriter(self)
         self._queries = self.result_network.queries
 
         self._col_name_delimiter = col_name_delimiter
@@ -447,3 +449,30 @@ class Res1D:
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
 
     #endregion Query wrapper
+
+    def modify(self, data_frame, file_path=None):
+        """
+        Modifies the ResultData object TimeData based on the provided data frame.
+
+        Parameters
+        ----------
+        data_frame : pandas.DataFrame
+            Pandas data frame object with column names based on query labels
+        file_path : str
+            File path for the new res1d file. Optional.
+        """
+        self.result_writer.modify(data_frame)
+        if file_path is not None:
+            self.save(file_path)
+
+    def save(self, file_path):
+        """
+        Saves the ResultData to a new res1d file.
+
+        Parameters
+        ----------
+        file_path : str
+            File path for the new res1d file.
+        """
+        self.data.Connection.FilePath.Path = file_path
+        self.data.Save()
