@@ -27,8 +27,8 @@ class ResultStructure(ResultLocation):
     """
 
     def __init__(self, reach, data_items, res1d):
-        data_items = []
-        ResultLocation.__init__(self, data_items, res1d)
+        empty_list = []
+        ResultLocation.__init__(self, empty_list, res1d)
 
         self.reach = reach
         self.chainage = None
