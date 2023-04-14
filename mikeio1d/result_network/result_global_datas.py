@@ -1,7 +1,6 @@
 from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_global_data import ResultGlobalData
-from .various import make_proper_variable_name
 
 
 class ResultGlobalDatas(ResultLocations):

@@ -1,4 +1,3 @@
-from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
@@ -32,7 +31,7 @@ class ResultReaches(ResultLocations):
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
         self.reach_label = 'r_'
-        self.result_reach_map = { }
+        self.result_reach_map = {}
 
         res1d.result_network.reaches = self
         self.set_reaches()

@@ -11,12 +11,12 @@ from .result_extractor import ExtractorAll
 from .result_network import ResultNetwork
 from .result_network import ResultWriter
 
-from .query import QueryData
-from .query import QueryDataCatchment
-from .query import QueryDataNode
-from .query import QueryDataReach
+from .query import QueryData            # noqa: F401
+from .query import QueryDataCatchment   # noqa: F401
+from .query import QueryDataNode        # noqa: F401
+from .query import QueryDataReach       # noqa: F401
 
-from .various import mike1d_quantities
+from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
 
 from System import DateTime

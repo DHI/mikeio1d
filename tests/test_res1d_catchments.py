@@ -164,4 +164,4 @@ def test_all_catchments_attributes(test_file):
     assert len(df.columns) == 31
 
     max_runoff = round(df.max().max(), 3)
-    assert pytest.approx(max_runoff) ==0.469
+    assert pytest.approx(max_runoff) == 0.469
