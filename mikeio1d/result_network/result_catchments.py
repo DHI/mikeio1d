@@ -36,7 +36,6 @@ class ResultCatchments(ResultLocations):
         Set attributes to the current ResultCatchments object based
         on the catchment ID.
         """
-        catchments_count = self.data.Catchments.Count
         for catchment in self.data.Catchments:
             self.set_res1d_catchment_to_dict(catchment)
             result_catchment = ResultCatchment(catchment, self.res1d)

@@ -1,4 +1,3 @@
-from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_structure import ResultStructure
 from .various import make_proper_variable_name
@@ -28,7 +27,7 @@ class ResultStructures(ResultLocations):
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
         self.structure_label = 's_'
-        self.result_structure_map = { }
+        self.result_structure_map = {}
 
         res1d.result_network.structures = self
         self.set_structures()
