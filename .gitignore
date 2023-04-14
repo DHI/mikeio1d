@@ -141,3 +141,6 @@ mikeio1d/bin/*.xml
 
 # Specific files
 tests/testdata/NetworkRiver.mod.res1d
+tests/testdata/NetworkRiver.extract.csv
+tests/testdata/NetworkRiver.extract.dfs0
+tests/testdata/NetworkRiver.extract.txt

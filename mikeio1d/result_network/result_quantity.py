@@ -1,3 +1,6 @@
+from .data_entry import DataEntry
+
+
 class ResultQuantity:
     """
     Class for wrapping a single ResultData data item quantity.
@@ -17,7 +20,7 @@ class ResultQuantity:
     Attributes
     ----------
     element_index : int
-        An integer (can be None) giving an element index into the data item
+        An integer giving an element index into the data item
         which gives the concrete time series for given location.
     """
 
@@ -25,10 +28,13 @@ class ResultQuantity:
         self.result_location = result_location
         self.data_item = data_item
         self.res1d = res1d
-        self.element_index = None
+        self.element_index = 0
 
     def add(self):
         """
         Add a query to ResultNetwork.queries based on the data item.
         """
         self.result_location.add_query(self.data_item)
+
+    def get_data_entry(self):
+        return DataEntry(self.data_item, self.element_index)

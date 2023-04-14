@@ -41,10 +41,10 @@ class ResultLocation:
         data_items_count = len(data_items)
         for i in range(data_items_count):
             data_item = data_items[i]
-            element_index = element_indices[i] if element_indices is not None else None
+            element_index = element_indices[i] if element_indices is not None else 0
             self.set_quantity(self, data_item, element_index)
 
-    def set_quantity(self, obj, data_item, element_index=None):
+    def set_quantity(self, obj, data_item, element_index=0):
         """ Sets a single quantity attribute on the obj. """
         result_quantity = ResultQuantity(self, data_item, self.res1d)
         result_quantity.element_index = element_index

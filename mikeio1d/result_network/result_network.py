@@ -90,3 +90,14 @@ class ResultNetwork:
         if query_string not in queries_ids:
             queries_ids.add(query_string)
             queries.append(query)
+
+    def convert_queries_to_data_entries(self, queries):
+        data_entries = []
+
+        for query in queries:
+            query_label = str(query)
+            result_quantity = self.result_quantity_map[query_label]
+            data_entry = result_quantity.get_data_entry()
+            data_entries.append(data_entry)
+
+        return data_entries
