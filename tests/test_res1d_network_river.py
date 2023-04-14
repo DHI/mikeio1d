@@ -1,6 +1,5 @@
 import os
 import pytest
-import numpy as np
 import pandas as pd
 
 from mikeio1d.res1d import Res1D
@@ -205,8 +204,8 @@ def test_res1d_modification(test_file):
 
     # Test the reading of modified file
     res1d_new = Res1D(file_path)
-    df_new = res1d.read()
-    max_value_new = round(df_mod.max().max(), 3)
+    df_new = res1d_new.read()
+    max_value_new = round(df_new.max().max(), 3)
 
     # Check the overall new maximum value again
     assert pytest.approx(max_value_new) == 2.0 * max_value
@@ -252,3 +251,26 @@ def test_res1d_modification_filtered(test_file):
 
     # Check the overall new maximum value, which should be determined by flow velocity
     assert pytest.approx(max_value_mod) == max_value_velocity
+
+
+def test_extraction_to_csv_dfs0_txt(test_file):
+    res1d = test_file
+    res1d.reaches.WaterLevel.add()
+    res1d.nodes.WaterLevel.add()
+
+    file_path = res1d.data.Connection.FilePath.Path
+
+    file_path_csv = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.extract.csv')
+    res1d.to_csv(file_path_csv, time_step_skipping_number=10)
+    file_size_csv = 21905
+    assert 0.5 * file_size_csv < os.stat(file_path_csv).st_size < 2.0 * file_size_csv
+
+    file_path_dfs0 = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.extract.dfs0')
+    res1d.to_dfs0(file_path_dfs0, time_step_skipping_number=10)
+    file_size_dfs0 = 30302
+    assert file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
+
+    file_path_txt = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.extract.txt')
+    res1d.to_txt(file_path_txt, time_step_skipping_number=10)
+    file_size_txt = 23400
+    assert 0.5 * file_size_txt < os.stat(file_path_txt).st_size < 2.0 * file_size_txt

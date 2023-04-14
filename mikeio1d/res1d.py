@@ -7,6 +7,7 @@ from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
 from .dotnet import pythonnet_implementation as impl
 
+from .result_extractor import ExtractorAll
 from .result_network import ResultNetwork
 from .result_network import ResultWriter
 
@@ -193,6 +194,28 @@ class Res1D:
 
     #endregion File loading
 
+    #region Private methods
+
+    def _update_time_quantities(self, df):
+        if not self._is_lts_result_file():
+            return
+
+        simulation_start = from_dotnet_datetime(self._data.StartTime)
+        for label in df:
+            time_suffix = f'Time{self._col_name_delimiter}'
+            if time_suffix in label:
+                seconds_after_simulation_start_array = df[label].to_numpy()
+                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
+                df[label] = times
+
+    def _get_actual_queries(self, queries):
+        """ Finds out which list of queries should be used. """
+        queries = self._queries if queries is None else queries
+        queries = queries if isinstance(queries, list) else [queries]
+        return queries
+
+    #endregion Private methods
+
     def read(self, queries=None):
         """
         Read loaded .res1d file data based on queries.
@@ -222,8 +245,7 @@ class Res1D:
         if queries is None and len(self._queries) == 0:
             return self.read_all()
 
-        queries = self._queries if queries is None else queries
-        queries = queries if isinstance(queries, list) else [queries]
+        queries = self._get_actual_queries(queries)
 
         dfs = []
         for query in queries:
@@ -265,18 +287,6 @@ class Res1D:
         """ Clear the current active list of queries. """
         self.result_network.queries.clear()
         self.result_network.queries_ids.clear()
-
-    def _update_time_quantities(self, df):
-        if not self._is_lts_result_file():
-            return
-
-        simulation_start = from_dotnet_datetime(self._data.StartTime)
-        for label in df:
-            time_suffix = f'Time{self._col_name_delimiter}'
-            if time_suffix in label:
-                seconds_after_simulation_start_array = df[label].to_numpy()
-                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
-                df[label] = times
 
     def get_values(self, data_set, data_item):
         """ Get all time series values in given data_item. """
@@ -476,3 +486,44 @@ class Res1D:
         """
         self.data.Connection.FilePath.Path = file_path
         self.data.Save()
+
+    def extract(self, file_path, queries=None, time_step_skipping_number=1, ext=None):
+        """
+        Extract given queries to provided file.
+        File type is determined from file_path extension.
+        The supported formats are:
+        * csv
+        * dfs0
+        * txt
+
+        Parameters
+        ----------
+        file_path : str
+            Output file path.
+        queries : list
+            List of queries.
+        time_step_skipping_number : int
+            Number specifying the time step frequency to output.
+        ext : str
+            Output file type to use instead of determining it from extension.
+            Can be 'csv', 'dfs0', 'txt'.
+        """
+        ext = os.path.splitext(file_path)[-1] if ext is None else ext
+
+        queries = self._get_actual_queries(queries)
+        data_entries = self.result_network.convert_queries_to_data_entries(queries)
+
+        extractor = ExtractorAll.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
+        extractor.export()
+
+    def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
+        """ Extract to csv file. """
+        self.extract(file_path, queries, time_step_skipping_number, 'csv')
+
+    def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
+        """ Extract to dfs0 file. """
+        self.extract(file_path, queries, time_step_skipping_number, 'dfs0')
+
+    def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
+        """ Extract to txt file. """
+        self.extract(file_path, queries, time_step_skipping_number, 'txt')

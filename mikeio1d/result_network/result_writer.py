@@ -36,7 +36,6 @@ class ResultWriter:
         for query_label in data_frame:
             result_quantity = result_quantity_map[query_label]
             element_index = result_quantity.element_index
-            element_index = 0 if element_index is None else element_index
             data_item = result_quantity.data_item
 
             values = data_frame[query_label]
