@@ -22,19 +22,16 @@ class ExtractorAll(object):
 
     @staticmethod
     def create(out_file_type, out_file_name, output_data, result_data, time_step_skipping_number=1):
-        if out_file_type == OutputFileType.TXT:
-            return ExtractorTxt(out_file_name, output_data, result_data, time_step_skipping_number)
+        extractors = {
+            OutputFileType.TXT: ExtractorTxt,
+            OutputFileType.CSV: ExtractorCsv,
+            OutputFileType.DFS0: ExtractorDfs0,
+            OutputFileType.ALL: ExtractorAll
+        }
 
-        elif out_file_type == OutputFileType.CSV:
-            return ExtractorCsv(out_file_name, output_data, result_data, time_step_skipping_number)
+        extractor = extractors.get(out_file_type, None)
 
-        elif out_file_type == OutputFileType.DFS0:
-            return ExtractorDfs0(out_file_name, output_data, result_data, time_step_skipping_number)
-
-        elif out_file_type == OutputFileType.ALL:
-            return ExtractorAll(out_file_name, output_data, result_data, time_step_skipping_number)
-
-        return None
+        return extractor(out_file_name, output_data, result_data, time_step_skipping_number)
 
     def export(self):
         for extractor in self.all_extractors:
