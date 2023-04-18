@@ -245,7 +245,6 @@ def test_res1d_modification_filtered(test_file):
     assert pytest.approx(max_value_velocity) == 418.842
 
     res1d.modify(df2)
-    res1d.clear_queries()
     df_mod = res1d.read()
     max_value_mod = round(df_mod.max().max(), 3)
 
@@ -255,6 +254,8 @@ def test_res1d_modification_filtered(test_file):
 
 def test_extraction_to_csv_dfs0_txt(test_file):
     res1d = test_file
+    res1d.clear_queries_after_reading = False
+
     res1d.reaches.WaterLevel.add()
     res1d.nodes.WaterLevel.add()
 
