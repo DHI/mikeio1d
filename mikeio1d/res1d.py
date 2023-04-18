@@ -61,6 +61,8 @@ class Res1D:
         (and optionally chainage) in the data frame label.
     put_chainage_in_col_name : bool
         Flag specifying to add chainage into data frame column label.
+    clear_queries_after_reading : bool
+        Flag specifying to clear active queries after reading/processing them.
 
     Examples
     --------
@@ -82,7 +84,8 @@ class Res1D:
                  nodes=None,
                  catchments=None,
                  col_name_delimiter=NAME_DELIMITER,
-                 put_chainage_in_col_name=True):
+                 put_chainage_in_col_name=True,
+                 clear_queries_after_reading=True):
 
         self.file_path = file_path
         self._file_extension = os.path.splitext(file_path)[-1]
@@ -110,6 +113,7 @@ class Res1D:
 
         self._col_name_delimiter = col_name_delimiter
         self._put_chainage_in_col_name = put_chainage_in_col_name
+        self.clear_queries_after_reading = clear_queries_after_reading
 
     def __repr__(self):
         out = ["<mikeio1d.Res1D>"]
@@ -227,7 +231,7 @@ class Res1D:
         Parameters
         ----------
         queries: A single query or a list of queries.
-        Default is None = reads all data.
+            Default is None = reads all data.
 
         Examples
         --------
@@ -256,6 +260,10 @@ class Res1D:
 
         df = pd.concat(dfs, axis=1)
         self._update_time_quantities(df)
+
+        if self.clear_queries_after_reading:
+            self.clear_queries()
+
         return df
 
     def read_all(self):
@@ -515,6 +523,9 @@ class Res1D:
 
         extractor = ExtractorAll.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
         extractor.export()
+
+        if self.clear_queries_after_reading:
+            self.clear_queries()
 
     def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to csv file. """
