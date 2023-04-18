@@ -15,6 +15,8 @@ from .query import QueryData            # noqa: F401
 from .query import QueryDataCatchment   # noqa: F401
 from .query import QueryDataNode        # noqa: F401
 from .query import QueryDataReach       # noqa: F401
+from .query import QueryDataStructure   # noqa: F401
+from .query import QueryDataGlobal      # noqa: F401
 
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
