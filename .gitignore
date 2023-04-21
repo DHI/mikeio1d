@@ -138,3 +138,15 @@ mikeio1d/bin/*.dll
 mikeio1d/bin/*.pfs
 mikeio1d/bin/*.ubg
 mikeio1d/bin/*.xml
+
+# Specific files
+tests/testdata/NetworkRiver.mod.res1d
+tests/testdata/NetworkRiver.extract.csv
+tests/testdata/NetworkRiver.extract.dfs0
+tests/testdata/NetworkRiver.extract.txt
+tests/testdata/DischargeInStructure.extract.csv
+tests/testdata/DischargeInStructure.extract.dfs0
+tests/testdata/DischargeInStructure.extract.txt
+tests/testdata/W_right_DischargeInStructure.extract.csv
+tests/testdata/W_right_DischargeInStructure.extract.dfs0
+tests/testdata/W_right_DischargeInStructure.extract.txt

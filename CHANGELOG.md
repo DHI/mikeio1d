@@ -2,7 +2,20 @@
 
 ## [Unreleased]
 
-## [0.2] - 2022-06-20
+## [0.3] - 2023-04-21
+
+### Added
+
+- Ability to add queries using auto-completion
+- Ability to modify res1d file contents using a data frame
+- Ability to extract time series to csv, dfs0, and txt files
+- Support for querying structures and global data items
+
+### Changed
+
+- Use MIKE 1D NuGet packages v21.0.0
+
+## [0.2] - 2023-03-14
 
 ### Added
 
@@ -32,6 +45,7 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.2...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.3...HEAD
+[0.3]: https://github.com/DHI/mikeio1d/releases/tag/v0.3
 [0.2]: https://github.com/DHI/mikeio1d/releases/tag/v0.2
 [0.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.1

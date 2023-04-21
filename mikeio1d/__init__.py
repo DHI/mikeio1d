@@ -19,7 +19,7 @@ from platform import architecture
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 if "64" not in architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
@@ -30,7 +30,8 @@ sys.path.append(mike_bin_path)
 clr.AddReference("System")
 clr.AddReference("System.Runtime")
 clr.AddReference("System.Runtime.InteropServices")
-# clr.AddReference("DHI.Generic.MikeZero.EUM")
+clr.AddReference("DHI.Generic.MikeZero.DFS")
+clr.AddReference("DHI.Generic.MikeZero.EUM")
 # clr.AddReference("DHI.PFS")
 # clr.AddReference("DHI.Projections")
 clr.AddReference("DHI.Mike1D.Generic")
