@@ -47,13 +47,13 @@ class ResultGridPoint(ResultLocation):
         query = QueryDataReach(quantity_id, self.reach.Name, self.gridpoint.Chainage)
         self.add_to_network_result_quantity_map(query, result_quantity)
 
-    def add_query(self, data_item):
-        """ Add QueryDataReach to ResultNetwork.queries list."""
+    def get_query(self, data_item):
+        """ Get a QueryDataReach for given data item. """
         quantity_id = data_item.Quantity.Id
         reach_name = self.reach.Name
         chainage = self.gridpoint.Chainage
         query = QueryDataReach(quantity_id, reach_name, chainage)
-        self.res1d.result_network.add_query(query)
+        return query
 
     def add_data_item(self, data_item, element_index):
         """ Adds data item to grid point data items list."""

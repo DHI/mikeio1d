@@ -288,3 +288,35 @@ def test_extraction_to_csv_dfs0_txt(test_file):
     res1d.to_txt(file_path_txt, time_step_skipping_number=10)
     file_size_txt = 23400
     assert 0.5 * file_size_txt < os.stat(file_path_txt).st_size < 2.0 * file_size_txt
+
+
+def test_result_quantity_methods(test_file):
+    res1d = test_file
+    file_path = res1d.data.Connection.FilePath.Path
+    discharge_in_structure = res1d.structures.W_right.DischargeInStructure
+
+    df = discharge_in_structure.to_dataframe()
+    max_value = round(df.max()[0], 3)
+    assert pytest.approx(max_value) == 11.018
+
+    # Test the calling of methods
+    discharge_in_structure.plot()
+    discharge_in_structure.to_csv(file_path.replace('NetworkRiver.res1d', 'W_right_DischargeInStructure.extract.csv'))
+    discharge_in_structure.to_dfs0(file_path.replace('NetworkRiver.res1d', 'W_right_DischargeInStructure.extract.dfs0'))
+    discharge_in_structure.to_txt(file_path.replace('NetworkRiver.res1d', 'W_right_DischargeInStructure.extract.txt'))
+
+
+def test_result_quantity_collection_methods(test_file):
+    res1d = test_file
+    file_path = res1d.data.Connection.FilePath.Path
+    discharge_in_structure = res1d.structures.DischargeInStructure
+
+    df = discharge_in_structure.to_dataframe()
+    max_value = round(df.max().max(), 3)
+    assert pytest.approx(max_value) == 100.247
+
+    # Test the calling of methods
+    discharge_in_structure.plot()
+    discharge_in_structure.to_csv(file_path.replace('NetworkRiver.res1d', 'DischargeInStructure.extract.csv'))
+    discharge_in_structure.to_dfs0(file_path.replace('NetworkRiver.res1d', 'DischargeInStructure.extract.dfs0'))
+    discharge_in_structure.to_txt(file_path.replace('NetworkRiver.res1d', 'DischargeInStructure.extract.txt'))

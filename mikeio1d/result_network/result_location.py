@@ -107,4 +107,9 @@ class ResultLocation:
 
     def add_query(self, data_item):
         """ Base method for adding a query to ResultNetwork.queries list. """
-        pass
+        query = self.get_query(data_item)
+        self.res1d.result_network.add_query(query)
+
+    def get_query(self, data_item):
+        """ Base method for creating a query for given data item. """
+        return None
