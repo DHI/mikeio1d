@@ -7,12 +7,18 @@ from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
 from .dotnet import pythonnet_implementation as impl
 
-from .query import QueryData
-from .query import QueryDataCatchment
-from .query import QueryDataNode
-from .query import QueryDataReach
+from .result_extractor import ExtractorAll
+from .result_network import ResultNetwork
+from .result_network import ResultWriter
 
-from .various import mike1d_quantities
+from .query import QueryData            # noqa: F401
+from .query import QueryDataCatchment   # noqa: F401
+from .query import QueryDataNode        # noqa: F401
+from .query import QueryDataReach       # noqa: F401
+from .query import QueryDataStructure   # noqa: F401
+from .query import QueryDataGlobal      # noqa: F401
+
+from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
 
 from System import DateTime
@@ -57,11 +63,13 @@ class Res1D:
         (and optionally chainage) in the data frame label.
     put_chainage_in_col_name : bool
         Flag specifying to add chainage into data frame column label.
+    clear_queries_after_reading : bool
+        Flag specifying to clear active queries after reading/processing them.
 
     Examples
     --------
     An example of reading the res1d file only for nodes with
-    ID 'node1', 'node2' and reaches with ID 'reach1', reach2:
+    ID 'node1', 'node2' and reaches with ID 'reach1', 'reach2':
     ```python
     >>> nodes = ['node1', 'node2']
     >>> reaches = ['reach1', 'reach2']
@@ -78,7 +86,8 @@ class Res1D:
                  nodes=None,
                  catchments=None,
                  col_name_delimiter=NAME_DELIMITER,
-                 put_chainage_in_col_name=True):
+                 put_chainage_in_col_name=True,
+                 clear_queries_after_reading=True):
 
         self.file_path = file_path
         self._file_extension = os.path.splitext(file_path)[-1]
@@ -96,14 +105,17 @@ class Res1D:
         self._start_time = None
         self._end_time = None
 
-        self._queries = []
-
         self._load_header()
         if not header_load:
             self._load_file()
 
+        self.result_network = ResultNetwork(self)
+        self.result_writer = ResultWriter(self)
+        self._queries = self.result_network.queries
+
         self._col_name_delimiter = col_name_delimiter
         self._put_chainage_in_col_name = put_chainage_in_col_name
+        self.clear_queries_after_reading = clear_queries_after_reading
 
     def __repr__(self):
         out = ["<mikeio1d.Res1D>"]
@@ -188,6 +200,28 @@ class Res1D:
 
     #endregion File loading
 
+    #region Private methods
+
+    def _update_time_quantities(self, df):
+        if not self._is_lts_result_file():
+            return
+
+        simulation_start = from_dotnet_datetime(self._data.StartTime)
+        for label in df:
+            time_suffix = f'Time{self._col_name_delimiter}'
+            if time_suffix in label:
+                seconds_after_simulation_start_array = df[label].to_numpy()
+                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
+                df[label] = times
+
+    def _get_actual_queries(self, queries):
+        """ Finds out which list of queries should be used. """
+        queries = self._queries if queries is None else queries
+        queries = queries if isinstance(queries, list) else [queries]
+        return queries
+
+    #endregion Private methods
+
     def read(self, queries=None):
         """
         Read loaded .res1d file data based on queries.
@@ -199,7 +233,7 @@ class Res1D:
         Parameters
         ----------
         queries: A single query or a list of queries.
-        Default is None = reads all data.
+            Default is None = reads all data.
 
         Examples
         --------
@@ -214,19 +248,24 @@ class Res1D:
         ```
         """
 
-        if queries is None:
+        if queries is None and len(self._queries) == 0:
             return self.read_all()
 
-        queries = queries if isinstance(queries, list) else [queries]
+        queries = self._get_actual_queries(queries)
 
         dfs = []
         for query in queries:
             df = pd.DataFrame(index=self.time_index)
-            df[str(query)] = query.get_values(self)
+            values = query.get_values(self)
+            df[str(query)] = values
             dfs.append(df)
 
         df = pd.concat(dfs, axis=1)
         self._update_time_quantities(df)
+
+        if self.clear_queries_after_reading:
+            self.clear_queries()
+
         return df
 
     def read_all(self):
@@ -254,17 +293,10 @@ class Res1D:
         self._update_time_quantities(df)
         return df
 
-    def _update_time_quantities(self, df):
-        if not self._is_lts_result_file():
-            return
-
-        simulation_start = from_dotnet_datetime(self._data.StartTime)
-        for label in df:
-            time_suffix = f'Time{self._col_name_delimiter}'
-            if time_suffix in label:
-                seconds_after_simulation_start_array = df[label].to_numpy()
-                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
-                df[label] = times
+    def clear_queries(self):
+        """ Clear the current active list of queries. """
+        self.result_network.queries.clear()
+        self.result_network.queries_ids.clear()
 
     def get_values(self, data_set, data_item):
         """ Get all time series values in given data_item. """
@@ -276,19 +308,22 @@ class Res1D:
     def get_scalar_value(self, data_set, data_item):
         name = Res1D.get_data_set_name(data_set)
         quantity_id = data_item.Quantity.Id
-        col_name = self._col_name_delimiter.join([quantity_id, name])
+        col_name = self.get_col_name(quantity_id, name)
         element_index = 0
 
         yield data_item.CreateTimeSeriesData(element_index), col_name
 
     def get_vector_values(self, data_set, data_item):
         name = Res1D.get_data_set_name(data_set)
+        item_id = data_item.ItemId
+        # Add item id if present before the name.
+        # Needed for unique identification of structures.
+        name = self._col_name_delimiter.join([item_id, name]) if item_id is not None else name
         chainages = data_set.GetChainages(data_item)
 
         for i in range(data_item.NumberOfElements):
             quantity_id = data_item.Quantity.Id
-            postfix = f"{chainages[i]:g}" if self._put_chainage_in_col_name else str(i)
-            col_name_i = self._col_name_delimiter.join([quantity_id, name, postfix])
+            col_name_i = self.get_col_name(quantity_id, name, chainages[i], i)
 
             yield data_item.CreateTimeSeriesData(i), col_name_i
 
@@ -305,6 +340,16 @@ class Res1D:
 
         name = "" if name is None else name
         return name
+
+    def get_col_name(self, quantity_id, name="", chainage=None, i=None):
+        if name == "":
+            return quantity_id
+
+        if chainage is None:
+            return self._col_name_delimiter.join([quantity_id, name])
+
+        postfix = f"{chainage:g}" if self._put_chainage_in_col_name else str(i)
+        return self._col_name_delimiter.join([quantity_id, name, postfix])
 
     @property
     def time_index(self):
@@ -374,22 +419,27 @@ class Res1D:
     @property
     def catchments(self):
         """ Catchments in res1d file. """
-        return { Res1D.get_data_set_name(catchment): impl(catchment) for catchment in self._data.Catchments }
+        return self.result_network.catchments
 
     @property
     def reaches(self):
         """ Reaches in res1d file. """
-        return { Res1D.get_data_set_name(reach): impl(reach) for reach in self._data.Reaches }
+        return self.result_network.reaches
 
     @property
     def nodes(self):
         """ Nodes in res1d file. """
-        return { Res1D.get_data_set_name(node): impl(node) for node in self._data.Nodes }
+        return self.result_network.nodes
+
+    @property
+    def structures(self):
+        """ Structures in res1d file. """
+        return self.result_network.structures
 
     @property
     def global_data(self):
         """ Global data items in res1d file. """
-        return { Res1D.get_data_set_name(gdat): impl(gdat) for gdat in self._data.GlobalData.DataItems }
+        return self.result_network.global_data
 
     #region Query wrappers
 
@@ -419,3 +469,74 @@ class Res1D:
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
 
     #endregion Query wrapper
+
+    def modify(self, data_frame, file_path=None):
+        """
+        Modifies the ResultData object TimeData based on the provided data frame.
+
+        Parameters
+        ----------
+        data_frame : pandas.DataFrame
+            Pandas data frame object with column names based on query labels
+        file_path : str
+            File path for the new res1d file. Optional.
+        """
+        self.result_writer.modify(data_frame)
+        if file_path is not None:
+            self.save(file_path)
+
+    def save(self, file_path):
+        """
+        Saves the ResultData to a new res1d file.
+
+        Parameters
+        ----------
+        file_path : str
+            File path for the new res1d file.
+        """
+        self.data.Connection.FilePath.Path = file_path
+        self.data.Save()
+
+    def extract(self, file_path, queries=None, time_step_skipping_number=1, ext=None):
+        """
+        Extract given queries to provided file.
+        File type is determined from file_path extension.
+        The supported formats are:
+        * csv
+        * dfs0
+        * txt
+
+        Parameters
+        ----------
+        file_path : str
+            Output file path.
+        queries : list
+            List of queries.
+        time_step_skipping_number : int
+            Number specifying the time step frequency to output.
+        ext : str
+            Output file type to use instead of determining it from extension.
+            Can be 'csv', 'dfs0', 'txt'.
+        """
+        ext = os.path.splitext(file_path)[-1] if ext is None else ext
+
+        queries = self._get_actual_queries(queries)
+        data_entries = self.result_network.convert_queries_to_data_entries(queries)
+
+        extractor = ExtractorAll.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
+        extractor.export()
+
+        if self.clear_queries_after_reading:
+            self.clear_queries()
+
+    def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
+        """ Extract to csv file. """
+        self.extract(file_path, queries, time_step_skipping_number, 'csv')
+
+    def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
+        """ Extract to dfs0 file. """
+        self.extract(file_path, queries, time_step_skipping_number, 'dfs0')
+
+    def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
+        """ Extract to txt file. """
+        self.extract(file_path, queries, time_step_skipping_number, 'txt')

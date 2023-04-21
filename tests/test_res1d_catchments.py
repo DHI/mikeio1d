@@ -82,7 +82,7 @@ def test_valid_catchment_data_queries(test_file, query, expected):
     (QueryDataCatchment("TotalRunOff", "20_2_2"), 0.236),
     (QueryDataCatchment("TotalRunOff", "22_8_8"), 0.231)
 ])
-def test_read_reach_with_queries(test_file, query, expected_max):
+def test_read_catchment_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
@@ -139,3 +139,29 @@ def test_res1d_filter_readall(test_file_path):
     res1d = Res1D(test_file_path, catchments=catchments)
 
     res1d.read()
+
+
+def test_catchment_attributes(test_file):
+    res1d = test_file
+    catchments = res1d.catchments
+
+    catchments.c_20_2_2.TotalRunOff.add()
+    catchments.c_22_8_8.TotalRunOff.add()
+    df = res1d.read()
+
+    actual_max = round(df["TotalRunOff:20_2_2"].max(), 3)
+    assert pytest.approx(actual_max) == 0.236
+
+    actual_max = round(df["TotalRunOff:22_8_8"].max(), 3)
+    assert pytest.approx(actual_max) == 0.231
+
+
+def test_all_catchments_attributes(test_file):
+    res1d = test_file
+    res1d.catchments.TotalRunOff.add()
+    df = res1d.read()
+
+    assert len(df.columns) == 31
+
+    max_runoff = round(df.max().max(), 3)
+    assert pytest.approx(max_runoff) == 0.469
