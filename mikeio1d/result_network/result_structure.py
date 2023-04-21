@@ -89,9 +89,9 @@ class ResultStructure(ResultLocation):
         """ Retrieve a data item for given quantity id. """
         return self.data_items_dict[quantity_id]
 
-    def add_query(self, data_item):
-        """ Add QueryDataStructure to ResultNetwork.queries list."""
+    def get_query(self, data_item):
+        """ Get a QueryDataStructure for given data item. """
         quantity_id = data_item.Quantity.Id
         structure_id = self.structure_id
         query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self.chainage)
-        self.res1d.result_network.add_query(query)
+        return query

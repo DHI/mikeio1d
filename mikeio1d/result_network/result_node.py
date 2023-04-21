@@ -29,9 +29,9 @@ class ResultNode(ResultLocation):
         query = QueryDataNode(quantity_id, self.node.ID, validate=False)
         self.add_to_network_result_quantity_map(query, result_quantity)
 
-    def add_query(self, data_item):
-        """ Add QueryDataNode to ResultNetwork.queries list."""
+    def get_query(self, data_item):
+        """ Get a QueryDataNode for given data item. """
         quantity_id = data_item.Quantity.Id
         node_id = self.node.ID
         query = QueryDataNode(quantity_id, node_id)
-        self.res1d.result_network.add_query(query)
+        return query

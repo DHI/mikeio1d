@@ -1,4 +1,7 @@
-class ResultQuantityCollection:
+from .result_quantity import ResultQuantity
+
+
+class ResultQuantityCollection(ResultQuantity):
     """
     Class for dealing with a collection ResultQuantity objects.
 
@@ -24,3 +27,19 @@ class ResultQuantityCollection:
         """
         for result_quantity in self.result_quantities:
             result_quantity.add()
+
+    def plot(self):
+        """ Plot the time series data. """
+        if len(self.result_quantities) <= 0:
+            return
+
+        self.data_item = self.result_quantities[0].data_item
+        ResultQuantity.plot(self)
+
+    def get_query(self):
+        """ Get queries corresponding to ResultQuantityCollection. """
+        queries = []
+        for result_quantity in self.result_quantities:
+            query = result_quantity.get_query()
+            queries.append(query)
+        return queries
