@@ -105,6 +105,19 @@ def test_structure_attributes(test_file):
     assert pytest.approx(actual_max) == 11.252
 
 
+def test_structure_reach_attributes(test_file):
+    res1d = test_file
+    structures = res1d.structures
+
+    structures.link_links_1_2_LinkChannel.Discharge.add()
+    structures.link_links_2_2_LinkChannel.Discharge.add()
+
+    df = res1d.read()
+
+    max_discharge = round(df.max().max(), 3)
+    assert pytest.approx(max_discharge) == 0.0
+
+
 @pytest.mark.parametrize("query,expected_max", [
     (QueryDataGlobal("Discharge:Sensor:SensorGauge1"), 77.522),
     (QueryDataGlobal("Gate level:Sensor:SensorGateLevel"), 53.770),

@@ -40,26 +40,39 @@ class ResultStructures(ResultLocations):
         """
         for reach in self.data.Reaches:
             for data_item in reach.DataItems:
-                # Data items on reaches with defined ItemId
-                # correspond to structure data items.
-                structure_id = data_item.ItemId
-                if structure_id is None:
+                if not self.is_structure(reach, data_item):
                     continue
 
                 result_structure = self.get_or_create_result_structure(reach, data_item)
+                structure_id = result_structure.structure_id
                 result_structure_attribute_string = make_proper_variable_name(structure_id, self.structure_label)
                 setattr(self, result_structure_attribute_string, result_structure)
 
+    def is_structure(self, reach, data_item):
+        # Data items on reaches with defined ItemId correspond to structure data items.
+        if data_item.ItemId is not None:
+            return True
+
+        # Data item with no index list is not a structure data item.
+        if data_item.IndexList is None:
+            return False
+
+        is_data_item_for_single_grid_point = len(list(data_item.IndexList)) == 1
+        has_three_grid_points = len(list(reach.GridPoints)) == 3
+
+        if reach.IsStructureReach and has_three_grid_points and is_data_item_for_single_grid_point:
+            return True
+
+        return False
+
     def get_or_create_result_structure(self, reach, data_item):
         """
-        Create or get already existing ResultReach object.
-        There potentially could be just a single ResultReach object,
-        for many IRes1DReach object, which have the same name.
+        Create or get already existing ResultStructure object.
 
-        Also update a result_reach_map dict entry from reach name
-        to a list of ResultReach objects.
+        Also update a result_structure_map dict entry from structure ID
+        to a ResultStructure object.
         """
-        structure_id = data_item.ItemId
+        structure_id = ResultStructure.get_structure_id(reach, data_item)
 
         result_structure_map = self.result_structure_map
         if structure_id in result_structure_map:
@@ -67,15 +80,7 @@ class ResultStructures(ResultLocations):
             result_structure.add_res1d_structure_data_item(data_item)
             return result_structure
 
-        result_structure = ResultStructure(reach, [data_item], self.res1d)
-        self.set_res1d_structure_data_item_to_dict(result_structure, data_item)
+        result_structure = ResultStructure(structure_id, reach, [data_item], self.res1d)
+        self.set_res1d_object_to_dict(structure_id, result_structure)
         result_structure_map[structure_id] = result_structure
         return result_structure
-
-    def set_res1d_structure_data_item_to_dict(self, result_structure, data_item):
-        """
-        Create a dict entry from reach name to IRes1DReach object
-        or a list of IRes1DReach objects.
-        """
-        structure_id = data_item.ItemId
-        self.set_res1d_object_to_dict(structure_id, result_structure)

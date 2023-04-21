@@ -1,3 +1,4 @@
+from ..dotnet import pythonnet_implementation as impl
 from ..query import QueryDataStructure
 from .result_location import ResultLocation
 
@@ -9,6 +10,8 @@ class ResultStructure(ResultLocation):
 
     Parameters
     ----------
+    structure_id : str
+        Structure ID.
     reach: IRes1DReach
         Reach where the structure belongs to.
     res1d : Res1D
@@ -22,17 +25,15 @@ class ResultStructure(ResultLocation):
         A dictionary from quantity id to a data item.
     chainage : float
         Chainage where the structure is located on the reach.
-    structure_id : str
-        Structure ID.
     """
 
-    def __init__(self, reach, data_items, res1d):
+    def __init__(self, structure_id, reach, data_items, res1d):
         empty_list = []
         ResultLocation.__init__(self, empty_list, res1d)
 
+        self.structure_id = structure_id
         self.reach = reach
         self.chainage = None
-        self.structure_id = None
 
         self.data_items_dict = {}
         for data_item in data_items:
@@ -57,9 +58,6 @@ class ResultStructure(ResultLocation):
         data_item: IDataItem
             A MIKE 1D IDataItem object.
         """
-        if self.structure_id is None:
-            self.structure_id = data_item.ItemId
-
         if self.chainage is None:
             index_list = list(data_item.IndexList)
             gridpoint_index = index_list[0]
@@ -70,6 +68,23 @@ class ResultStructure(ResultLocation):
         self.data_items_dict[data_item.Quantity.Id] = data_item
         self.set_quantity(self, data_item)
 
+    @staticmethod
+    def get_structure_id(reach, data_item):
+        """
+        Gets structure ID either from IDataItem.ItemId or for structure reaches
+        from actual Res1DStructureGridPoint structure.
+        """
+        if data_item.ItemId is not None:
+            return data_item.ItemId
+
+        if reach.IsStructureReach:
+            structure_gridpoint = impl(list(reach.GridPoints)[1])
+            structures = list(structure_gridpoint.Structures)
+            structure_id = structures[0].Id
+            return structure_id
+
+        return None
+
     def get_data_item(self, quantity_id):
         """ Retrieve a data item for given quantity id. """
         return self.data_items_dict[quantity_id]
@@ -77,6 +92,6 @@ class ResultStructure(ResultLocation):
     def add_query(self, data_item):
         """ Add QueryDataStructure to ResultNetwork.queries list."""
         quantity_id = data_item.Quantity.Id
-        structure_id = data_item.ItemId
+        structure_id = self.structure_id
         query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self.chainage)
         self.res1d.result_network.add_query(query)

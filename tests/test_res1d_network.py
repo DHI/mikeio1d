@@ -63,6 +63,7 @@ def test_data_item_dicts(test_file):
     assert len(res1d.catchments) == 0
     assert len(res1d.nodes) == 119
     assert len(res1d.reaches) == 118
+    assert len(res1d.structures) == 2
     assert len(res1d.global_data) == 0
 
 
@@ -227,3 +228,16 @@ def test_reach_attributes(test_file):
 
     actual_max = round(df["Discharge:9l1:5"].max(), 3)
     assert pytest.approx(actual_max) == 0.761
+
+
+def test_structure_reach_attributes(test_file):
+    res1d = test_file
+    structures = res1d.structures
+
+    structures.s_119w1.Discharge.add()
+    structures.s_115p1.Discharge.add()
+
+    df = res1d.read()
+
+    max_discharge = round(df.max().max(), 3)
+    assert pytest.approx(max_discharge) == 1.491
