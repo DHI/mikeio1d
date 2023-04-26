@@ -4,7 +4,8 @@ from .dotnet import from_dotnet_datetime
 from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
 
-from .result_extractor import ExtractorAll
+from .result_extractor import ExtractorCreator
+from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
 from .result_reader_writer import ResultReader
 from .result_reader_writer import ResultWriter
@@ -318,7 +319,7 @@ class Res1D:
         queries = self._get_actual_queries(queries)
         data_entries = self.result_network.convert_queries_to_data_entries(queries)
 
-        extractor = ExtractorAll.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
+        extractor = ExtractorCreator.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
         extractor.export()
 
         if self.clear_queries_after_reading:
@@ -326,12 +327,12 @@ class Res1D:
 
     def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to csv file. """
-        self.extract(file_path, queries, time_step_skipping_number, 'csv')
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
     def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to dfs0 file. """
-        self.extract(file_path, queries, time_step_skipping_number, 'dfs0')
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
     def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to txt file. """
-        self.extract(file_path, queries, time_step_skipping_number, 'txt')
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)

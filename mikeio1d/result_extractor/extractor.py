@@ -1,4 +1,4 @@
-class Extractor(object):
+class Extractor:
     """Base class for data extractors to specified file format"""
 
     def __init__(self, out_file_name, output_data, result_data, time_step_skipping_number=1):
