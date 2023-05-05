@@ -164,7 +164,7 @@ class Res1D:
             for catchment in self._catchments:
                 self._add_catchment(catchment)
 
-        if self._file_extension.lower() == '.resx':
+        if self._file_extension.lower() in ['.resx', '.crf', '.prf', '.xrf']:
             self._data.Load(self._diagnostics)
         else:
             self._data.LoadData(self._diagnostics)
