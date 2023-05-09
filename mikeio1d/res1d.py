@@ -7,7 +7,8 @@ from .dotnet import to_numpy
 from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
-from .result_reader_writer import ResultReader
+from .result_reader_writer import ResultReaderCreator
+from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
 
 from .query import QueryData            # noqa: F401
@@ -77,10 +78,13 @@ class Res1D:
                  catchments=None,
                  col_name_delimiter=NAME_DELIMITER,
                  put_chainage_in_col_name=True,
-                 clear_queries_after_reading=True):
+                 clear_queries_after_reading=True,
+                 result_reader_type=ResultReaderType.QUERY):
 
-        self.result_reader = ResultReader(
-            self, file_path, lazy_load, header_load, reaches, nodes, catchments,
+        self.result_reader = ResultReaderCreator.create(
+            result_reader_type, self,
+            file_path, lazy_load, header_load,
+            reaches, nodes, catchments,
             col_name_delimiter, put_chainage_in_col_name)
 
         self._start_time = None
