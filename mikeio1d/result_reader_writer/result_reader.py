@@ -112,7 +112,7 @@ class ResultReader:
             for catchment in self._catchments:
                 self._add_catchment(catchment)
 
-        if self.file_extension.lower() == '.resx':
+        if self.file_extension.lower() in ['.resx', '.crf', '.prf', '.xrf']:
             self.data.Load(self.diagnostics)
         else:
             self.data.LoadData(self.diagnostics)
