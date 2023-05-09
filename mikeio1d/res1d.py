@@ -79,7 +79,7 @@ class Res1D:
                  col_name_delimiter=NAME_DELIMITER,
                  put_chainage_in_col_name=True,
                  clear_queries_after_reading=True,
-                 result_reader_type=ResultReaderType.QUERY):
+                 result_reader_type=ResultReaderType.COPIER):
 
         self.result_reader = ResultReaderCreator.create(
             result_reader_type, self,
@@ -200,6 +200,16 @@ class Res1D:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
         """
         return self.result_reader.query
+
+    @property
+    def searcher(self):
+        """
+        .NET object ResultDataSearcher to use for searching res1d data items on network.
+
+        More information about ResultDataSearcher class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
+        """
+        return self.result_reader.searcher
 
     @property
     def file_path(self):

@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -71,10 +72,10 @@ class ResultWriter:
         # Pick the first available value.
         # TODO: Some of the query IDs can be not unique. Figure out how to handle this case.
         values_count = len(values)
-        is_float = isinstance(values[0] if values_count > 0 else 0.0, float)
+        is_float = not isinstance(values[0] if values_count > 0 else 0.0, np.ndarray)
 
         for i in range(values_count):
-            value = values[i] if is_float else values[i][0]
+            value = float(values[i] if is_float else values[i][0])
             data_item.TimeData.SetValue(i, element_index, value)
 
     def set_values_indexed(self, time_index, values, data_item, element_index):
@@ -90,6 +91,6 @@ class ResultWriter:
             values = values.iloc[:, 0]
 
         for time in time_index:
-            value = values[time]
+            value = float(values[time])
             i = res1d_time_index.get_loc(time)
             data_item.TimeData.SetValue(i, element_index, value)

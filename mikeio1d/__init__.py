@@ -37,5 +37,6 @@ clr.AddReference("DHI.Generic.MikeZero.EUM")
 clr.AddReference("DHI.Mike1D.Generic")
 clr.AddReference("DHI.Mike1D.ResultDataAccess")
 clr.AddReference("DHI.Mike1D.CrossSectionModule")
+clr.AddReference("DHI.Mike1D.MikeIO")
 
 from .res1d import Res1D

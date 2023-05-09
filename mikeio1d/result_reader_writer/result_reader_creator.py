@@ -1,10 +1,13 @@
 from ..various import NAME_DELIMITER
 
+from .result_reader_copier import ResultReaderCopier
 from .result_reader_query import ResultReaderQuery
 
 
 class ResultReaderType:
+    COPIER = 'copier'
     QUERY = 'query'
+
 
 class ResultReaderCreator:
 
@@ -21,6 +24,7 @@ class ResultReaderCreator:
                put_chainage_in_col_name=True):
 
         reasult_readers = {
+            ResultReaderType.COPIER: ResultReaderCopier,
             ResultReaderType.QUERY: ResultReaderQuery
         }
 

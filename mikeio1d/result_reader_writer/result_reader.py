@@ -3,11 +3,11 @@ import pandas as pd
 import datetime
 
 from ..dotnet import from_dotnet_datetime
-from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
+from DHI.Mike1D.ResultDataAccess import ResultDataSearch
 from DHI.Mike1D.ResultDataAccess import Filter
 from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 from DHI.Mike1D.ResultDataAccess import ResultTypes
@@ -118,6 +118,7 @@ class ResultReader:
             self.data.LoadData(self.diagnostics)
 
         self.query = ResultDataQuery(self.data)
+        self.searcher = ResultDataSearch(self.data)
 
     def _setup_filter(self):
         """
@@ -217,7 +218,9 @@ class ResultReader:
             time_suffix = f'Time{self.col_name_delimiter}'
             if time_suffix in label:
                 seconds_after_simulation_start_array = df[label].to_numpy()
-                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
+                times = [
+                    simulation_start + datetime.timedelta(seconds=float(sec)) for sec in seconds_after_simulation_start_array
+                ]
                 df[label] = times
 
     def is_lts_result_file(self):
