@@ -26,7 +26,7 @@ class NuGetPackageInfo:
 
 class NuGetRetriever:
     """
-    Retrieves necessary DHI NuGet packages and installs them into bin folder of mikeio1d.
+    Retrieves necessary DHI NuGet packages and installs them into bin folder of MIKE IO 1D.
     """
 
     # Default path

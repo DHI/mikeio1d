@@ -1,5 +1,7 @@
 from .data_entry import DataEntry
 
+from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
+
 
 class ResultQuantity:
     """
@@ -73,3 +75,7 @@ class ResultQuantity:
     def get_data_entry(self):
         """ Get DataEntry corresponding to ResultQuantity. """
         return DataEntry(self.data_item, self.element_index)
+
+    def get_data_entry_net(self):
+        """ Get DataEntryNet corresponding to ResultQuantity. """
+        return DataEntryNet(self.data_item, self.element_index)
