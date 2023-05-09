@@ -144,40 +144,17 @@ class ResultReader:
     #endregion File loading
 
     def read(self, queries=None):
-        dfs = []
-        for query in queries:
-            df = pd.DataFrame(index=self.time_index)
-            values = query.get_values(self.res1d)
-            df[str(query)] = values
-            dfs.append(df)
-
-        df = pd.concat(dfs, axis=1)
-        self.update_time_quantities(df)
-
-        return df
+        return None
 
     def read_all(self):
-        dfs = []
-        for data_set in self.data.DataSets:
+        return None
 
-            data_set = impl(data_set)
-
-            # Skip filtered data sets
-            name = self.get_data_set_name(data_set)
-            if self.use_filter and name not in self._catchments + self._reaches + self._nodes:
-                continue
-
-            for data_item in data_set.DataItems:
-                values_name_pair = self.get_values(data_set, data_item)
-
-                for values, col_name in values_name_pair:
-                    df = pd.DataFrame(index=self.time_index)
-                    df[col_name] = values
-                    dfs.append(df)
-
-        df = pd.concat(dfs, axis=1)
-        self.update_time_quantities(df)
-        return df
+    def is_data_set_included(self, data_set):
+        """ Skip filtered data sets """
+        name = self.get_data_set_name(data_set)
+        if self.use_filter and name not in self._catchments + self._reaches + self._nodes:
+            return False
+        return True
 
     @property
     def time_index(self):
@@ -192,37 +169,7 @@ class ResultReader:
         self._time_index = pd.DatetimeIndex(time_stamps)
         return self._time_index
 
-    def get_values(self, data_set, data_item):
-        """ Get all time series values in given data_item. """
-        if data_item.IndexList is None:
-            return self.get_scalar_value(data_set, data_item)
-        else:
-            return self.get_vector_values(data_set, data_item)
-
-    def get_scalar_value(self, data_set, data_item):
-        name = self.get_data_set_name(data_set)
-        quantity_id = data_item.Quantity.Id
-        col_name = self.get_col_name(quantity_id, name)
-        element_index = 0
-
-        yield data_item.CreateTimeSeriesData(element_index), col_name
-
-    def get_vector_values(self, data_set, data_item):
-        name = self.get_data_set_name(data_set)
-        item_id = data_item.ItemId
-        # Add item id if present before the name.
-        # Needed for unique identification of structures.
-        name = self.col_name_delimiter.join([item_id, name]) if item_id is not None else name
-        chainages = data_set.GetChainages(data_item)
-
-        for i in range(data_item.NumberOfElements):
-            quantity_id = data_item.Quantity.Id
-            col_name_i = self.get_col_name(quantity_id, name, chainages[i], i)
-
-            yield data_item.CreateTimeSeriesData(i), col_name_i
-
-    @staticmethod
-    def get_data_set_name(data_set):
+    def get_data_set_name(self, data_set, item_id=None):
         name = None
 
         if hasattr(data_set, "Name"):
@@ -233,9 +180,23 @@ class ResultReader:
             name = data_set.Quantity.Id
 
         name = "" if name is None else name
+
+        # Add item id if present before the name.
+        # Needed for unique identification of structures.
+        name = self.col_name_delimiter.join([item_id, name]) if item_id is not None else name
+
         return name
 
-    def get_col_name(self, quantity_id, name="", chainage=None, i=None):
+    def get_column_name(self, data_set, data_item, i):
+        quantity_id = data_item.Quantity.Id
+        item_id = data_item.ItemId
+        name = self.get_data_set_name(data_set, item_id)
+
+        chainage = None
+        if data_item.IndexList is not None:
+            chainages = data_set.GetChainages(data_item)
+            chainage = chainages[i]
+
         if name == "":
             return quantity_id
 
