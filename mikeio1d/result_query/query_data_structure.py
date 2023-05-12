@@ -30,8 +30,7 @@ class QueryDataStructure(QueryDataReach):
     def get_values(self, res1d):
         self._check_invalid_quantity(res1d)
 
-        self._check_invalid_structure(res1d)
-        result_structure = res1d.structures[self._structure]
+        result_structure = self._get_result_structure(res1d)
 
         self._check_invalid_structure_quantity(result_structure)
         data_item = result_structure.get_data_item(self._quantity)
@@ -43,6 +42,15 @@ class QueryDataStructure(QueryDataReach):
         self._update_location_info(result_structure)
 
         return self.from_dotnet_to_python(values)
+
+    def _update_query(self, res1d):
+        result_structure = self._get_result_structure(res1d)
+        self._update_location_info(result_structure)
+
+    def _get_result_structure(self, res1d):
+        self._check_invalid_structure(res1d)
+        result_structure = res1d.structures[self._structure]
+        return result_structure
 
     def _check_invalid_structure(self, res1d):
         if self._structure not in res1d.structures:

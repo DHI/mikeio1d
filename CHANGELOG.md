@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Added
+
+- DHI.Mike1D.MikeIO C# utility and ResultReaderCopier for more performant reading of result files
+
+### Changed
+
+- Made ResultQuantity.plot method more Matplotlib-like
+
+### Fixed
+
+- Reading of MOUSE results files: CRF, PRF, and XRF
+
+### Removed
+
+- Support for Python 3.6
+
 ## [0.3] - 2023-04-21
 
 ### Added
@@ -28,7 +44,7 @@
 ### Changed
 
 - Use MIKE 1D NuGet packages v20.1.0
-- Use pythonnet v3.0.1
+- Use Python.NET v3.0.1
 
 ### Fixed
 

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="DHI.Mike1D.ResultDataAccess">
+      <HintPath>..\..\mikeio1d\bin\DHI.Mike1D.ResultDataAccess.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

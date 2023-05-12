@@ -1,5 +1,7 @@
 from .data_entry import DataEntry
 
+from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
+
 
 class ResultQuantity:
     """
@@ -39,13 +41,14 @@ class ResultQuantity:
         query = self.get_query()
         return self.res1d.read(query)
 
-    def plot(self):
+    def plot(self, **kwargs):
         """ Plot the time series data. """
         df = self.read()
-        ax = df.plot()
+        ax = df.plot(**kwargs)
         quantity = self.data_item.Quantity
         ax.set_xlabel('Time')
-        ax.set_ylabel(f'{quantity.Id} [$\\mathrm{{{quantity.EumQuantity.UnitAbbreviation}}}$]')
+        ax.set_ylabel(f'{quantity.Description} [$\\mathrm{{{quantity.EumQuantity.UnitAbbreviation}}}$]')
+        return ax
 
     def to_dataframe(self):
         """ Get a time series as a data frame. """
@@ -73,3 +76,7 @@ class ResultQuantity:
     def get_data_entry(self):
         """ Get DataEntry corresponding to ResultQuantity. """
         return DataEntry(self.data_item, self.element_index)
+
+    def get_data_entry_net(self):
+        """ Get DataEntryNet corresponding to ResultQuantity. """
+        return DataEntryNet(self.data_item, self.element_index)
