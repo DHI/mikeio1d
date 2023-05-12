@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using DHI.Mike1D.ResultDataAccess;
 
@@ -33,7 +34,7 @@ namespace DHI.Mike1D.MikeIO
 
     /// <summary>
     /// Copies all the ResultData data items into memory specified by a given pointer.
-    /// </summary
+    /// </summary>
     public void CopyData(IntPtr intPointer)
     {
       var dataEntries = GetAllDataEntries();
@@ -42,27 +43,20 @@ namespace DHI.Mike1D.MikeIO
 
     /// <summary>
     /// Creates a list of all data entries corresponding to all data items.
-    /// </summary
+    /// </summary>
     public List<DataEntry> GetAllDataEntries()
     {
-      var dataEntries = new List<DataEntry>();
-      foreach (var dataSet in _resultData.DataSets)
-      {
-        foreach (var dataItem in dataSet.DataItems)
-        {
-          for (int i = 0; i < dataItem.NumberOfElements; i++)
-          {
-            var dataEntry = new DataEntry(dataItem, i);
-            dataEntries.Add(dataEntry);
-          }
-        }
-      }
+      var dataEntries = _resultData.DataSets
+        .SelectMany(dataSet => dataSet.DataItems)
+        .SelectMany(dataItem => Enumerable.Range(0, dataItem.NumberOfElements)
+        .Select(elementIndex => new DataEntry(dataItem, elementIndex)))
+        .ToList();
       return dataEntries;
     }
 
     /// <summary>
     /// Copies the given data entries into memory specified by a pointer.
-    /// </summary
+    /// </summary>
     public void CopyData(IntPtr intPointer, List<DataEntry> dataEntries)
     {
 
