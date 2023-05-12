@@ -133,6 +133,12 @@ dmypy.json
 # SublimeText project
 project/
 
+# Some of C# build directories
+obj
+Debug
+Release
+.vs
+
 # mikeio1d/bin folder
 mikeio1d/bin/*.dll
 mikeio1d/bin/*.pfs

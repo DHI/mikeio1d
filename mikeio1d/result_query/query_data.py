@@ -19,6 +19,8 @@ class QueryData:
         Flag specifying to validate the query.
     """
 
+    delete_value = -1e-30
+
     def __init__(self, quantity, name=None, validate=True):
         self._name = name
         self._quantity = quantity
@@ -33,6 +35,21 @@ class QueryData:
         if self.name is not None and not isinstance(self.name, str):
             raise TypeError("Argument 'name' must be either None or a string.")
 
+    def add_to_data_entries(self, res1d, data_entries, column_names):
+        self._check_invalid_quantity(res1d)
+
+        self._update_query(res1d)
+
+        query_label = str(self)
+        result_quantity = res1d.result_network.result_quantity_map.get(query_label, None)
+
+        self._check_invalid_values(result_quantity)
+
+        column_names.append(query_label)
+
+        data_entry = result_quantity.get_data_entry_net()
+        data_entries.Add(data_entry)
+
     @staticmethod
     def from_dotnet_to_python(array):
         """Convert .NET array to numpy."""
@@ -45,6 +62,9 @@ class QueryData:
     @property
     def name(self):
         return self._name
+
+    def _update_query(self, res1d):
+        pass
 
     def _check_invalid_quantity(self, res1d):
         if self._quantity not in res1d.quantities:

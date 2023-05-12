@@ -19,7 +19,7 @@ from platform import architecture
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 if "64" not in architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
@@ -37,5 +37,6 @@ clr.AddReference("DHI.Generic.MikeZero.EUM")
 clr.AddReference("DHI.Mike1D.Generic")
 clr.AddReference("DHI.Mike1D.ResultDataAccess")
 clr.AddReference("DHI.Mike1D.CrossSectionModule")
+clr.AddReference("DHI.Mike1D.MikeIO")
 
 from .res1d import Res1D

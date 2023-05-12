@@ -9,5 +9,4 @@ from .result_nodes import ResultNodes
 from .result_quantity import ResultQuantity
 from .result_reach import ResultReach
 from .result_reaches import ResultReaches
-from .result_writer import ResultWriter
 from .various import make_proper_variable_name

@@ -54,6 +54,31 @@ class QueryDataReach(QueryData):
 
         return self.from_dotnet_to_python(values)
 
+    def _update_query(self, res1d):
+        name = self._name
+        chainage = self._chainage
+        quantity = self._quantity
+
+        if chainage is None:
+            return
+
+        reach = res1d.searcher.FindReach(name, chainage)
+        if reach is None:
+            return
+
+        data_item = res1d.query.FindDataItem(reach, quantity)
+        if data_item is None:
+            return
+
+        closest_element_index = res1d.query.FindClosestElement(reach, chainage, data_item)
+        if closest_element_index == -1:
+            return
+
+        gridpoint_index = list(data_item.IndexList)[closest_element_index]
+        gridpoint = list(reach.GridPoints)[gridpoint_index]
+
+        self._chainage = gridpoint.Chainage
+
     @property
     def chainage(self):
         return self._chainage
@@ -65,6 +90,6 @@ class QueryDataReach(QueryData):
 
         return (
             NAME_DELIMITER.join([quantity, name, f'{chainage:g}'])
-            if chainage is not None else
+            if chainage is not None and chainage != self.delete_value else
             NAME_DELIMITER.join([quantity, name])
         )

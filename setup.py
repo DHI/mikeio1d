@@ -7,17 +7,26 @@ try:
 except Exception as e:
     print('NuGetRetriever failed with an ERROR:')
     print(e)
-    print("NuGetRetriever did not succeed : packages are not installed.")
+    print("NuGetRetriever did not succeed: packages are not installed.")
+
+# Try to build DHI.Mike1D.MikeIO C# project
+try:
+    from scripts.util_builder import UtilBuilder
+    UtilBuilder.build_and_install()
+except Exception as e:
+    print('UtilBuilder failed with an ERROR:')
+    print(e)
+    print("UtilBuilder did not succeed: packages are not installed.")
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.3.0",
+    version="0.4.0",
     install_requires=[
-        'pythonnet<=2.5.2; python_version < "3.9.0"',
-        'pythonnet>=3.0.0a2; python_version >= "3.9.0"',
+        'pythonnet<=2.5.2; python_version < "3.7.0"',
+        'pythonnet>=3.0.0a2; python_version >= "3.7.0"',
         "numpy",
         "pandas",
     ],
@@ -47,11 +56,11 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: Microsoft :: Windows",
         "Topic :: Scientific/Engineering",
     ],

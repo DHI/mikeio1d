@@ -1,15 +1,15 @@
 import os.path
-import pandas as pd
-import datetime
 
 from .dotnet import from_dotnet_datetime
 from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
-from .dotnet import pythonnet_implementation as impl
 
-from .result_extractor import ExtractorAll
+from .result_extractor import ExtractorCreator
+from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
-from .result_network import ResultWriter
+from .result_reader_writer import ResultReaderCreator
+from .result_reader_writer import ResultReaderType
+from .result_reader_writer import ResultWriter
 
 from .query import QueryData            # noqa: F401
 from .query import QueryDataCatchment   # noqa: F401
@@ -22,15 +22,6 @@ from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
 
 from System import DateTime
-
-from DHI.Mike1D.ResultDataAccess import ResultData
-from DHI.Mike1D.ResultDataAccess import ResultDataQuery
-from DHI.Mike1D.ResultDataAccess import Filter
-from DHI.Mike1D.ResultDataAccess import DataItemFilterName
-from DHI.Mike1D.ResultDataAccess import ResultTypes
-
-from DHI.Mike1D.Generic import Connection
-from DHI.Mike1D.Generic import Diagnostics
 
 
 class Res1D:
@@ -87,34 +78,22 @@ class Res1D:
                  catchments=None,
                  col_name_delimiter=NAME_DELIMITER,
                  put_chainage_in_col_name=True,
-                 clear_queries_after_reading=True):
+                 clear_queries_after_reading=True,
+                 result_reader_type=ResultReaderType.COPIER):
 
-        self.file_path = file_path
-        self._file_extension = os.path.splitext(file_path)[-1]
-        self._lazy_load = lazy_load
+        self.result_reader = ResultReaderCreator.create(
+            result_reader_type, self,
+            file_path, lazy_load, header_load,
+            reaches, nodes, catchments,
+            col_name_delimiter, put_chainage_in_col_name)
 
-        self._reaches = reaches if reaches else []
-        self._nodes = nodes if nodes else []
-        self._catchments = catchments if catchments else []
-
-        self._use_filter = (reaches is not None or
-                            nodes is not None or
-                            catchments is not None)
-
-        self._time_index = None
         self._start_time = None
         self._end_time = None
-
-        self._load_header()
-        if not header_load:
-            self._load_file()
 
         self.result_network = ResultNetwork(self)
         self.result_writer = ResultWriter(self)
         self._queries = self.result_network.queries
 
-        self._col_name_delimiter = col_name_delimiter
-        self._put_chainage_in_col_name = put_chainage_in_col_name
         self.clear_queries_after_reading = clear_queries_after_reading
 
     def __repr__(self):
@@ -134,85 +113,7 @@ class Res1D:
 
         return str.join("\n", out)
 
-    #region File loading
-
-    def _load_header(self):
-        if not os.path.exists(self.file_path):
-            raise FileExistsError(f"File {self.file_path} does not exist.")
-
-        self._data = ResultData()
-        self._data.Connection = Connection.Create(self.file_path)
-        self._diagnostics = Diagnostics("Loading header")
-
-        if self._lazy_load:
-            self._data.Connection.BridgeName = "res1dlazy"
-
-        if self._use_filter:
-            self._data.LoadHeader(True, self._diagnostics)
-        else:
-            self._data.LoadHeader(self._diagnostics)
-
-    def _load_file(self):
-
-        if self._use_filter:
-            self._setup_filter()
-
-            for reach in self._reaches:
-                self._add_reach(reach)
-            for node in self._nodes:
-                self._add_node(node)
-            for catchment in self._catchments:
-                self._add_catchment(catchment)
-
-        if self._file_extension.lower() == '.resx':
-            self._data.Load(self._diagnostics)
-        else:
-            self._data.LoadData(self._diagnostics)
-
-        self._query = ResultDataQuery(self._data)
-
-    def _setup_filter(self):
-        """
-        Setup the filter for result data object.
-        """
-        if not self._use_filter:
-            return
-
-        self._data_filter = Filter()
-        self._data_subfilter = DataItemFilterName(self._data)
-        self._data_filter.AddDataItemFilter(self._data_subfilter)
-
-        self._data.Parameters.Filter = self._data_filter
-
-    def _add_reach(self, reach_id):
-        self._data_subfilter.Reaches.Add(reach_id)
-
-    def _add_node(self, node_id):
-        self._data_subfilter.Nodes.Add(node_id)
-
-    def _add_catchment(self, catchment_id):
-        self._data_subfilter.Catchments.Add(catchment_id)
-
-    def _is_lts_result_file(self):
-        # For pythonnet version > 3.0 it is possible to call
-        # return self._data.ResultType.Equals(ResultTypes.LTSEvents)
-        return int(self._data.ResultType) == int(ResultTypes.LTSEvents)
-
-    #endregion File loading
-
     #region Private methods
-
-    def _update_time_quantities(self, df):
-        if not self._is_lts_result_file():
-            return
-
-        simulation_start = from_dotnet_datetime(self._data.StartTime)
-        for label in df:
-            time_suffix = f'Time{self._col_name_delimiter}'
-            if time_suffix in label:
-                seconds_after_simulation_start_array = df[label].to_numpy()
-                times = [simulation_start + datetime.timedelta(seconds=sec) for sec in seconds_after_simulation_start_array]
-                df[label] = times
 
     def _get_actual_queries(self, queries):
         """ Finds out which list of queries should be used. """
@@ -253,129 +154,23 @@ class Res1D:
 
         queries = self._get_actual_queries(queries)
 
-        dfs = []
-        for query in queries:
-            df = pd.DataFrame(index=self.time_index)
-            values = query.get_values(self)
-            df[str(query)] = values
-            dfs.append(df)
-
-        df = pd.concat(dfs, axis=1)
-        self._update_time_quantities(df)
-
-        if self.clear_queries_after_reading:
-            self.clear_queries()
+        df = self.result_reader.read(queries)
 
         return df
 
     def read_all(self):
         """ Read all data from res1d file to dataframe. """
-
-        dfs = []
-        for data_set in self.data.DataSets:
-
-            data_set = impl(data_set)
-
-            # Skip filtered data sets
-            name = Res1D.get_data_set_name(data_set)
-            if self._use_filter and name not in self._catchments + self._reaches + self._nodes:
-                continue
-
-            for data_item in data_set.DataItems:
-                values_name_pair = self.get_values(data_set, data_item)
-
-                for values, col_name in values_name_pair:
-                    df = pd.DataFrame(index=self.time_index)
-                    df[col_name] = values
-                    dfs.append(df)
-
-        df = pd.concat(dfs, axis=1)
-        self._update_time_quantities(df)
-        return df
+        return self.result_reader.read_all()
 
     def clear_queries(self):
         """ Clear the current active list of queries. """
         self.result_network.queries.clear()
         self.result_network.queries_ids.clear()
 
-    def get_values(self, data_set, data_item):
-        """ Get all time series values in given data_item. """
-        if data_item.IndexList is None:
-            return self.get_scalar_value(data_set, data_item)
-        else:
-            return self.get_vector_values(data_set, data_item)
-
-    def get_scalar_value(self, data_set, data_item):
-        name = Res1D.get_data_set_name(data_set)
-        quantity_id = data_item.Quantity.Id
-        col_name = self.get_col_name(quantity_id, name)
-        element_index = 0
-
-        yield data_item.CreateTimeSeriesData(element_index), col_name
-
-    def get_vector_values(self, data_set, data_item):
-        name = Res1D.get_data_set_name(data_set)
-        item_id = data_item.ItemId
-        # Add item id if present before the name.
-        # Needed for unique identification of structures.
-        name = self._col_name_delimiter.join([item_id, name]) if item_id is not None else name
-        chainages = data_set.GetChainages(data_item)
-
-        for i in range(data_item.NumberOfElements):
-            quantity_id = data_item.Quantity.Id
-            col_name_i = self.get_col_name(quantity_id, name, chainages[i], i)
-
-            yield data_item.CreateTimeSeriesData(i), col_name_i
-
-    @staticmethod
-    def get_data_set_name(data_set):
-        name = None
-
-        if hasattr(data_set, "Name"):
-            name = data_set.Name
-        elif hasattr(data_set, "Id"):
-            name = data_set.Id
-        elif data_set.Quantity is not None:
-            name = data_set.Quantity.Id
-
-        name = "" if name is None else name
-        return name
-
-    def get_col_name(self, quantity_id, name="", chainage=None, i=None):
-        if name == "":
-            return quantity_id
-
-        if chainage is None:
-            return self._col_name_delimiter.join([quantity_id, name])
-
-        postfix = f"{chainage:g}" if self._put_chainage_in_col_name else str(i)
-        return self._col_name_delimiter.join([quantity_id, name, postfix])
-
     @property
     def time_index(self):
         """ pandas.DatetimeIndex of the time index. """
-        if self._time_index is not None:
-            return self._time_index
-
-        if self._is_lts_result_file():
-            return self.lts_event_index
-
-        time_stamps = [from_dotnet_datetime(t) for t in self.data.TimesList]
-        self._time_index = pd.DatetimeIndex(time_stamps)
-        return self._time_index
-
-    @property
-    def lts_event_index(self):
-        """ pandas.DatetimeIndex of the LTS event index. """
-        if self._time_index is not None:
-            return self._time_index
-
-        number_of_event_entries = len(self._data.TimesList)
-        event_index = [i for i in range(number_of_event_entries)]
-
-        self._time_index = pd.Index(event_index)
-
-        return self._time_index
+        return self.result_reader.time_index
 
     @property
     def start_time(self):
@@ -394,7 +189,7 @@ class Res1D:
     @property
     def quantities(self):
         """ Quantities in res1d file. """
-        return [quantity.Id for quantity in self._data.Quantities]
+        return self.result_reader.quantities
 
     @property
     def query(self):
@@ -404,7 +199,22 @@ class Res1D:
         More information about ResultDataQuery class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
         """
-        return self._query
+        return self.result_reader.query
+
+    @property
+    def searcher(self):
+        """
+        .NET object ResultDataSearcher to use for searching res1d data items on network.
+
+        More information about ResultDataSearcher class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
+        """
+        return self.result_reader.searcher
+
+    @property
+    def file_path(self):
+        """ File path of the result file. """
+        return self.result_reader.file_path
 
     @property
     def data(self):
@@ -414,7 +224,7 @@ class Res1D:
         More information about ResultData class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm
         """
-        return self._data
+        return self.result_reader.data
 
     @property
     def catchments(self):
@@ -453,7 +263,7 @@ class Res1D:
         return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
-        if self._is_lts_result_file():
+        if self.result_reader.is_lts_result_file():
             raise NotImplementedError('The method is not implemented for LTS event statistics.')
 
         time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
@@ -523,7 +333,7 @@ class Res1D:
         queries = self._get_actual_queries(queries)
         data_entries = self.result_network.convert_queries_to_data_entries(queries)
 
-        extractor = ExtractorAll.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
+        extractor = ExtractorCreator.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
         extractor.export()
 
         if self.clear_queries_after_reading:
@@ -531,12 +341,12 @@ class Res1D:
 
     def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to csv file. """
-        self.extract(file_path, queries, time_step_skipping_number, 'csv')
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
     def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to dfs0 file. """
-        self.extract(file_path, queries, time_step_skipping_number, 'dfs0')
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
     def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
         """ Extract to txt file. """
-        self.extract(file_path, queries, time_step_skipping_number, 'txt')
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
