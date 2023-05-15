@@ -3,6 +3,8 @@ import sys
 import os
 from platform import architecture
 
+from .mikepath import setup_mike_installation
+
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/
 #
@@ -24,16 +26,15 @@ __version__ = "0.4.0"
 if "64" not in architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
 
-mike_bin_path = os.path.join(os.path.dirname(__file__), "bin")
-sys.path.append(mike_bin_path)
+setup_mike_installation(sys.path)
 
 clr.AddReference("System")
 clr.AddReference("System.Runtime")
 clr.AddReference("System.Runtime.InteropServices")
 clr.AddReference("DHI.Generic.MikeZero.DFS")
 clr.AddReference("DHI.Generic.MikeZero.EUM")
-# clr.AddReference("DHI.PFS")
-# clr.AddReference("DHI.Projections")
+# clr.AddReference('DHI.PFS')
+# clr.AddReference('DHI.Projections')
 clr.AddReference("DHI.Mike1D.Generic")
 clr.AddReference("DHI.Mike1D.ResultDataAccess")
 clr.AddReference("DHI.Mike1D.CrossSectionModule")
