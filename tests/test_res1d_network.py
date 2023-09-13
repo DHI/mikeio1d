@@ -128,6 +128,9 @@ def test_time_index(test_file):
 def test_start_time(test_file):
     assert test_file.start_time == test_file.time_index.min()
 
+def test_time_index_microseconds(test_file):
+    df = test_file.read()
+    assert df.index.microsecond.unique().size  > 1
 
 def test_get_node_values(test_file):
     values = test_file.get_node_values("1", "WaterLevel")
