@@ -35,12 +35,16 @@ _MAP_NET_NP = {
 
 def to_dotnet_datetime(x):
     """Convert from python datetime to .NET System.DateTime """
-    return System.DateTime(x.year, x.month, x.day, x.hour, x.minute, x.second,)
+    milliseconds = x.microsecond // 1000
+    return System.DateTime(x.year, x.month, x.day, x.hour, x.minute, 
+                                      x.second, milliseconds)
 
 
 def from_dotnet_datetime(x):
     """Convert from .NET System.DateTime to python datetime"""
-    return datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second)
+    microseconds = x.Millisecond * 1000
+    return datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second,
+                             microseconds)
 
 
 def asNumpyArray(x):
