@@ -13,6 +13,7 @@
 ### Fixed
 
 - Reading of MOUSE results files: CRF, PRF, and XRF
+- Include milliseconds from .res1d files
 
 ### Removed
 
