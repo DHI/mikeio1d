@@ -34,13 +34,19 @@ _MAP_NET_NP = {
 
 
 def to_dotnet_datetime(x):
-    """Convert from python datetime to .NET System.DateTime """
-    return System.DateTime(x.year, x.month, x.day, x.hour, x.minute, x.second,)
+    """Convert from python datetime to .NET System.DateTime"""
+    milliseconds = x.microsecond // 1000
+    return System.DateTime(
+        x.year, x.month, x.day, x.hour, x.minute, x.second, milliseconds
+    )
 
 
 def from_dotnet_datetime(x):
     """Convert from .NET System.DateTime to python datetime"""
-    return datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second)
+    microseconds = x.Millisecond * 1000
+    return datetime.datetime(
+        x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second, microseconds
+    )
 
 
 def asNumpyArray(x):
@@ -134,7 +140,6 @@ def asnetarray_v2(x):
 
 
 def to_dotnet_float_array(x):
-
     return to_dotnet_array(x.astype(np.float32))
 
 
@@ -179,7 +184,7 @@ def pythonnet_implementation(clr_object):
     CLR object having the type of the actual implementation of the object
 
     """
-    if hasattr(clr_object, '__implementation__'):
+    if hasattr(clr_object, "__implementation__"):
         return clr_object.__implementation__
 
     return clr_object
