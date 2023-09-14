@@ -39,7 +39,7 @@ setuptools.setup(
             "matplotlib",
             "jupyterlab",
         ],
-        "test": ["pytest", "matplotlib", "tk"],
+        "test": ["pytest", "matplotlib"],
     },
     author="Gediminas Kirsanskas",
     author_email="geki@dhigroup.com",

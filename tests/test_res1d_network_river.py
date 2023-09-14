@@ -1,10 +1,16 @@
 import os
 import pytest
 import pandas as pd
+import matplotlib as mpl
+
+# Avoid problems with matplotlib when running on a server without a display
+mpl.use("Agg")
 
 from mikeio1d.res1d import Res1D
 from mikeio1d.query import QueryDataStructure
 from mikeio1d.query import QueryDataGlobal
+
+
 
 
 @pytest.fixture
