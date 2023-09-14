@@ -34,8 +34,8 @@ def test_repr(test_file):
     swmm_out_repr = swmm_out.__repr__()
     swmm_out_repr_ref = (
         '<mikeio1d.Res1D>\n' +
-        'Start time: 1998-01-01 01:00:00\n' +
-        'End time: 1998-01-02 12:00:00\n'
+        'Start time: 1998-01-01 01:00:00.001000\n' +
+        'End time: 1998-01-02 12:00:00.001000\n'
         '# Timesteps: 36\n' +
         '# Catchments: 8\n' +
         '# Nodes: 14\n' +
