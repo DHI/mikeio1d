@@ -18,19 +18,33 @@ class ResultCatchment(ResultLocation):
         ResultLocation.__init__(self, catchment.DataItems, res1d)
         self.catchment = catchment
         self.set_quantities()
+        self.set_static_attributes()
+
+    def set_static_attributes(self):
+        """Set static attributes. These show up in the html repr."""
+        self.set_static_attribute("id", self.catchment.Id)
+        self.set_static_attribute("area", self.catchment.Area)
+        self.set_static_attribute("center_xcoord", self.catchment.CenterPoint.X)
+        self.set_static_attribute("center_ycoord", self.catchment.CenterPoint.Y)
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
-        """ Add catchment result quantity to result quantity maps. """
-        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+        """Add catchment result quantity to result quantity maps."""
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, self.result_quantity_map
+        )
 
-        catchment_result_quantity_map = self.res1d.result_network.catchments.result_quantity_map
-        self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
+        catchment_result_quantity_map = (
+            self.res1d.result_network.catchments.result_quantity_map
+        )
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, catchment_result_quantity_map
+        )
 
         query = QueryDataCatchment(quantity_id, self.catchment.Id, validate=False)
         self.add_to_network_result_quantity_map(query, result_quantity)
 
     def get_query(self, data_item):
-        """ Get a QueryDataCatchment for given data item. """
+        """Get a QueryDataCatchment for given data item."""
         quantity_id = data_item.Quantity.Id
         catchment_id = self.catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
