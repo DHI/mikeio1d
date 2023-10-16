@@ -1,3 +1,4 @@
+import warnings
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
@@ -36,7 +37,7 @@ class ResultReach(ResultLocation):
         data_items = []
         ResultLocation.__init__(self, data_items, res1d)
 
-        self.chainage_label = 'm_'
+        self.chainage_label = "m_"
 
         self.result_gridpoints = []
         self.current_reach_result_gridpoints = None
@@ -44,6 +45,34 @@ class ResultReach(ResultLocation):
         self.reaches = []
         for reach in reaches:
             self.add_res1d_reach(reach)
+
+    # TODO: Is there a better way to get the total length? maybe it can be removed eventually if replaced by geom
+    def _get_total_length(self):
+        total_length = 0
+        for reach in self.reaches:
+            total_length += reach.Length
+        return total_length
+
+    def set_static_attributes(self):
+        """Set static attributes. These show up in the html repr."""
+        if self.reaches[0].Name == "river":
+            print(self.reaches)
+        self.set_static_attribute("name", self.reaches[0].Name)
+        try:
+            self.set_static_attribute("length", self._get_total_length())
+        except Exception as _:
+            warnings.warn(
+                "Length attribute not included. For SWMM and EPANET results this is not available."
+            )
+        self.set_static_attribute(
+            "start_chainage", self.reaches[0].LocationSpan.StartChainage
+        )
+        self.set_static_attribute(
+            "end_chainage", self.reaches[-1].LocationSpan.EndChainage
+        )
+        self.set_static_attribute("n_gridpoints", len(self.result_gridpoints))
+
+        # TODO: Customized attributes based on type (e.g. a pipe might want the diameter, maybe upstream/downstream nodes)
 
     def add_res1d_reach(self, reach):
         """
@@ -60,6 +89,7 @@ class ResultReach(ResultLocation):
         self.set_gridpoint_data_items(reach)
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint.set_quantities()
+        self.set_static_attributes()
 
     def set_gridpoints(self, reach):
         """
@@ -101,11 +131,15 @@ class ResultReach(ResultLocation):
         """
         current_reach_result_gridpoints = self.current_reach_result_gridpoints
 
-        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d)
+        result_gridpoint = ResultGridPoint(
+            reach, gridpoint, reach.DataItems, self, self.res1d
+        )
         current_reach_result_gridpoints.append(result_gridpoint)
 
-        chainage_string = f'{gridpoint.Chainage:g}'
-        result_gridpoint_attribute_string = make_proper_variable_name(chainage_string, self.chainage_label)
+        chainage_string = f"{gridpoint.Chainage:g}"
+        result_gridpoint_attribute_string = make_proper_variable_name(
+            chainage_string, self.chainage_label
+        )
         setattr(self, result_gridpoint_attribute_string, result_gridpoint)
 
     def set_gridpoint_data_items(self, reach):
@@ -120,7 +154,9 @@ class ResultReach(ResultLocation):
         """
         for data_item in reach.DataItems:
             # For SWMM and EPANET results IndexList is None.
-            index_list = [0] if data_item.IndexList is None else list(data_item.IndexList)
+            index_list = (
+                [0] if data_item.IndexList is None else list(data_item.IndexList)
+            )
             element_count = len(index_list)
             for element_index in range(element_count):
                 gridpoint_index = index_list[element_index]

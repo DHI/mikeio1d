@@ -13,6 +13,11 @@ def res1d_network():
 
 
 @pytest.fixture()
+def res1d_river_network():
+    return Res1D(testdata.NetworkRiver_res1d)
+
+
+@pytest.fixture()
 def res1d_catchments():
     return Res1D(testdata.Catchments_res1d)
 
@@ -35,8 +40,12 @@ def many_nodes(res1d_network):
 
 @pytest.fixture
 def reach(res1d_network):
-    dotnet_reach = impl(res1d_network.data.Reaches)
-    return ResultReach(dotnet_reach, res1d_network)
+    return res1d_network.result_network.reaches.r_100l1
+
+
+@pytest.fixture
+def river_reach(res1d_river_network):
+    return res1d_river_network.result_network.reaches.river
 
 
 @pytest.fixture
