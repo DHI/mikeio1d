@@ -1,5 +1,6 @@
 from .result_quantity import ResultQuantity
-from .various import make_proper_variable_name, build_html_repr_from_sections
+from .various import make_proper_variable_name
+from .various import build_html_repr_from_sections
 
 
 class ResultLocation:
