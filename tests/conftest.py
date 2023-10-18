@@ -1,7 +1,8 @@
 import pytest
 
 from mikeio1d.res1d import Res1D
-from mikeio1d.result_network import ResultNode, ResultReach, ResultCatchment
+from mikeio1d.result_network import ResultNode
+from mikeio1d.result_network import ResultCatchment
 from mikeio1d.dotnet import pythonnet_implementation as impl
 
 from .testdata import testdata
