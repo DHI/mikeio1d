@@ -46,6 +46,22 @@ class ResultReach(ResultLocation):
         for reach in reaches:
             self.add_res1d_reach(reach)
 
+    def __getattribute__(self, __name: str):
+        # TODO: Remove this in 1.0.0
+        try:
+            return super().__getattribute__(__name)
+        except AttributeError as e:
+            if hasattr(self.reaches[0], __name):
+                warnings.warn(
+                    f"Accessing IRes1DReach attribute {__name} like this is deprecated. Use static attributes instead, or .reaches[0].{__name}."
+                )
+                return getattr(self.reaches[0], __name)
+            else:
+                raise e
+
+    def __getitem__(self, index):
+        return self.reaches[index]
+
     # TODO: Is there a better way to get the total length? maybe it can be removed eventually if replaced by geom
     def _get_total_length(self):
         total_length = 0
