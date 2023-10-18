@@ -21,6 +21,7 @@ class ResultNode(ResultLocation):
         self.set_static_attributes()
 
     def __getattribute__(self, __name: str) -> Any:
+        # TODO: Remove this in 1.0.0
         if __name == "node":
             warn("Accessing IRes1DNode attribute via .node is deprecated. Use ._node.")
             return self._node
