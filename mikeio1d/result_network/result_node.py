@@ -20,6 +20,9 @@ class ResultNode(ResultLocation):
         self.set_quantities()
         self.set_static_attributes()
 
+    def __repr__(self) -> str:
+        return f"<{self.type}: {self.id}>"
+
     def __getattribute__(self, __name: str) -> Any:
         # TODO: Remove this in 1.0.0
         if __name == "node":
@@ -43,8 +46,8 @@ class ResultNode(ResultLocation):
         self._static_attributes = []
 
         node_type = self._node.GetType().Name[5:]  # Removes 'Res1D' from type name
-        self.set_static_attribute("type", node_type)
         self.set_static_attribute("id", self._node.Id)
+        self.set_static_attribute("type", node_type)
         self.set_static_attribute("xcoord", self._node.XCoordinate)
         self.set_static_attribute("ycoord", self._node.YCoordinate)
 
