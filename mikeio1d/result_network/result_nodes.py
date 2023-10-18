@@ -38,15 +38,15 @@ class ResultNodes(ResultLocations):
         """
         for node in self.data.Nodes:
             node = impl(node)
-            self.set_res1d_node_to_dict(node)
             result_node = ResultNode(node, self.res1d)
+            self.set_res1d_node_to_dict(result_node)
             result_node_attribute_string = make_proper_variable_name(
                 node.ID, self.node_label
             )
             setattr(self, result_node_attribute_string, result_node)
 
-    def set_res1d_node_to_dict(self, node):
+    def set_res1d_node_to_dict(self, result_node):
         """
-        Create a dict entry from node ID to IRes1DNode object.
+        Create a dict entry from node ID to ResultNode object.
         """
-        self[node.ID] = node
+        self[result_node.id] = result_node
