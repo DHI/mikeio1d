@@ -55,8 +55,6 @@ class ResultReach(ResultLocation):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        if self.reaches[0].Name == "river":
-            print(self.reaches)
         self.set_static_attribute("name", self.reaches[0].Name)
         try:
             self.set_static_attribute("length", self._get_total_length())
