@@ -1,6 +1,7 @@
 from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
+from ..dotnet import pythonnet_implementation as impl
 
 
 class ResultReaches(ResultLocations):
@@ -30,7 +31,7 @@ class ResultReaches(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
-        self.reach_label = 'r_'
+        self.reach_label = "r_"
         self.result_reach_map = {}
 
         res1d.result_network.reaches = self
@@ -43,23 +44,18 @@ class ResultReaches(ResultLocations):
         on the reach name.
         """
         for reach in self.data.Reaches:
-            self.set_res1d_reach_to_dict(reach)
+            reach = impl(reach)
             result_reach = self.get_or_create_result_reach(reach)
-            result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
+            result_reach_attribute_string = make_proper_variable_name(
+                reach.Name, self.reach_label
+            )
             setattr(self, result_reach_attribute_string, result_reach)
 
     def set_quantity_collections(self):
         ResultLocations.set_quantity_collections(self)
-        for reach_name in self.result_reach_map:
-            result_reach = self.result_reach_map[reach_name]
+        for reach_name in self:
+            result_reach = self[reach_name]
             ResultLocations.set_quantity_collections(result_reach)
-
-    def set_res1d_reach_to_dict(self, reach):
-        """
-        Create a dict entry from reach name to IRes1DReach object
-        or a list of IRes1DReach objects.
-        """
-        self.set_res1d_object_to_dict(reach.Name, reach)
 
     def get_or_create_result_reach(self, reach):
         """
@@ -67,15 +63,14 @@ class ResultReaches(ResultLocations):
         There potentially could be just a single ResultReach object,
         for many IRes1DReach object, which have the same name.
 
-        Also update a result_reach_map dict entry from reach name
-        to a list of ResultReach objects.
+        Also update self's dict entry from reach name
+        to a ResultReach object.
         """
-        result_reach_map = self.result_reach_map
-        if reach.Name in result_reach_map:
-            result_reach = result_reach_map[reach.Name]
+        if reach.Name in self:
+            result_reach = self[reach.Name]
             result_reach.add_res1d_reach(reach)
             return result_reach
 
         result_reach = ResultReach([reach], self.res1d)
-        result_reach_map[reach.Name] = result_reach
+        self[reach.Name] = result_reach
         return result_reach
