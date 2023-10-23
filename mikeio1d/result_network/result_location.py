@@ -79,17 +79,6 @@ class ResultLocation:
 
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
 
-    def set_static_quantity(self):
-        """Sets a single static quantity attribute on the obj."""
-        data_item = self.data_items[0]
-        result_quantity = ResultQuantity(self, data_item, self.res1d)
-        quantity = data_item.Quantity
-        quantity_id = quantity.Id
-        result_quantity_attribute_string = make_proper_variable_name(
-            quantity_id, self.quantity_label
-        )
-        setattr(self, result_quantity_attribute_string, result_quantity)
-
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """
         Base method for adding to result quantity maps, which is a dictionary

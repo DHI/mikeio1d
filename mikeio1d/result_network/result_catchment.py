@@ -1,6 +1,7 @@
+from warnings import warn
+
 from ..query import QueryDataCatchment
 from .result_location import ResultLocation
-from warnings import warn
 
 
 class ResultCatchment(ResultLocation):

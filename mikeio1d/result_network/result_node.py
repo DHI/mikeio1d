@@ -1,7 +1,7 @@
-from typing import Any
+from warnings import warn
+
 from ..query import QueryDataNode
 from .result_location import ResultLocation
-from warnings import warn
 
 
 class ResultNode(ResultLocation):
@@ -23,7 +23,7 @@ class ResultNode(ResultLocation):
     def __repr__(self) -> str:
         return f"<{self.type}: {self.id}>"
 
-    def __getattribute__(self, __name: str) -> Any:
+    def __getattribute__(self, __name: str):
         # TODO: Remove this in 1.0.0
         if __name == "node":
             warn("Accessing IRes1DNode attribute via .node is deprecated. Use ._node.")

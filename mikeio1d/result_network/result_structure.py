@@ -1,8 +1,8 @@
+from warnings import warn
+
 from ..dotnet import pythonnet_implementation as impl
 from ..query import QueryDataStructure
 from .result_location import ResultLocation
-
-from warnings import warn
 
 
 class ResultStructure(ResultLocation):
