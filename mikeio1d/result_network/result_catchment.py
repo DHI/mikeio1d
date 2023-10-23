@@ -1,5 +1,6 @@
 from ..query import QueryDataCatchment
 from .result_location import ResultLocation
+from warnings import warn
 
 
 class ResultCatchment(ResultLocation):
@@ -16,9 +17,29 @@ class ResultCatchment(ResultLocation):
 
     def __init__(self, catchment, res1d):
         ResultLocation.__init__(self, catchment.DataItems, res1d)
-        self.catchment = catchment
+        self._catchment = catchment
         self.set_quantities()
         self.set_static_attributes()
+
+    def __getattribute__(self, __name: str):
+        # TODO: Remove this in 1.0.0
+        if __name == "catchment":
+            warn(
+                "Accessing IRes1DCatchment attribute via .catchment is deprecated. Use ._catchment."
+            )
+            return self._catchment
+        try:
+            return super().__getattribute__(__name)
+        except AttributeError:
+            if hasattr(self._catchment, __name):
+                warn(
+                    f"Accessing IRes1DCatchment attribute {__name} directly is deprecated. Use static attributes instead, or ._catchment.{__name}."
+                )
+                return getattr(self._catchment, __name)
+            else:
+                raise AttributeError(
+                    f"'{self.__class__.__name}' object has no attribute '{__name}'"
+                )
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
