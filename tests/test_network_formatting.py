@@ -10,7 +10,7 @@ def test_location_str_repr_header_line(node, reach, catchment, structure):
         "<Reach: 100l1>"
     ), "Reach header line is not correct."
     assert catchment.__repr__().startswith(
-        "<ResultCatchment>"
+        "<Catchment: 100_16_16>"
     ), "Catchment header line is not correct."
     assert structure.__repr__().startswith(
         "<Weir: 119w1>"
@@ -25,7 +25,7 @@ def test_location_html_repr_header_line(node, reach, catchment):
         "&lt;Reach: 100l1&gt;"
     ), "Reach header line is not correct."
     assert catchment._repr_html_().startswith(
-        "&lt;ResultCatchment&gt;"
+        "&lt;Catchment: 100_16_16&gt;"
     ), "Catchment header line is not correct."
 
 
@@ -60,7 +60,7 @@ def test_single_node_html_repr(node):
 
 def test_single_catchment_html_repr(catchment):
     html_repr = catchment._repr_html_()
-    expected_html_repr = """&lt;ResultCatchment&gt;
+    expected_html_repr = """&lt;Catchment: 100_16_16&gt;
     <style>
         ul {
             margin: 0px;
