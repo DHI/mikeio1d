@@ -177,8 +177,9 @@ def test_all_catchments_attributes(test_file):
 def test_catchment_attribute_access_maintains_backwards_compat(res1d_catchments):
     res = res1d_catchments
     catchment = res.result_network.catchments["100_16_16"]
-    assert catchment.Id == "100_16_16"
-    assert pytest.approx(catchment.Area) == 22800.0
+    with pytest.warns(UserWarning):
+        assert catchment.Id == "100_16_16"
+        assert pytest.approx(catchment.Area) == 22800.0
     for name, catchment in res.result_network.catchments.items():
         assert catchment.CatchmentName == name
 
