@@ -24,8 +24,7 @@ class ResultCatchment(ResultLocation):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("id", self.catchment.Id)
         self.set_static_attribute("area", self.catchment.Area)
-        self.set_static_attribute("center_xcoord", self.catchment.CenterPoint.X)
-        self.set_static_attribute("center_ycoord", self.catchment.CenterPoint.Y)
+        self.set_static_attribute("type", self.catchment.Type)
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add catchment result quantity to result quantity maps."""

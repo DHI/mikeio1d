@@ -25,7 +25,7 @@ class ResultCatchments(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
-        self.catchment_label = 'c_'
+        self.catchment_label = "c_"
 
         res1d.result_network.catchments = self
         self.set_catchments()
@@ -37,14 +37,16 @@ class ResultCatchments(ResultLocations):
         on the catchment ID.
         """
         for catchment in self.data.Catchments:
-            self.set_res1d_catchment_to_dict(catchment)
+            catchment = impl(catchment)
             result_catchment = ResultCatchment(catchment, self.res1d)
-            result_catchment_attribute_string = make_proper_variable_name(catchment.Id, self.catchment_label)
+            self.set_res1d_catchment_to_dict(result_catchment)
+            result_catchment_attribute_string = make_proper_variable_name(
+                result_catchment.id, self.catchment_label
+            )
             setattr(self, result_catchment_attribute_string, result_catchment)
 
     def set_res1d_catchment_to_dict(self, catchment):
         """
-        Create a dict entry from catchment ID to IRes1DCatchment object.
+        Create a dict entry from catchment ID to ResultCatchment object.
         """
-        catchment = impl(catchment)
-        self[catchment.Id] = catchment
+        self[catchment.id] = catchment
