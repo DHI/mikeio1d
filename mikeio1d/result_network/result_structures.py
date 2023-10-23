@@ -26,7 +26,7 @@ class ResultStructures(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
-        self.structure_label = 's_'
+        self.structure_label = "s_"
         self.result_structure_map = {}
 
         res1d.result_network.structures = self
@@ -44,8 +44,10 @@ class ResultStructures(ResultLocations):
                     continue
 
                 result_structure = self.get_or_create_result_structure(reach, data_item)
-                structure_id = result_structure.structure_id
-                result_structure_attribute_string = make_proper_variable_name(structure_id, self.structure_label)
+                structure_id = result_structure.id
+                result_structure_attribute_string = make_proper_variable_name(
+                    structure_id, self.structure_label
+                )
                 setattr(self, result_structure_attribute_string, result_structure)
 
     def is_structure(self, reach, data_item):
@@ -60,7 +62,11 @@ class ResultStructures(ResultLocations):
         is_data_item_for_single_grid_point = len(list(data_item.IndexList)) == 1
         has_three_grid_points = len(list(reach.GridPoints)) == 3
 
-        if reach.IsStructureReach and has_three_grid_points and is_data_item_for_single_grid_point:
+        if (
+            reach.IsStructureReach
+            and has_three_grid_points
+            and is_data_item_for_single_grid_point
+        ):
             return True
 
         return False
