@@ -22,6 +22,9 @@ class ResultCatchment(ResultLocation):
         self.set_quantities()
         self.set_static_attributes()
 
+    def __repr__(self) -> str:
+        return f"<Catchment: {self.id}>"
+
     def __getattribute__(self, __name: str):
         # TODO: Remove this in 1.0.0
         if __name == "catchment":
