@@ -282,6 +282,33 @@ def test_structure_reach_attributes(test_file):
     assert pytest.approx(max_discharge) == 1.491
 
 
+def test_structure_reach_static_attributes_exist(res1d_network, res1d_river_network):
+    for network in [res1d_network, res1d_river_network]:
+        for _, structure in network.result_network.structures.items():
+            assert hasattr(structure, "id")
+            assert hasattr(structure, "type")
+            assert hasattr(structure, "chainage")
+
+
+def test_structure_reach_static_attributes(res1d_network):
+    structures = res1d_network.result_network.structures
+
+    assert structures.s_119w1.type == "Weir"
+    assert structures.s_119w1.id == "119w1"
+    assert structures.s_119w1.chainage == pytest.approx(0.5)
+
+    assert structures.s_115p1.type == "Pump"
+    assert structures.s_115p1.id == "115p1"
+    assert structures.s_115p1.chainage == pytest.approx(41.21402714094492)
+
+
+def test_structure_reach_maintains_backweards_compatibility(res1d_network):
+    structures = res1d_network.result_network.structures
+
+    with pytest.warns(UserWarning):
+        assert structures.s_119w1.structure_id == structures.s_119w1.id
+
+
 def test_nodes_dict_access_maintains_backwards_compatibility(res1d_network):
     with pytest.warns(UserWarning):
         node = res1d_network.result_network.nodes["1"]
