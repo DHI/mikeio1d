@@ -33,19 +33,19 @@ def test_repr(test_file):
     res1d = test_file
     res1d_repr = res1d.__repr__()
     res1d_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 1994-08-07 16:35:00\n' +
-        'End time: 1994-08-07 18:35:00\n'
-        '# Timesteps: 108\n' +
-        '# Catchments: 31\n' +
-        '# Nodes: 0\n' +
-        '# Reaches: 0\n' +
-        '# Globals: 0\n' +
-        '0 - TotalRunOff <m^3/s>\n' +
-        '1 - ActualRainfall <m/s>\n' +
-        '2 - ZinkLoadRR <kg/s>\n' +
-        '3 - ZinkMassAccumulatedRR <kg>\n' +
-        '4 - ZinkRR <mg/l>'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 1994-08-07 16:35:00\n"
+        + "End time: 1994-08-07 18:35:00\n"
+        "# Timesteps: 108\n"
+        + "# Catchments: 31\n"
+        + "# Nodes: 0\n"
+        + "# Reaches: 0\n"
+        + "# Globals: 0\n"
+        + "0 - TotalRunOff <m^3/s>\n"
+        + "1 - ActualRainfall <m/s>\n"
+        + "2 - ZinkLoadRR <kg/s>\n"
+        + "3 - ZinkMassAccumulatedRR <kg>\n"
+        + "4 - ZinkRR <mg/l>"
     )
     assert res1d_repr == res1d_repr_ref
 
@@ -58,11 +58,14 @@ def test_data_item_dicts(test_file):
     assert len(res1d.global_data) == 0
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataCatchment("TotalRunOff", "20_2_2"), True),
-    (QueryDataCatchment("ZinkRR", "22_8_8"), True),
-    (QueryDataCatchment("TotalRunOff", "wrong_catchment_name"), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataCatchment("TotalRunOff", "20_2_2"), True),
+        (QueryDataCatchment("ZinkRR", "22_8_8"), True),
+        (QueryDataCatchment("TotalRunOff", "wrong_catchment_name"), False),
+    ],
+)
 def test_valid_catchment_data_queries(test_file, query, expected):
     res1d = test_file
 
@@ -78,19 +81,22 @@ def test_valid_catchment_data_queries(test_file, query, expected):
         pass
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataCatchment("TotalRunOff", "20_2_2"), 0.236),
-    (QueryDataCatchment("TotalRunOff", "22_8_8"), 0.231)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataCatchment("TotalRunOff", "20_2_2"), 0.236),
+        (QueryDataCatchment("TotalRunOff", "22_8_8"), 0.231),
+    ],
+)
 def test_read_catchment_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,catchment_id,expected_max", [
-    ("TotalRunoff", "20_2_2", 0.236),
-    ("TotalRunoff", "22_8_8", 0.231)
-])
+@pytest.mark.parametrize(
+    "quantity,catchment_id,expected_max",
+    [("TotalRunoff", "20_2_2", 0.236), ("TotalRunoff", "22_8_8", 0.231)],
+)
 def test_read_catchment(test_file, quantity, catchment_id, expected_max):
     data = test_file.query.GetCatchmentValues(catchment_id, quantity)
     data = to_numpy(data)
@@ -165,3 +171,11 @@ def test_all_catchments_attributes(test_file):
 
     max_runoff = round(df.max().max(), 3)
     assert pytest.approx(max_runoff) == 0.469
+
+
+def test_catchment_attribute_access_maintains_backwards_compat(res1d_catchments):
+    res = res1d_catchments
+    catchment = res.result_network.catchments["100_16_16"]
+    assert catchment.CatchmentName == "100_16_16"
+    for name, catchment in res.result_network.catchments.items():
+        assert catchment.CatchmentName == name
