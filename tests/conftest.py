@@ -73,3 +73,8 @@ def many_catchments(res1d_catchments):
         for c in catchments.__dict__.keys()
         if c.startswith(catchments.catchment_label)
     ]
+
+
+@pytest.fixture
+def structure(res1d_network):
+    return res1d_network.result_network.structures["119w1"]

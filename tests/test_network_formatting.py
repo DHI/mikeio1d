@@ -2,7 +2,7 @@
 Tests for the formatting of the result network objects."""
 
 
-def test_location_str_repr_header_line(node, reach, catchment):
+def test_location_str_repr_header_line(node, reach, catchment, structure):
     assert node.__repr__().startswith(
         "<Manhole: 1>"
     ), "Node header line is not correct."
@@ -12,6 +12,9 @@ def test_location_str_repr_header_line(node, reach, catchment):
     assert catchment.__repr__().startswith(
         "<ResultCatchment>"
     ), "Catchment header line is not correct."
+    assert structure.__repr__().startswith(
+        "<Weir: 119w1>"
+    ), "Structure header line is not correct."
 
 
 def test_location_html_repr_header_line(node, reach, catchment):
@@ -81,3 +84,17 @@ def test_single_reach_html_repr(river_reach):
     </style>
     <details><summary>Attributes</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 6</li></ul></details><details><summary>Quantities</summary><ul><li>WaterLevel</li><li>ManningResistanceNumber</li><li>Discharge</li><li>FlowVelocity</li></ul></details>"""
     assert html_repr == excepted_html_repr
+
+
+def test_single_structure_html_repr(structure):
+    html_repr = structure._repr_html_()
+    expected_html_repr = """&lt;Weir: 119w1&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Attributes</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities</summary><ul><li>Discharge</li></ul></details>"""
+    assert html_repr == expected_html_repr
