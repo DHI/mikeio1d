@@ -47,6 +47,9 @@ class ResultReach(ResultLocation):
         for reach in reaches:
             self.add_res1d_reach(reach)
 
+    def __repr__(self) -> str:
+        return f"<Reach: {self.name}>"
+
     def __getattribute__(self, __name: str):
         # TODO: Remove this in 1.0.0
         try:

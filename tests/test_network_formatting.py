@@ -7,7 +7,7 @@ def test_location_str_repr_header_line(node, reach, catchment, structure):
         "<Manhole: 1>"
     ), "Node header line is not correct."
     assert reach.__repr__().startswith(
-        "<ResultReach>"
+        "<Reach: 100l1>"
     ), "Reach header line is not correct."
     assert catchment.__repr__().startswith(
         "<ResultCatchment>"
@@ -22,7 +22,7 @@ def test_location_html_repr_header_line(node, reach, catchment):
         "&lt;Manhole: 1&gt;"
     ), "Node header line is not correct."
     assert reach._repr_html_().startswith(
-        "&lt;ResultReach&gt;"
+        "&lt;Reach: 100l1&gt;"
     ), "Reach header line is not correct."
     assert catchment._repr_html_().startswith(
         "&lt;ResultCatchment&gt;"
@@ -74,7 +74,7 @@ def test_single_catchment_html_repr(catchment):
 
 def test_single_reach_html_repr(river_reach):
     html_repr = river_reach._repr_html_()
-    excepted_html_repr = """&lt;ResultReach&gt;
+    excepted_html_repr = """&lt;Reach: river&gt;
     <style>
         ul {
             margin: 0px;
