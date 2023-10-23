@@ -43,6 +43,9 @@ class ResultStructure(ResultLocation):
 
         self.set_static_attributes()
 
+    def __repr__(self) -> str:
+        return f"<{self.type}: {self.id}>"
+
     @property
     def structure_id(self):
         # TODO: Remove this in 1.0.0
