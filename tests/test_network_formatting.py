@@ -65,7 +65,7 @@ def test_single_catchment_html_repr(catchment):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>center_xcoord: -687904.1384546768</li><li>center_ycoord: -1056368.7400316757</li></ul></details><details><summary>Quantities</summary><ul><li>TotalRunOff</li><li>ActualRainfall</li><li>ZinkLoadRR</li><li>ZinkMassAccumulatedRR</li><li>ZinkRR</li></ul></details>"""
+    <details><summary>Attributes</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities</summary><ul><li>TotalRunOff</li><li>ActualRainfall</li><li>ZinkLoadRR</li><li>ZinkMassAccumulatedRR</li><li>ZinkRR</li></ul></details>"""
     assert html_repr == expected_html_repr
 
 
