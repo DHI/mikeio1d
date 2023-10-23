@@ -1,4 +1,5 @@
 import warnings
+
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
@@ -62,7 +63,6 @@ class ResultReach(ResultLocation):
     def __getitem__(self, index):
         return self.reaches[index]
 
-    # TODO: Is there a better way to get the total length? maybe it can be removed eventually if replaced by geom
     def _get_total_length(self):
         total_length = 0
         for reach in self.reaches:
@@ -85,8 +85,6 @@ class ResultReach(ResultLocation):
             "end_chainage", self.reaches[-1].LocationSpan.EndChainage
         )
         self.set_static_attribute("n_gridpoints", len(self.result_gridpoints))
-
-        # TODO: Customized attributes based on type (e.g. a pipe might want the diameter, maybe upstream/downstream nodes)
 
     def add_res1d_reach(self, reach):
         """
