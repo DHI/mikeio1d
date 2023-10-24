@@ -50,18 +50,15 @@ class ResultReach(ResultLocation):
     def __repr__(self) -> str:
         return f"<Reach: {self.name}>"
 
-    def __getattribute__(self, __name: str):
+    def __getattr__(self, name: str):
         # TODO: Remove this in 1.0.0
-        try:
-            return super().__getattribute__(__name)
-        except AttributeError as e:
-            if hasattr(self.reaches[0], __name):
-                warnings.warn(
-                    f"Accessing IRes1DReach attribute {__name} like this is deprecated. Use static attributes instead, or .reaches[0].{__name}."
-                )
-                return getattr(self.reaches[0], __name)
-            else:
-                raise e
+        if hasattr(self.reaches[0], name):
+            warnings.warn(
+                f"Accessing IRes1DReach attribute {name} like this is deprecated. Use static attributes instead, or .reaches[0].{name}."
+            )
+            return getattr(self.reaches[0], name)
+        else:
+            object.__getattribute__(self, name)
 
     def __getitem__(self, index):
         return self.reaches[index]

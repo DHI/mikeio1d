@@ -23,23 +23,18 @@ class ResultNode(ResultLocation):
     def __repr__(self) -> str:
         return f"<{self.type}: {self.id}>"
 
-    def __getattribute__(self, __name: str):
+    def __getattr__(self, name: str):
         # TODO: Remove this in 1.0.0
-        if __name == "node":
+        if name == "node":
             warn("Accessing IRes1DNode attribute via .node is deprecated. Use ._node.")
             return self._node
-        try:
-            return super().__getattribute__(__name)
-        except AttributeError:
-            if hasattr(self._node, __name):
-                warn(
-                    f"Accessing IRes1DNode attribute {__name} directly is deprecated. Use static attributes instead, or ._node.{__name}."
-                )
-                return getattr(self._node, __name)
-            else:
-                raise AttributeError(
-                    f"'{self.__class__.__name}' object has no attribute '{__name}'"
-                )
+        elif hasattr(self._node, name):
+            warn(
+                f"Accessing IRes1DNode attribute {name} directly is deprecated. Use static attributes instead, or ._node.{name}."
+            )
+            return getattr(self._node, name)
+        else:
+            object.__getattribute__(self, name)
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
