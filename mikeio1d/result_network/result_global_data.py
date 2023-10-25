@@ -35,12 +35,12 @@ class ResultGlobalData(ResultLocation):
         self.set_quantity(self.global_datas, data_item)
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
-        """ Add global data result quantity to result quantity maps. """
+        """Add global data result quantity to result quantity maps."""
         query = QueryDataGlobal(quantity_id)
         self.add_to_network_result_quantity_map(query, result_quantity)
 
     def get_query(self, data_item):
-        """ Get a QueryDataGlobal for given data item. """
+        """Get a QueryDataGlobal for given data item."""
         quantity_id = data_item.Quantity.Id
         query = QueryDataGlobal(quantity_id)
         return query

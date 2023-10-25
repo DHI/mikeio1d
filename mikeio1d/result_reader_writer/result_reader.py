@@ -45,17 +45,18 @@ class ResultReader:
         Flag specifying to add chainage into data frame column label.
     """
 
-    def __init__(self,
-                 res1d,
-                 file_path=None,
-                 lazy_load=False,
-                 header_load=False,
-                 reaches=None,
-                 nodes=None,
-                 catchments=None,
-                 col_name_delimiter=NAME_DELIMITER,
-                 put_chainage_in_col_name=True):
-
+    def __init__(
+        self,
+        res1d,
+        file_path=None,
+        lazy_load=False,
+        header_load=False,
+        reaches=None,
+        nodes=None,
+        catchments=None,
+        col_name_delimiter=NAME_DELIMITER,
+        put_chainage_in_col_name=True,
+    ):
         self.res1d = res1d
 
         self.file_path = file_path
@@ -67,9 +68,7 @@ class ResultReader:
         self._nodes = nodes if nodes else []
         self._catchments = catchments if catchments else []
 
-        self.use_filter = (reaches is not None or
-                           nodes is not None or
-                           catchments is not None)
+        self.use_filter = reaches is not None or nodes is not None or catchments is not None
 
         self._load_header()
         if not header_load:
@@ -82,7 +81,7 @@ class ResultReader:
 
         self.quantities = [quantity.Id for quantity in self.data.Quantities]
 
-    #region File loading
+    # region File loading
 
     def _load_header(self):
         if not os.path.exists(self.file_path):
@@ -101,7 +100,6 @@ class ResultReader:
             self.data.LoadHeader(self.diagnostics)
 
     def _load_file(self):
-
         if self.use_filter:
             self._setup_filter()
 
@@ -112,7 +110,7 @@ class ResultReader:
             for catchment in self._catchments:
                 self._add_catchment(catchment)
 
-        if self.file_extension.lower() in ['.resx', '.crf', '.prf', '.xrf']:
+        if self.file_extension.lower() in [".resx", ".crf", ".prf", ".xrf"]:
             self.data.Load(self.diagnostics)
         else:
             self.data.LoadData(self.diagnostics)
@@ -142,7 +140,7 @@ class ResultReader:
     def _add_catchment(self, catchment_id):
         self.data_subfilter.Catchments.Add(catchment_id)
 
-    #endregion File loading
+    # endregion File loading
 
     def read(self, queries=None):
         return None
@@ -151,7 +149,7 @@ class ResultReader:
         return None
 
     def is_data_set_included(self, data_set):
-        """ Skip filtered data sets """
+        """Skip filtered data sets"""
         name = self.get_data_set_name(data_set)
         if self.use_filter and name not in self._catchments + self._reaches + self._nodes:
             return False
@@ -159,7 +157,7 @@ class ResultReader:
 
     @property
     def time_index(self):
-        """ pandas.DatetimeIndex of the time index. """
+        """pandas.DatetimeIndex of the time index."""
         if self._time_index is not None:
             return self._time_index
 
@@ -207,7 +205,7 @@ class ResultReader:
         postfix = f"{chainage:g}" if self.put_chainage_in_col_name else str(i)
         return self.col_name_delimiter.join([quantity_id, name, postfix])
 
-    #region Methods for LTS result files
+    # region Methods for LTS result files
 
     def update_time_quantities(self, df):
         if not self.is_lts_result_file():
@@ -215,11 +213,12 @@ class ResultReader:
 
         simulation_start = from_dotnet_datetime(self.data.StartTime)
         for label in df:
-            time_suffix = f'Time{self.col_name_delimiter}'
+            time_suffix = f"Time{self.col_name_delimiter}"
             if time_suffix in label:
                 seconds_after_simulation_start_array = df[label].to_numpy()
                 times = [
-                    simulation_start + datetime.timedelta(seconds=float(sec)) for sec in seconds_after_simulation_start_array
+                    simulation_start + datetime.timedelta(seconds=float(sec))
+                    for sec in seconds_after_simulation_start_array
                 ]
                 df[label] = times
 
@@ -230,7 +229,7 @@ class ResultReader:
 
     @property
     def lts_event_index(self):
-        """ pandas.DatetimeIndex of the LTS event index. """
+        """pandas.DatetimeIndex of the LTS event index."""
         if self._time_index is not None:
             return self._time_index
 
@@ -241,4 +240,4 @@ class ResultReader:
 
         return self._time_index
 
-    #endregion Methods for LTS result files
+    # endregion Methods for LTS result files

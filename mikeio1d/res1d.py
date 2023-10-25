@@ -124,9 +124,7 @@ class Res1D:
 
             out.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
             for i, quantity in enumerate(self.data.Quantities):
-                out.append(
-                    f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>"
-                )
+                out.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
 
         return str.join("\n", out)
 
@@ -256,9 +254,7 @@ class Res1D:
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
         if self.result_reader.is_lts_result_file():
-            raise NotImplementedError(
-                "The method is not implemented for LTS event statistics."
-            )
+            raise NotImplementedError("The method is not implemented for LTS event statistics.")
 
         time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
         return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
@@ -337,18 +333,12 @@ class Res1D:
 
     def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
         """Extract to csv file."""
-        self.extract(
-            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV
-        )
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
     def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
         """Extract to dfs0 file."""
-        self.extract(
-            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0
-        )
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
     def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
         """Extract to txt file."""
-        self.extract(
-            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT
-        )
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)

@@ -40,9 +40,7 @@ class ResultNodes(ResultLocations):
             node = impl(node)
             result_node = ResultNode(node, self.res1d)
             self.set_res1d_node_to_dict(result_node)
-            result_node_attribute_string = make_proper_variable_name(
-                node.ID, self.node_label
-            )
+            result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
             setattr(self, result_node_attribute_string, result_node)
 
     def set_res1d_node_to_dict(self, result_node):

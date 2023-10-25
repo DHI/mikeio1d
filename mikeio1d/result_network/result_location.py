@@ -94,9 +94,7 @@ class ResultLocation:
         """
         pass
 
-    def add_to_result_quantity_map(
-        self, quantity_id, result_quantity, result_quantity_map
-    ):
+    def add_to_result_quantity_map(self, quantity_id, result_quantity, result_quantity_map):
         """
         Method for adding to a given result quantity map.
 

@@ -9,7 +9,7 @@ class ExtractorTxt(Extractor):
     """Class which extracts data to text file"""
 
     def export(self):
-        self.f = open(self.out_file_name, 'w')
+        self.f = open(self.out_file_name, "w")
         self.set_output_format()
         self.write_item_type()
         self.write_quantity()
@@ -102,19 +102,26 @@ class ExtractorTxt(Extractor):
             reaches = list(result_data.Reaches)
             gridpoints = list(reaches[data_item.NumberWithinGroup].GridPoints)
             gridpoint_index = index_list[element_index]
-            f.write(chainage_format % System.String.Format(chainage_formatcs, gridpoints[gridpoint_index].Chainage)),
+            f.write(
+                chainage_format
+                % System.String.Format(chainage_formatcs, gridpoints[gridpoint_index].Chainage)
+            ),
 
         f.write("\n")
 
     def write_data_items(self):
         output_data, f = self.output_data, self.f
         result_data = self.result_data
-        header1_format, data_format, data_formatcs = self.header1_format, self.data_format, self.data_formatcs
+        header1_format, data_format, data_formatcs = (
+            self.header1_format,
+            self.data_format,
+            self.data_formatcs,
+        )
 
         times = list(result_data.TimesList)
         # Write data
         for time_step_index in range(result_data.NumberOfTimeSteps):
-            if (time_step_index % self.time_step_skipping_number != 0):
+            if time_step_index % self.time_step_skipping_number != 0:
                 continue
 
             time = times[time_step_index]

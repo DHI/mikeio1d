@@ -39,38 +39,38 @@ def test_repr(test_file):
     res1d = test_file
     res1d_repr = res1d.__repr__()
     res1d_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 1957-01-01 00:00:00\n' +
-        'End time: 1963-01-01 00:00:00\n'
-        '# Timesteps: 10\n' +
-        '# Catchments: 0\n' +
-        '# Nodes: 16\n' +
-        '# Reaches: 17\n' +
-        '# Globals: 0\n' +
-        '0 - WaterLevelMaximum <m>\n' +
-        '1 - WaterLevelMaximumTime <sec>\n' +
-        '2 - DischargeIntegrated <m^3>\n' +
-        '3 - DischargeIntegratedTime <sec>\n' +
-        '4 - DischargeMaximum <m^3/s>\n' +
-        '5 - DischargeMaximumTime <sec>\n' +
-        '6 - DischargeDuration <h>\n' +
-        '7 - DischargeDurationTime <sec>\n' +
-        '8 - Component_1Maximum <kg/m^3>\n' +
-        '9 - Component_1MaximumTime <sec>\n' +
-        '10 - Component_2Maximum <kg/m^3>\n' +
-        '11 - Component_2MaximumTime <sec>\n' +
-        '12 - Component_1TransportIntegrated <kg>\n' +
-        '13 - Component_1TransportIntegratedTime <sec>\n' +
-        '14 - Component_2TransportIntegrated <kg>\n' +
-        '15 - Component_2TransportIntegratedTime <sec>\n' +
-        '16 - SurchargeMaximum <m^3/s>\n' +
-        '17 - SurchargeMaximumTime <sec>\n' +
-        '18 - SurchargeIntegrated <m^3>\n' +
-        '19 - SurchargeIntegratedTime <sec>\n' +
-        '20 - SurchargeDuration <h>\n' +
-        '21 - SurchargeDurationTime <sec>\n' +
-        '22 - FlowVelocityMaximum <m/s>\n' +
-        '23 - FlowVelocityMaximumTime <sec>'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 1957-01-01 00:00:00\n"
+        + "End time: 1963-01-01 00:00:00\n"
+        "# Timesteps: 10\n"
+        + "# Catchments: 0\n"
+        + "# Nodes: 16\n"
+        + "# Reaches: 17\n"
+        + "# Globals: 0\n"
+        + "0 - WaterLevelMaximum <m>\n"
+        + "1 - WaterLevelMaximumTime <sec>\n"
+        + "2 - DischargeIntegrated <m^3>\n"
+        + "3 - DischargeIntegratedTime <sec>\n"
+        + "4 - DischargeMaximum <m^3/s>\n"
+        + "5 - DischargeMaximumTime <sec>\n"
+        + "6 - DischargeDuration <h>\n"
+        + "7 - DischargeDurationTime <sec>\n"
+        + "8 - Component_1Maximum <kg/m^3>\n"
+        + "9 - Component_1MaximumTime <sec>\n"
+        + "10 - Component_2Maximum <kg/m^3>\n"
+        + "11 - Component_2MaximumTime <sec>\n"
+        + "12 - Component_1TransportIntegrated <kg>\n"
+        + "13 - Component_1TransportIntegratedTime <sec>\n"
+        + "14 - Component_2TransportIntegrated <kg>\n"
+        + "15 - Component_2TransportIntegratedTime <sec>\n"
+        + "16 - SurchargeMaximum <m^3/s>\n"
+        + "17 - SurchargeMaximumTime <sec>\n"
+        + "18 - SurchargeIntegrated <m^3>\n"
+        + "19 - SurchargeIntegratedTime <sec>\n"
+        + "20 - SurchargeDuration <h>\n"
+        + "21 - SurchargeDurationTime <sec>\n"
+        + "22 - FlowVelocityMaximum <m/s>\n"
+        + "23 - FlowVelocityMaximumTime <sec>"
     )
     assert res1d_repr == res1d_repr_ref
 
@@ -83,11 +83,14 @@ def test_data_item_dicts(test_file):
     assert len(res1d.global_data) == 0
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataReach("WaterLevelMaximum", "B4.1320l1", 0), True),
-    (QueryDataReach("WaterLevelMaximumTime", "B4.1320l1", 42424242), False),
-    (QueryDataReach("WaterLevelMaximum", "wrong_reach_name", 0), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataReach("WaterLevelMaximum", "B4.1320l1", 0), True),
+        (QueryDataReach("WaterLevelMaximumTime", "B4.1320l1", 42424242), False),
+        (QueryDataReach("WaterLevelMaximum", "wrong_reach_name", 0), False),
+    ],
+)
 def test_valid_reach_data_queries(test_file, query, expected):
     res1d = test_file
 
@@ -102,23 +105,29 @@ def test_valid_reach_data_queries(test_file, query, expected):
             assert res1d.read(query)
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataReach("WaterLevelMaximum", "B4.1320l1", 135.001), 17.379),
-    (QueryDataReach("WaterLevelMaximum", "B4.1491l1", 144), 18.638),
-    (QueryDataReach("DischargeMaximum", "B4.1320l1", 270.002), 0.444),
-    (QueryDataReach("DischargeMaximum", "B4.1491l1", 239.999), 0.151)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataReach("WaterLevelMaximum", "B4.1320l1", 135.001), 17.379),
+        (QueryDataReach("WaterLevelMaximum", "B4.1491l1", 144), 18.638),
+        (QueryDataReach("DischargeMaximum", "B4.1320l1", 270.002), 0.444),
+        (QueryDataReach("DischargeMaximum", "B4.1491l1", 239.999), 0.151),
+    ],
+)
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,reach_id,chainage,expected_max", [
-    ("WaterLevelMaximum", "B4.1320l1", 135.001, 17.379),
-    ("WaterLevelMaximum", "B4.1491l1", 144, 18.638),
-    ("DischargeMaximum", "B4.1320l1", 270.002, 0.444),
-    ("DischargeMaximum", "B4.1491l1", 239.999, 0.151)
-])
+@pytest.mark.parametrize(
+    "quantity,reach_id,chainage,expected_max",
+    [
+        ("WaterLevelMaximum", "B4.1320l1", 135.001, 17.379),
+        ("WaterLevelMaximum", "B4.1491l1", 144, 18.638),
+        ("DischargeMaximum", "B4.1320l1", 270.002, 0.444),
+        ("DischargeMaximum", "B4.1491l1", 239.999, 0.151),
+    ],
+)
 def test_read_reach(test_file, quantity, reach_id, chainage, expected_max):
     data = test_file.query.GetReachValues(reach_id, chainage, quantity)
     data = to_numpy(data)
@@ -126,10 +135,10 @@ def test_read_reach(test_file, quantity, reach_id, chainage, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
-@pytest.mark.parametrize("quantity,node_id,expected_max", [
-    ("WaterLevelMaximum", "B4.1320", 17.511),
-    ("WaterLevelMaximum", "B4.1480", 16.957)
-])
+@pytest.mark.parametrize(
+    "quantity,node_id,expected_max",
+    [("WaterLevelMaximum", "B4.1320", 17.511), ("WaterLevelMaximum", "B4.1480", 16.957)],
+)
 def test_read_node(test_file, quantity, node_id, expected_max):
     data = test_file.query.GetNodeValues(node_id, quantity)
     data = to_numpy(data)

@@ -33,50 +33,50 @@ def test_repr(test_file):
     swmm_out = test_file
     swmm_out_repr = swmm_out.__repr__()
     swmm_out_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 1998-01-01 01:00:00.001000\n' +
-        'End time: 1998-01-02 12:00:00.001000\n'
-        '# Timesteps: 36\n' +
-        '# Catchments: 8\n' +
-        '# Nodes: 14\n' +
-        '# Reaches: 13\n' +
-        '# Globals: 15\n' +
-        '0 - SWMM_NODE_DEPTH <ft>\n' +
-        '1 - SWMM_NODE_HEAD <ft>\n' +
-        '2 - SWMM_NODE_VOLUME <ft^3>\n' +
-        '3 - SWMM_NODE_LATFLOW <ft^3/s>\n' +
-        '4 - SWMM_NODE_INFLOW <ft^3/s>\n' +
-        '5 - SWMM_NODE_OVERFLOW <ft^3/s>\n' +
-        '6 - SWMM_NODE_QUAL <mu-g/l>\n' +
-        '7 - SWMM_LINK_FLOW <ft^3/s>\n' +
-        '8 - SWMM_LINK_DEPTH <ft>\n' +
-        '9 - SWMM_LINK_VELOCITY <ft/s>\n' +
-        '10 - SWMM_LINK_Froude_Number <()>\n' +
-        '11 - SWMM_LINK_CAPACITY <()>\n' +
-        '12 - SWMM_LINK_QUAL <mu-g/l>\n' +
-        '13 - SWMM_SUBCATCH_RAINFALL <in/h>\n' +
-        '14 - SWMM_SUBCATCH_SNOWDEPTH <in>\n' +
-        '15 - SWMM_SUBCATCH_EVAP <in>\n' +
-        '16 - SWMM_SUBCATCH_INFIL <in/h>\n' +
-        '17 - SWMM_SUBCATCH_RUNOFF <ft^3/s>\n' +
-        '18 - SWMM_SUBCATCH_GW_FLOW <ft^3/s>\n' +
-        '19 - SWMM_SUBCATCH_GW_ELEV <ft>\n' +
-        '20 - SWMM_SUBCATCH_SOIL_MOIST <()>\n' +
-        '21 - SWMM_SUBCATCH_WASHOFF <mu-g/l>\n' +
-        '22 - SWMM_SYS_TEMPERATURE <deg F>\n' +
-        '23 - SWMM_SYS_RAINFALL <in/h>\n' +
-        '24 - SWMM_SYS_SNOWDEPTH <in>\n' +
-        '25 - SWMM_SYS_INFIL <in/h>\n' +
-        '26 - SWMM_SYS_RUNOFF <ft^3/s>\n' +
-        '27 - SWMM_SYS_DWFLOW <ft^3/s>\n' +
-        '28 - SWMM_SYS_GWFLOW <ft^3/s>\n' +
-        '29 - SWMM_SYS_INFLOW <ft^3/s>\n' +
-        '30 - SWMM_SYS_EXFLOW <ft^3/s>\n' +
-        '31 - SWMM_SYS_FLOODING <ft^3/s>\n' +
-        '32 - SWMM_SYS_OUTFLOW <ft^3/s>\n' +
-        '33 - SWMM_SYS_STORAGE <ft^3>\n' +
-        '34 - SWMM_SYS_EVAP <->\n' +
-        '35 - SWMM_SYS_PET <->'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 1998-01-01 01:00:00.001000\n"
+        + "End time: 1998-01-02 12:00:00.001000\n"
+        "# Timesteps: 36\n"
+        + "# Catchments: 8\n"
+        + "# Nodes: 14\n"
+        + "# Reaches: 13\n"
+        + "# Globals: 15\n"
+        + "0 - SWMM_NODE_DEPTH <ft>\n"
+        + "1 - SWMM_NODE_HEAD <ft>\n"
+        + "2 - SWMM_NODE_VOLUME <ft^3>\n"
+        + "3 - SWMM_NODE_LATFLOW <ft^3/s>\n"
+        + "4 - SWMM_NODE_INFLOW <ft^3/s>\n"
+        + "5 - SWMM_NODE_OVERFLOW <ft^3/s>\n"
+        + "6 - SWMM_NODE_QUAL <mu-g/l>\n"
+        + "7 - SWMM_LINK_FLOW <ft^3/s>\n"
+        + "8 - SWMM_LINK_DEPTH <ft>\n"
+        + "9 - SWMM_LINK_VELOCITY <ft/s>\n"
+        + "10 - SWMM_LINK_Froude_Number <()>\n"
+        + "11 - SWMM_LINK_CAPACITY <()>\n"
+        + "12 - SWMM_LINK_QUAL <mu-g/l>\n"
+        + "13 - SWMM_SUBCATCH_RAINFALL <in/h>\n"
+        + "14 - SWMM_SUBCATCH_SNOWDEPTH <in>\n"
+        + "15 - SWMM_SUBCATCH_EVAP <in>\n"
+        + "16 - SWMM_SUBCATCH_INFIL <in/h>\n"
+        + "17 - SWMM_SUBCATCH_RUNOFF <ft^3/s>\n"
+        + "18 - SWMM_SUBCATCH_GW_FLOW <ft^3/s>\n"
+        + "19 - SWMM_SUBCATCH_GW_ELEV <ft>\n"
+        + "20 - SWMM_SUBCATCH_SOIL_MOIST <()>\n"
+        + "21 - SWMM_SUBCATCH_WASHOFF <mu-g/l>\n"
+        + "22 - SWMM_SYS_TEMPERATURE <deg F>\n"
+        + "23 - SWMM_SYS_RAINFALL <in/h>\n"
+        + "24 - SWMM_SYS_SNOWDEPTH <in>\n"
+        + "25 - SWMM_SYS_INFIL <in/h>\n"
+        + "26 - SWMM_SYS_RUNOFF <ft^3/s>\n"
+        + "27 - SWMM_SYS_DWFLOW <ft^3/s>\n"
+        + "28 - SWMM_SYS_GWFLOW <ft^3/s>\n"
+        + "29 - SWMM_SYS_INFLOW <ft^3/s>\n"
+        + "30 - SWMM_SYS_EXFLOW <ft^3/s>\n"
+        + "31 - SWMM_SYS_FLOODING <ft^3/s>\n"
+        + "32 - SWMM_SYS_OUTFLOW <ft^3/s>\n"
+        + "33 - SWMM_SYS_STORAGE <ft^3>\n"
+        + "34 - SWMM_SYS_EVAP <->\n"
+        + "35 - SWMM_SYS_PET <->"
     )
     assert swmm_out_repr == swmm_out_repr_ref
 
@@ -89,11 +89,14 @@ def test_data_item_dicts(test_file):
     assert len(swmm_out.global_data) == 14
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataReach("SWMM_LINK_FLOW", "10"), True),
-    (QueryDataReach("SWMM_LINK_FLOW", "10xyz"), False),
-    (QueryDataReach("SWMM_LINK_FLOW", "wrong_reach_name"), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataReach("SWMM_LINK_FLOW", "10"), True),
+        (QueryDataReach("SWMM_LINK_FLOW", "10xyz"), False),
+        (QueryDataReach("SWMM_LINK_FLOW", "wrong_reach_name"), False),
+    ],
+)
 def test_valid_reach_data_queries(test_file, query, expected):
     swmm_out = test_file
 
@@ -108,23 +111,29 @@ def test_valid_reach_data_queries(test_file, query, expected):
             assert swmm_out.read(query)
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataReach("SWMM_LINK_FLOW", "10"), 18.204),
-    (QueryDataReach("SWMM_LINK_FLOW", "12"), 2.43),
-    (QueryDataReach("SWMM_LINK_DEPTH", "10"), 1.063),
-    (QueryDataReach("SWMM_LINK_DEPTH", "12"), 0.462)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataReach("SWMM_LINK_FLOW", "10"), 18.204),
+        (QueryDataReach("SWMM_LINK_FLOW", "12"), 2.43),
+        (QueryDataReach("SWMM_LINK_DEPTH", "10"), 1.063),
+        (QueryDataReach("SWMM_LINK_DEPTH", "12"), 0.462),
+    ],
+)
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,reach_id,expected_max", [
-    ("SWMM_LINK_FLOW", "10", 18.204),
-    ("SWMM_LINK_FLOW", "12", 2.43),
-    ("SWMM_LINK_DEPTH", "10", 1.063),
-    ("SWMM_LINK_DEPTH", "12", 0.462)
-])
+@pytest.mark.parametrize(
+    "quantity,reach_id,expected_max",
+    [
+        ("SWMM_LINK_FLOW", "10", 18.204),
+        ("SWMM_LINK_FLOW", "12", 2.43),
+        ("SWMM_LINK_DEPTH", "10", 1.063),
+        ("SWMM_LINK_DEPTH", "12", 0.462),
+    ],
+)
 def test_read_reach(test_file, quantity, reach_id, expected_max):
     data = test_file.query.GetReachStartValues(reach_id, quantity)
     data = to_numpy(data)
@@ -132,10 +141,10 @@ def test_read_reach(test_file, quantity, reach_id, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
-@pytest.mark.parametrize("quantity,node_id,expected_max", [
-    ("SWMM_NODE_DEPTH", "9", 0.568),
-    ("SWMM_NODE_DEPTH", "10", 3.0)
-])
+@pytest.mark.parametrize(
+    "quantity,node_id,expected_max",
+    [("SWMM_NODE_DEPTH", "9", 0.568), ("SWMM_NODE_DEPTH", "10", 3.0)],
+)
 def test_read_node(test_file, quantity, node_id, expected_max):
     data = test_file.query.GetNodeValues(node_id, quantity)
     data = to_numpy(data)
@@ -188,9 +197,15 @@ def test_dotnet_methods(test_file):
     # >>> swmm_out.query.GetReachValue("10", 0, "SWMM_LINK_FLOW", swmm_out.data.StartTime)
     # >>> swmm_out.query.GetReachValues("10", 0, "SWMM_LINK_FLOW")
 
-    assert pytest.approx(0.000736411) == swmm_out.query.GetReachEndValues("10", "SWMM_LINK_FLOW")[20]
-    assert pytest.approx(0.000736411) == swmm_out.query.GetReachStartValues("10", "SWMM_LINK_FLOW")[20]
-    assert pytest.approx(0.000736411) == swmm_out.query.GetReachSumValues("10", "SWMM_LINK_FLOW")[20]
+    assert (
+        pytest.approx(0.000736411) == swmm_out.query.GetReachEndValues("10", "SWMM_LINK_FLOW")[20]
+    )
+    assert (
+        pytest.approx(0.000736411) == swmm_out.query.GetReachStartValues("10", "SWMM_LINK_FLOW")[20]
+    )
+    assert (
+        pytest.approx(0.000736411) == swmm_out.query.GetReachSumValues("10", "SWMM_LINK_FLOW")[20]
+    )
 
 
 def test_swmm_out_filter(test_file_path):

@@ -73,12 +73,8 @@ class ResultReach(ResultLocation):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("name", self.reaches[0].Name)
         self.try_set_static_attribute_length()
-        self.set_static_attribute(
-            "start_chainage", self.reaches[0].LocationSpan.StartChainage
-        )
-        self.set_static_attribute(
-            "end_chainage", self.reaches[-1].LocationSpan.EndChainage
-        )
+        self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
+        self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
         self.set_static_attribute("n_gridpoints", len(self.result_gridpoints))
 
     def try_set_static_attribute_length(self):
@@ -146,9 +142,7 @@ class ResultReach(ResultLocation):
         """
         current_reach_result_gridpoints = self.current_reach_result_gridpoints
 
-        result_gridpoint = ResultGridPoint(
-            reach, gridpoint, reach.DataItems, self, self.res1d
-        )
+        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d)
         current_reach_result_gridpoints.append(result_gridpoint)
 
         chainage_string = f"{gridpoint.Chainage:g}"
@@ -169,9 +163,7 @@ class ResultReach(ResultLocation):
         """
         for data_item in reach.DataItems:
             # For SWMM and EPANET results IndexList is None.
-            index_list = (
-                [0] if data_item.IndexList is None else list(data_item.IndexList)
-            )
+            index_list = [0] if data_item.IndexList is None else list(data_item.IndexList)
             element_count = len(index_list)
             for element_index in range(element_count):
                 gridpoint_index = index_list[element_index]
