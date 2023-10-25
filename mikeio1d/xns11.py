@@ -71,11 +71,11 @@ def _not_closed(prop):
                 f"{prop.__name__} property."
             )
         return prop(self, *args, **kwargs)
+
     return wrapper
 
 
 class Xns11:
-
     def __init__(self, file_path=None):
         self.file_path = file_path
         self.file = None
@@ -142,7 +142,7 @@ class Xns11:
             r.TopoId
             for r in list(self.file.GetReachTopoIdEnumerable())
             if reach.ReachId == r.ReachId
-            ]
+        ]
 
     @staticmethod
     def _chainages(reach):
@@ -156,9 +156,9 @@ class Xns11:
             location = Location()
             location.ID = reach.value
             location.Chainage = chainage.value
-            geometry = (self.file.FindClosestCrossSection(
-                location, topoid.value)
-                .BaseCrossSection.Points)
+            geometry = self.file.FindClosestCrossSection(
+                location, topoid.value
+            ).BaseCrossSection.Points
             x, z = [], []
             for i in range(geometry.Count):
                 x.append(geometry.LstPoints[i].X)
@@ -178,12 +178,10 @@ class Xns11:
         """Check whether the queries point to existing data in the file."""
         for q in queries:
             if q.topoid_name not in self.topoid_names:
-                raise DataNotFoundInFile(
-                    f"Topo-id '{q.topoid_name}' was not found.")
+                raise DataNotFoundInFile(f"Topo-id '{q.topoid_name}' was not found.")
             if q.reach_name is not None:
                 if q.reach_name not in self.reach_names:
-                    raise DataNotFoundInFile(
-                        f"Reach '{q.reach_name}' was not found.")
+                    raise DataNotFoundInFile(f"Reach '{q.reach_name}' was not found.")
                 else:
                     found_topo_id_in_reach = False
                     for reach in self._reaches:
@@ -196,7 +194,8 @@ class Xns11:
                         topoid_names_in_reach = self._topoid_in_reach(self, reach)
                         if q.topoid_name not in topoid_names_in_reach:
                             raise DataNotFoundInFile(
-                                f"Topo-ID '{q.topoid_name}' was not found in reach '{q.reach_name}'.")
+                                f"Topo-ID '{q.topoid_name}' was not found in reach '{q.reach_name}'."
+                            )
                         found_topo_id_in_reach = True
             if q.chainage is not None:
                 found_chainage = False
@@ -214,10 +213,11 @@ class Xns11:
                             break
                 if not found_chainage:
                     raise DataNotFoundInFile(
-                        f"Chainage {q.chainage} was not found in reach '{q.reach_name}' for Topo-ID '{q.topoid_name}'.")
+                        f"Chainage {q.chainage} was not found in reach '{q.reach_name}' for Topo-ID '{q.topoid_name}'."
+                    )
 
     def _build_queries(self, queries):
-        """"
+        """ "
         A query can be in an undefined state if reach_name and/or chainage
         isn't set. This function takes care of building lists of queries
         for these cases. Chainages are rounded to three decimal places.
@@ -250,9 +250,7 @@ class Xns11:
                     else:
                         continue
 
-                    q = QueryData(
-                        q_topoid_name, reach_name, round(chainage, 3)
-                    )
+                    q = QueryData(q_topoid_name, reach_name, round(chainage, 3))
                     built_queries.append(q)
         return built_queries
 
@@ -263,17 +261,14 @@ class Xns11:
         later on.
         """
 
-        PointInfo = namedtuple('PointInfo', ['index', 'value'])
+        PointInfo = namedtuple("PointInfo", ["index", "value"])
 
         found_points = defaultdict(list)
         # Find the points given its topo-id, reach, and chainage
         for q in queries:
             for reach_idx, curr_reach in enumerate(self._reaches):
                 # Look for the targed reach and topo-id
-                if (
-                    q.reach_name != curr_reach.ReachId
-                    or q.topoid_name != curr_reach.TopoId
-                ):
+                if q.reach_name != curr_reach.ReachId or q.topoid_name != curr_reach.TopoId:
                     continue
                 reach_info = PointInfo(reach_idx, q.reach_name)
                 topo_pair = self._topoid_in_reach(self, curr_reach)

@@ -1,5 +1,6 @@
 from .result_quantity import ResultQuantity
 from .various import make_proper_variable_name
+from .various import build_html_repr_from_sections
 
 
 class ResultLocation:
@@ -30,12 +31,31 @@ class ResultLocation:
     def __init__(self, data_items, res1d):
         self.data_items = data_items
         self.res1d = res1d
-        self.quantity_label = 'q_'
+        self.quantity_label = "q_"
         self.result_quantity_map = {}
         self.element_indices = None
+        self._static_attributes = []
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}>"
+
+    def _repr_html_(self) -> str:
+        repr = build_html_repr_from_sections(
+            self.__repr__(),
+            [
+                ("Attributes", {k: getattr(self, k) for k in self._static_attributes}),
+                ("Quantities", list(self.result_quantity_map.keys())),
+            ],
+        )
+        return repr
+
+    def set_static_attribute(self, key, value):
+        """Add static attribute. This shows up in the html repr"""
+        self._static_attributes.append(key)
+        setattr(self, key, value)
 
     def set_quantities(self):
-        """ Sets all quantity attributes. """
+        """Sets all quantity attributes."""
         element_indices = self.element_indices
         data_items = list(self.data_items)
         data_items_count = len(data_items)
@@ -45,14 +65,16 @@ class ResultLocation:
             self.set_quantity(self, data_item, element_index)
 
     def set_quantity(self, obj, data_item, element_index=0):
-        """ Sets a single quantity attribute on the obj. """
+        """Sets a single quantity attribute on the obj."""
         result_quantity = ResultQuantity(self, data_item, self.res1d)
         result_quantity.element_index = element_index
 
         quantity = data_item.Quantity
         quantity_id = quantity.Id
 
-        result_quantity_attribute_string = make_proper_variable_name(quantity_id, self.quantity_label)
+        result_quantity_attribute_string = make_proper_variable_name(
+            quantity_id, self.quantity_label
+        )
         setattr(obj, result_quantity_attribute_string, result_quantity)
 
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
@@ -106,10 +128,10 @@ class ResultLocation:
         network_result_quantity_map[str(query)] = result_quantity
 
     def add_query(self, data_item):
-        """ Base method for adding a query to ResultNetwork.queries list. """
+        """Base method for adding a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
         self.res1d.result_network.add_query(query)
 
     def get_query(self, data_item):
-        """ Base method for creating a query for given data item. """
+        """Base method for creating a query for given data item."""
         return None

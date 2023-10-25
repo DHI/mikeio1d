@@ -31,7 +31,9 @@ class ExtractorDfs0(Extractor):
         # Set up file header
         builder.SetDataType(1)
         builder.SetGeographicalProjection(factory.CreateProjectionUndefined())
-        builder.SetTemporalAxis(factory.CreateTemporalNonEqCalendarAxis(eumUnit.eumUsec, result_data.StartTime))
+        builder.SetTemporalAxis(
+            factory.CreateTemporalNonEqCalendarAxis(eumUnit.eumUsec, result_data.StartTime)
+        )
         builder.SetItemStatisticsType(StatType.NoStat)
 
         return builder
@@ -90,7 +92,7 @@ class ExtractorDfs0(Extractor):
         # Write data to file
         val = Array.CreateInstance(System.Single, 1)
         for time_step_index in range(result_data.NumberOfTimeSteps):
-            if (time_step_index % self.time_step_skipping_number != 0):
+            if time_step_index % self.time_step_skipping_number != 0:
                 continue
 
             time = times[time_step_index].Subtract(result_data.StartTime).TotalSeconds

@@ -1,8 +1,6 @@
 import pytest
 
-from mikeio1d.xns11 import (
-    read, Xns11, QueryData, FileNotOpenedError, DataNotFoundInFile
-)
+from mikeio1d.xns11 import read, Xns11, QueryData, FileNotOpenedError, DataNotFoundInFile
 
 
 def test_query_validate():
@@ -25,8 +23,7 @@ def test_query_validate():
 
 def test_query_repr():
     query = QueryData("topoid1", "reach1", 34.4131)
-    expected = ("QueryData(topoid_name='topoid1', reach_name='reach1', "
-                "chainage=34.4131)")
+    expected = "QueryData(topoid_name='topoid1', reach_name='reach1', " "chainage=34.4131)"
     assert repr(query) == expected
 
 
@@ -58,23 +55,29 @@ def test_get_properties_if_not_opened(file):
     assert "reach_names" in str(excinfo.value)
 
 
-@pytest.mark.parametrize("query,expected_bottom", [
-    (QueryData("topoid1", "reach1", 58.68), 1626.16),
-    (QueryData("topoid2", "reach2", -50), 1611.42),
-    (QueryData("topoid1", "reach3", 11150.42), 1616.038),
-    (QueryData("topoid1", "reach4", 13645.41), 1594.923)
-])
+@pytest.mark.parametrize(
+    "query,expected_bottom",
+    [
+        (QueryData("topoid1", "reach1", 58.68), 1626.16),
+        (QueryData("topoid2", "reach2", -50), 1611.42),
+        (QueryData("topoid1", "reach3", 11150.42), 1616.038),
+        (QueryData("topoid1", "reach4", 13645.41), 1594.923),
+    ],
+)
 def test_read_single_query_as_list(file, query, expected_bottom):
     geometry = read(file, [query])
     assert pytest.approx(round(geometry[geometry.columns[1]].min(), 3)) == expected_bottom
 
 
-@pytest.mark.parametrize("query,expected_bottom", [
-    (QueryData("topoid1", "reach1", 58.68), 1626.16),
-    (QueryData("topoid2", "reach2", -50), 1611.42),
-    (QueryData("topoid1", "reach3", 11150.42), 1616.038),
-    (QueryData("topoid1", "reach4", 13645.41), 1594.923)
-])
+@pytest.mark.parametrize(
+    "query,expected_bottom",
+    [
+        (QueryData("topoid1", "reach1", 58.68), 1626.16),
+        (QueryData("topoid2", "reach2", -50), 1611.42),
+        (QueryData("topoid1", "reach3", 11150.42), 1616.038),
+        (QueryData("topoid1", "reach4", 13645.41), 1594.923),
+    ],
+)
 def test_read_single_query(file, query, expected_bottom):
     geometry = read(file, query)
     assert pytest.approx(round(geometry[geometry.columns[1]].min(), 3)) == expected_bottom
@@ -114,12 +117,12 @@ def test_read_reach(file):
     q_reach = QueryData("topoid2", "reach2")
     geometry = read(file, [q_reach])
     assert list(geometry.columns) == [
-        'x topoid2 reach2 -50.0',
-        'z topoid2 reach2 -50.0',
-        'x topoid2 reach2 64.376',
-        'z topoid2 reach2 64.376',
-        'x topoid2 reach2 135.0',
-        'z topoid2 reach2 135.0',
+        "x topoid2 reach2 -50.0",
+        "z topoid2 reach2 -50.0",
+        "x topoid2 reach2 64.376",
+        "z topoid2 reach2 64.376",
+        "x topoid2 reach2 135.0",
+        "z topoid2 reach2 135.0",
     ]
 
 

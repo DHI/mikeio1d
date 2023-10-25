@@ -3,18 +3,20 @@ import setuptools
 # Try to download NuGet packages if the download script is present
 try:
     from scripts.nuget_retriever import NuGetRetriever
+
     NuGetRetriever.install()
 except Exception as e:
-    print('NuGetRetriever failed with an ERROR:')
+    print("NuGetRetriever failed with an ERROR:")
     print(e)
     print("NuGetRetriever did not succeed: packages are not installed.")
 
 # Try to build DHI.Mike1D.MikeIO C# project
 try:
     from scripts.util_builder import UtilBuilder
+
     UtilBuilder.build_and_install()
 except Exception as e:
-    print('UtilBuilder failed with an ERROR:')
+    print("UtilBuilder failed with an ERROR:")
     print(e)
     print("UtilBuilder did not succeed: packages are not installed.")
 

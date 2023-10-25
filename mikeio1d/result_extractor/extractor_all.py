@@ -8,9 +8,24 @@ class ExtractorAll:
 
     def __init__(self, out_file_name, output_data, result_data, time_step_skipping_number=1):
         self.all_extractors = [
-            ExtractorTxt(out_file_name.replace(".-", ".txt"), output_data, result_data, time_step_skipping_number),
-            ExtractorCsv(out_file_name.replace(".-", ".csv"), output_data, result_data, time_step_skipping_number),
-            ExtractorDfs0(out_file_name.replace(".-", ".dfs0"), output_data, result_data, time_step_skipping_number)
+            ExtractorTxt(
+                out_file_name.replace(".-", ".txt"),
+                output_data,
+                result_data,
+                time_step_skipping_number,
+            ),
+            ExtractorCsv(
+                out_file_name.replace(".-", ".csv"),
+                output_data,
+                result_data,
+                time_step_skipping_number,
+            ),
+            ExtractorDfs0(
+                out_file_name.replace(".-", ".dfs0"),
+                output_data,
+                result_data,
+                time_step_skipping_number,
+            ),
         ]
 
     def export(self):

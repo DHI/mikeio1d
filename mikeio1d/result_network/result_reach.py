@@ -1,3 +1,5 @@
+import warnings
+
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
@@ -36,7 +38,7 @@ class ResultReach(ResultLocation):
         data_items = []
         ResultLocation.__init__(self, data_items, res1d)
 
-        self.chainage_label = 'm_'
+        self.chainage_label = "m_"
 
         self.result_gridpoints = []
         self.current_reach_result_gridpoints = None
@@ -44,6 +46,44 @@ class ResultReach(ResultLocation):
         self.reaches = []
         for reach in reaches:
             self.add_res1d_reach(reach)
+
+    def __repr__(self) -> str:
+        return f"<Reach: {self.name}>"
+
+    def __getattr__(self, name: str):
+        # TODO: Remove this in 1.0.0
+        if hasattr(self.reaches[0], name):
+            warnings.warn(
+                f"Accessing IRes1DReach attribute {name} like this is deprecated. Use static attributes instead, or .reaches[0].{name}."
+            )
+            return getattr(self.reaches[0], name)
+        else:
+            object.__getattribute__(self, name)
+
+    def __getitem__(self, index):
+        return self.reaches[index]
+
+    def _get_total_length(self):
+        total_length = 0
+        for reach in self.reaches:
+            total_length += reach.Length
+        return total_length
+
+    def set_static_attributes(self):
+        """Set static attributes. These show up in the html repr."""
+        self.set_static_attribute("name", self.reaches[0].Name)
+        self.try_set_static_attribute_length()
+        self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
+        self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
+        self.set_static_attribute("n_gridpoints", len(self.result_gridpoints))
+
+    def try_set_static_attribute_length(self):
+        try:
+            self.set_static_attribute("length", self._get_total_length())
+        except Exception as _:
+            warnings.warn(
+                "Length attribute not included. For SWMM and EPANET results this is not implemented."
+            )
 
     def add_res1d_reach(self, reach):
         """
@@ -60,6 +100,7 @@ class ResultReach(ResultLocation):
         self.set_gridpoint_data_items(reach)
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint.set_quantities()
+        self.set_static_attributes()
 
     def set_gridpoints(self, reach):
         """
@@ -104,8 +145,10 @@ class ResultReach(ResultLocation):
         result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d)
         current_reach_result_gridpoints.append(result_gridpoint)
 
-        chainage_string = f'{gridpoint.Chainage:g}'
-        result_gridpoint_attribute_string = make_proper_variable_name(chainage_string, self.chainage_label)
+        chainage_string = f"{gridpoint.Chainage:g}"
+        result_gridpoint_attribute_string = make_proper_variable_name(
+            chainage_string, self.chainage_label
+        )
         setattr(self, result_gridpoint_attribute_string, result_gridpoint)
 
     def set_gridpoint_data_items(self, reach):

@@ -11,8 +11,6 @@ from mikeio1d.query import QueryDataStructure
 from mikeio1d.query import QueryDataGlobal
 
 
-
-
 @pytest.fixture
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
@@ -39,27 +37,27 @@ def test_repr(test_file):
     res1d = test_file
     res1d_repr = res1d.__repr__()
     res1d_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 2000-02-18 00:06:00\n' +
-        'End time: 2000-02-18 12:06:00\n'
-        '# Timesteps: 73\n' +
-        '# Catchments: 0\n' +
-        '# Nodes: 18\n' +
-        '# Reaches: 18\n' +
-        '# Globals: 4\n'
-        '0 - WaterLevel <m>\n' +
-        '1 - Discharge <m^3/s>\n' +
-        '2 - ManningResistanceNumber <m^(1/3)/s>\n' +
-        '3 - FlowVelocity <m/s>\n' +
-        '4 - FlowVelocityInStructure <m/s>\n' +
-        '5 - FlowAreaInStructure <m^2>\n' +
-        '6 - DischargeInStructure <m^3/s>\n' +
-        '7 - ControlStrategyId <Integer>\n' +
-        '8 - GateLevel <m>\n' +
-        '9 - Variable:TwoTimeSensorGateLevel <->\n' +
-        '10 - Water level:Sensor:s.h.river53745.34 <m>\n' +
-        '11 - Gate level:Sensor:SensorGateLevel <m>\n' +
-        '12 - Discharge:Sensor:SensorGauge1 <m^3/s>'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 2000-02-18 00:06:00\n"
+        + "End time: 2000-02-18 12:06:00\n"
+        "# Timesteps: 73\n"
+        + "# Catchments: 0\n"
+        + "# Nodes: 18\n"
+        + "# Reaches: 18\n"
+        + "# Globals: 4\n"
+        "0 - WaterLevel <m>\n"
+        + "1 - Discharge <m^3/s>\n"
+        + "2 - ManningResistanceNumber <m^(1/3)/s>\n"
+        + "3 - FlowVelocity <m/s>\n"
+        + "4 - FlowVelocityInStructure <m/s>\n"
+        + "5 - FlowAreaInStructure <m^2>\n"
+        + "6 - DischargeInStructure <m^3/s>\n"
+        + "7 - ControlStrategyId <Integer>\n"
+        + "8 - GateLevel <m>\n"
+        + "9 - Variable:TwoTimeSensorGateLevel <->\n"
+        + "10 - Water level:Sensor:s.h.river53745.34 <m>\n"
+        + "11 - Gate level:Sensor:SensorGateLevel <m>\n"
+        + "12 - Discharge:Sensor:SensorGauge1 <m^3/s>"
     )
     assert res1d_repr == res1d_repr_ref
 
@@ -73,12 +71,15 @@ def test_data_item_dicts(test_file):
     assert len(res1d.structures) == 10
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataStructure("DischargeInStructure", "W_right"), 11.018),
-    (QueryDataStructure("DischargeInStructure", "W_left_1_1"), 13.543),
-    (QueryDataStructure("FlowAreaInStructure", "W_right"), 9.851),
-    (QueryDataStructure("FlowAreaInStructure", "W_left_1_1"), 11.252)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataStructure("DischargeInStructure", "W_right"), 11.018),
+        (QueryDataStructure("DischargeInStructure", "W_left_1_1"), 13.543),
+        (QueryDataStructure("FlowAreaInStructure", "W_right"), 9.851),
+        (QueryDataStructure("FlowAreaInStructure", "W_left_1_1"), 11.252),
+    ],
+)
 def test_read_structures_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
@@ -124,11 +125,14 @@ def test_structure_reach_attributes(test_file):
     assert pytest.approx(max_discharge) == 0.0
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataGlobal("Discharge:Sensor:SensorGauge1"), 77.522),
-    (QueryDataGlobal("Gate level:Sensor:SensorGateLevel"), 53.770),
-    (QueryDataGlobal("Variable:TwoTimeSensorGateLevel"), 107.54)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataGlobal("Discharge:Sensor:SensorGauge1"), 77.522),
+        (QueryDataGlobal("Gate level:Sensor:SensorGateLevel"), 53.770),
+        (QueryDataGlobal("Variable:TwoTimeSensorGateLevel"), 107.54),
+    ],
+)
 def test_read_global_items_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
@@ -212,7 +216,7 @@ def test_res1d_modification(test_file):
     # saving the modified data to a new res1d file.
     df2 = df.multiply(2.0)
     file_path = res1d.data.Connection.FilePath.Path
-    file_path = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.mod.res1d')
+    file_path = file_path.replace("NetworkRiver.res1d", "NetworkRiver.mod.res1d")
     res1d.modify(df2, file_path=file_path)
 
     df_mod = res1d.read()
@@ -237,8 +241,8 @@ def test_res1d_modification_filtered(test_file):
     df = res1d.read()
     max_value = round(df.max().max(), 3)
 
-    df = df.drop(pd.date_range('2000-02-18 00:06:00', '2000-02-18 00:16:00', freq='10min'))
-    df = df.drop(pd.date_range('2000-02-18 00:56:00', '2000-02-18 12:06:00', freq='10min'))
+    df = df.drop(pd.date_range("2000-02-18 00:06:00", "2000-02-18 00:16:00", freq="10min"))
+    df = df.drop(pd.date_range("2000-02-18 00:56:00", "2000-02-18 12:06:00", freq="10min"))
 
     # Test the modification of ResultData
     df2 = df.multiply(2.0)
@@ -254,8 +258,8 @@ def test_res1d_modification_filtered(test_file):
     res1d.structures.FlowVelocityInStructure.add()
     df = res1d.read()
 
-    df = df.drop(pd.date_range('2000-02-18 00:06:00', '2000-02-18 00:16:00', freq='10min'))
-    df = df.drop(pd.date_range('2000-02-18 00:56:00', '2000-02-18 12:06:00', freq='10min'))
+    df = df.drop(pd.date_range("2000-02-18 00:06:00", "2000-02-18 00:16:00", freq="10min"))
+    df = df.drop(pd.date_range("2000-02-18 00:56:00", "2000-02-18 12:06:00", freq="10min"))
 
     df2 = df.multiply(100.0)
 
@@ -280,17 +284,17 @@ def test_extraction_to_csv_dfs0_txt(test_file):
 
     file_path = res1d.data.Connection.FilePath.Path
 
-    file_path_csv = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.extract.csv')
+    file_path_csv = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.csv")
     res1d.to_csv(file_path_csv, time_step_skipping_number=10)
     file_size_csv = 21905
     assert 0.5 * file_size_csv < os.stat(file_path_csv).st_size < 2.0 * file_size_csv
 
-    file_path_dfs0 = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.extract.dfs0')
+    file_path_dfs0 = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.dfs0")
     res1d.to_dfs0(file_path_dfs0, time_step_skipping_number=10)
     file_size_dfs0 = 30302
     assert file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
 
-    file_path_txt = file_path.replace('NetworkRiver.res1d', 'NetworkRiver.extract.txt')
+    file_path_txt = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.txt")
     res1d.to_txt(file_path_txt, time_step_skipping_number=10)
     file_size_txt = 23400
     assert 0.5 * file_size_txt < os.stat(file_path_txt).st_size < 2.0 * file_size_txt
@@ -307,9 +311,15 @@ def test_result_quantity_methods(test_file):
 
     # Test the calling of methods
     discharge_in_structure.plot()
-    discharge_in_structure.to_csv(file_path.replace('NetworkRiver.res1d', 'W_right_DischargeInStructure.extract.csv'))
-    discharge_in_structure.to_dfs0(file_path.replace('NetworkRiver.res1d', 'W_right_DischargeInStructure.extract.dfs0'))
-    discharge_in_structure.to_txt(file_path.replace('NetworkRiver.res1d', 'W_right_DischargeInStructure.extract.txt'))
+    discharge_in_structure.to_csv(
+        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.csv")
+    )
+    discharge_in_structure.to_dfs0(
+        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.dfs0")
+    )
+    discharge_in_structure.to_txt(
+        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.txt")
+    )
 
 
 def test_result_quantity_collection_methods(test_file):
@@ -323,6 +333,17 @@ def test_result_quantity_collection_methods(test_file):
 
     # Test the calling of methods
     discharge_in_structure.plot()
-    discharge_in_structure.to_csv(file_path.replace('NetworkRiver.res1d', 'DischargeInStructure.extract.csv'))
-    discharge_in_structure.to_dfs0(file_path.replace('NetworkRiver.res1d', 'DischargeInStructure.extract.dfs0'))
-    discharge_in_structure.to_txt(file_path.replace('NetworkRiver.res1d', 'DischargeInStructure.extract.txt'))
+    discharge_in_structure.to_csv(
+        file_path.replace("NetworkRiver.res1d", "DischargeInStructure.extract.csv")
+    )
+    discharge_in_structure.to_dfs0(
+        file_path.replace("NetworkRiver.res1d", "DischargeInStructure.extract.dfs0")
+    )
+    discharge_in_structure.to_txt(
+        file_path.replace("NetworkRiver.res1d", "DischargeInStructure.extract.txt")
+    )
+
+
+def test_calculate_total_reach_lengths(res1d_river_network):
+    reach = res1d_river_network.result_network.reaches.river
+    assert reach._get_total_length() == pytest.approx(2024.22765)

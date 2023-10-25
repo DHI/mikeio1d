@@ -10,7 +10,7 @@ class NuGetPackageInfo:
     Information about NuGet package to retrieve
     """
 
-    root = 'https://www.nuget.org/api/v2/package/'
+    root = "https://www.nuget.org/api/v2/package/"
 
     def __init__(self, name, version, path):
         nuget = NuGetRetriever.nuget_dir_name
@@ -19,9 +19,9 @@ class NuGetPackageInfo:
         self.version = version
         self.path = path
 
-        self.dir_name = f'{path}/{nuget}/{name}.{version}'
-        self.zip_name = f'{path}/{nuget}/{name}.{version}.zip'
-        self.link = f'{self.root}{name}/{version}'
+        self.dir_name = f"{path}/{nuget}/{name}.{version}"
+        self.zip_name = f"{path}/{nuget}/{name}.{version}.zip"
+        self.link = f"{self.root}{name}/{version}"
 
 
 class NuGetRetriever:
@@ -30,40 +30,40 @@ class NuGetRetriever:
     """
 
     # Default path
-    path_default = '.\\'
+    path_default = ".\\"
 
     # Directory where NuGet packages will be downloaded
-    nuget_dir_name = 'nuget'
+    nuget_dir_name = "nuget"
 
     # Directory where libraries will be installed
-    bin_dir_name = r'mikeio1d\bin'
+    bin_dir_name = r"mikeio1d\bin"
 
     # Default version of DHI NuGet packages to retrieve
-    version_default = '21.0.0'
+    version_default = "21.0.0"
 
     # DHI NuGet packages to install
     package_names = [
-        'DHI.Chart.Map',
-        'DHI.DHIfl',
-        'DHI.DFS',
-        'DHI.EUM',
-        'DHI.PFS',
-        'DHI.Projections',
-        'DHI.Mike1D.CrossSectionModule',
-        'DHI.Mike1D.HDParameterDataAccess',
-        'DHI.Mike1D.Generic',
-        'DHI.Mike1D.ResultDataAccess',
-        'GeoAPI',
-        'NetTopologySuite',
+        "DHI.Chart.Map",
+        "DHI.DHIfl",
+        "DHI.DFS",
+        "DHI.EUM",
+        "DHI.PFS",
+        "DHI.Projections",
+        "DHI.Mike1D.CrossSectionModule",
+        "DHI.Mike1D.HDParameterDataAccess",
+        "DHI.Mike1D.Generic",
+        "DHI.Mike1D.ResultDataAccess",
+        "GeoAPI",
+        "NetTopologySuite",
     ]
 
-    version_map = {'GeoAPI': '1.7.4', 'NetTopologySuite': '2.0.0'}
+    version_map = {"GeoAPI": "1.7.4", "NetTopologySuite": "2.0.0"}
 
     # Builds to include
-    include_builds = ['netstandard2.0', 'net45', 'net47', 'win-x64']
+    include_builds = ["netstandard2.0", "net45", "net47", "win-x64"]
 
     # Files with these extensions copy
-    extensions = ['*.dll', '*.pfs', '*.ubg', '*.xml']
+    extensions = ["*.dll", "*.pfs", "*.ubg", "*.xml"]
 
     def __init__(self, path=path_default, version=version_default):
         self.path = path
@@ -94,29 +94,29 @@ class NuGetRetriever:
 
     def download_packages(self):
         nuget_dir = os.path.join(self.path, self.nuget_dir_name)
-        print(f'  Downloading DHI NuGet packages into: {nuget_dir}')
+        print(f"  Downloading DHI NuGet packages into: {nuget_dir}")
 
         for info in self.package_infos:
-            print(f'    Downloading package: {info.name} {info.version}')
+            print(f"    Downloading package: {info.name} {info.version}")
             urllib.request.urlretrieve(info.link, info.zip_name)
 
     def extract_packages(self):
         version = self.version
 
         for info in self.package_infos:
-            with zipfile.ZipFile(info.zip_name, 'r') as zip_ref:
-                zip_ref.extractall(f'./{info.dir_name}')
+            with zipfile.ZipFile(info.zip_name, "r") as zip_ref:
+                zip_ref.extractall(f"./{info.dir_name}")
 
     def copy_packages_to_bin(self):
         destination = os.path.join(self.path, self.bin_dir_name)
 
-        print(f'  Copying DHI NuGet packages into: {destination}')
+        print(f"  Copying DHI NuGet packages into: {destination}")
 
         files = self.create_file_list_to_copy()
 
         for source_file in files:
-            source_file_path_stripped = source_file.split(r'\nuget')[1]
-            print(f'    Copying file: {source_file_path_stripped}')
+            source_file_path_stripped = source_file.split(r"\nuget")[1]
+            print(f"    Copying file: {source_file_path_stripped}")
             _, file_name = os.path.split(source_file)
             destination_file = os.path.join(destination, file_name)
             shutil.copy2(source_file, destination_file)
@@ -147,10 +147,10 @@ class NuGetRetriever:
 
     @staticmethod
     def install(version=version_default):
-        """ Installs NuGet packages into mikeio1d/bin folder """
+        """Installs NuGet packages into mikeio1d/bin folder"""
         cwd = os.getcwd()
         path, _ = os.path.split(os.path.join(cwd, __file__))
-        path = os.path.normpath(os.path.join(path, '../'))
+        path = os.path.normpath(os.path.join(path, "../"))
 
         print("Installing DHI NuGet packages:")
 

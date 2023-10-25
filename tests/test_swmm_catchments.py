@@ -28,11 +28,14 @@ def test_quantities(test_file):
     assert len(quantities) == 36
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"), True),
-    (QueryDataCatchment("SWMM_SUBCATCH_EVAP", "6"), True),
-    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "wrong_catchment_name"), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"), True),
+        (QueryDataCatchment("SWMM_SUBCATCH_EVAP", "6"), True),
+        (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "wrong_catchment_name"), False),
+    ],
+)
 def test_valid_catchment_data_queries(test_file, query, expected):
     swmm_out = test_file
 
@@ -48,19 +51,22 @@ def test_valid_catchment_data_queries(test_file, query, expected):
         pass
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"), 6.562),
-    (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"), 1.495)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"), 6.562),
+        (QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"), 1.495),
+    ],
+)
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,catchment_id,expected_max", [
-    ("SWMM_SUBCATCH_RUNOFF", "5", 6.562),
-    ("SWMM_SUBCATCH_RUNOFF", "6", 1.495)
-])
+@pytest.mark.parametrize(
+    "quantity,catchment_id,expected_max",
+    [("SWMM_SUBCATCH_RUNOFF", "5", 6.562), ("SWMM_SUBCATCH_RUNOFF", "6", 1.495)],
+)
 def test_read_catchment(test_file, quantity, catchment_id, expected_max):
     data = test_file.query.GetCatchmentValues(catchment_id, quantity)
     data = to_numpy(data)

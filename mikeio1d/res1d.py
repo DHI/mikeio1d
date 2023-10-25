@@ -7,16 +7,17 @@ from .dotnet import to_numpy
 from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
+from .result_network import ResultCatchment
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
 
-from .query import QueryData            # noqa: F401
-from .query import QueryDataCatchment   # noqa: F401
-from .query import QueryDataNode        # noqa: F401
-from .query import QueryDataReach       # noqa: F401
-from .query import QueryDataStructure   # noqa: F401
-from .query import QueryDataGlobal      # noqa: F401
+from .query import QueryData  # noqa: F401
+from .query import QueryDataCatchment  # noqa: F401
+from .query import QueryDataNode  # noqa: F401
+from .query import QueryDataReach  # noqa: F401
+from .query import QueryDataStructure  # noqa: F401
+from .query import QueryDataGlobal  # noqa: F401
 
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
@@ -69,23 +70,31 @@ class Res1D:
     ```
     """
 
-    def __init__(self,
-                 file_path=None,
-                 lazy_load=False,
-                 header_load=False,
-                 reaches=None,
-                 nodes=None,
-                 catchments=None,
-                 col_name_delimiter=NAME_DELIMITER,
-                 put_chainage_in_col_name=True,
-                 clear_queries_after_reading=True,
-                 result_reader_type=ResultReaderType.COPIER):
-
+    def __init__(
+        self,
+        file_path=None,
+        lazy_load=False,
+        header_load=False,
+        reaches=None,
+        nodes=None,
+        catchments=None,
+        col_name_delimiter=NAME_DELIMITER,
+        put_chainage_in_col_name=True,
+        clear_queries_after_reading=True,
+        result_reader_type=ResultReaderType.COPIER,
+    ):
         self.result_reader = ResultReaderCreator.create(
-            result_reader_type, self,
-            file_path, lazy_load, header_load,
-            reaches, nodes, catchments,
-            col_name_delimiter, put_chainage_in_col_name)
+            result_reader_type,
+            self,
+            file_path,
+            lazy_load,
+            header_load,
+            reaches,
+            nodes,
+            catchments,
+            col_name_delimiter,
+            put_chainage_in_col_name,
+        )
 
         self._start_time = None
         self._end_time = None
@@ -95,6 +104,12 @@ class Res1D:
         self._queries = self.result_network.queries
 
         self.clear_queries_after_reading = clear_queries_after_reading
+
+        self.catchments = self.result_network.catchments
+        self.reaches = self.result_network.reaches
+        self.nodes = self.result_network.nodes
+        self.structures = self.result_network.structures
+        self.global_data = self.result_network.global_data
 
     def __repr__(self):
         out = ["<mikeio1d.Res1D>"]
@@ -113,15 +128,15 @@ class Res1D:
 
         return str.join("\n", out)
 
-    #region Private methods
+    # region Private methods
 
     def _get_actual_queries(self, queries):
-        """ Finds out which list of queries should be used. """
+        """Finds out which list of queries should be used."""
         queries = self._queries if queries is None else queries
         queries = queries if isinstance(queries, list) else [queries]
         return queries
 
-    #endregion Private methods
+    # endregion Private methods
 
     def read(self, queries=None):
         """
@@ -159,17 +174,17 @@ class Res1D:
         return df
 
     def read_all(self):
-        """ Read all data from res1d file to dataframe. """
+        """Read all data from res1d file to dataframe."""
         return self.result_reader.read_all()
 
     def clear_queries(self):
-        """ Clear the current active list of queries. """
+        """Clear the current active list of queries."""
         self.result_network.queries.clear()
         self.result_network.queries_ids.clear()
 
     @property
     def time_index(self):
-        """ pandas.DatetimeIndex of the time index. """
+        """pandas.DatetimeIndex of the time index."""
         return self.result_reader.time_index
 
     @property
@@ -188,7 +203,7 @@ class Res1D:
 
     @property
     def quantities(self):
-        """ Quantities in res1d file. """
+        """Quantities in res1d file."""
         return self.result_reader.quantities
 
     @property
@@ -213,7 +228,7 @@ class Res1D:
 
     @property
     def file_path(self):
-        """ File path of the result file. """
+        """File path of the result file."""
         return self.result_reader.file_path
 
     @property
@@ -226,32 +241,7 @@ class Res1D:
         """
         return self.result_reader.data
 
-    @property
-    def catchments(self):
-        """ Catchments in res1d file. """
-        return self.result_network.catchments
-
-    @property
-    def reaches(self):
-        """ Reaches in res1d file. """
-        return self.result_network.reaches
-
-    @property
-    def nodes(self):
-        """ Nodes in res1d file. """
-        return self.result_network.nodes
-
-    @property
-    def structures(self):
-        """ Structures in res1d file. """
-        return self.result_network.structures
-
-    @property
-    def global_data(self):
-        """ Global data items in res1d file. """
-        return self.result_network.global_data
-
-    #region Query wrappers
+    # region Query wrappers
 
     def get_catchment_values(self, catchment_id, quantity):
         return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
@@ -264,7 +254,7 @@ class Res1D:
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
         if self.result_reader.is_lts_result_file():
-            raise NotImplementedError('The method is not implemented for LTS event statistics.')
+            raise NotImplementedError("The method is not implemented for LTS event statistics.")
 
         time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
         return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
@@ -278,7 +268,7 @@ class Res1D:
     def get_reach_sum_values(self, reach_name, quantity):
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
 
-    #endregion Query wrapper
+    # endregion Query wrapper
 
     def modify(self, data_frame, file_path=None):
         """
@@ -333,20 +323,22 @@ class Res1D:
         queries = self._get_actual_queries(queries)
         data_entries = self.result_network.convert_queries_to_data_entries(queries)
 
-        extractor = ExtractorCreator.create(ext, file_path, data_entries, self.data, time_step_skipping_number)
+        extractor = ExtractorCreator.create(
+            ext, file_path, data_entries, self.data, time_step_skipping_number
+        )
         extractor.export()
 
         if self.clear_queries_after_reading:
             self.clear_queries()
 
     def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
-        """ Extract to csv file. """
+        """Extract to csv file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
     def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
-        """ Extract to dfs0 file. """
+        """Extract to dfs0 file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
     def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
-        """ Extract to txt file. """
+        """Extract to txt file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
