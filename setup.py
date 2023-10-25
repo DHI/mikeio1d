@@ -38,6 +38,7 @@ setuptools.setup(
             "black",
             "sphinx",
             "sphinx-rtd-theme",
+            "myst-parser",
             "matplotlib",
             "jupyterlab",
         ],
