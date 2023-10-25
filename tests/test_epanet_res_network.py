@@ -33,26 +33,26 @@ def test_repr(test_file):
     epanet_res = test_file
     epanet_res_repr = epanet_res.__repr__()
     epanet_res_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 2022-10-13 00:00:00\n' +
-        'End time: 2022-10-14 00:00:00\n'
-        '# Timesteps: 25\n' +
-        '# Catchments: 0\n' +
-        '# Nodes: 11\n' +
-        '# Reaches: 13\n' +
-        '# Globals: 0\n' +
-        '0 - Demand <l/s>\n' +
-        '1 - Head <m>\n' +
-        '2 - Pressure <m>\n' +
-        '3 - WaterQuality <->\n' +
-        '4 - Flow <l/s>\n' +
-        '5 - Velocity <m/s>\n' +
-        '6 - HeadlossPer1000Unit <m>\n' +
-        '7 - AvgWaterQuality <->\n' +
-        '8 - StatusCode <->\n' +
-        '9 - Setting <->\n' +
-        '10 - ReactorRate <->\n' +
-        '11 - FrictionFactor <->'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 2022-10-13 00:00:00\n"
+        + "End time: 2022-10-14 00:00:00\n"
+        "# Timesteps: 25\n"
+        + "# Catchments: 0\n"
+        + "# Nodes: 11\n"
+        + "# Reaches: 13\n"
+        + "# Globals: 0\n"
+        + "0 - Demand <l/s>\n"
+        + "1 - Head <m>\n"
+        + "2 - Pressure <m>\n"
+        + "3 - WaterQuality <->\n"
+        + "4 - Flow <l/s>\n"
+        + "5 - Velocity <m/s>\n"
+        + "6 - HeadlossPer1000Unit <m>\n"
+        + "7 - AvgWaterQuality <->\n"
+        + "8 - StatusCode <->\n"
+        + "9 - Setting <->\n"
+        + "10 - ReactorRate <->\n"
+        + "11 - FrictionFactor <->"
     )
     assert epanet_res_repr == epanet_res_repr_ref
 
@@ -65,11 +65,14 @@ def test_data_item_dicts(test_file):
     assert len(epanet_res.global_data) == 0
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataReach("Flow", "10"), True),
-    (QueryDataReach("Flow", "10xyz"), False),
-    (QueryDataReach("Flow", "wrong_reach_name"), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataReach("Flow", "10"), True),
+        (QueryDataReach("Flow", "10xyz"), False),
+        (QueryDataReach("Flow", "wrong_reach_name"), False),
+    ],
+)
 def test_valid_reach_data_queries(test_file, query, expected):
     epanet_res = test_file
 
@@ -84,23 +87,29 @@ def test_valid_reach_data_queries(test_file, query, expected):
             assert epanet_res.read(query)
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataReach("Flow", "10"), 120.466),
-    (QueryDataReach("Flow", "12"), 16.268),
-    (QueryDataReach("FrictionFactor", "10"), 0.032),
-    (QueryDataReach("FrictionFactor", "12"), 0.047)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataReach("Flow", "10"), 120.466),
+        (QueryDataReach("Flow", "12"), 16.268),
+        (QueryDataReach("FrictionFactor", "10"), 0.032),
+        (QueryDataReach("FrictionFactor", "12"), 0.047),
+    ],
+)
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,reach_id,expected_max", [
-    ("Flow", "10", 120.466),
-    ("Flow", "12", 16.268),
-    ("FrictionFactor", "10", 0.032),
-    ("FrictionFactor", "12", 0.047)
-])
+@pytest.mark.parametrize(
+    "quantity,reach_id,expected_max",
+    [
+        ("Flow", "10", 120.466),
+        ("Flow", "12", 16.268),
+        ("FrictionFactor", "10", 0.032),
+        ("FrictionFactor", "12", 0.047),
+    ],
+)
 def test_read_reach(test_file, quantity, reach_id, expected_max):
     data = test_file.query.GetReachStartValues(reach_id, quantity)
     data = to_numpy(data)
@@ -108,10 +117,9 @@ def test_read_reach(test_file, quantity, reach_id, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
-@pytest.mark.parametrize("quantity,node_id,expected_max", [
-    ("Pressure", "10", 94.181),
-    ("Pressure", "11", 88.970)
-])
+@pytest.mark.parametrize(
+    "quantity,node_id,expected_max", [("Pressure", "10", 94.181), ("Pressure", "11", 88.970)]
+)
 def test_read_node(test_file, quantity, node_id, expected_max):
     data = test_file.query.GetNodeValues(node_id, quantity)
     data = to_numpy(data)

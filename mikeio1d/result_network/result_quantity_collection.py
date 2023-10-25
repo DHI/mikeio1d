@@ -29,7 +29,7 @@ class ResultQuantityCollection(ResultQuantity):
             result_quantity.add()
 
     def plot(self):
-        """ Plot the time series data. """
+        """Plot the time series data."""
         if len(self.result_quantities) <= 0:
             return
 
@@ -37,7 +37,7 @@ class ResultQuantityCollection(ResultQuantity):
         ResultQuantity.plot(self)
 
     def get_query(self):
-        """ Get queries corresponding to ResultQuantityCollection. """
+        """Get queries corresponding to ResultQuantityCollection."""
         queries = []
         for result_quantity in self.result_quantities:
             query = result_quantity.get_query()

@@ -3,24 +3,16 @@ Tests for the formatting of the result network objects."""
 
 
 def test_location_str_repr_header_line(node, reach, catchment, structure):
-    assert node.__repr__().startswith(
-        "<Manhole: 1>"
-    ), "Node header line is not correct."
-    assert reach.__repr__().startswith(
-        "<Reach: 100l1>"
-    ), "Reach header line is not correct."
+    assert node.__repr__().startswith("<Manhole: 1>"), "Node header line is not correct."
+    assert reach.__repr__().startswith("<Reach: 100l1>"), "Reach header line is not correct."
     assert catchment.__repr__().startswith(
         "<Catchment: 100_16_16>"
     ), "Catchment header line is not correct."
-    assert structure.__repr__().startswith(
-        "<Weir: 119w1>"
-    ), "Structure header line is not correct."
+    assert structure.__repr__().startswith("<Weir: 119w1>"), "Structure header line is not correct."
 
 
 def test_location_html_repr_header_line(node, reach, catchment):
-    assert node._repr_html_().startswith(
-        "&lt;Manhole: 1&gt;"
-    ), "Node header line is not correct."
+    assert node._repr_html_().startswith("&lt;Manhole: 1&gt;"), "Node header line is not correct."
     assert reach._repr_html_().startswith(
         "&lt;Reach: 100l1&gt;"
     ), "Reach header line is not correct."

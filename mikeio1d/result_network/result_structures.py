@@ -62,11 +62,7 @@ class ResultStructures(ResultLocations):
         is_data_item_for_single_grid_point = len(list(data_item.IndexList)) == 1
         has_three_grid_points = len(list(reach.GridPoints)) == 3
 
-        if (
-            reach.IsStructureReach
-            and has_three_grid_points
-            and is_data_item_for_single_grid_point
-        ):
+        if reach.IsStructureReach and has_three_grid_points and is_data_item_for_single_grid_point:
             return True
 
         return False

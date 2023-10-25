@@ -16,9 +16,7 @@ def make_proper_variable_name(string, extra_string_before_digit="_"):
     # Replace more than two underscores with a single underscore.
     string = re.sub(r"_{2,}", "_", string)
     # Add an extra string is the string starts with a number.
-    string = (
-        extra_string_before_digit + string if string and string[0].isdigit() else string
-    )
+    string = extra_string_before_digit + string if string and string[0].isdigit() else string
     # Remove a starting underscore
     string = string[1:] if string[0] == "_" else string
     # Remove a trailing underscore

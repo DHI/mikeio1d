@@ -102,9 +102,7 @@ def test_structure_attributes(test_file):
     actual_max = round(df["DischargeInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 11.018
 
-    actual_max = round(
-        df["DischargeInStructure:W_left_1_1:link_basin_left:46"].max(), 3
-    )
+    actual_max = round(df["DischargeInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 13.543
 
     actual_max = round(df["FlowAreaInStructure:W_right:link_basin_right:18"].max(), 3)
@@ -243,12 +241,8 @@ def test_res1d_modification_filtered(test_file):
     df = res1d.read()
     max_value = round(df.max().max(), 3)
 
-    df = df.drop(
-        pd.date_range("2000-02-18 00:06:00", "2000-02-18 00:16:00", freq="10min")
-    )
-    df = df.drop(
-        pd.date_range("2000-02-18 00:56:00", "2000-02-18 12:06:00", freq="10min")
-    )
+    df = df.drop(pd.date_range("2000-02-18 00:06:00", "2000-02-18 00:16:00", freq="10min"))
+    df = df.drop(pd.date_range("2000-02-18 00:56:00", "2000-02-18 12:06:00", freq="10min"))
 
     # Test the modification of ResultData
     df2 = df.multiply(2.0)
@@ -264,12 +258,8 @@ def test_res1d_modification_filtered(test_file):
     res1d.structures.FlowVelocityInStructure.add()
     df = res1d.read()
 
-    df = df.drop(
-        pd.date_range("2000-02-18 00:06:00", "2000-02-18 00:16:00", freq="10min")
-    )
-    df = df.drop(
-        pd.date_range("2000-02-18 00:56:00", "2000-02-18 12:06:00", freq="10min")
-    )
+    df = df.drop(pd.date_range("2000-02-18 00:06:00", "2000-02-18 00:16:00", freq="10min"))
+    df = df.drop(pd.date_range("2000-02-18 00:56:00", "2000-02-18 12:06:00", freq="10min"))
 
     df2 = df.multiply(100.0)
 
@@ -299,14 +289,10 @@ def test_extraction_to_csv_dfs0_txt(test_file):
     file_size_csv = 21905
     assert 0.5 * file_size_csv < os.stat(file_path_csv).st_size < 2.0 * file_size_csv
 
-    file_path_dfs0 = file_path.replace(
-        "NetworkRiver.res1d", "NetworkRiver.extract.dfs0"
-    )
+    file_path_dfs0 = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.dfs0")
     res1d.to_dfs0(file_path_dfs0, time_step_skipping_number=10)
     file_size_dfs0 = 30302
-    assert (
-        file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
-    )
+    assert file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
 
     file_path_txt = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.txt")
     res1d.to_txt(file_path_txt, time_step_skipping_number=10)
@@ -326,19 +312,13 @@ def test_result_quantity_methods(test_file):
     # Test the calling of methods
     discharge_in_structure.plot()
     discharge_in_structure.to_csv(
-        file_path.replace(
-            "NetworkRiver.res1d", "W_right_DischargeInStructure.extract.csv"
-        )
+        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.csv")
     )
     discharge_in_structure.to_dfs0(
-        file_path.replace(
-            "NetworkRiver.res1d", "W_right_DischargeInStructure.extract.dfs0"
-        )
+        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.dfs0")
     )
     discharge_in_structure.to_txt(
-        file_path.replace(
-            "NetworkRiver.res1d", "W_right_DischargeInStructure.extract.txt"
-        )
+        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.txt")
     )
 
 

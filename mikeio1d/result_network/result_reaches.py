@@ -46,9 +46,7 @@ class ResultReaches(ResultLocations):
         for reach in self.data.Reaches:
             reach = impl(reach)
             result_reach = self.get_or_create_result_reach(reach)
-            result_reach_attribute_string = make_proper_variable_name(
-                reach.Name, self.reach_label
-            )
+            result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
             setattr(self, result_reach_attribute_string, result_reach)
 
     def set_quantity_collections(self):

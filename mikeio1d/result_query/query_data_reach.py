@@ -46,8 +46,8 @@ class QueryDataReach(QueryData):
 
         values = (
             res1d.query.GetReachValues(name, chainage, quantity)
-            if chainage is not None else
-            res1d.query.GetReachStartValues(name, quantity)
+            if chainage is not None
+            else res1d.query.GetReachStartValues(name, quantity)
         )
 
         self._check_invalid_values(values)
@@ -89,7 +89,7 @@ class QueryDataReach(QueryData):
         quantity = self._quantity
 
         return (
-            NAME_DELIMITER.join([quantity, name, f'{chainage:g}'])
-            if chainage is not None and chainage != self.delete_value else
-            NAME_DELIMITER.join([quantity, name])
+            NAME_DELIMITER.join([quantity, name, f"{chainage:g}"])
+            if chainage is not None and chainage != self.delete_value
+            else NAME_DELIMITER.join([quantity, name])
         )

@@ -324,9 +324,7 @@ def test_node_node_property_maintains_backwards_compatibility(res1d_network):
     assert node.node.XCoordinate == pytest.approx(-687934.6000976562)
 
 
-def test_reaches_dict_access_maintains_backwards_compatibility(
-    res1d_network, res1d_river_network
-):
+def test_reaches_dict_access_maintains_backwards_compatibility(res1d_network, res1d_river_network):
     with pytest.warns(UserWarning):
         # Indexing reaches could return a single dotnet reach
         reach = res1d_network.result_network.reaches["100l1"]

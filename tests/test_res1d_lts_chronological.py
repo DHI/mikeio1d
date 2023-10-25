@@ -41,35 +41,35 @@ def test_repr(test_file):
     res1d = test_file
     res1d_repr = res1d.__repr__()
     res1d_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 1957-01-01 00:00:00\n' +
-        'End time: 1963-01-01 00:00:00\n'
-        '# Timesteps: 73\n' +
-        '# Catchments: 0\n' +
-        '# Nodes: 16\n' +
-        '# Reaches: 17\n' +
-        '# Globals: 9\n' +
-        '0 - DischargeIntegratedMonthly <m^3>\n' +
-        '1 - DischargeIntegratedMonthlyCount <()>\n' +
-        '2 - DischargeIntegratedMonthlyDuration <h>\n' +
-        '3 - Component_1TransportIntegratedMonthly <kg>\n' +
-        '4 - Component_1TransportIntegratedMonthlyCount <()>\n' +
-        '5 - Component_1TransportIntegratedMonthlyDuration <h>\n' +
-        '6 - Component_2TransportIntegratedMonthly <kg>\n' +
-        '7 - Component_2TransportIntegratedMonthlyCount <()>\n' +
-        '8 - Component_2TransportIntegratedMonthlyDuration <h>\n' +
-        '9 - SurchargeIntegratedMonthly <m^3>\n' +
-        '10 - SurchargeIntegratedMonthlyCount <()>\n' +
-        '11 - SurchargeIntegratedMonthlyDuration <h>\n' +
-        '12 - DischargeIntegratedMonthlyOutlets <m^3>\n' +
-        '13 - DischargeIntegratedMonthlyWeirs <m^3>\n' +
-        '14 - DischargeIntegratedMonthlyTotalOutflow <m^3>\n' +
-        '15 - Component_1TransportIntegratedMonthlyTotalEmission <kg>\n' +
-        '16 - Component_2TransportIntegratedMonthlyTotalEmission <kg>\n' +
-        '17 - Component_1TransportIntegratedMonthlyOutlets <kg>\n' +
-        '18 - Component_2TransportIntegratedMonthlyOutlets <kg>\n' +
-        '19 - Component_1TransportIntegratedMonthlyWeirs <kg>\n' +
-        '20 - Component_2TransportIntegratedMonthlyWeirs <kg>'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 1957-01-01 00:00:00\n"
+        + "End time: 1963-01-01 00:00:00\n"
+        "# Timesteps: 73\n"
+        + "# Catchments: 0\n"
+        + "# Nodes: 16\n"
+        + "# Reaches: 17\n"
+        + "# Globals: 9\n"
+        + "0 - DischargeIntegratedMonthly <m^3>\n"
+        + "1 - DischargeIntegratedMonthlyCount <()>\n"
+        + "2 - DischargeIntegratedMonthlyDuration <h>\n"
+        + "3 - Component_1TransportIntegratedMonthly <kg>\n"
+        + "4 - Component_1TransportIntegratedMonthlyCount <()>\n"
+        + "5 - Component_1TransportIntegratedMonthlyDuration <h>\n"
+        + "6 - Component_2TransportIntegratedMonthly <kg>\n"
+        + "7 - Component_2TransportIntegratedMonthlyCount <()>\n"
+        + "8 - Component_2TransportIntegratedMonthlyDuration <h>\n"
+        + "9 - SurchargeIntegratedMonthly <m^3>\n"
+        + "10 - SurchargeIntegratedMonthlyCount <()>\n"
+        + "11 - SurchargeIntegratedMonthlyDuration <h>\n"
+        + "12 - DischargeIntegratedMonthlyOutlets <m^3>\n"
+        + "13 - DischargeIntegratedMonthlyWeirs <m^3>\n"
+        + "14 - DischargeIntegratedMonthlyTotalOutflow <m^3>\n"
+        + "15 - Component_1TransportIntegratedMonthlyTotalEmission <kg>\n"
+        + "16 - Component_2TransportIntegratedMonthlyTotalEmission <kg>\n"
+        + "17 - Component_1TransportIntegratedMonthlyOutlets <kg>\n"
+        + "18 - Component_2TransportIntegratedMonthlyOutlets <kg>\n"
+        + "19 - Component_1TransportIntegratedMonthlyWeirs <kg>\n"
+        + "20 - Component_2TransportIntegratedMonthlyWeirs <kg>"
     )
     assert res1d_repr == res1d_repr_ref
 
@@ -82,11 +82,14 @@ def test_data_item_dicts(test_file):
     assert len(res1d.global_data) == 9
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataReach("DischargeIntegratedMonthly", "B4.1320l1", 0), True),
-    (QueryDataReach("DischargeIntegratedMonthly", "B4.1320l1", 42424242), False),
-    (QueryDataReach("DischargeIntegratedMonthly", "wrong_reach_name", 0), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataReach("DischargeIntegratedMonthly", "B4.1320l1", 0), True),
+        (QueryDataReach("DischargeIntegratedMonthly", "B4.1320l1", 42424242), False),
+        (QueryDataReach("DischargeIntegratedMonthly", "wrong_reach_name", 0), False),
+    ],
+)
 def test_valid_reach_data_queries(test_file, query, expected):
     res1d = test_file
 
@@ -101,23 +104,29 @@ def test_valid_reach_data_queries(test_file, query, expected):
             assert res1d.read(query)
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataReach("DischargeIntegratedMonthly", "B4.1320l1", 135.001), 1215.915),
-    (QueryDataReach("DischargeIntegratedMonthly", "B4.1491l1", 144), 563.973),
-    (QueryDataReach("DischargeIntegratedMonthlyCount", "B4.1320l1", 270.002), 3),
-    (QueryDataReach("DischargeIntegratedMonthlyCount", "B4.1491l1", 239.999), 3)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataReach("DischargeIntegratedMonthly", "B4.1320l1", 135.001), 1215.915),
+        (QueryDataReach("DischargeIntegratedMonthly", "B4.1491l1", 144), 563.973),
+        (QueryDataReach("DischargeIntegratedMonthlyCount", "B4.1320l1", 270.002), 3),
+        (QueryDataReach("DischargeIntegratedMonthlyCount", "B4.1491l1", 239.999), 3),
+    ],
+)
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,reach_id,chainage,expected_max", [
-    ("DischargeIntegratedMonthly", "B4.1320l1", 135.001, 1215.915),
-    ("DischargeIntegratedMonthly", "B4.1491l1", 144, 563.973),
-    ("DischargeIntegratedMonthlyCount", "B4.1320l1", 270.002, 3),
-    ("DischargeIntegratedMonthlyCount", "B4.1491l1", 239.999, 3)
-])
+@pytest.mark.parametrize(
+    "quantity,reach_id,chainage,expected_max",
+    [
+        ("DischargeIntegratedMonthly", "B4.1320l1", 135.001, 1215.915),
+        ("DischargeIntegratedMonthly", "B4.1491l1", 144, 563.973),
+        ("DischargeIntegratedMonthlyCount", "B4.1320l1", 270.002, 3),
+        ("DischargeIntegratedMonthlyCount", "B4.1491l1", 239.999, 3),
+    ],
+)
 def test_read_reach(test_file, quantity, reach_id, chainage, expected_max):
     data = test_file.query.GetReachValues(reach_id, chainage, quantity)
     data = to_numpy(data)
@@ -125,10 +134,13 @@ def test_read_reach(test_file, quantity, reach_id, chainage, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
-@pytest.mark.parametrize("quantity,node_id,expected_max", [
-    ("SurchargeIntegratedMonthly", "B4.1200", 97.434),
-    ("SurchargeIntegratedMonthlyCount", "B4.1200", 1)
-])
+@pytest.mark.parametrize(
+    "quantity,node_id,expected_max",
+    [
+        ("SurchargeIntegratedMonthly", "B4.1200", 97.434),
+        ("SurchargeIntegratedMonthlyCount", "B4.1200", 1),
+    ],
+)
 def test_read_node(test_file, quantity, node_id, expected_max):
     data = test_file.query.GetNodeValues(node_id, quantity)
     data = to_numpy(data)
@@ -163,7 +175,9 @@ def test_get_reach_values(test_file):
 
 
 def test_get_reach_value(test_file):
-    value = test_file.get_reach_value("B4.1491l1", 144, "DischargeIntegratedMonthlyCount", test_file.start_time)
+    value = test_file.get_reach_value(
+        "B4.1491l1", 144, "DischargeIntegratedMonthlyCount", test_file.start_time
+    )
     assert value == 0
 
 
@@ -192,11 +206,14 @@ def test_res1d_filter_readall(test_file_path):
     res1d = None
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataGlobal("DischargeIntegratedMonthlyOutlets"), 5562.719),
-    (QueryDataGlobal("DischargeIntegratedMonthlyWeirs"), 437.729),
-    (QueryDataGlobal("DischargeIntegratedMonthlyTotalOutflow"), 5971.352)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataGlobal("DischargeIntegratedMonthlyOutlets"), 5562.719),
+        (QueryDataGlobal("DischargeIntegratedMonthlyWeirs"), 437.729),
+        (QueryDataGlobal("DischargeIntegratedMonthlyTotalOutflow"), 5971.352),
+    ],
+)
 def test_read_global_items_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max

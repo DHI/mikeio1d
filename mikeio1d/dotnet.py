@@ -36,17 +36,13 @@ _MAP_NET_NP = {
 def to_dotnet_datetime(x):
     """Convert from python datetime to .NET System.DateTime"""
     milliseconds = x.microsecond // 1000
-    return System.DateTime(
-        x.year, x.month, x.day, x.hour, x.minute, x.second, milliseconds
-    )
+    return System.DateTime(x.year, x.month, x.day, x.hour, x.minute, x.second, milliseconds)
 
 
 def from_dotnet_datetime(x):
     """Convert from .NET System.DateTime to python datetime"""
     microseconds = x.Millisecond * 1000
-    return datetime.datetime(
-        x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second, microseconds
-    )
+    return datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second, microseconds)
 
 
 def asNumpyArray(x):
@@ -115,9 +111,7 @@ def to_dotnet_array(x):
     try:
         netArray = System.Array.CreateInstance(_MAP_NP_NET[dtype], dims)
     except KeyError:
-        raise NotImplementedError(
-            "asNetArray does not yet support dtype {}".format(dtype)
-        )
+        raise NotImplementedError("asNetArray does not yet support dtype {}".format(dtype))
 
     try:  # Memmove
         destHandle = GCHandle.Alloc(netArray, GCHandleType.Pinned)

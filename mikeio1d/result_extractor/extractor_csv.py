@@ -4,7 +4,7 @@ from .extractor_txt import ExtractorTxt
 class ExtractorCsv(ExtractorTxt):
     """Class which extracts data to comma separated value (CSV) file"""
 
-    separator = ';'
+    separator = ";"
 
     def set_output_format(self):
         self.header1_format = "%s;"

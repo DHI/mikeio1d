@@ -28,17 +28,19 @@ class ResultLocations(dict):
 
     def __init__(self, res1d):
         self.res1d = res1d
-        self.quantity_label = 'q_'
+        self.quantity_label = "q_"
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
         self.result_quantity_map = {}
 
     def set_quantity_collections(self):
-        """ Sets all quantity collection attributes. """
+        """Sets all quantity collection attributes."""
         for quantity_id in self.result_quantity_map:
             result_quantities = self.result_quantity_map[quantity_id]
             result_quantity_collection = ResultQuantityCollection(result_quantities, self.res1d)
-            result_quantity_attribute_string = make_proper_variable_name(quantity_id, self.quantity_label)
+            result_quantity_attribute_string = make_proper_variable_name(
+                quantity_id, self.quantity_label
+            )
             setattr(self, result_quantity_attribute_string, result_quantity_collection)
 
     def set_res1d_object_to_dict(self, dict_key, obj):
