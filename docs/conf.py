@@ -43,6 +43,5 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 # html_logo = "..\images\logo\MIKE-IO-1D-Logo-Pos-RGB-nomargin.png"
-# autodoc_typehints = "none"
 
 myst_heading_anchors = 2
