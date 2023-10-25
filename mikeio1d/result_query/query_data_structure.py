@@ -79,4 +79,4 @@ class QueryDataStructure(QueryDataReach):
         if chainage is None:
             return NAME_DELIMITER.join([quantity, structure, name])
 
-        return NAME_DELIMITER.join([quantity, structure, name, f'{chainage:g}'])
+        return NAME_DELIMITER.join([quantity, structure, name, f"{chainage:g}"])

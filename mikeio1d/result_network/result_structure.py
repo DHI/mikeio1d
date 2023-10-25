@@ -1,3 +1,5 @@
+from warnings import warn
+
 from ..dotnet import pythonnet_implementation as impl
 from ..query import QueryDataStructure
 from .result_location import ResultLocation
@@ -31,7 +33,7 @@ class ResultStructure(ResultLocation):
         empty_list = []
         ResultLocation.__init__(self, empty_list, res1d)
 
-        self.structure_id = structure_id
+        self.id = structure_id
         self.reach = reach
         self.chainage = None
 
@@ -39,14 +41,34 @@ class ResultStructure(ResultLocation):
         for data_item in data_items:
             self.add_res1d_structure_data_item(data_item)
 
+        self.set_static_attributes()
+
+    def __repr__(self) -> str:
+        return f"<{self.type}: {self.id}>"
+
+    @property
+    def structure_id(self):
+        # TODO: Remove this in 1.0.0
+        warn(
+            "Please use .id instead of .structure_id. This attribute will be removed in the future."
+        )
+        return self.id
+
+    def set_static_attributes(self):
+        """Set static attributes. These show up in the html repr."""
+        self._static_attributes = []
+        self.set_static_attribute("id", self.id)
+        self.set_static_attribute("type", self.reach.Name.split(":")[0])
+        self.set_static_attribute("chainage", self.chainage)
+
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
-        """ Add structure result quantity to result quantity maps. """
+        """Add structure result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
         structure_result_quantity_map = self.res1d.result_network.structures.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
 
-        query = QueryDataStructure(quantity_id, self.structure_id, self.reach.Name, self.chainage)
+        query = QueryDataStructure(quantity_id, self.id, self.reach.Name, self.chainage)
         self.add_to_network_result_quantity_map(query, result_quantity)
 
     def add_res1d_structure_data_item(self, data_item):
@@ -86,12 +108,12 @@ class ResultStructure(ResultLocation):
         return None
 
     def get_data_item(self, quantity_id):
-        """ Retrieve a data item for given quantity id. """
+        """Retrieve a data item for given quantity id."""
         return self.data_items_dict[quantity_id]
 
     def get_query(self, data_item):
-        """ Get a QueryDataStructure for given data item. """
+        """Get a QueryDataStructure for given data item."""
         quantity_id = data_item.Quantity.Id
-        structure_id = self.structure_id
+        structure_id = self.id
         query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self.chainage)
         return query

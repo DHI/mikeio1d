@@ -42,7 +42,7 @@ class ResultReaderQuery(ResultReader):
         return df
 
     def get_values(self, data_set, data_item):
-        """ Get all time series values in given data_item. """
+        """Get all time series values in given data_item."""
         for i in range(data_item.NumberOfElements):
             col_name = self.get_column_name(data_set, data_item, i)
             yield data_item.CreateTimeSeriesData(i), col_name

@@ -33,50 +33,52 @@ class ResultQuantity:
         self.element_index = 0
 
     def add(self):
-        """ Add a query to ResultNetwork.queries based on the data item. """
+        """Add a query to ResultNetwork.queries based on the data item."""
         self.result_location.add_query(self.data_item)
 
     def read(self):
-        """ Read the time series data into a data frame. """
+        """Read the time series data into a data frame."""
         query = self.get_query()
         return self.res1d.read(query)
 
     def plot(self, **kwargs):
-        """ Plot the time series data. """
+        """Plot the time series data."""
         df = self.read()
         ax = df.plot(**kwargs)
         quantity = self.data_item.Quantity
-        ax.set_xlabel('Time')
-        ax.set_ylabel(f'{quantity.Description} [$\\mathrm{{{quantity.EumQuantity.UnitAbbreviation}}}$]')
+        ax.set_xlabel("Time")
+        ax.set_ylabel(
+            f"{quantity.Description} [$\\mathrm{{{quantity.EumQuantity.UnitAbbreviation}}}$]"
+        )
         return ax
 
     def to_dataframe(self):
-        """ Get a time series as a data frame. """
+        """Get a time series as a data frame."""
         return self.read()
 
     def to_csv(self, file_path, time_step_skipping_number=1):
-        """ Extract time series data into a csv file. """
+        """Extract time series data into a csv file."""
         query = self.get_query()
         self.res1d.to_csv(file_path, query, time_step_skipping_number)
 
     def to_dfs0(self, file_path, time_step_skipping_number=1):
-        """ Extract time series data into a dfs0 file. """
+        """Extract time series data into a dfs0 file."""
         query = self.get_query()
         self.res1d.to_dfs0(file_path, query, time_step_skipping_number)
 
     def to_txt(self, file_path, time_step_skipping_number=1):
-        """ Extract time series data into a txt file. """
+        """Extract time series data into a txt file."""
         query = self.get_query()
         self.res1d.to_txt(file_path, query, time_step_skipping_number)
 
     def get_query(self):
-        """ Get query corresponding to ResultQuantity. """
+        """Get query corresponding to ResultQuantity."""
         return self.result_location.get_query(self.data_item)
 
     def get_data_entry(self):
-        """ Get DataEntry corresponding to ResultQuantity. """
+        """Get DataEntry corresponding to ResultQuantity."""
         return DataEntry(self.data_item, self.element_index)
 
     def get_data_entry_net(self):
-        """ Get DataEntryNet corresponding to ResultQuantity. """
+        """Get DataEntryNet corresponding to ResultQuantity."""
         return DataEntryNet(self.data_item, self.element_index)

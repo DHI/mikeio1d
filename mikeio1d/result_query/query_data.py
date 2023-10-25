@@ -68,8 +68,10 @@ class QueryData:
 
     def _check_invalid_quantity(self, res1d):
         if self._quantity not in res1d.quantities:
-            raise InvalidQuantity(f"Undefined quantity {self._quantity}. "
-                                  f"Allowed quantities are: {', '.join(res1d.quantities)}.")
+            raise InvalidQuantity(
+                f"Undefined quantity {self._quantity}. "
+                f"Allowed quantities are: {', '.join(res1d.quantities)}."
+            )
 
     def _check_invalid_values(self, values):
         if values is None:

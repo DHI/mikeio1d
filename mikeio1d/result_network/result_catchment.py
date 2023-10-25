@@ -1,3 +1,5 @@
+from warnings import warn
+
 from ..query import QueryDataCatchment
 from .result_location import ResultLocation
 
@@ -16,22 +18,48 @@ class ResultCatchment(ResultLocation):
 
     def __init__(self, catchment, res1d):
         ResultLocation.__init__(self, catchment.DataItems, res1d)
-        self.catchment = catchment
+        self._catchment = catchment
         self.set_quantities()
+        self.set_static_attributes()
+
+    def __repr__(self) -> str:
+        return f"<Catchment: {self.id}>"
+
+    def __getattr__(self, name: str):
+        # TODO: Remove this in 1.0.0
+        if name == "catchment":
+            warn(
+                "Accessing IRes1DCatchment attribute via .catchment is deprecated. Use ._catchment."
+            )
+            return self._catchment
+
+        elif hasattr(self._catchment, name):
+            warn(
+                f"Accessing IRes1DCatchment attribute {name} directly is deprecated. Use static attributes instead, or ._catchment.{name}."
+            )
+            return getattr(self._catchment, name)
+        else:
+            object.__getattribute__(self, name)
+
+    def set_static_attributes(self):
+        """Set static attributes. These show up in the html repr."""
+        self.set_static_attribute("id", self._catchment.Id)
+        self.set_static_attribute("area", self._catchment.Area)
+        self.set_static_attribute("type", self._catchment.Type)
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
-        """ Add catchment result quantity to result quantity maps. """
+        """Add catchment result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
         catchment_result_quantity_map = self.res1d.result_network.catchments.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
 
-        query = QueryDataCatchment(quantity_id, self.catchment.Id, validate=False)
+        query = QueryDataCatchment(quantity_id, self._catchment.Id, validate=False)
         self.add_to_network_result_quantity_map(query, result_quantity)
 
     def get_query(self, data_item):
-        """ Get a QueryDataCatchment for given data item. """
+        """Get a QueryDataCatchment for given data item."""
         quantity_id = data_item.Quantity.Id
-        catchment_id = self.catchment.Id
+        catchment_id = self._catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
         return query

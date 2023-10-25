@@ -33,19 +33,19 @@ def test_repr(test_file):
     epanet_resx = test_file
     epanet_resx_repr = epanet_resx.__repr__()
     epanet_repr_ref = (
-        '<mikeio1d.Res1D>\n' +
-        'Start time: 2022-10-13 00:00:00\n' +
-        'End time: 2022-10-14 00:00:00\n'
-        '# Timesteps: 25\n' +
-        '# Catchments: 0\n' +
-        '# Nodes: 2\n' +
-        '# Reaches: 1\n' +
-        '# Globals: 0\n' +
-        '0 - Volume <m^3>\n' +
-        '1 - Volume Percentage <%>\n' +
-        '2 - Pump efficiency <%>\n' +
-        '3 - Pump energy costs </kWh>\n' +
-        '4 - Pump energy <kW>'
+        "<mikeio1d.Res1D>\n"
+        + "Start time: 2022-10-13 00:00:00\n"
+        + "End time: 2022-10-14 00:00:00\n"
+        "# Timesteps: 25\n"
+        + "# Catchments: 0\n"
+        + "# Nodes: 2\n"
+        + "# Reaches: 1\n"
+        + "# Globals: 0\n"
+        + "0 - Volume <m^3>\n"
+        + "1 - Volume Percentage <%>\n"
+        + "2 - Pump efficiency <%>\n"
+        + "3 - Pump energy costs </kWh>\n"
+        + "4 - Pump energy <kW>"
     )
     assert epanet_resx_repr == epanet_repr_ref
 
@@ -58,11 +58,14 @@ def test_data_item_dicts(test_file):
     assert len(epanet_resx.global_data) == 0
 
 
-@pytest.mark.parametrize("query,expected", [
-    (QueryDataReach("Pump energy", "9"), True),
-    (QueryDataReach("Pump energy", "10xyz"), False),
-    (QueryDataReach("Pump energy", "wrong_reach_name"), False)
-])
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (QueryDataReach("Pump energy", "9"), True),
+        (QueryDataReach("Pump energy", "10xyz"), False),
+        (QueryDataReach("Pump energy", "wrong_reach_name"), False),
+    ],
+)
 def test_valid_reach_data_queries(test_file, query, expected):
     epanet_resx = test_file
 
@@ -77,21 +80,23 @@ def test_valid_reach_data_queries(test_file, query, expected):
             assert epanet_resx.read(query)
 
 
-@pytest.mark.parametrize("query,expected_max", [
-    (QueryDataReach("Pump energy", "9"), 96.707),
-    (QueryDataReach("Pump energy costs", "9"), 0.0),
-    (QueryDataReach("Pump efficiency", "9"), 75.0)
-])
+@pytest.mark.parametrize(
+    "query,expected_max",
+    [
+        (QueryDataReach("Pump energy", "9"), 96.707),
+        (QueryDataReach("Pump energy costs", "9"), 0.0),
+        (QueryDataReach("Pump efficiency", "9"), 75.0),
+    ],
+)
 def test_read_reach_with_queries(test_file, query, expected_max):
     data = test_file.read(query)
     assert pytest.approx(round(data.max().values[0], 3)) == expected_max
 
 
-@pytest.mark.parametrize("quantity,reach_id,expected_max", [
-    ("Pump energy", "9", 96.707),
-    ("Pump energy costs", "9", 0.0),
-    ("Pump efficiency", "9", 75.0)
-])
+@pytest.mark.parametrize(
+    "quantity,reach_id,expected_max",
+    [("Pump energy", "9", 96.707), ("Pump energy costs", "9", 0.0), ("Pump efficiency", "9", 75.0)],
+)
 def test_read_reach(test_file, quantity, reach_id, expected_max):
     data = test_file.query.GetReachStartValues(reach_id, quantity)
     data = to_numpy(data)
@@ -99,10 +104,9 @@ def test_read_reach(test_file, quantity, reach_id, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
-@pytest.mark.parametrize("quantity,node_id,expected_max", [
-    ("Volume", "2", 7859.459),
-    ("Volume Percentage", "2", 92.381)
-])
+@pytest.mark.parametrize(
+    "quantity,node_id,expected_max", [("Volume", "2", 7859.459), ("Volume Percentage", "2", 92.381)]
+)
 def test_read_node(test_file, quantity, node_id, expected_max):
     data = test_file.query.GetNodeValues(node_id, quantity)
     data = to_numpy(data)
