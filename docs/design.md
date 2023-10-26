@@ -50,7 +50,7 @@ By providing the historical versions of MIKE IO 1D on PyPI it is possible to rep
 **Install specific version**
 
 ```bash
-pip install mikeio1d==0.4.0
+$ pip install mikeio1d==0.4.0
 ```
 
 ## Easy access to new features
