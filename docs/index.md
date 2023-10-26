@@ -4,7 +4,7 @@
  ![Python version](https://img.shields.io/pypi/pyversions/mikeio1d.svg)
 [![PyPI version](https://badge.fury.io/py/mikeio1d.svg)](https://badge.fury.io/py/mikeio1d)
 
-Read res1d and xns11 files.
+MIKE IO 1D is a python library for reading and modifying network result files (e.g. .res1d). Its target audience is scientists, engineers, and modellers working with MIKE 1D network results.
 
 For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files) use the related package [MIKE IO](https://github.com/DHI/mikeio)
 
@@ -46,8 +46,9 @@ Where can I get help?
    :caption: Contents:
    :hidden:
 
-   getting-started
    design
+   getting-started
+   network
    res1d
    xns11
 ```
