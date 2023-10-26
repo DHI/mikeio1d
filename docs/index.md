@@ -8,7 +8,7 @@ MIKE IO 1D is a python library for reading and modifying network result files (e
 
 For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files) use the related package [MIKE IO](https://github.com/DHI/mikeio)
 
-```{note} MIKE IO 1D is under development and could be subject to changes.
+```{caution} MIKE IO 1D is under development and could be subject to changes.
 ```
 
 ## Requirements
