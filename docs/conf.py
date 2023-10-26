@@ -20,13 +20,17 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
     "myst_parser",
 ]
+
+# don't include prompts in copyable code blocks
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
 
 autodoc_typehints = "none"
 
 # Napoleon configurations
-
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_use_param = False
@@ -44,4 +48,4 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 # html_logo = "..\images\logo\MIKE-IO-1D-Logo-Pos-RGB-nomargin.png"
 
-myst_heading_anchors = 2
+myst_heading_anchors = 3

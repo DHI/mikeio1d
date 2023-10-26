@@ -19,16 +19,16 @@ For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files) use the related pa
 
 ## Installation
 
-```
+```bash
 $ pip install mikeio1d
 ```
 
 ## Getting started
 
 ```python
->>>  from mikeio1d import Res1D
->>>  res = Res1D('simple.res1d')
->>>  df = res.read()
+>>> from mikeio1d import Res1D
+>>> res = Res1D('simple.res1d')
+>>> df = res.read()
 ```
 
 Read more in the [getting started guide](getting-started).
@@ -49,4 +49,5 @@ Where can I get help?
    getting-started
    design
    res1d
+   xns11
 ```
