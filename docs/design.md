@@ -21,7 +21,7 @@ Make extensive use of existing standard libraries for scientific computing such 
 
 MIKE IO 1D aims to use a syntax familiar to users of scientific computing libraries such as NumPy, Pandas and xarray.
 
-cls## Easy to install
+## Easy to install
 
 ```bash
 $ pip install mikeio1d

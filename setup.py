@@ -36,11 +36,15 @@ setuptools.setup(
         "dev": [
             "pytest",
             "black",
-            "sphinx",
-            "sphinx-rtd-theme",
-            "myst-parser",
             "matplotlib",
             "jupyterlab",
+        ],
+        "docs": [
+            "sphinx",
+            "sphinx-rtd-theme",
+            "sphinx-autobuild",
+            "sphinx-copybutton",
+            "myst-parser",
         ],
         "test": ["pytest", "matplotlib"],
     },
