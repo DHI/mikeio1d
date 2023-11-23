@@ -11,13 +11,20 @@ def setup_mike_installation(syspath):
     syspath: list of str
         List of strings defining PATH variable.
     """
-    # It could be possible to try to use DHI.Mike.Install instead
-    #   clr.AddReference("DHI.Mike.Install, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c513450b5d0bf0bf")
-    #   from DHI.Mike.Install import MikeImport, MikeProducts
-    #   MikeImport.SetupLatest(MikeProducts.MikePlus)
     syspath.append(mike_bin_path)
     if mikeio1d_bin_path != mike_bin_path:
         syspath.append(mikeio1d_bin_path)
+
+        # Some of the MIKE libraries will need to be resolved by DHI.Mike.Install,
+        # so set it up here.
+        import clr
+
+        clr.AddReference(
+            "DHI.Mike.Install, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c513450b5d0bf0bf"
+        )
+        from DHI.Mike.Install import MikeImport
+
+        MikeImport.SetupInstallDir(mike_install_path)
 
 
 mikeio1d_bin_path = os.path.join(os.path.dirname(__file__), "bin")
