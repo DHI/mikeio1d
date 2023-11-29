@@ -1,0 +1,5 @@
+Base model: MIKE+ Examples - Sirius - DWF_Network Scenario
+Updates:
+1. Change the simulation duration to 1 hour.
+2. Change the saving frequency to 10 minutes.
+3. Update the IDs of 10 links to use chinese words.
