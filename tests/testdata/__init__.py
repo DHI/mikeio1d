@@ -24,6 +24,8 @@ class testdata:
 
     Network_res1d: str = format_path("Network.res1d")
     """A basic urban network file."""
+    Network_res1d_chinese: str = format_path("Network_chinese.res1d")
+    """A basic urban network file with chinese characters for some links."""
     NetworkRiver_res1d: str = format_path("NetworkRiver.res1d")
     """A basic river network file."""
     Catchments_res1d: str = format_path("Catchments.res1d")
