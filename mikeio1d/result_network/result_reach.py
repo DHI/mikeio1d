@@ -69,13 +69,16 @@ class ResultReach(ResultLocation):
             total_length += reach.Length
         return total_length
 
+    def _get_total_gridpoints(self):
+        return sum([len(gp_list) for gp_list in self.result_gridpoints])
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("name", self.reaches[0].Name)
         self.try_set_static_attribute_length()
         self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
         self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
-        self.set_static_attribute("n_gridpoints", len(self.result_gridpoints))
+        self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
 
     def try_set_static_attribute_length(self):
         try:
