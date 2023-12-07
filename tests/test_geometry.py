@@ -4,8 +4,6 @@ import random
 import shapely
 
 from mikeio1d.result_network.geometry import geometry_from_node
-from mikeio1d.result_network.geometry import geometry_from_reach
-from mikeio1d.result_network.geometry import geometry_from_reaches
 from mikeio1d.result_network.geometry import geometry_from_catchment
 from mikeio1d.result_network.geometry import ReachGeometry
 from mikeio1d.result_network.geometry import ReachPoint
@@ -110,6 +108,7 @@ class TestReachGeometry:
         for p in g.points:
             assert p.chainage >= prev_chainage, "Chainages should be sorted in ascending order."
             prev_chainage = p.chainage
+        assert g.length == pytest.approx(2024.2276598819008)
 
     def test_reaches_point_interpolation_matches_mikeplus(self, river_reach):
         g = ReachGeometry.from_dotnet_reaches(river_reach.reaches)
@@ -135,16 +134,6 @@ def test_geometry_from_node(node):
     assert g.y == pytest.approx(-1056500.69921875)
 
 
-def test_geometry_from_reach(reach):
-    reach = reach.reaches[0]  # dotnet reach
-    g = geometry_from_reach(reach)
-    assert isinstance(g, shapely.LineString)
-    x, y = g.xy
-    assert x == pytest.approx([-687887.6008911133, -687907.999206543])
-    assert y == pytest.approx([-1056368.9006958008, -1056412.0])
-    assert g.length == pytest.approx(47.6827148432828)
-
-
 def test_geometry_from_catchment(catchment):
     catchment = catchment._catchment  # dotnet catchment
     g = geometry_from_catchment(catchment)
@@ -165,7 +154,7 @@ def test_geometry_from_node_runs(many_nodes):
 
 def test_geometry_from_reaches_runs(many_reaches):
     for reach in many_reaches:
-        g = geometry_from_reaches(reach.reaches)
+        g = ReachGeometry.from_dotnet_reaches(reach.reaches).to_shapely()
         assert isinstance(g, shapely.LineString)
 
 
