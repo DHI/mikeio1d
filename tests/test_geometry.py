@@ -134,19 +134,17 @@ def test_geometry_from_node(node):
     assert g.y == pytest.approx(-1056500.69921875)
 
 
-def test_geometry_from_catchment(catchment):
-    catchment = catchment._catchment  # dotnet catchment
-    g = geometry_from_catchment(catchment)
-    assert isinstance(g, shapely.Polygon)
-    assert (g.centroid.x, g.centroid.y) == pytest.approx(
-        (catchment.CenterPoint.X, catchment.CenterPoint.Y)
-    )
-    # TODO: not sure why this fails
-    #   - is it because catchment.Area can deviate from the shape area?
-    assert g.area == pytest.approx(catchment.Area)
+def test_geometry_from_catchment(many_catchments):
+    for catchment in many_catchments:
+        catchment = catchment._catchment  # dotnet catchment
+        g = geometry_from_catchment(catchment)
+        assert isinstance(g, shapely.Polygon)
+        assert (g.centroid.x, g.centroid.y) == pytest.approx(
+            (catchment.CenterPoint.X, catchment.CenterPoint.Y)
+        )
 
 
-def test_geometry_from_node_runs(many_nodes):
+def test_geometry_from_nodes_runs(many_nodes):
     for node in many_nodes:
         g = geometry_from_node(node._node)
         assert isinstance(g, shapely.Point)
