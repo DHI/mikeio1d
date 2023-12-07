@@ -27,44 +27,6 @@ def geometry_from_node(dotnet_node) -> shapely.Point:
     return geometry
 
 
-def geometry_from_reach(dotnet_reach) -> shapely.LineString:
-    """
-    Create a shapely LineString from an IRes1DReach object.
-
-    Parameters
-    ----------
-    dotnet_reach : IRes1DReach
-
-    Returns
-    -------
-    shapely.LineString
-    """
-    digipoints = dotnet_reach.DigiPoints
-    xy = [(dp.X, dp.Y) for dp in digipoints]
-    geometry = shapely.LineString(xy)
-    return geometry
-
-
-def geometry_from_reaches(dotnet_reaches) -> shapely.LineString:
-    """
-    Create a shapely LineString from an interable of IRes1DReach objects.
-
-    Useful for joining multiple IRes1DReach objects that share the same name.
-
-    Parameters
-    ----------
-
-    dotnet_reach : iterable of IRes1DReach
-    Returns
-    -------
-    shapely.LineString
-    """
-    linestrings = [geometry_from_reach(reach) for reach in dotnet_reaches]
-    geometry = shapely.MultiLineString(linestrings)
-    geometry = shapely.line_merge(geometry)
-    return geometry
-
-
 class ReachPointType(Enum):
     DIGIPOINT = 0
     GRIDPOINT = 1
