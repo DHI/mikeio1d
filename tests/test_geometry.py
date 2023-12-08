@@ -4,10 +4,10 @@ import random
 import shapely
 
 from mikeio1d.result_network.geometry import NodePoint
-from mikeio1d.result_network.geometry import geometry_from_catchment
 from mikeio1d.result_network.geometry import ReachGeometry
 from mikeio1d.result_network.geometry import ReachPoint
 from mikeio1d.result_network.geometry import ReachPointType
+from mikeio1d.result_network.geometry import CatchmentGeometry
 
 
 class TestReachPoint:
@@ -136,8 +136,8 @@ def test_geometry_from_node(node):
 
 def test_geometry_from_catchment(many_catchments):
     for catchment in many_catchments:
-        catchment = catchment._catchment  # dotnet catchment
-        g = geometry_from_catchment(catchment)
+        catchment_geom = CatchmentGeometry.from_dotnet_catchment(catchment._catchment)
+        g = catchment_geom.to_shapely()
         assert isinstance(g, shapely.Polygon)
         assert (g.centroid.x, g.centroid.y) == pytest.approx(
             (catchment.CenterPoint.X, catchment.CenterPoint.Y)
@@ -159,5 +159,6 @@ def test_geometry_from_reaches_runs(many_reaches):
 
 def test_geometry_from_catchments_runs(many_catchments):
     for catchment in many_catchments:
-        g = geometry_from_catchment(catchment._catchment)
+        catchment = CatchmentGeometry.from_dotnet_catchment(catchment._catchment)
+        g = catchment.to_shapely()
         assert isinstance(g, shapely.Polygon)
