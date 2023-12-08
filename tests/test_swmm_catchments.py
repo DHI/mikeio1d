@@ -96,12 +96,18 @@ def test_dotnet_methods(test_file):
     swmm_out.query.GetCatchmentValues("5", "SWMM_SUBCATCH_RUNOFF")
 
 
-def test_swmm_out_filter(test_file_path):
+def test_swmm_out_filter(test_file_path, helpers):
     catchments = ["5", "6"]
     swmm_out = Res1D(test_file_path, catchments=catchments)
 
-    swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"))
-    swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"))
+    df_5 = swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"))
+    df_6 = swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"))
+
+    swmm_out_full = Res1D(test_file_path)
+    df_full = swmm_out_full.read()
+
+    helpers.compare_data_frames(df_full, df_5)
+    helpers.compare_data_frames(df_full, df_6)
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException

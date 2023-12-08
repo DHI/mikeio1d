@@ -29,6 +29,8 @@ class testdata:
     NetworkRiver_res1d: str = format_path("NetworkRiver.res1d")
     """A basic river network file."""
     Catchments_res1d: str = format_path("Catchments.res1d")
+    """A small urban setup with three pipes."""
+    FlowSplit_res1d: str = format_path("FlowSplit.res1d")
     """A basic urban network file containing only catchments."""
     LTSEventStatistics_res1d: str = format_path("LTSEventStatistics.res1d")
     """An LTS event statistics file."""
