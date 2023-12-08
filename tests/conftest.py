@@ -8,6 +8,41 @@ from mikeio1d.dotnet import pythonnet_implementation as impl
 from .testdata import testdata
 
 
+class Helpers:
+    """
+    Class containing helper methods for performing tests.
+    """
+
+    @staticmethod
+    def compare_data_frames(df_ref, df):
+        """
+        Compares columns in df to the ones in df_ref.
+
+        Note that df_ref typically has more columngs than df.
+        Comparison is performed only in columns of df.
+        """
+        for col in df:
+            diff = (df[col] - df_ref[col]).abs().sum()
+
+            # TODO: Handle cases of different types than float
+            try:
+                diff = float(diff)
+            except:
+                continue
+
+            assert pytest.approx(diff) == 0.0
+
+
+@pytest.fixture
+def helpers():
+    return Helpers
+
+
+@pytest.fixture()
+def flow_split_file_path():
+    return testdata.FlowSplit_res1d
+
+
 @pytest.fixture()
 def res1d_network():
     return Res1D(testdata.Network_res1d)
