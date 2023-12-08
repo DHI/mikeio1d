@@ -8,9 +8,17 @@ from typing import Iterable, List, Protocol, Tuple
 import numpy as np
 import shapely
 from shapely.geometry.base import BaseGeometry
+from shapely.geometry import Point
+from shapely.geometry import LineString
+from shapely.geometry import Polygon
 
 
-class ShapelyProtocol(Protocol):
+class ReachPointType(Enum):
+    DIGIPOINT = 0
+    GRIDPOINT = 1
+
+
+class ConvertableToShapely(Protocol):
     def to_shapely(self) -> BaseGeometry:
         ...
 
@@ -18,7 +26,7 @@ class ShapelyProtocol(Protocol):
 @dataclass(frozen=True)
 class NodePoint:
     """
-    Create a shapely Point from an IRes1DNode object.
+    A utility class for working with node geometries.
 
     Parameters
     ----------
@@ -33,23 +41,22 @@ class NodePoint:
 
     @staticmethod
     def from_res1d_node(res1d_node) -> NodePoint:
+        """
+        Create a NodePoint from an IRes1DNode object.
+        """
         xcoord = res1d_node.XCoordinate
         ycoord = res1d_node.YCoordinate
         return NodePoint(xcoord, ycoord)
 
-    def to_shapely(self) -> shapely.Point:
-        return shapely.Point(self.x, self.y)
-
-
-class ReachPointType(Enum):
-    DIGIPOINT = 0
-    GRIDPOINT = 1
+    def to_shapely(self) -> BaseGeometry:
+        return Point(self.x, self.y)
 
 
 @dataclass(frozen=True, order=True)
 class ReachPoint:
     """
-    A point on a reach, either a digipoint or gridpoint.
+    A utility class for working with points along a reach.
+
     Parameters
     ----------
     point_type : ReachPointType
@@ -76,36 +83,54 @@ class ReachPoint:
     def is_gridpoint(self):
         return self.point_type == ReachPointType.GRIDPOINT
 
-    def to_shapely(self) -> shapely.Point:
-        return shapely.Point(self.x, self.y)
+    def to_shapely(self) -> BaseGeometry:
+        return Point(self.x, self.y)
 
     @staticmethod
-    def from_digipoint(digipoint):
+    def from_digipoint(res1d_digipoint):
+        """
+        Create a ReachPoint from an IRes1DDigiPoint object.
+        """
         return ReachPoint(
             ReachPointType.DIGIPOINT,
-            digipoint.M,
-            digipoint.X,
-            digipoint.Y,
-            digipoint.Z,
+            res1d_digipoint.M,
+            res1d_digipoint.X,
+            res1d_digipoint.Y,
+            res1d_digipoint.Z,
         )
 
     @staticmethod
-    def from_gridpoint(gridpoint):
+    def from_gridpoint(res1d_gridpoint):
+        """
+        Create a ReachPoint from an IRes1DGridPoint object.
+        """
         return ReachPoint(
             ReachPointType.GRIDPOINT,
-            gridpoint.Chainage,
-            gridpoint.X,
-            gridpoint.Y,
-            gridpoint.Z,
+            res1d_gridpoint.Chainage,
+            res1d_gridpoint.X,
+            res1d_gridpoint.Y,
+            res1d_gridpoint.Z,
         )
 
 
 class ReachGeometry:
+    """
+    A utility class for working with reach geometries.
+    """
+
     def __init__(self, points: List[ReachPoint]):
         self._points = sorted(points)
 
     @staticmethod
     def from_res1d_reaches(res1d_reaches):
+        """
+        Create a ReachGeometry from a list of IRes1DReach objects.
+
+        Parameters
+        ----------
+        res1d_reaches : List[IRes1DReach]
+        """
+
         if not isinstance(res1d_reaches, Iterable):
             res1d_reaches = [res1d_reaches]
 
@@ -136,10 +161,11 @@ class ReachGeometry:
     def length(self) -> float:
         return self.chainages[-1] - self.chainages[0]
 
-    def to_shapely(self) -> shapely.LineString:
+    def to_shapely(self) -> BaseGeometry:
+        """Convert to a shapely geometry."""
         points = self._get_unique_points()
         xy = [(p.x, p.y) for p in points]
-        return shapely.LineString(xy)
+        return LineString(xy)
 
     def chainage_to_geometric_distance(self, chainage: float) -> float:
         """Convert chainage to geometric distance."""
@@ -165,10 +191,12 @@ class ReachGeometry:
 
     @cache
     def _get_unique_points(self) -> List[ReachPoint]:
+        """Removes points sharing the same chainage and coordinates."""
         return sorted(list(set(self._points)))
 
     @cache
     def _get_distances(self) -> List[float]:
+        """Returns a list of geometric distances between all unique points."""
         points = self._get_unique_points()
         distances = []
         total_distance = 0.0
@@ -184,7 +212,7 @@ class ReachGeometry:
 @dataclass(frozen=True)
 class CatchmentGeometry:
     """
-    A catchment geometry.
+    A utility class for working with catchment geometries.
 
     Parameters
     ----------
@@ -196,6 +224,9 @@ class CatchmentGeometry:
 
     @staticmethod
     def from_res1d_catchment(res1d_catchment) -> CatchmentGeometry:
+        """
+        Create a CatchmentGeometry from an IRes1DCatchment object.
+        """
         shape = res1d_catchment.Shape[0]  # there will always be one element
         points = []
         for i in range(shape.VertexCount()):
@@ -203,5 +234,6 @@ class CatchmentGeometry:
             points.append((vertex.X, vertex.Y))
         return CatchmentGeometry(points)
 
-    def to_shapely(self) -> shapely.Polygon:
-        return shapely.Polygon(self.points)
+    def to_shapely(self) -> BaseGeometry:
+        """Convert to a shapely geometry."""
+        return Polygon(self.points)
