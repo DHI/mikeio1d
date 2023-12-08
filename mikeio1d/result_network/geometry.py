@@ -3,28 +3,42 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import cache
-from typing import Iterable, List
+from typing import Iterable, List, Protocol
 
 import numpy as np
 import shapely
+from shapely.geometry.base import BaseGeometry
 
 
-def geometry_from_node(dotnet_node) -> shapely.Point:
+class ShapelyProtocol(Protocol):
+    def to_shapely(self) -> BaseGeometry:
+        ...
+
+
+@dataclass(frozen=True)
+class NodePoint:
     """
     Create a shapely Point from an IRes1DNode object.
 
     Parameters
     ----------
-    dotnet_node : IRes1DNode
-
-    Returns
-    -------
-    shapely.Point
+    x : float
+        X coordinate
+    y : float
+        Y coordinate
     """
-    xcoord = dotnet_node.XCoordinate
-    ycoord = dotnet_node.YCoordinate
-    geometry = shapely.Point(xcoord, ycoord)
-    return geometry
+
+    x: float
+    y: float
+
+    @staticmethod
+    def from_res1d_node(res1d_node) -> NodePoint:
+        xcoord = res1d_node.XCoordinate
+        ycoord = res1d_node.YCoordinate
+        return NodePoint(xcoord, ycoord)
+
+    def to_shapely(self) -> shapely.Point:
+        return shapely.Point(self.x, self.y)
 
 
 class ReachPointType(Enum):
