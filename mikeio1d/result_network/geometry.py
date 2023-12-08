@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import cache
-from typing import Iterable, List, Protocol
+from typing import Iterable, List, Protocol, Tuple
 
 import numpy as np
 import shapely
@@ -181,12 +181,27 @@ class ReachGeometry:
         return distances
 
 
-def geometry_from_catchment(dotnet_catchment) -> shapely.Polygon:
-    """Get a shapely Polygon from a catchment."""
-    shape = dotnet_catchment.Shape[0]  # there will always be one element
-    coords = []
-    for i in range(shape.VertexCount()):
-        vertex = shape.GetVertex(i)
-        coords.append((vertex.X, vertex.Y))
-    geometry = shapely.Polygon(coords)
-    return geometry
+@dataclass(frozen=True)
+class CatchmentGeometry:
+    """
+    A catchment geometry.
+
+    Parameters
+    ----------
+    points : List[Tuple[float, float]]
+        List of points (x, y) defining the catchment boundary. The first and last points should be the same.
+    """
+
+    points: List[Tuple[float, float]]
+
+    @staticmethod
+    def from_dotnet_catchment(dotnet_catchment) -> CatchmentGeometry:
+        shape = dotnet_catchment.Shape[0]  # there will always be one element
+        points = []
+        for i in range(shape.VertexCount()):
+            vertex = shape.GetVertex(i)
+            points.append((vertex.X, vertex.Y))
+        return CatchmentGeometry(points)
+
+    def to_shapely(self) -> shapely.Polygon:
+        return shapely.Polygon(self.points)
