@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from functools import cache
+from functools import lru_cache
 from typing import Iterable, List, Protocol, Tuple
 
 import numpy as np
@@ -188,12 +188,12 @@ class ReachGeometry:
         chainage = float(np.interp(geometric_distance, distances, chainages))
         return chainage
 
-    @cache
+    @lru_cache(maxsize=None)
     def _get_unique_points(self) -> List[ReachPoint]:
         """Removes points sharing the same chainage and coordinates."""
         return sorted(list(set(self._points)))
 
-    @cache
+    @lru_cache(maxsize=None)
     def _get_distances(self) -> List[float]:
         """Returns a list of geometric distances between all unique points."""
         points = self._get_unique_points()
