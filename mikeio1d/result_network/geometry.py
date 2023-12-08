@@ -105,12 +105,12 @@ class ReachGeometry:
         self._points = sorted(points)
 
     @staticmethod
-    def from_dotnet_reaches(dotnet_reaches):
-        if not isinstance(dotnet_reaches, Iterable):
-            dotnet_reaches = [dotnet_reaches]
+    def from_res1d_reaches(res1d_reaches):
+        if not isinstance(res1d_reaches, Iterable):
+            res1d_reaches = [res1d_reaches]
 
         points = []
-        for reach in dotnet_reaches:
+        for reach in res1d_reaches:
             points.extend([ReachPoint.from_digipoint(dp) for dp in reach.DigiPoints])
             points.extend([ReachPoint.from_gridpoint(gp) for gp in reach.GridPoints])
 
@@ -195,8 +195,8 @@ class CatchmentGeometry:
     points: List[Tuple[float, float]]
 
     @staticmethod
-    def from_dotnet_catchment(dotnet_catchment) -> CatchmentGeometry:
-        shape = dotnet_catchment.Shape[0]  # there will always be one element
+    def from_res1d_catchment(res1d_catchment) -> CatchmentGeometry:
+        shape = res1d_catchment.Shape[0]  # there will always be one element
         points = []
         for i in range(shape.VertexCount()):
             vertex = shape.GetVertex(i)
