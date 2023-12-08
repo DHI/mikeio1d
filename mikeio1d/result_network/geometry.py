@@ -6,7 +6,6 @@ from functools import cache
 from typing import Iterable, List, Protocol, Tuple
 
 import numpy as np
-import shapely
 from shapely.geometry.base import BaseGeometry
 from shapely.geometry import Point
 from shapely.geometry import LineString
