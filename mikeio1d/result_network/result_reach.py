@@ -1,8 +1,14 @@
+from __future__ import annotations
 import warnings
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .geometry import ReachGeometry
 
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
+from ..various import try_import_shapely
 
 from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
 
@@ -175,3 +181,13 @@ class ResultReach(ResultLocation):
                     result_gridpoint.add_data_item(data_item, element_index)
                 else:
                     result_gridpoint.add_structure_data_item(data_item)
+
+    @property
+    def geometry(self) -> ReachGeometry:
+        """
+        A geometric representation of the reach. Requires shapely.
+        """
+        try_import_shapely()
+        from .geometry import ReachGeometry
+
+        return ReachGeometry.from_res1d_reaches(self.reaches)

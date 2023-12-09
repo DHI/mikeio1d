@@ -1,7 +1,13 @@
+from __future__ import annotations
 from warnings import warn
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .geometry import CatchmentGeometry
 
 from ..query import QueryDataCatchment
 from .result_location import ResultLocation
+from ..various import try_import_shapely
 
 
 class ResultCatchment(ResultLocation):
@@ -63,3 +69,13 @@ class ResultCatchment(ResultLocation):
         catchment_id = self._catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
         return query
+
+    @property
+    def geometry(self) -> CatchmentGeometry:
+        """
+        A geometric representation of the catchment. Requires shapely.
+        """
+        try_import_shapely()
+        from .geometry import CatchmentGeometry
+
+        return CatchmentGeometry.from_res1d_catchment(self._catchment)
