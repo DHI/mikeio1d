@@ -1,7 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from geopandas import GeoDataFrame
+
 from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_catchment import ResultCatchment
 from .various import make_proper_variable_name
+from ..various import try_import_geopandas
 
 
 class ResultCatchments(ResultLocations):
@@ -50,3 +58,17 @@ class ResultCatchments(ResultLocations):
         Create a dict entry from catchment ID to ResultCatchment object.
         """
         self[catchment.id] = catchment
+
+    def to_geopandas(self) -> GeoDataFrame:
+        """
+        Convert catchments to a geopandas.GeoDataFrame object.
+
+        Returns
+        -------
+        gdf : geopandas.GeoDataFrame
+            A GeoDataFrame object with catchments as Polygon geometries.
+        """
+        gpd = try_import_geopandas()
+        geometries = [catchment.geometry.to_shapely() for catchment in self.values()]
+        gdf = gpd.GeoDataFrame(geometry=geometries)
+        return gdf

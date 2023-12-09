@@ -12,3 +12,27 @@ def mike1d_quantities():
     Useful for knowing what quantity string to query.
     """
     return [quantity for quantity in Enum.GetNames(clr.GetClrType(PredefinedQuantity))]
+
+
+def try_import_geopandas():
+    """
+    Try 'import geopandas as gpd' and raise ImportError if not installed.
+    """
+    try:
+        import geopandas as gpd
+    except ImportError:
+        message = "This functionality requires installing the optional dependency geopandas."
+        raise ImportError(message)
+    return gpd
+
+
+def try_import_shapely():
+    """
+    Try 'import shapely' and raise ImportError if not installed.
+    """
+    try:
+        import shapely
+    except ImportError:
+        message = "This functionality requires installing the optional dependency shapely."
+        raise ImportError(message)
+    return shapely

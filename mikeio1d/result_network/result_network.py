@@ -1,3 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from geopandas import GeoDataFrame
+
+import pandas as pd
+
+from ..various import try_import_geopandas
+
 from .result_nodes import ResultNodes
 from .result_reaches import ResultReaches
 from .result_catchments import ResultCatchments
@@ -101,3 +112,14 @@ class ResultNetwork:
             data_entries.append(data_entry)
 
         return data_entries
+
+    def to_geopandas(self) -> GeoDataFrame:
+        """
+        Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed.
+        """
+        gpd = try_import_geopandas()
+        gdf_nodes = self.nodes.to_geopandas()
+        gdf_reaches = self.reaches.to_geopandas()
+        gdf_catchments = self.catchments.to_geopandas()
+        gdf = pd.concat([gdf_nodes, gdf_reaches, gdf_catchments], ignore_index=True)
+        return gdf

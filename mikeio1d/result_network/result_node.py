@@ -1,7 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .geometry import NodePoint
+
 from warnings import warn
 
 from ..query import QueryDataNode
 from .result_location import ResultLocation
+from ..various import try_import_shapely
 
 
 class ResultNode(ResultLocation):
@@ -70,3 +78,13 @@ class ResultNode(ResultLocation):
         node_id = self._node.ID
         query = QueryDataNode(quantity_id, node_id)
         return query
+
+    @property
+    def geometry(self) -> NodePoint:
+        """
+        A geometric representation of the node. Requires shapely.
+        """
+        try_import_shapely()
+        from .geometry import NodePoint
+
+        return NodePoint.from_res1d_node(self._node)
