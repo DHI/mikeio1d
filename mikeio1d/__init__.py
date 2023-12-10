@@ -1,7 +1,7 @@
-import clr
 import sys
 import os
-from platform import architecture
+import platform
+import pythonnet
 
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/
@@ -21,11 +21,20 @@ from platform import architecture
 #
 __version__ = "0.4.0"
 
-if "64" not in architecture()[0]:
+if "64" not in platform.architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
 
 mike_bin_path = os.path.join(os.path.dirname(__file__), "bin")
 sys.path.append(mike_bin_path)
+
+is_linux = platform.system() == "Linux"
+if is_linux:
+    import mikecore
+
+    runtime_config = os.path.join(mike_bin_path, "DHI.Mike1D.Application.runtimeconfig.json")
+    pythonnet.load("coreclr", runtime_config=runtime_config)
+
+import clr
 
 clr.AddReference("System")
 clr.AddReference("System.Runtime")
