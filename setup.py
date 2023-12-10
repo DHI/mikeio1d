@@ -31,6 +31,7 @@ setuptools.setup(
         'pythonnet>=3.0.0a2; python_version >= "3.7.0"',
         "numpy",
         "pandas",
+        'mikecore; platform_system=="Linux"',
     ],
     extras_require={
         "dev": [

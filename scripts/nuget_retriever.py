@@ -2,7 +2,10 @@ import os
 import shutil
 import urllib.request
 import zipfile
+import platform
+
 from glob import glob
+from pathlib import Path
 
 
 class NuGetPackageInfo:
@@ -36,7 +39,7 @@ class NuGetRetriever:
     nuget_dir_name = "nuget"
 
     # Directory where libraries will be installed
-    bin_dir_name = r"mikeio1d\bin"
+    bin_dir_name = os.path.join("mikeio1d", "bin")
 
     # Default version of DHI NuGet packages to retrieve
     version_default = "21.0.0"
@@ -57,24 +60,41 @@ class NuGetRetriever:
         "NetTopologySuite",
     ]
 
-    version_map = {"GeoAPI": "1.7.4", "NetTopologySuite": "2.0.0"}
+    package_names_linux = [
+        "DHI.MikeCore.Linux.rhel7",
+    ]
+
+    version_map = {
+        "GeoAPI": "1.7.4",
+        "NetTopologySuite": "2.0.0",
+        "DHI.MikeCore.Linux.rhel7": "20.0.0",
+    }
 
     # Builds to include
-    include_builds = ["netstandard2.0", "net45", "net47", "win-x64"]
+    include_builds = {
+        "Windows": ["netstandard2.0", "net45", "net47", "win-x64"],
+        "Linux": ["netstandard2.0", "linux-x64"],
+    }
 
     # Files with these extensions copy
-    extensions = ["*.dll", "*.pfs", "*.ubg", "*.xml"]
+    extensions = ["*.dll", "*.pfs", "*.ubg", "*.xml", "*.so", "*.so.5"]
 
     def __init__(self, path=path_default, version=version_default):
         self.path = path
         self.version = version
 
     def install_packages(self):
+        self.refine_package_names_list()
         self.create_nuget_dir_if_needed()
         self.generate_package_infos()
         self.download_packages()
         self.extract_packages()
         self.copy_packages_to_bin()
+
+    def refine_package_names_list(self):
+        is_linux = platform.system() == "Linux"
+        if is_linux:
+            self.package_names += self.package_names_linux
 
     def create_nuget_dir_if_needed(self):
         path = os.path.join(self.path, self.nuget_dir_name)
@@ -105,7 +125,8 @@ class NuGetRetriever:
 
         for info in self.package_infos:
             with zipfile.ZipFile(info.zip_name, "r") as zip_ref:
-                zip_ref.extractall(f"./{info.dir_name}")
+                extract_dir = os.path.join(".", info.dir_name)
+                zip_ref.extractall(extract_dir)
 
     def copy_packages_to_bin(self):
         destination = os.path.join(self.path, self.bin_dir_name)
@@ -115,11 +136,22 @@ class NuGetRetriever:
         files = self.create_file_list_to_copy()
 
         for source_file in files:
-            source_file_path_stripped = source_file.split(r"\nuget")[1]
+            source_file_path_stripped = self.strip_source_file_path(source_file)
             print(f"    Copying file: {source_file_path_stripped}")
             _, file_name = os.path.split(source_file)
             destination_file = os.path.join(destination, file_name)
             shutil.copy2(source_file, destination_file)
+
+    def strip_source_file_path(self, file_path):
+        path = Path(file_path)
+        path_stripped = path.parts[-1]
+        for path_part in reversed(path.parts):
+            if path_part == path_stripped:
+                continue
+            if path_part == "nuget":
+                break
+            path_stripped = os.path.join(path_part, path_stripped)
+        return path_stripped
 
     def create_file_list_to_copy(self):
         start_dir = os.path.join(self.path, self.nuget_dir_name)
@@ -140,7 +172,8 @@ class NuGetRetriever:
 
     def check_file_candidate(self, file_candidate):
         include_file = False
-        for build in self.include_builds:
+        builds = self.include_builds[platform.system()]
+        for build in builds:
             if build in file_candidate:
                 include_file = True
         return include_file
@@ -150,7 +183,7 @@ class NuGetRetriever:
         """Installs NuGet packages into mikeio1d/bin folder"""
         cwd = os.getcwd()
         path, _ = os.path.split(os.path.join(cwd, __file__))
-        path = os.path.normpath(os.path.join(path, "../"))
+        path = os.path.normpath(os.path.join(path, ".."))
 
         print("Installing DHI NuGet packages:")
 
