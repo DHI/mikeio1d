@@ -1,6 +1,7 @@
 import pytest
 
 from geopandas import GeoDataFrame
+from pyproj import CRS
 from shapely import Point
 from shapely import LineString
 from shapely import Polygon
@@ -40,5 +41,11 @@ def test_network_to_geopandas_basic(res1d_network):
     assert all(isinstance(x, (Point, LineString, Polygon)) for x in gdf.geometry)
 
 
-# TODO: test CRS
+def test_network_to_geopandas_crs(res1d_river_network):
+    """Test that network.to_geopandas() returns a GeoDataFrame with the correct CRS."""
+    gdf = res1d_river_network.result_network.to_geopandas()
+    assert isinstance(gdf.crs, CRS)
+    assert gdf.crs.to_epsg() == 25832
+
+
 # TODO: test import of mikeio1d does not break if geopandas isn't installed

@@ -9,6 +9,7 @@ from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
 from ..various import try_import_geopandas
+from ..various import pyproj_crs_from_projection_string
 from ..dotnet import pythonnet_implementation as impl
 
 
@@ -92,5 +93,6 @@ class ResultReaches(ResultLocations):
         """
         gpd = try_import_geopandas()
         geometries = [reach.geometry.to_shapely() for reach in self.values()]
-        gdf = gpd.GeoDataFrame(geometry=geometries)
+        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
+        gdf = gpd.GeoDataFrame(geometry=geometries, crs=crs)
         return gdf

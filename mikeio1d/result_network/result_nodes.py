@@ -10,6 +10,7 @@ from .result_locations import ResultLocations
 from .result_node import ResultNode
 from .various import make_proper_variable_name
 from ..various import try_import_geopandas
+from ..various import pyproj_crs_from_projection_string
 
 
 class ResultNodes(ResultLocations):
@@ -68,5 +69,6 @@ class ResultNodes(ResultLocations):
         """
         gpd = try_import_geopandas()
         geometries = [node.geometry.to_shapely() for node in self.values()]
-        gdf = gpd.GeoDataFrame(geometry=geometries)
+        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
+        gdf = gpd.GeoDataFrame(geometry=geometries, crs=crs)
         return gdf

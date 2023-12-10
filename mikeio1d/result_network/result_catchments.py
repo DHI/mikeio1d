@@ -10,6 +10,7 @@ from .result_locations import ResultLocations
 from .result_catchment import ResultCatchment
 from .various import make_proper_variable_name
 from ..various import try_import_geopandas
+from ..various import pyproj_crs_from_projection_string
 
 
 class ResultCatchments(ResultLocations):
@@ -70,5 +71,6 @@ class ResultCatchments(ResultLocations):
         """
         gpd = try_import_geopandas()
         geometries = [catchment.geometry.to_shapely() for catchment in self.values()]
-        gdf = gpd.GeoDataFrame(geometry=geometries)
+        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
+        gdf = gpd.GeoDataFrame(geometry=geometries, crs=crs)
         return gdf
