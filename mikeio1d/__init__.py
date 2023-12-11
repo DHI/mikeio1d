@@ -3,7 +3,7 @@ import sys
 import os
 from platform import architecture
 
-from .mikepath import setup_mike_installation
+from .mikepath import MikePath
 
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/
@@ -26,7 +26,7 @@ __version__ = "0.4.0"
 if "64" not in architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
 
-setup_mike_installation(sys.path)
+MikePath.setup_mike_installation(sys.path)
 
 clr.AddReference("System")
 clr.AddReference("System.Runtime")

@@ -2,9 +2,7 @@ import os
 import sys
 from glob import glob
 
-from ..mikepath import setup_mike_installation
-from ..mikepath import mike_bin_path
-from ..mikepath import library_patterns
+from ..mikepath import MikePath
 
 from .library_loader import LibraryLoader
 
@@ -25,7 +23,7 @@ class LibraryLoaders:
         self.library_loader_list = []
         self.library_loader_dict = {}
 
-        setup_mike_installation(sys.path)
+        MikePath.setup_mike_installation(sys.path)
         self.create_loaders()
 
     def create_loaders(self):
@@ -35,8 +33,8 @@ class LibraryLoaders:
         """
         mikenet_module = self.mikenet_module
 
-        for pattern in library_patterns:
-            file_candidates = glob(os.path.join(mike_bin_path, pattern))
+        for pattern in MikePath.library_patterns:
+            file_candidates = glob(os.path.join(MikePath.mike_bin_path, pattern))
             for file_name in file_candidates:
                 library_loader = LibraryLoader(file_name, mikenet_module)
                 self.library_loader_list.append(library_loader)
