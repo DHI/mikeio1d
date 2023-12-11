@@ -31,7 +31,7 @@ mikeio1d_bin_path = os.path.join(os.path.dirname(__file__), "bin")
 
 mike_install_path = os.environ.get("MIKE_INSTALL_PATH", None)
 
-skip_bin_x64 = os.environ.get("SKIP_BIN_X64", None)
+skip_bin_x64 = os.environ.get("MIKE_SKIP_BIN_X64", None)
 bin_x64 = r"bin\x64" if skip_bin_x64 is None else ""
 
 mike_bin_path = (
