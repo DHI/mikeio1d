@@ -1,0 +1,6 @@
+{
+    "name": "Your Dev Container",
+    "dockerFile": "Dockerfile",
+    "forwardPorts": [],
+    "postCreateCommand": "dotnet --version"
+  }
