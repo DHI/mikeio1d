@@ -48,6 +48,3 @@ def test_network_to_geopandas_crs(res1d_river_network):
     gdf = res1d_river_network.result_network.to_geopandas()
     assert isinstance(gdf.crs, CRS)
     assert gdf.crs.to_epsg() == 25832
-
-
-# TODO: test import of mikeio1d does not break if geopandas isn't installed
