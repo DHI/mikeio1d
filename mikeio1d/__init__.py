@@ -32,7 +32,7 @@ is_linux = platform.system() == "Linux"
 if is_linux:
     import mikecore
 
-    runtime_config = os.path.join(mike_bin_path, "DHI.Mike1D.Application.runtimeconfig.json")
+    runtime_config = os.path.join(MikePath.mike_bin_path, "DHI.Mike1D.Application.runtimeconfig.json")
     pythonnet.load("coreclr", runtime_config=runtime_config)
 
 import clr
