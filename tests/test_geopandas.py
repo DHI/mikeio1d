@@ -1,10 +1,12 @@
 import pytest
 
-from geopandas import GeoDataFrame
-from pyproj import CRS
-from shapely import Point
-from shapely import LineString
-from shapely import Polygon
+pytest.importorskip("geopandas")
+
+from geopandas import GeoDataFrame  # noqa: E402
+from pyproj import CRS  # noqa: E402
+from shapely import Point  # noqa: E402
+from shapely import LineString  # noqa: E402
+from shapely import Polygon  # noqa: E402
 
 
 def test_nodes_to_geopandas_basic(res1d_network):
