@@ -4,6 +4,12 @@
 
 ### Added
 
+- mikenet module for easier work with DHI .NET libraries.
+
+## [0.4]
+
+### Added
+
 - DHI.Mike1D.MikeIO C# utility and ResultReaderCopier for more performant reading of result files
 
 ### Changed
@@ -62,7 +68,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.3...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.4...HEAD
+[0.4]: https://github.com/DHI/mikeio1d/releases/tag/v0.4
 [0.3]: https://github.com/DHI/mikeio1d/releases/tag/v0.3
 [0.2]: https://github.com/DHI/mikeio1d/releases/tag/v0.2
 [0.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.1
