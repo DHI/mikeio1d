@@ -1,5 +1,6 @@
 import clr
 from pathlib import Path
+from warnings import warn
 
 
 class LibraryLoader:
@@ -37,5 +38,5 @@ class LibraryLoader:
         try:
             mikenet_dict = self.mikenet_module.__dict__
             exec(f"import {self.library_name} as {self.library_alias}", mikenet_dict)
-        except:
-            pass
+        except Exception as e:
+            warn(f"Could not import .NET library {self.library_name}: {e}")
