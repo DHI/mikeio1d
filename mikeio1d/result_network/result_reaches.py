@@ -92,7 +92,9 @@ class ResultReaches(ResultLocations):
             A GeoDataFrame object with reaches as LineString geometries.
         """
         gpd = try_import_geopandas()
+        ids = [reach.name for reach in self.values()]
         geometries = [reach.geometry.to_shapely() for reach in self.values()]
+        data = {"id": ids, "geometry": geometries}
         crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(geometry=geometries, crs=crs)
+        gdf = gpd.GeoDataFrame(data=data, crs=crs)
         return gdf

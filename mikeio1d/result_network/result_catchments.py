@@ -70,7 +70,9 @@ class ResultCatchments(ResultLocations):
             A GeoDataFrame object with catchments as Polygon geometries.
         """
         gpd = try_import_geopandas()
+        ids = [catchment.id for catchment in self.values()]
         geometries = [catchment.geometry.to_shapely() for catchment in self.values()]
+        data = {"id": ids, "geometry": geometries}
         crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(geometry=geometries, crs=crs)
+        gdf = gpd.GeoDataFrame(data=data, crs=crs)
         return gdf
