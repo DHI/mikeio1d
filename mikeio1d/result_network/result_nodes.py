@@ -68,7 +68,9 @@ class ResultNodes(ResultLocations):
             A GeoDataFrame object with nodes as Point geometries.
         """
         gpd = try_import_geopandas()
+        ids = [node.id for node in self.values()]
         geometries = [node.geometry.to_shapely() for node in self.values()]
+        data = {"id": ids, "geometry": geometries}
         crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(geometry=geometries, crs=crs)
+        gdf = gpd.GeoDataFrame(data=data, crs=crs)
         return gdf
