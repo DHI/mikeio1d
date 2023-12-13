@@ -138,8 +138,8 @@ def test_res1d_filter(test_file_path, helpers):
     res1d_full = Res1D(test_file_path)
     df_full = res1d_full.read()
 
-    helpers.compare_data_frames(df_full, df_20_2_2)
-    helpers.compare_data_frames(df_full, df_22_8_8)
+    helpers.assert_shared_columns_equal(df_full, df_20_2_2)
+    helpers.assert_shared_columns_equal(df_full, df_22_8_8)
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -156,7 +156,7 @@ def test_res1d_filter_readall(test_file_path, helpers):
     res1d_full = Res1D(test_file_path)
     df_full = res1d_full.read()
 
-    helpers.compare_data_frames(df_full, df)
+    helpers.assert_shared_columns_equal(df_full, df)
 
 
 def test_catchment_attributes(test_file):

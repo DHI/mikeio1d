@@ -221,9 +221,9 @@ def test_swmm_out_filter(test_file_path, helpers):
     swmm_out_full = Res1D(test_file_path)
     df_full = swmm_out_full.read()
 
-    helpers.compare_data_frames(df_full, df_flow_10)
-    helpers.compare_data_frames(df_full, df_depth_9)
-    helpers.compare_data_frames(df_full, df_depth_10)
+    helpers.assert_shared_columns_equal(df_full, df_flow_10)
+    helpers.assert_shared_columns_equal(df_full, df_depth_9)
+    helpers.assert_shared_columns_equal(df_full, df_depth_10)
 
     # Currently Mike1D raises System.ArgumentOutOfRangeException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -244,4 +244,4 @@ def test_swmm_out_filter_readall(test_file_path, helpers):
     swmm_out_full = Res1D(test_file_path)
     df_full = swmm_out_full.read()
 
-    helpers.compare_data_frames(df_full, df)
+    helpers.assert_shared_columns_equal(df_full, df)

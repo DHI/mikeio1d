@@ -177,9 +177,9 @@ def test_epanet_resx_filter(test_file_path, helpers):
     epanet_resx_full = Res1D(test_file_path)
     df_full = epanet_resx_full.read()
 
-    helpers.compare_data_frames(df_full, df_energy_9)
-    helpers.compare_data_frames(df_full, df_volume_2)
-    helpers.compare_data_frames(df_full, df_volume_9)
+    helpers.assert_shared_columns_equal(df_full, df_energy_9)
+    helpers.assert_shared_columns_equal(df_full, df_volume_2)
+    helpers.assert_shared_columns_equal(df_full, df_volume_9)
 
     # Currently Mike1D raises System.ArgumentOutOfRangeException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -200,4 +200,4 @@ def test_epanet_resx_filter_readall(test_file_path, helpers):
     epanet_resx_full = Res1D(test_file_path)
     df_full = epanet_resx_full.read()
 
-    helpers.compare_data_frames(df_full, df)
+    helpers.assert_shared_columns_equal(df_full, df)

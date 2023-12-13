@@ -107,8 +107,8 @@ def test_swmm_out_filter(test_file_path, helpers):
     swmm_out_full = Res1D(test_file_path)
     df_full = swmm_out_full.read()
 
-    helpers.compare_data_frames(df_full, df_5)
-    helpers.compare_data_frames(df_full, df_6)
+    helpers.assert_shared_columns_equal(df_full, df_5)
+    helpers.assert_shared_columns_equal(df_full, df_6)
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException

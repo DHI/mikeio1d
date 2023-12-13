@@ -216,9 +216,9 @@ def test_res1d_filter(test_file_path, helpers):
     res1d_full = Res1D(test_file_path)
     df_full = res1d_full.read()
 
-    helpers.compare_data_frames(df_full, df_9l1)
-    helpers.compare_data_frames(df_full, df_1)
-    helpers.compare_data_frames(df_full, df_2)
+    helpers.assert_shared_columns_equal(df_full, df_9l1)
+    helpers.assert_shared_columns_equal(df_full, df_1)
+    helpers.assert_shared_columns_equal(df_full, df_2)
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -237,7 +237,7 @@ def test_res1d_filter_readall(test_file_path, helpers):
     res1d_full = Res1D(test_file_path)
     df_full = res1d_full.read()
 
-    helpers.compare_data_frames(df_full, df)
+    helpers.assert_shared_columns_equal(df_full, df)
 
 
 def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
@@ -247,12 +247,12 @@ def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
     for node in res1d_full.nodes:
         res1d = Res1D(flow_split_file_path, nodes=[str(node)])
         df = res1d.read()
-        helpers.compare_data_frames(df_full, df)
+        helpers.assert_shared_columns_equal(df_full, df)
 
     for reach in res1d_full.reaches:
         res1d = Res1D(flow_split_file_path, reaches=[str(reach)])
         df = res1d.read()
-        helpers.compare_data_frames(df_full, df)
+        helpers.assert_shared_columns_equal(df_full, df)
 
 
 def test_node_attributes(test_file):
