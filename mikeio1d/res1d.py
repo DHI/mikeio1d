@@ -8,6 +8,7 @@ from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
 from .result_network import ResultCatchment
+from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
@@ -347,3 +348,18 @@ class Res1D:
     def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
         """Extract to txt file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
+
+    @staticmethod
+    def merge(file_names, merged_file_name):
+        """
+        Merges res1d files.
+
+        Parameters
+        ----------
+        file_names : list of str
+            List of res1d file names to merge.
+        merged_file_name : str
+            File name of the res1d file to store the merged data.
+        """
+        result_merger = ResultMerger(file_names)
+        result_merger.merge(merged_file_name)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using DHI.Mike1D.ResultDataAccess;
 
@@ -18,7 +17,7 @@ namespace DHI.Mike1D.MikeIO
     public ResultData ResultData { get => _resultData; set => _resultData = value; }
     private ResultData _resultData;
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="ResultDataCopier" />
     public ResultDataCopier(ResultData resultData)
     {
       _resultData = resultData;
@@ -41,17 +40,10 @@ namespace DHI.Mike1D.MikeIO
       CopyData(intPointer, dataEntries);
     }
 
-    /// <summary>
-    /// Creates a list of all data entries corresponding to all data items.
-    /// </summary>
+    /// <inheritdoc cref="MikeIO.ResultDataExtensions.GetAllDataEntries"/>
     public List<DataEntry> GetAllDataEntries()
     {
-      var dataEntries = _resultData.DataSets
-        .SelectMany(dataSet => dataSet.DataItems)
-        .SelectMany(dataItem => Enumerable.Range(0, dataItem.NumberOfElements)
-        .Select(elementIndex => new DataEntry(dataItem, elementIndex)))
-        .ToList();
-      return dataEntries;
+      return _resultData.GetAllDataEntries();
     }
 
     /// <summary>
