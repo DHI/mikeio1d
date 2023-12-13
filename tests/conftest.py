@@ -1,5 +1,8 @@
 import pytest
 
+from pandas.testing import assert_index_equal
+from pandas.testing import assert_series_equal
+
 from mikeio1d.res1d import Res1D
 from mikeio1d.result_network import ResultNode
 from mikeio1d.result_network import ResultCatchment
@@ -18,9 +21,10 @@ class Helpers:
         """
         Compares columns in df to the ones in df_ref.
 
-        Note that df_ref typically has more columngs than df.
+        Note that df_ref typically has more columns than df.
         Comparison is performed only in columns of df.
         """
+        assert_index_equal(df_ref.index, df.index)
         for col in df:
             diff = (df[col] - df_ref[col]).abs().sum()
 
