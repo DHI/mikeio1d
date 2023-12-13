@@ -189,9 +189,9 @@ def test_res1d_filter(test_file_path, helpers):
     res1d_full = Res1D(test_file_path)
     df_full = res1d_full.read()
 
-    helpers.compare_data_frames(df_full, df_b4_14)
-    helpers.compare_data_frames(df_full, df_b4_13)
-    helpers.compare_data_frames(df_full, df_a0)
+    helpers.assert_shared_columns_equal(df_full, df_b4_14)
+    helpers.assert_shared_columns_equal(df_full, df_b4_13)
+    helpers.assert_shared_columns_equal(df_full, df_a0)
 
     # Release the .NET object
     res1d = None
@@ -207,7 +207,7 @@ def test_res1d_filter_readall(test_file_path, helpers):
     res1d_full = Res1D(test_file_path)
     df_full = res1d_full.read()
 
-    helpers.compare_data_frames(df_full, df)
+    helpers.assert_shared_columns_equal(df_full, df)
 
     # Release the .NET object
     res1d = None

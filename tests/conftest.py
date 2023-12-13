@@ -17,7 +17,7 @@ class Helpers:
     """
 
     @staticmethod
-    def compare_data_frames(df_ref, df):
+    def assert_shared_columns_equal(df_ref, df):
         """
         Compares columns in df to the ones in df_ref.
 
