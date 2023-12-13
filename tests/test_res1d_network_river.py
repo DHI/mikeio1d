@@ -26,6 +26,7 @@ def test_file(test_file_path, request):
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 73
+    assert not df.columns.duplicated().any()
 
 
 def test_quantities(test_file):

@@ -30,6 +30,7 @@ def test_file_does_not_exist():
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 110
+    assert not df.columns.duplicated().any()
 
 
 def test_mike1d_quantities():
