@@ -5,3 +5,5 @@ from .result_reader import ResultReader
 from .result_reader_copier import ResultReaderCopier
 from .result_reader_query import ResultReaderQuery
 from .result_writer import ResultWriter
+
+from .result_merger import ResultMerger

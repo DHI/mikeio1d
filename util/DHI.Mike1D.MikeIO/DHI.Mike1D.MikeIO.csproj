@@ -5,6 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="DHI.Generic.MikeZero.EUM">
+      <HintPath>..\..\mikeio1d\bin\DHI.Generic.MikeZero.EUM.dll</HintPath>
+    </Reference>
+    <Reference Include="DHI.corlib">
+      <HintPath>..\..\mikeio1d\bin\DHI.corlib.dll</HintPath>
+    </Reference>
+    <Reference Include="DHI.Mike1D.Generic">
+      <HintPath>..\..\mikeio1d\bin\DHI.Mike1D.Generic.dll</HintPath>
+    </Reference>
     <Reference Include="DHI.Mike1D.ResultDataAccess">
       <HintPath>..\..\mikeio1d\bin\DHI.Mike1D.ResultDataAccess.dll</HintPath>
     </Reference>
