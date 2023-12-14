@@ -26,6 +26,7 @@ class Helpers:
         """
         assert_index_equal(df_ref.index, df.index)
         for col in df:
+            # TODO: Replace with assert_series_equal(df[col], df_ref[col]) - this fails now since columns are not guaranteed unique
             diff = (df[col] - df_ref[col]).abs().sum()
 
             # TODO: Handle cases of different types than float
