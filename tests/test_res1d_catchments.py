@@ -23,6 +23,7 @@ def test_file(test_file_path, request):
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 108
+    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
 
 
 def test_quantities(test_file):
@@ -37,7 +38,7 @@ def test_repr(test_file):
         "<mikeio1d.Res1D>\n"
         + "Start time: 1994-08-07 16:35:00\n"
         + "End time: 1994-08-07 18:35:00\n"
-        "# Timesteps: 108\n"
+        + "# Timesteps: 108\n"
         + "# Catchments: 31\n"
         + "# Nodes: 0\n"
         + "# Reaches: 0\n"
@@ -127,12 +128,18 @@ def test_dotnet_methods(test_file):
     res1d.query.GetCatchmentValues("20_2_2", "TotalRunOff")
 
 
-def test_res1d_filter(test_file_path):
+def test_res1d_filter(test_file_path, helpers):
     catchments = ["20_2_2", "22_8_8"]
     res1d = Res1D(test_file_path, catchments=catchments)
 
-    res1d.read(QueryDataCatchment("TotalRunOff", "20_2_2"))
-    res1d.read(QueryDataCatchment("TotalRunOff", "22_8_8"))
+    df_20_2_2 = res1d.read(QueryDataCatchment("TotalRunOff", "20_2_2"))
+    df_22_8_8 = res1d.read(QueryDataCatchment("TotalRunOff", "22_8_8"))
+
+    res1d_full = Res1D(test_file_path)
+    df_full = res1d_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df_20_2_2)
+    helpers.assert_shared_columns_equal(df_full, df_22_8_8)
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -140,12 +147,16 @@ def test_res1d_filter(test_file_path):
     #     assert res1d.read(QueryDataCatchment("TotalRunOff", "100_16_16"))
 
 
-def test_res1d_filter_readall(test_file_path):
+def test_res1d_filter_readall(test_file_path, helpers):
     # Make sure readall works with filters
     catchments = ["20_2_2", "22_8_8"]
     res1d = Res1D(test_file_path, catchments=catchments)
+    df = res1d.read()
 
-    res1d.read()
+    res1d_full = Res1D(test_file_path)
+    df_full = res1d_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df)
 
 
 def test_catchment_attributes(test_file):
