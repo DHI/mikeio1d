@@ -41,7 +41,7 @@ setuptools.setup(
             "matplotlib",
             "jupyterlab",
         ],
-        "test": ["pytest", "matplotlib"],
+        "test": ["pytest", "matplotlib", "pyarrow"],
     },
     author="Gediminas Kirsanskas",
     author_email="geki@dhigroup.com",
