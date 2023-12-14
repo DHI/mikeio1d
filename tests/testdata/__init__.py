@@ -38,6 +38,12 @@ class testdata:
     """An LTS monthly statistics file."""
     xsections_xns11: str = format_path("xsections.xns11")
     """A basic xsections file."""
+    Epanet_res: str = format_path("Epanet.res")
+    """A basic Epanet res file. Must have accompanying .inp file."""
+    Epanet_resx: str = format_path("Epanet.resx")
+    """A basic Epanet resx file. Must have accompanying .inp file."""
+    SWMM_out: str = format_path("SWMM.out")
+    """A basic SWMM result file. Must have accompanying .inp file."""
 
 
 testdata = testdata()
