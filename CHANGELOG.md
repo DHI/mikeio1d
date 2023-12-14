@@ -4,6 +4,14 @@
 
 ### Added
 
+### Fixed
+
+### Changed
+
+## 0.4.1 - 2023-12-14
+
+### Added
+
 - mikenet module for easier work with DHI .NET libraries.
 
 ### Fixed
