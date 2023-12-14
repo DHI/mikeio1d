@@ -22,6 +22,7 @@ def test_file(test_file_path, request):
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 25
+    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
 
 
 def test_quantities(test_file):
@@ -36,7 +37,7 @@ def test_repr(test_file):
         "<mikeio1d.Res1D>\n"
         + "Start time: 2022-10-13 00:00:00\n"
         + "End time: 2022-10-14 00:00:00\n"
-        "# Timesteps: 25\n"
+        + "# Timesteps: 25\n"
         + "# Catchments: 0\n"
         + "# Nodes: 11\n"
         + "# Reaches: 13\n"
@@ -177,14 +178,21 @@ def test_dotnet_methods(test_file):
     assert pytest.approx(77.8665) == epanet_res.query.GetReachSumValues("11", "Flow")[0]
 
 
-def test_epanet_res_filter(test_file_path):
+def test_epanet_res_filter(test_file_path, helpers):
     nodes = ["10", "11"]
     reaches = ["11"]
     epanet_res = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
-    epanet_res.read(QueryDataReach("Flow", "10"))
-    epanet_res.read(QueryDataNode("Pressure", "10"))
-    epanet_res.read(QueryDataNode("Pressure", "11"))
+    df_flow_10 = epanet_res.read(QueryDataReach("Flow", "10"))
+    df_pressures_10 = epanet_res.read(QueryDataNode("Pressure", "10"))
+    df_pressure_11 = epanet_res.read(QueryDataNode("Pressure", "11"))
+
+    epanet_res_full = Res1D(test_file_path)
+    df_full = epanet_res_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df_flow_10)
+    helpers.assert_shared_columns_equal(df_full, df_pressures_10)
+    helpers.assert_shared_columns_equal(df_full, df_pressure_11)
 
     # Currently Mike1D raises System.ArgumentOutOfRangeException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -195,10 +203,14 @@ def test_epanet_res_filter(test_file_path):
         assert epanet_res.read(QueryDataNode("Pressure", "10xyz"))
 
 
-def test_epanet_res_filter_readall(test_file_path):
+def test_epanet_res_filter_readall(test_file_path, helpers):
     # Make sure read all can be used with filters
     nodes = ["10", "11"]
     reaches = ["11"]
     epanet_res = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    df = epanet_res.read()
 
-    epanet_res.read()
+    epanet_res_full = Res1D(test_file_path)
+    df_full = epanet_res_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df)
