@@ -4,7 +4,23 @@
 
 ### Added
 
+### Fixed
+
+### Changed
+
+## 0.4.1 - 2023-12-14
+
+### Added
+
 - mikenet module for easier work with DHI .NET libraries.
+
+### Fixed
+
+- Res1D filtering for reaches inside MIKE 1D itself.
+
+### Changed
+
+- Use MIKE 1D NuGet packages v22.0.3 and v22.0.4 for DHI.Mike1D.ResultDataAccess
 
 ## [0.4]
 

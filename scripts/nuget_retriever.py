@@ -42,7 +42,7 @@ class NuGetRetriever:
     bin_dir_name = os.path.join("mikeio1d", "bin")
 
     # Default version of DHI NuGet packages to retrieve
-    version_default = "21.0.0"
+    version_default = "22.0.3"
 
     # DHI NuGet packages to install
     package_names = [
@@ -52,6 +52,7 @@ class NuGetRetriever:
         "DHI.EUM",
         "DHI.PFS",
         "DHI.Projections",
+        "DHI.corlib",
         "DHI.Mike1D.CrossSectionModule",
         "DHI.Mike1D.HDParameterDataAccess",
         "DHI.Mike1D.Generic",
@@ -65,6 +66,8 @@ class NuGetRetriever:
     ]
 
     version_map = {
+        "DHI.corlib": "1.0.0",
+        "DHI.Mike1D.ResultDataAccess": "22.0.4",
         "GeoAPI": "1.7.4",
         "NetTopologySuite": "2.0.0",
         "DHI.MikeCore.Linux.rhel7": "20.0.0",
