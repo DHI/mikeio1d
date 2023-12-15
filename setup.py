@@ -25,7 +25,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.4.0",
+    version="0.4.1",
     install_requires=[
         'pythonnet<=2.5.2; python_version < "3.7.0"',
         'pythonnet>=3.0.0a2; python_version >= "3.7.0"',
@@ -42,7 +42,7 @@ setuptools.setup(
             "matplotlib",
             "jupyterlab",
         ],
-        "test": ["pytest", "matplotlib"],
+        "test": ["pytest", "matplotlib", "pyarrow"],
     },
     author="Gediminas Kirsanskas",
     author_email="geki@dhigroup.com",

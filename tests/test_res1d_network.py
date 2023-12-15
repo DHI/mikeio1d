@@ -30,6 +30,7 @@ def test_file_does_not_exist():
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 110
+    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
 
 
 def test_mike1d_quantities():
@@ -49,12 +50,13 @@ def test_repr(test_file):
         "<mikeio1d.Res1D>\n"
         + "Start time: 1994-08-07 16:35:00\n"
         + "End time: 1994-08-07 18:35:00\n"
-        "# Timesteps: 110\n"
+        + "# Timesteps: 110\n"
         + "# Catchments: 0\n"
         + "# Nodes: 119\n"
         + "# Reaches: 118\n"
         + "# Globals: 0\n"
-        "0 - WaterLevel <m>\n" + "1 - Discharge <m^3/s>"
+        + "0 - WaterLevel <m>\n"
+        + "1 - Discharge <m^3/s>"
     )
     assert res1d_repr == res1d_repr_ref
 
@@ -202,14 +204,21 @@ def test_dotnet_methods(test_file):
     )  # useful for summing volume in reach (all grid points)
 
 
-def test_res1d_filter(test_file_path):
+def test_res1d_filter(test_file_path, helpers):
     nodes = ["1", "2"]
     reaches = ["9l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
-    res1d.read(QueryDataReach("WaterLevel", "9l1", 10))
-    res1d.read(QueryDataNode("WaterLevel", "1"))
-    res1d.read(QueryDataNode("WaterLevel", "2"))
+    df_9l1 = res1d.read(QueryDataReach("WaterLevel", "9l1", 10))
+    df_1 = res1d.read(QueryDataNode("WaterLevel", "1"))
+    df_2 = res1d.read(QueryDataNode("WaterLevel", "2"))
+
+    res1d_full = Res1D(test_file_path)
+    df_full = res1d_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df_9l1)
+    helpers.assert_shared_columns_equal(df_full, df_1)
+    helpers.assert_shared_columns_equal(df_full, df_2)
 
     # Currently Mike1D raises NullReferenceException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -218,13 +227,32 @@ def test_res1d_filter(test_file_path):
     #     assert res1d.read(QueryDataNode("WaterLevel", "3"))
 
 
-def test_res1d_filter_readall(test_file_path):
+def test_res1d_filter_readall(test_file_path, helpers):
     # Make sure read all can be used with filters
     nodes = ["1", "2"]
     reaches = ["9l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    df = res1d.read()
 
-    res1d.read()
+    res1d_full = Res1D(test_file_path)
+    df_full = res1d_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df)
+
+
+def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
+    res1d_full = Res1D(flow_split_file_path)
+    df_full = res1d_full.read()
+
+    for node in res1d_full.nodes:
+        res1d = Res1D(flow_split_file_path, nodes=[str(node)])
+        df = res1d.read()
+        helpers.assert_shared_columns_equal(df_full, df)
+
+    for reach in res1d_full.reaches:
+        res1d = Res1D(flow_split_file_path, reaches=[str(reach)])
+        df = res1d.read()
+        helpers.assert_shared_columns_equal(df_full, df)
 
 
 def test_node_attributes(test_file):
