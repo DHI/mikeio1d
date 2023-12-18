@@ -33,7 +33,7 @@ class NuGetRetriever:
     """
 
     # Default path
-    path_default = ".\\"
+    path_default = f".{os.sep}"
 
     # Directory where NuGet packages will be downloaded
     nuget_dir_name = "nuget"
@@ -57,7 +57,6 @@ class NuGetRetriever:
         "DHI.Mike1D.HDParameterDataAccess",
         "DHI.Mike1D.Generic",
         "DHI.Mike1D.ResultDataAccess",
-        "GeoAPI",
         "NetTopologySuite",
     ]
 
@@ -68,7 +67,6 @@ class NuGetRetriever:
     version_map = {
         "DHI.corlib": "1.0.0",
         "DHI.Mike1D.ResultDataAccess": "22.0.4",
-        "GeoAPI": "1.7.4",
         "NetTopologySuite": "2.0.0",
         "DHI.MikeCore.Linux.rhel7": "20.0.0",
     }
