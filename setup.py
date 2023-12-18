@@ -1,4 +1,5 @@
 import setuptools
+import sysconfig
 
 # Try to download NuGet packages if the download script is present
 try:
@@ -44,6 +45,11 @@ setuptools.setup(
         ],
         "test": ["pytest", "matplotlib", "pyarrow"],
     },
+    options={
+        "bdist_wheel": {
+            "plat_name": sysconfig.get_platform().replace("linux-x86_64", "manylinux2010_x86_64")
+        }
+    },
     author="Gediminas Kirsanskas",
     author_email="geki@dhigroup.com",
     description="A package that uses the DHI MIKE1D .NET libraries to read res1d and xns11 files.",
@@ -59,12 +65,13 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
         "Topic :: Scientific/Engineering",
     ],
 )
