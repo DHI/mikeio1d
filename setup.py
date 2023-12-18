@@ -26,7 +26,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.4.1",
+    version="0.5rc1",
     install_requires=[
         'pythonnet<=2.5.2; python_version < "3.7.0"',
         'pythonnet>=3.0.0a2; python_version >= "3.7.0"',
@@ -47,7 +47,7 @@ setuptools.setup(
     },
     options={
         "bdist_wheel": {
-            "plat_name": sysconfig.get_platform()
+            "plat_name": sysconfig.get_platform().replace("linux-x86_64", "manylinux2010_x86_64")
         }
     },
     author="Gediminas Kirsanskas",
