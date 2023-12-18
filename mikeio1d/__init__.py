@@ -1,7 +1,5 @@
 import sys
-import os
 import platform
-import pythonnet
 
 from .mikepath import MikePath
 
@@ -27,13 +25,6 @@ if "64" not in platform.architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
 
 MikePath.setup_mike_installation(sys.path)
-
-is_linux = platform.system() == "Linux"
-if is_linux:
-    import mikecore
-
-    runtime_config = os.path.join(MikePath.mike_bin_path, "DHI.Mike1D.Application.runtimeconfig.json")
-    pythonnet.load("coreclr", runtime_config=runtime_config)
 
 import clr
 
