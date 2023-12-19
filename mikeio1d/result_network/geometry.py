@@ -1,9 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from enum import Enum
 from functools import lru_cache
-from typing import Iterable, List, Protocol, Tuple
+from typing import Iterable
+from typing import List
+from typing import Protocol
+from typing import Tuple
 
 import numpy as np
 from shapely.geometry.base import BaseGeometry
