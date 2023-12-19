@@ -25,7 +25,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.4.0",
+    version="0.4.1",
     install_requires=[
         "pythonnet>=3.0.0a2",
         "numpy",
@@ -41,7 +41,7 @@ setuptools.setup(
             "jupyterlab",
             "geopandas",
         ],
-        "test": ["pytest", "matplotlib"],
+        "test": ["pytest", "matplotlib", "pyarrow"],
         "all": ["matplotlib", "geopandas"],
     },
     author="Gediminas Kirsanskas",
