@@ -1,11 +1,51 @@
 import pytest
 
+from pandas.testing import assert_index_equal
+from pandas.testing import assert_series_equal
+
 from mikeio1d.res1d import Res1D
 from mikeio1d.result_network import ResultNode
 from mikeio1d.result_network import ResultCatchment
 from mikeio1d.dotnet import pythonnet_implementation as impl
 
 from .testdata import testdata
+
+
+class Helpers:
+    """
+    Class containing helper methods for performing tests.
+    """
+
+    @staticmethod
+    def assert_shared_columns_equal(df_ref, df):
+        """
+        Compares columns in df to the ones in df_ref.
+
+        Note that df_ref typically has more columns than df.
+        Comparison is performed only in columns of df.
+        """
+        assert_index_equal(df_ref.index, df.index)
+        for col in df:
+            # TODO: Replace with assert_series_equal(df[col], df_ref[col]) - this fails now since columns are not guaranteed unique
+            diff = (df[col] - df_ref[col]).abs().sum()
+
+            # TODO: Handle cases of different types than float
+            try:
+                diff = float(diff)
+            except:
+                continue
+
+            assert pytest.approx(diff) == 0.0
+
+
+@pytest.fixture
+def helpers():
+    return Helpers
+
+
+@pytest.fixture()
+def flow_split_file_path():
+    return testdata.FlowSplit_res1d
 
 
 @pytest.fixture()
