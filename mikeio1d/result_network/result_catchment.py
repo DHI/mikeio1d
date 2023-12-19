@@ -3,7 +3,7 @@ from warnings import warn
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .geometry import CatchmentGeometry
+    from ..geometry import CatchmentGeometry
 
 from ..query import QueryDataCatchment
 from .result_location import ResultLocation
@@ -76,6 +76,6 @@ class ResultCatchment(ResultLocation):
         A geometric representation of the catchment. Requires shapely.
         """
         try_import_shapely()
-        from .geometry import CatchmentGeometry
+        from ..geometry import CatchmentGeometry
 
         return CatchmentGeometry.from_res1d_catchment(self._catchment)

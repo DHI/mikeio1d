@@ -5,11 +5,11 @@ pytest.importorskip("geopandas")
 
 import shapely  # noqa: E402
 
-from mikeio1d.result_network.geometry import NodePoint  # noqa: E402
-from mikeio1d.result_network.geometry import ReachGeometry  # noqa: E402
-from mikeio1d.result_network.geometry import ReachPoint  # noqa: E402
-from mikeio1d.result_network.geometry import ReachPointType  # noqa: E402
-from mikeio1d.result_network.geometry import CatchmentGeometry  # noqa: E402
+from mikeio1d.geometry import NodePoint  # noqa: E402
+from mikeio1d.geometry import ReachGeometry  # noqa: E402
+from mikeio1d.geometry import ReachPoint  # noqa: E402
+from mikeio1d.geometry import ReachPointType  # noqa: E402
+from mikeio1d.geometry import CatchmentGeometry  # noqa: E402
 
 
 class TestReachPoint:

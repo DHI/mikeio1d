@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .geometry import NodePoint
+    from ..geometry import NodePoint
 
 from warnings import warn
 
@@ -85,6 +85,6 @@ class ResultNode(ResultLocation):
         A geometric representation of the node. Requires shapely.
         """
         try_import_shapely()
-        from .geometry import NodePoint
+        from ..geometry import NodePoint
 
         return NodePoint.from_res1d_node(self._node)

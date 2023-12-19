@@ -3,7 +3,7 @@ import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .geometry import ReachGeometry
+    from ..geometry import ReachGeometry
 
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
@@ -188,6 +188,6 @@ class ResultReach(ResultLocation):
         A geometric representation of the reach. Requires shapely.
         """
         try_import_shapely()
-        from .geometry import ReachGeometry
+        from ..geometry import ReachGeometry
 
         return ReachGeometry.from_res1d_reaches(self.reaches)
