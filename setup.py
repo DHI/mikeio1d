@@ -27,7 +27,7 @@ setuptools.setup(
     name="mikeio1d",
     version="0.4.1",
     install_requires=[
-        "pythonnet>=3.0.0a2",
+        "pythonnet>=3.0.0",
         "numpy",
         "pandas",
     ],
@@ -41,7 +41,7 @@ setuptools.setup(
             "jupyterlab",
             "geopandas",
         ],
-        "test": ["pytest", "matplotlib", "pyarrow"],
+        "test": ["pytest", "matplotlib", "pyarrow", "geopandas"],
         "all": ["matplotlib", "geopandas"],
     },
     author="Gediminas Kirsanskas",
