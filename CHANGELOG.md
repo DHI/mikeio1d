@@ -4,9 +4,17 @@
 
 ### Added
 
+- Support for Python 3.12
+- Initial support for GeoPandas (ability to export static network)
+- Geometry package for converting IRes1DLocation objects to corresponding Shapely objects
+
 ### Fixed
 
 ### Changed
+
+### Removed
+
+- Suport for Python 3.7
 
 ## 0.4.1 - 2023-12-14
 
