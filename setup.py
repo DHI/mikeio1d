@@ -41,7 +41,7 @@ setuptools.setup(
             "jupyterlab",
             "geopandas",
         ],
-        "test": ["pytest", "matplotlib", "pyarrow", "geopandas"],
+        "test": ["pytest", "matplotlib", "pyarrow"],
         "all": ["matplotlib", "geopandas"],
     },
     author="Gediminas Kirsanskas",

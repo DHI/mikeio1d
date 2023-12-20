@@ -8,7 +8,7 @@ import shapely  # noqa: E402
 from mikeio1d.geometry import NodePoint  # noqa: E402
 from mikeio1d.geometry import ReachGeometry  # noqa: E402
 from mikeio1d.geometry import ReachPoint  # noqa: E402
-from mikeio1d.geometry import ReachPointType  # noqa: E402
+from mikeio1d.geometry.reach_point import ReachPointType  # noqa: E402
 from mikeio1d.geometry import CatchmentGeometry  # noqa: E402
 
 
