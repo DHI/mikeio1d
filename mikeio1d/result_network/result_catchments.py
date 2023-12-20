@@ -40,6 +40,9 @@ class ResultCatchments(ResultLocations):
         self.set_catchments()
         self.set_quantity_collections()
 
+        self._catchment_ids = None
+        self._geometries = None
+
     def set_catchments(self):
         """
         Set attributes to the current ResultCatchments object based
@@ -70,8 +73,13 @@ class ResultCatchments(ResultLocations):
             A GeoDataFrame object with catchments as Polygon geometries.
         """
         gpd = try_import_geopandas()
-        ids = [catchment.id for catchment in self.values()]
-        geometries = [catchment.geometry.to_shapely() for catchment in self.values()]
+        if not self._catchment_ids or not self._geometries:
+            values = self.values()
+            self._catchment_ids = [catchment.id for catchment in values]
+            self._geometries = [catchment.geometry.to_shapely() for catchment in values]
+
+        ids = self._catchment_ids
+        geometries = self._geometries
         data = {"id": ids, "geometry": geometries}
         crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
         gdf = gpd.GeoDataFrame(data=data, crs=crs)
