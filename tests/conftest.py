@@ -45,22 +45,22 @@ def helpers():
 
 @pytest.fixture()
 def flow_split_file_path():
-    return testdata.FlowSplit_res1d
+    return testdata.flow_split_res1d
 
 
 @pytest.fixture()
 def res1d_network():
-    return Res1D(testdata.Network_res1d)
+    return Res1D(testdata.network_res1d)
 
 
 @pytest.fixture()
 def res1d_river_network():
-    return Res1D(testdata.NetworkRiver_res1d)
+    return Res1D(testdata.network_river_res1d)
 
 
 @pytest.fixture()
 def res1d_catchments():
-    return Res1D(testdata.Catchments_res1d)
+    return Res1D(testdata.catchments_res1d)
 
 
 @pytest.fixture

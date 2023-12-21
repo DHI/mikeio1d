@@ -20,30 +20,30 @@ class testdata:
     --------
     >>> from mikeio1d import Res1D
     >>> from tests import testdata
-    >>> res = Res1D(testdata.Network_res1d)
+    >>> res = Res1D(testdata.network_res1d)
     """
 
-    Network_res1d: str = format_path("Network.res1d")
+    network_res1d: str = format_path("network.res1d")
     """A basic urban network file."""
-    Network_res1d_chinese: str = format_path("Network_chinese.res1d")
+    network_res1d_chinese: str = format_path("network_chinese.res1d")
     """A basic urban network file with chinese characters for some links."""
-    NetworkRiver_res1d: str = format_path("NetworkRiver.res1d")
+    network_river_res1d: str = format_path("network_river.res1d")
     """A basic river network file."""
-    Catchments_res1d: str = format_path("Catchments.res1d")
+    catchments_res1d: str = format_path("catchments.res1d")
     """A small urban setup with three pipes."""
-    FlowSplit_res1d: str = format_path("FlowSplit.res1d")
+    flow_split_res1d: str = format_path("flow_split.res1d")
     """A basic urban network file containing only catchments."""
-    LTSEventStatistics_res1d: str = format_path("LTSEventStatistics.res1d")
+    lts_event_statistics_res1d: str = format_path("lts_event_statistics.res1d")
     """An LTS event statistics file."""
-    LTSMonthlyStatistics_res1d: str = format_path("LTSMonthlyStatistics.res1d")
+    lts_monthly_statistics_res1d: str = format_path("lts_monthly_statistics.res1d")
     """An LTS monthly statistics file."""
     xsections_xns11: str = format_path("xsections.xns11")
     """A basic xsections file."""
-    Epanet_res: str = format_path("Epanet.res")
+    epanet_res: str = format_path("epanet.res")
     """A basic Epanet res file. Must have accompanying .inp file."""
-    Epanet_resx: str = format_path("Epanet.resx")
+    epanet_resx: str = format_path("epanet.resx")
     """A basic Epanet resx file. Must have accompanying .inp file."""
-    SWMM_out: str = format_path("Swmm.out")
+    swmm_out: str = format_path("swmm.out")
     """A basic SWMM result file. Must have accompanying .inp file."""
 
     def get_expected_dataframe(self, name: str):
