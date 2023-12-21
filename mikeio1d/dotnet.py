@@ -35,14 +35,25 @@ _MAP_NET_NP = {
 
 def to_dotnet_datetime(x):
     """Convert from python datetime to .NET System.DateTime"""
-    milliseconds = x.microsecond // 1000
-    return System.DateTime(x.year, x.month, x.day, x.hour, x.minute, x.second, milliseconds)
+    dotnet_datetime = System.DateTime(x.year, x.month, x.day, x.hour, x.minute, x.second)
+    # Get .NET ticks microseconds
+    ticks = x.microsecond * 10
+    dotnet_datetime = dotnet_datetime.AddTicks(ticks)
+    return dotnet_datetime
 
 
-def from_dotnet_datetime(x):
+def from_dotnet_datetime(x, round_to_milliseconds=True):
     """Convert from .NET System.DateTime to python datetime"""
-    microseconds = x.Millisecond * 1000
-    return datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second, microseconds)
+    # Get microseconds from .NET ticks
+    microseconds = x.Ticks % 10**7 // 10
+    time = datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second, microseconds)
+
+    # Round to milliseconds if requested
+    if round_to_milliseconds:
+        microseconds_rounded = round(time.microsecond, -3)
+        time = time.replace(microsecond=microseconds_rounded)
+
+    return time
 
 
 def asNumpyArray(x):

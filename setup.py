@@ -1,4 +1,5 @@
 import setuptools
+import sysconfig
 
 # Try to download NuGet packages if the download script is present
 try:
@@ -25,12 +26,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.4.1",
+    version="0.5.dev0",
     install_requires=[
         'pythonnet<=2.5.2; python_version < "3.7.0"',
         'pythonnet>=3.0.0a2; python_version >= "3.7.0"',
         "numpy",
         "pandas",
+        'mikecore; platform_system=="Linux"',
     ],
     extras_require={
         "dev": [
@@ -42,6 +44,11 @@ setuptools.setup(
             "jupyterlab",
         ],
         "test": ["pytest", "matplotlib", "pyarrow"],
+    },
+    options={
+        "bdist_wheel": {
+            "plat_name": sysconfig.get_platform().replace("linux-x86_64", "manylinux2010_x86_64")
+        }
     },
     author="Gediminas Kirsanskas",
     author_email="geki@dhigroup.com",
@@ -58,12 +65,13 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
         "Topic :: Scientific/Engineering",
     ],
 )

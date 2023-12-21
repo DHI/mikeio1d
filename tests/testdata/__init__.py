@@ -43,7 +43,7 @@ class testdata:
     """A basic Epanet res file. Must have accompanying .inp file."""
     Epanet_resx: str = format_path("Epanet.resx")
     """A basic Epanet resx file. Must have accompanying .inp file."""
-    SWMM_out: str = format_path("SWMM.out")
+    SWMM_out: str = format_path("Swmm.out")
     """A basic SWMM result file. Must have accompanying .inp file."""
 
     def get_expected_dataframe(self, name: str):
