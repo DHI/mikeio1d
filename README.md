@@ -21,6 +21,10 @@ Or development version:
 `pip install https://github.com/DHI/mikeio1d/archive/main.zip`
 
 
+For MIKE IO 1D to work .NET runtime environment (version 3.1 and above) is needed. On Linux operating systems this is not available per default. For example, on Ubuntu distribution to get .NET 7.0 runtime call:
+
+`sudo apt install dotnet-runtime-7.0`
+
 ## Where can I get help?
 
 * New ideas and feature requests - [GitHub Discussions](http://github.com/DHI/mikeio1d/discussions) 
