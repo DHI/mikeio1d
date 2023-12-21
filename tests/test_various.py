@@ -9,7 +9,7 @@ from mikeio1d.result_network.various import make_proper_variable_name
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # Original file name was Exam6Base.res1d
-    return os.path.join(test_folder_path, "testdata", "Network_chinese.res1d")
+    return os.path.join(test_folder_path, "testdata", "network_chinese.res1d")
 
 
 def test_make_proper_variable_name():

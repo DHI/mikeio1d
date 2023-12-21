@@ -12,7 +12,7 @@ from mikeio1d.dotnet import to_numpy
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # Original file name was Exam6Base.res1d
-    return os.path.join(test_folder_path, "testdata", "LTSEventStatistics.res1d")
+    return os.path.join(test_folder_path, "testdata", "lts_event_statistics.res1d")
 
 
 @pytest.fixture(params=[False])

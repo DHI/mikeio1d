@@ -147,13 +147,13 @@ mikeio1d/bin/*.xml
 mikeio1d/bin/*so.5
 
 # Specific files
-tests/testdata/NetworkRiver.mod.res1d
-tests/testdata/NetworkRiver.extract.csv
-tests/testdata/NetworkRiver.extract.dfs0
-tests/testdata/NetworkRiver.extract.txt
-tests/testdata/DischargeInStructure.extract.csv
-tests/testdata/DischargeInStructure.extract.dfs0
-tests/testdata/DischargeInStructure.extract.txt
-tests/testdata/W_right_DischargeInStructure.extract.csv
-tests/testdata/W_right_DischargeInStructure.extract.dfs0
-tests/testdata/W_right_DischargeInStructure.extract.txt
+tests/testdata/network_river.mod.res1d
+tests/testdata/network_river.extract.csv
+tests/testdata/network_river.extract.dfs0
+tests/testdata/network_river.extract.txt
+tests/testdata/discharge_in_structure.extract.csv
+tests/testdata/discharge_in_structure.extract.dfs0
+tests/testdata/discharge_in_structure.extract.txt
+tests/testdata/w_right_discharge_in_structure.extract.csv
+tests/testdata/w_right_discharge_in_structure.extract.dfs0
+tests/testdata/w_right_discharge_in_structure.extract.txt

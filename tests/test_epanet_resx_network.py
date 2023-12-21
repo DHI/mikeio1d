@@ -11,7 +11,7 @@ from mikeio1d.dotnet import to_numpy
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # Original file name was Exam6Base.epanet_resx
-    return os.path.join(test_folder_path, "testdata", "Epanet.resx")
+    return os.path.join(test_folder_path, "testdata", "epanet.resx")
 
 
 @pytest.fixture(params=[False])
