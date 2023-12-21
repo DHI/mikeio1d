@@ -13,15 +13,28 @@ For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files) use the related pa
 
 ## Requirements
 
-* Windows
-* Python x64 3.7 - 3.11
+* Windows, Linux (experimental)
+* Python x64 3.8 - 3.12
 * (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads>) (already installed if you have MIKE)
+* (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
 
 ## Installation
 
 ```bash
 $ pip install mikeio1d
 ```
+
+Linux users will need to install .NET runtime. If you're on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:
+
+```bash
+$ sudo apt install dotnet-runtime-7.0
+```
+
+```bash
+$ sudo apt install dotnet-sdk-7.0
+```
+
+
 
 ## Getting started
 

@@ -124,7 +124,6 @@ You can easily see what static and dynamic data is associated with a network ele
 ```python
 >>> res = Res1D('network.res1d')
 >>> node = res.nodes['101']
-html_code = """
 ```
 ```{raw} html
 &lt;Manhole: 101&gt;
