@@ -74,7 +74,7 @@ def test_single_reach_html_repr(river_reach):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 6</li></ul></details><details><summary>Quantities</summary><ul><li>WaterLevel</li><li>ManningResistanceNumber</li><li>Discharge</li><li>FlowVelocity</li></ul></details>"""
+    <details><summary>Attributes</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 94</li></ul></details><details><summary>Quantities</summary><ul><li>WaterLevel</li><li>ManningResistanceNumber</li><li>Discharge</li><li>FlowVelocity</li></ul></details>"""
     assert html_repr == excepted_html_repr
 
 

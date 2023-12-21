@@ -30,6 +30,7 @@ def test_file_does_not_exist():
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 73
+    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
 
 
 def test_quantities(test_file):
@@ -44,7 +45,7 @@ def test_repr(test_file):
         "<mikeio1d.Res1D>\n"
         + "Start time: 1957-01-01 00:00:00\n"
         + "End time: 1963-01-01 00:00:00\n"
-        "# Timesteps: 73\n"
+        + "# Timesteps: 73\n"
         + "# Catchments: 0\n"
         + "# Nodes: 16\n"
         + "# Reaches: 17\n"
@@ -181,26 +182,37 @@ def test_get_reach_value(test_file):
     assert value == 0
 
 
-def test_res1d_filter(test_file_path):
+def test_res1d_filter(test_file_path, helpers):
     nodes = ["B4.1320", "A0.0327"]
     reaches = ["B4.1491l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
-    res1d.read(QueryDataReach("DischargeIntegratedMonthly", "B4.1491l1", 144))
-    res1d.read(QueryDataNode("SurchargeIntegratedMonthly", "B4.1320"))
-    res1d.read(QueryDataNode("DischargeIntegratedMonthly", "A0.0327"))
+    df_b4_14 = res1d.read(QueryDataReach("DischargeIntegratedMonthly", "B4.1491l1", 144))
+    df_b4_13 = res1d.read(QueryDataNode("SurchargeIntegratedMonthly", "B4.1320"))
+    df_a0 = res1d.read(QueryDataNode("DischargeIntegratedMonthly", "A0.0327"))
+
+    res1d_full = Res1D(test_file_path)
+    df_full = res1d_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df_b4_14)
+    helpers.assert_shared_columns_equal(df_full, df_b4_13)
+    helpers.assert_shared_columns_equal(df_full, df_a0)
 
     # Release the .NET object
     res1d = None
 
 
-def test_res1d_filter_readall(test_file_path):
+def test_res1d_filter_readall(test_file_path, helpers):
     # Make sure read all can be used with filters
     nodes = ["B4.1320", "A0.0327"]
     reaches = ["B4.1491l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    df = res1d.read()
 
-    res1d.read()
+    res1d_full = Res1D(test_file_path)
+    df_full = res1d_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df)
 
     # Release the .NET object
     res1d = None
