@@ -28,8 +28,7 @@ setuptools.setup(
     name="mikeio1d",
     version="0.5.dev0",
     install_requires=[
-        'pythonnet<=2.5.2; python_version < "3.7.0"',
-        'pythonnet>=3.0.0a2; python_version >= "3.7.0"',
+        "pythonnet>=3.0.0",
         "numpy",
         "pandas",
         'mikecore; platform_system=="Linux"',
@@ -42,8 +41,10 @@ setuptools.setup(
             "sphinx-rtd-theme",
             "matplotlib",
             "jupyterlab",
+            "geopandas",
         ],
         "test": ["pytest", "matplotlib", "pyarrow"],
+        "all": ["matplotlib", "geopandas"],
     },
     options={
         "bdist_wheel": {

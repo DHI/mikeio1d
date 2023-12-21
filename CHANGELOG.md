@@ -4,7 +4,10 @@
 
 ### Added
 
-- Linux support.
+- Support for Python 3.12
+- Initial support for GeoPandas (ability to export static network)
+- Geometry package for converting IRes1DLocation objects to corresponding Shapely objects
+- Linux support (experimental).
 
 ### Fixed
 
