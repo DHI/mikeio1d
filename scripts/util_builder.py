@@ -2,6 +2,8 @@ import os
 import shutil
 import subprocess
 
+from pathlib import Path
+
 
 class UtilBuilder:
     """
@@ -9,21 +11,21 @@ class UtilBuilder:
     """
 
     # Default path
-    path_default = ".\\"
+    path_default = f".{os.sep}"
 
     # Directory for utility package source code
     util_dir_name = "util"
 
     # Directory where libraries are build
-    build_dir_name = r"bin\Release\netstandard2.0"
+    build_dir_name = os.path.join("bin", "Release", "netstandard2.0")
 
     # Directory where libraries will be installed
-    bin_dir_name = r"mikeio1d\bin"
+    bin_dir_name = os.path.join("mikeio1d", "bin")
 
     # Utility libraries to build and install
     library_names = ["DHI.Mike1D.MikeIO"]
 
-    # Files with these extensions copy
+    # Files with these extensions to copy
     extensions = [".dll"]
 
     def __init__(self, path=path_default):
@@ -40,7 +42,7 @@ class UtilBuilder:
 
             print(f"    Building project: {project_file_name}\n")
 
-            command = ["dotnet.exe", "build", "--configuration", "Release", project_file_path]
+            command = ["dotnet", "build", "--configuration", "Release", project_file_path]
             subprocess.run(command)
 
     def copy_libraries_to_bin(self):
@@ -51,11 +53,16 @@ class UtilBuilder:
         files = self.create_file_list_to_copy()
 
         for source_file in files:
-            source_file_path_stripped = source_file.split("\\")[-1]
+            source_file_path_stripped = self.strip_source_file_path(source_file)
             print(f"    Copying file: {source_file_path_stripped}")
             _, file_name = os.path.split(source_file)
             destination_file = os.path.join(destination, file_name)
             shutil.copy2(source_file, destination_file)
+
+    def strip_source_file_path(self, file_path):
+        path = Path(file_path)
+        path_stripped = path.parts[-1]
+        return path_stripped
 
     def create_file_list_to_copy(self):
         start_dir = os.path.join(self.path, self.util_dir_name)
@@ -74,7 +81,7 @@ class UtilBuilder:
         """Builds and installs MIKE IO 1D utilities into mikeio1d/bin folder"""
         cwd = os.getcwd()
         path, _ = os.path.split(os.path.join(cwd, __file__))
-        path = os.path.normpath(os.path.join(path, "../"))
+        path = os.path.normpath(os.path.join(path, ".."))
 
         util_builder = UtilBuilder(path)
         util_builder.build_libraries()

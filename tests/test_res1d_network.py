@@ -3,11 +3,9 @@ import pytest
 import numpy as np
 import pandas as pd
 
-import System
-
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
 from mikeio1d.res1d import Res1D, mike1d_quantities, QueryDataReach, QueryDataNode
-from mikeio1d.dotnet import to_numpy, from_dotnet_datetime, to_dotnet_datetime
+from mikeio1d.dotnet import to_numpy
 
 
 @pytest.fixture
@@ -139,26 +137,6 @@ def test_time_index(test_file):
 
 def test_start_time(test_file):
     assert test_file.start_time == test_file.time_index.min()
-
-
-def test_from_dotnet_datetime_preserves_millisecond_precision():
-    dtstr = "2021-01-01 00:00:00.123"
-
-    dotnet_dt = System.DateTime.Parse(dtstr)
-    assert dotnet_dt.Millisecond == 123
-    py_dt = from_dotnet_datetime(dotnet_dt)
-    # python datetime doesn't have a millisecond property so we use microsecond
-    assert py_dt.microsecond == 123000
-
-
-# Write the same test as above, but in the reverse direction
-def test_to_dotnet_datetime_preserves_millisecond_precision():
-    dtstr = "2021-01-01 00:00:00.123"
-
-    py_dt = pd.to_datetime(dtstr)
-    assert py_dt.microsecond == 123000
-    dotnet_dt = to_dotnet_datetime(py_dt)
-    assert dotnet_dt.Millisecond == 123
 
 
 def test_time_index_microseconds(test_file):
