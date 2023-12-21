@@ -4,23 +4,51 @@ from typing import List, Tuple, Dict
 from html import escape
 
 
-def make_proper_variable_name(string, extra_string_before_digit="_"):
+class ValidPythonIdentifierTranslatorTable:
+    """
+    Translator table for replacing invalid python characters with a valid identifier.
+
+    Used as argument to Python's built-in str.translate() method.
+
+    Parameters
+    ----------
+    replacement : str, default = "_"
+       The character to replace invalid characters with.
+    """
+
+    def __init__(self, replacement="_"):
+        self.replacement = replacement
+
+    def __getitem__(self, key):
+        key = chr(key)
+        if key.isdigit() or key.isidentifier():
+            return key
+        else:
+            return self.replacement
+
+
+_translator_table = ValidPythonIdentifierTranslatorTable()
+
+
+def make_proper_variable_name(string: str, extra_string_before_digit="_"):
     """
     Makes a more proper variable name.
 
     It is assumed that the input string never is or after manipulations
     becomes an '_' or an empty string.
     """
-    # Replace all non alpha numeric characters by an underscore.
-    string = re.sub(r"[^a-zA-Z0-9]", "_", string)
+    # Replace all characters that are not valid python identifier by an underscore.
+    string = string.translate(_translator_table)
     # Replace more than two underscores with a single underscore.
     string = re.sub(r"_{2,}", "_", string)
-    # Add an extra string is the string starts with a number.
-    string = extra_string_before_digit + string if string and string[0].isdigit() else string
     # Remove a starting underscore
-    string = string[1:] if string[0] == "_" else string
+    if len(string) > 1:
+        string = string[1:] if string[0] == "_" else string
     # Remove a trailing underscore
-    string = string[:-1] if string[-1] == "_" else string
+    if len(string) > 1:
+        string = string[:-1] if string[-1] == "_" else string
+    # Add an extra string if the string starts with a number.
+    string = extra_string_before_digit + string if string and string[0].isdigit() else string
     return string
 
 

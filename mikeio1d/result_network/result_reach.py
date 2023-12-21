@@ -1,8 +1,14 @@
+from __future__ import annotations
 import warnings
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..geometry import ReachGeometry
 
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
+from ..various import try_import_shapely
 
 from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
 
@@ -69,13 +75,16 @@ class ResultReach(ResultLocation):
             total_length += reach.Length
         return total_length
 
+    def _get_total_gridpoints(self):
+        return sum([len(gp_list) for gp_list in self.result_gridpoints])
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("name", self.reaches[0].Name)
         self.try_set_static_attribute_length()
         self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
         self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
-        self.set_static_attribute("n_gridpoints", len(self.result_gridpoints))
+        self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
 
     def try_set_static_attribute_length(self):
         try:
@@ -172,3 +181,13 @@ class ResultReach(ResultLocation):
                     result_gridpoint.add_data_item(data_item, element_index)
                 else:
                     result_gridpoint.add_structure_data_item(data_item)
+
+    @property
+    def geometry(self) -> ReachGeometry:
+        """
+        A geometric representation of the reach. Requires shapely.
+        """
+        try_import_shapely()
+        from ..geometry import ReachGeometry
+
+        return ReachGeometry.from_res1d_reaches(self.reaches)

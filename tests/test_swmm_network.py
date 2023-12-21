@@ -22,6 +22,7 @@ def test_file(test_file_path, request):
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 36
+    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
 
 
 def test_quantities(test_file):
@@ -36,7 +37,7 @@ def test_repr(test_file):
         "<mikeio1d.Res1D>\n"
         + "Start time: 1998-01-01 01:00:00.001000\n"
         + "End time: 1998-01-02 12:00:00.001000\n"
-        "# Timesteps: 36\n"
+        + "# Timesteps: 36\n"
         + "# Catchments: 8\n"
         + "# Nodes: 14\n"
         + "# Reaches: 13\n"
@@ -208,14 +209,21 @@ def test_dotnet_methods(test_file):
     )
 
 
-def test_swmm_out_filter(test_file_path):
+def test_swmm_out_filter(test_file_path, helpers):
     nodes = ["9", "10"]
     reaches = ["10"]
     swmm_out = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
-    swmm_out.read(QueryDataReach("SWMM_LINK_FLOW", "10"))
-    swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "9"))
-    swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "10"))
+    df_flow_10 = swmm_out.read(QueryDataReach("SWMM_LINK_FLOW", "10"))
+    df_depth_9 = swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "9"))
+    df_depth_10 = swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "10"))
+
+    swmm_out_full = Res1D(test_file_path)
+    df_full = swmm_out_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df_flow_10)
+    helpers.assert_shared_columns_equal(df_full, df_depth_9)
+    helpers.assert_shared_columns_equal(df_full, df_depth_10)
 
     # Currently Mike1D raises System.ArgumentOutOfRangeException when requesting location not included by filter
     # This should be fixed in Mike1D to raise more meaningful Mike1DException
@@ -226,10 +234,14 @@ def test_swmm_out_filter(test_file_path):
         assert swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "10xyz"))
 
 
-def test_swmm_out_filter_readall(test_file_path):
+def test_swmm_out_filter_readall(test_file_path, helpers):
     # Make sure read all can be used with filters
     nodes = ["9", "10"]
     reaches = ["10"]
     swmm_out = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    df = swmm_out.read()
 
-    swmm_out.read()
+    swmm_out_full = Res1D(test_file_path)
+    df_full = swmm_out_full.read()
+
+    helpers.assert_shared_columns_equal(df_full, df)

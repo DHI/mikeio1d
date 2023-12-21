@@ -1,7 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from geopandas import GeoDataFrame
+
 from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_node import ResultNode
 from .various import make_proper_variable_name
+from ..various import try_import_geopandas
+from ..various import pyproj_crs_from_projection_string
 
 
 class ResultNodes(ResultLocations):
@@ -31,6 +40,9 @@ class ResultNodes(ResultLocations):
         self.set_nodes()
         self.set_quantity_collections()
 
+        self._node_ids = None
+        self._geometries = None
+
     def set_nodes(self):
         """
         Set attributes to the current ResultNodes object based
@@ -48,3 +60,24 @@ class ResultNodes(ResultLocations):
         Create a dict entry from node ID to ResultNode object.
         """
         self[result_node.id] = result_node
+
+    def to_geopandas(self) -> GeoDataFrame:
+        """
+        Convert nodes to a geopandas.GeoDataFrame object.
+
+        Returns
+        -------
+        gdf : geopandas.GeoDataFrame
+            A GeoDataFrame object with nodes as Point geometries.
+        """
+        gpd = try_import_geopandas()
+        if not self._geometries or not self._node_ids:
+            values = self.values()
+            self._node_ids = [node.id for node in values]
+            self._geometries = [node.geometry.to_shapely() for node in values]
+        ids = self._node_ids
+        geometries = self._geometries
+        data = {"id": ids, "geometry": geometries}
+        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
+        gdf = gpd.GeoDataFrame(data=data, crs=crs)
+        return gdf

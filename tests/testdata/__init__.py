@@ -1,3 +1,4 @@
+import dataclasses
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -24,9 +25,13 @@ class testdata:
 
     Network_res1d: str = format_path("Network.res1d")
     """A basic urban network file."""
+    Network_res1d_chinese: str = format_path("Network_chinese.res1d")
+    """A basic urban network file with chinese characters for some links."""
     NetworkRiver_res1d: str = format_path("NetworkRiver.res1d")
     """A basic river network file."""
     Catchments_res1d: str = format_path("Catchments.res1d")
+    """A small urban setup with three pipes."""
+    FlowSplit_res1d: str = format_path("FlowSplit.res1d")
     """A basic urban network file containing only catchments."""
     LTSEventStatistics_res1d: str = format_path("LTSEventStatistics.res1d")
     """An LTS event statistics file."""
@@ -34,6 +39,38 @@ class testdata:
     """An LTS monthly statistics file."""
     xsections_xns11: str = format_path("xsections.xns11")
     """A basic xsections file."""
+    Epanet_res: str = format_path("Epanet.res")
+    """A basic Epanet res file. Must have accompanying .inp file."""
+    Epanet_resx: str = format_path("Epanet.resx")
+    """A basic Epanet resx file. Must have accompanying .inp file."""
+    SWMM_out: str = format_path("Swmm.out")
+    """A basic SWMM result file. Must have accompanying .inp file."""
+
+    def get_expected_dataframe(self, name: str):
+        import pandas as pd
+
+        return pd.read_parquet(Path(__file__).parent / "expected_results" / f"{name}.parquet")
 
 
 testdata = testdata()
+
+
+def generate_expected_results(output_folder: Path = Path(__file__).parent / "expected_results"):
+    import pandas as pd
+    from pandas.testing import assert_frame_equal
+    from mikeio1d import Res1D
+
+    if not output_folder.exists():
+        output_folder.mkdir()
+    for name, path in dataclasses.asdict(testdata).items():
+        if path.endswith(".xns11"):
+            continue
+        res = Res1D(path)
+        df = res.read()
+        df = df.loc[
+            :, ~df.columns.duplicated()
+        ]  # TODO: Remove this when column names are guaranteed unique
+        output_path = output_folder / f"{name}.parquet"
+        df.to_parquet(output_path)
+        df_parquet = testdata.get_expected_dataframe(name)
+        assert_frame_equal(df, df_parquet)

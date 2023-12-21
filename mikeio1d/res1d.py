@@ -241,6 +241,11 @@ class Res1D:
         """
         return self.result_reader.data
 
+    @property
+    def projection_string(self):
+        """Projection string of the result file."""
+        return self.data.ProjectionString
+
     # region Query wrappers
 
     def get_catchment_values(self, catchment_id, quantity):

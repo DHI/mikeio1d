@@ -4,6 +4,33 @@
 
 ### Added
 
+- Support for Python 3.12
+- Initial support for GeoPandas (ability to export static network)
+- Geometry package for converting IRes1DLocation objects to corresponding Shapely objects
+- Linux support (experimental).
+
+### Fixed
+
+### Changed
+
+## [0.4.1] - 2023-12-14
+
+### Added
+
+- mikenet module for easier work with DHI .NET libraries.
+
+### Fixed
+
+- Res1D filtering for reaches inside MIKE 1D itself.
+
+### Changed
+
+- Use MIKE 1D NuGet packages v22.0.3 and v22.0.4 for DHI.Mike1D.ResultDataAccess
+
+## [0.4] - 2023-09-14
+
+### Added
+
 - DHI.Mike1D.MikeIO C# utility and ResultReaderCopier for more performant reading of result files
 
 ### Changed
@@ -62,7 +89,9 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.3...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.4...HEAD
+[0.4.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.4.1
+[0.4]: https://github.com/DHI/mikeio1d/releases/tag/v0.4
 [0.3]: https://github.com/DHI/mikeio1d/releases/tag/v0.3
 [0.2]: https://github.com/DHI/mikeio1d/releases/tag/v0.2
 [0.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.1

@@ -12,10 +12,11 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.8", "3.12"]
 
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +27,7 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '5.0'
+        dotnet-version: '6.0.x'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -38,9 +39,15 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Install mikeio1d
+    - name: Install mikeio1d (basic)
       run: |
         pip install .[test]
-    - name: Test with pytest
+    - name: Test with pytest (basic)
+      run: |
+        pytest
+    - name: Install mikeio1d (optional dependencies)
+      run: |
+        pip install .[all]
+    - name: Test with pytest (optional dependencies)
       run: |
         pytest
