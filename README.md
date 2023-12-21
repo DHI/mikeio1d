@@ -6,7 +6,7 @@ Read res1d and xns11 files.
 For other MIKE files (Dfs0, Dfs1, Dfs2, Dfsu,...) use the related package [MIKE IO](https://github.com/DHI/mikeio)
 
 ## Requirements
-* Windows operating system
+* Windows operating system (Support for Linux is experimental)
 * Python x64 3.6, 3.7 or 3.8 
 * [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) (already installed if you have MIKE)
 
@@ -20,6 +20,10 @@ Or development version:
 
 `pip install https://github.com/DHI/mikeio1d/archive/main.zip`
 
+
+For MIKE IO 1D to work .NET runtime environment (version 3.1 and above) is needed. On Linux operating systems this is not available per default. For example, on Ubuntu distribution to get .NET 7.0 runtime call:
+
+`sudo apt install dotnet-runtime-7.0`
 
 ## Where can I get help?
 

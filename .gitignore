@@ -144,6 +144,7 @@ mikeio1d/bin/*.dll
 mikeio1d/bin/*.pfs
 mikeio1d/bin/*.ubg
 mikeio1d/bin/*.xml
+mikeio1d/bin/*so.5
 
 # Specific files
 tests/testdata/NetworkRiver.mod.res1d

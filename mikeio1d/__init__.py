@@ -1,7 +1,5 @@
-import clr
 import sys
-import os
-from platform import architecture
+import platform
 
 from .mikepath import MikePath
 
@@ -21,12 +19,14 @@ from .mikepath import MikePath
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "0.4.1"
+__version__ = "0.5.dev0"
 
-if "64" not in architecture()[0]:
+if "64" not in platform.architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
 
 MikePath.setup_mike_installation(sys.path)
+
+import clr
 
 clr.AddReference("System")
 clr.AddReference("System.Runtime")

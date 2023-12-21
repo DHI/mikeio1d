@@ -1,4 +1,5 @@
 import setuptools
+import sysconfig
 
 # Try to download NuGet packages if the download script is present
 try:
@@ -25,11 +26,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.4.1",
+    version="0.5.dev0",
     install_requires=[
         "pythonnet>=3.0.0",
         "numpy",
         "pandas",
+        'mikecore; platform_system=="Linux"',
     ],
     extras_require={
         "dev": [
@@ -43,6 +45,11 @@ setuptools.setup(
         ],
         "test": ["pytest", "matplotlib", "pyarrow"],
         "all": ["matplotlib", "geopandas"],
+    },
+    options={
+        "bdist_wheel": {
+            "plat_name": sysconfig.get_platform().replace("linux-x86_64", "manylinux2010_x86_64")
+        }
     },
     author="Gediminas Kirsanskas",
     author_email="geki@dhigroup.com",
@@ -65,6 +72,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
         "Topic :: Scientific/Engineering",
     ],
 )
