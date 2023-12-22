@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mikeio1d.xns11 &mdash; MIKE IO 1D  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            MIKE IO 1D
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design.html">Design philosophy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../network.html">Network structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../res1d.html">Res1D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../xns11.html">Xns11</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MIKE IO 1D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">mikeio1d.xns11</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mikeio1d.xns11</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">DHI.Mike1D.CrossSectionModule</span> <span class="kn">import</span> <span class="n">CrossSectionDataFactory</span>
+<span class="kn">from</span> <span class="nn">DHI.Mike1D.Generic</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Diagnostics</span><span class="p">,</span> <span class="n">Location</span>
+
+
+<span class="k">class</span> <span class="nc">BaseXns11Error</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Xns11 errors.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">DataNotFoundInFile</span><span class="p">(</span><span class="n">BaseXns11Error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data not found in file.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">FileNotOpenedError</span><span class="p">(</span><span class="n">BaseXns11Error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Accessing data from a file that is not opened.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="read">
+<a class="viewcode-back" href="../../xns11.html#mikeio1d.xns11.read">[docs]</a>
+<span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the requested data from the xns11 file and</span>
+<span class="sd">    return a Pandas DataFrame.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path: str</span>
+<span class="sd">        full path and file name to the xns11 file.</span>
+<span class="sd">    queries: a single query or a list of queries</span>
+<span class="sd">        `QueryData` objects that define the requested data.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">queries</span> <span class="o">=</span> <span class="n">queries</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">queries</span><span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">xns11</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">xns11</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open a xns11 file as a Xns11 object that has convenient methods</span>
+<span class="sd">    to extract specific data from the file. It is recommended to use it</span>
+<span class="sd">    as a context manager.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path: str</span>
+<span class="sd">        full path and file name to the xns11 file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Xns11</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; with open(&quot;file.xns11&quot;) as x11:</span>
+<span class="sd">    &gt;&gt;&gt;     print(x11.topoid_names)</span>
+<span class="sd">    [&#39;topoid1&#39;, &#39;topoid2&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Xns11</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_not_closed</span><span class="p">(</span><span class="n">prop</span><span class="p">):</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FileNotOpenedError</span><span class="p">(</span>
+                <span class="s2">&quot;The xns11 file should be opened first to access to its &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> property.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="k">class</span> <span class="nc">Xns11</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reach_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__reaches</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__topoids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Load the file on initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the file.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">CrossSectionDataFactory</span><span class="p">()</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span>
+            <span class="n">Connection</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">),</span> <span class="n">Diagnostics</span><span class="p">(</span><span class="s2">&quot;Error loading file.&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the file handle.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">Finalize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">excinfo</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_topoids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__topoids</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__topoids</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">GetReachTopoIdEnumerable</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@_not_closed</span>
+    <span class="k">def</span> <span class="nf">topoid_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the topo-id names&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_names</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">topoid</span><span class="o">.</span><span class="n">TopoId</span> <span class="k">for</span> <span class="n">topoid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoids</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_reaches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reaches</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reaches</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">GetReachTopoIdEnumerable</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@_not_closed</span>
+    <span class="k">def</span> <span class="nf">reach_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the reach names&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reach_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reachs_names</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">reach</span><span class="o">.</span><span class="n">ReachId</span> <span class="k">for</span> <span class="n">reach</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoids</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_topoid_in_reach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reach</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the topo-ID contained in a reach.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">TopoId</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">GetReachTopoIdEnumerable</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">reach</span><span class="o">.</span><span class="n">ReachId</span> <span class="o">==</span> <span class="n">r</span><span class="o">.</span><span class="n">ReachId</span>
+        <span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_chainages</span><span class="p">(</span><span class="n">reach</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of chainages of a reach topo-ID combination.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">Key</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">reach</span><span class="o">.</span><span class="n">GetChainageSortedCrossSections</span><span class="p">())]</span>
+
+    <span class="k">def</span> <span class="nf">_get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="s2">&quot;chainage&quot;</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="s2">&quot;reach&quot;</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="s2">&quot;topoid&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">chainage</span><span class="p">,</span> <span class="n">reach</span><span class="p">,</span> <span class="n">topoid</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">Location</span><span class="p">()</span>
+            <span class="n">location</span><span class="o">.</span><span class="n">ID</span> <span class="o">=</span> <span class="n">reach</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">location</span><span class="o">.</span><span class="n">Chainage</span> <span class="o">=</span> <span class="n">chainage</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">FindClosestCrossSection</span><span class="p">(</span>
+                <span class="n">location</span><span class="p">,</span> <span class="n">topoid</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">BaseCrossSection</span><span class="o">.</span><span class="n">Points</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">Count</span><span class="p">):</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">LstPoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+                <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">LstPoints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">Z</span><span class="p">)</span>
+            <span class="n">x_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;x </span><span class="si">{</span><span class="n">topoid</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reach</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">chainage</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">z_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;z </span><span class="si">{</span><span class="n">topoid</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reach</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">chainage</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">geometry_x</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">x_name</span><span class="p">)</span>
+            <span class="n">geometry_z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">z_name</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry_x</span><span class="p">,</span> <span class="n">geometry_z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_values</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_validate_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">chainage_tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether the queries point to existing data in the file.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topoid_names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DataNotFoundInFile</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Topo-id &#39;</span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span><span class="si">}</span><span class="s2">&#39; was not found.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reach_names</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DataNotFoundInFile</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reach &#39;</span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">reach_name</span><span class="si">}</span><span class="s2">&#39; was not found.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">found_topo_id_in_reach</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">reach</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reaches</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">found_topo_id_in_reach</span><span class="p">:</span>
+                            <span class="k">break</span>
+                        <span class="c1"># Look for the targeted reach</span>
+                        <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span> <span class="o">!=</span> <span class="n">reach</span><span class="o">.</span><span class="n">ReachId</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="c1"># Raise an error if the combination reach and topo-id does not exist</span>
+                        <span class="n">topoid_names_in_reach</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_in_reach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reach</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">topoid_names_in_reach</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">DataNotFoundInFile</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Topo-ID &#39;</span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span><span class="si">}</span><span class="s2">&#39; was not found in reach &#39;</span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">reach_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                            <span class="p">)</span>
+                        <span class="n">found_topo_id_in_reach</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">chainage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">found_chainage</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">reach</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reaches</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">found_chainage</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="c1"># Look for the targeted combination reach and topo-id</span>
+                    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span> <span class="o">!=</span> <span class="n">reach</span><span class="o">.</span><span class="n">ReachId</span> <span class="ow">and</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span> <span class="o">!=</span> <span class="n">reach</span><span class="o">.</span><span class="n">TopoId</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">for</span> <span class="n">chainage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chainages</span><span class="p">(</span><span class="n">reach</span><span class="p">):</span>
+                        <span class="c1"># Look for the targeted chainage</span>
+                        <span class="n">chainage_diff</span> <span class="o">=</span> <span class="n">chainage</span> <span class="o">-</span> <span class="n">q</span><span class="o">.</span><span class="n">chainage</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">chainage_diff</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">chainage_tolerance</span><span class="p">:</span>
+                            <span class="n">found_chainage</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found_chainage</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DataNotFoundInFile</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Chainage </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">chainage</span><span class="si">}</span><span class="s2"> was not found in reach &#39;</span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">reach_name</span><span class="si">}</span><span class="s2">&#39; for Topo-ID &#39;</span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;</span>
+<span class="sd">        A query can be in an undefined state if reach_name and/or chainage</span>
+<span class="sd">        isn&#39;t set. This function takes care of building lists of queries</span>
+<span class="sd">        for these cases. Chainages are rounded to three decimal places.</span>
+
+<span class="sd">        &gt;&gt;&gt; self._build_queries([QueryData(&quot;topoid1&quot;, &quot;reach1&quot;)])</span>
+<span class="sd">        [</span>
+<span class="sd">            QueryData(&quot;topoid1&quot;, &quot;reach1&quot;, 56.68),</span>
+<span class="sd">            QueryData(&quot;topoid1&quot;, &quot;reach1&quot;, 121.98)</span>
+<span class="sd">        ]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">built_queries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="c1"># e.g. QueryData(&quot;topoid1&quot;, &quot;reach1&quot;, 58.68)</span>
+            <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span> <span class="ow">and</span> <span class="n">q</span><span class="o">.</span><span class="n">chainage</span><span class="p">:</span>
+                <span class="n">built_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1"># e.g QueryData(&quot;topoid1&quot;, &quot;reach1&quot;) or QueryData(&quot;topoid1&quot;)</span>
+            <span class="n">q_topoid_name</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span>
+            <span class="n">q_reach_name</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span>
+            <span class="k">for</span> <span class="n">reach</span><span class="p">,</span> <span class="n">reach_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reaches</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reach_names</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">q_reach_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># When reach_name is set</span>
+                    <span class="k">if</span> <span class="n">reach_name</span> <span class="o">!=</span> <span class="n">q_reach_name</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                <span class="n">topoid_in_reach</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_in_reach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reach</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">topoid_in_reach</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">curr_chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chainages</span><span class="p">(</span><span class="n">reach</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">reach</span><span class="o">.</span><span class="n">TopoId</span> <span class="o">==</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span><span class="p">:</span>
+                        <span class="n">chainage</span> <span class="o">=</span> <span class="n">curr_chain</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">QueryData</span><span class="p">(</span><span class="n">q_topoid_name</span><span class="p">,</span> <span class="n">reach_name</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">chainage</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+                    <span class="n">built_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">built_queries</span>
+
+    <span class="k">def</span> <span class="nf">_find_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">chainage_tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From a list of queries returns a dictionary with the required</span>
+<span class="sd">        information for each requested point to extract its geometry</span>
+<span class="sd">        later on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">PointInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;PointInfo&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">])</span>
+
+        <span class="n">found_points</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="c1"># Find the points given its topo-id, reach, and chainage</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">reach_idx</span><span class="p">,</span> <span class="n">curr_reach</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reaches</span><span class="p">):</span>
+                <span class="c1"># Look for the targed reach and topo-id</span>
+                <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span> <span class="o">!=</span> <span class="n">curr_reach</span><span class="o">.</span><span class="n">ReachId</span> <span class="ow">or</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span> <span class="o">!=</span> <span class="n">curr_reach</span><span class="o">.</span><span class="n">TopoId</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">reach_info</span> <span class="o">=</span> <span class="n">PointInfo</span><span class="p">(</span><span class="n">reach_idx</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">reach_name</span><span class="p">)</span>
+                <span class="n">topo_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_in_reach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curr_reach</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">topoid_reach_idx</span><span class="p">,</span> <span class="n">topoid_reach</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">topo_pair</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">topoid_name</span> <span class="o">!=</span> <span class="n">topoid_reach</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">topoid_info</span> <span class="o">=</span> <span class="n">PointInfo</span><span class="p">(</span><span class="n">topoid_reach_idx</span><span class="p">,</span> <span class="n">topoid_reach</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">curr_chain</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chainages</span><span class="p">(</span><span class="n">curr_reach</span><span class="p">)):</span>
+                        <span class="c1"># Look for the targed chainage</span>
+                        <span class="n">chainage_diff</span> <span class="o">=</span> <span class="n">curr_chain</span> <span class="o">-</span> <span class="n">q</span><span class="o">.</span><span class="n">chainage</span>
+                        <span class="n">is_chainage</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">chainage_diff</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">chainage_tolerance</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_chainage</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="c1"># idx is the index in the topoid</span>
+                        <span class="n">chainage_info</span> <span class="o">=</span> <span class="n">PointInfo</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">chainage</span><span class="p">)</span>
+                        <span class="n">found_points</span><span class="p">[</span><span class="s2">&quot;chainage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chainage_info</span><span class="p">)</span>
+                        <span class="n">found_points</span><span class="p">[</span><span class="s2">&quot;topoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">topoid_info</span><span class="p">)</span>
+                        <span class="n">found_points</span><span class="p">[</span><span class="s2">&quot;reach&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reach_info</span><span class="p">)</span>
+                        <span class="k">break</span>  <span class="c1"># Break at the first chainage found.</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">found_points</span><span class="p">)</span>
+
+    <span class="nd">@_not_closed</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the requested data from the xns11 file and</span>
+<span class="sd">        return a Pandas DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        queries: list</span>
+<span class="sd">            `QueryData` objects that define the requested data.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+        <span class="n">built_queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+        <span class="n">found_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_points</span><span class="p">(</span><span class="n">built_queries</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">found_points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+
+<div class="viewcode-block" id="QueryData">
+<a class="viewcode-back" href="../../xns11.html#mikeio1d.xns11.QueryData">[docs]</a>
+<span class="k">class</span> <span class="nc">QueryData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A query object that declares what data should be</span>
+<span class="sd">    extracted from a .xns11 file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    topoid_name: str</span>
+<span class="sd">        Topo ID, must be passed</span>
+<span class="sd">    reach_name: str, optional</span>
+<span class="sd">        Reach name, consider all the reaches if None</span>
+<span class="sd">    chainage: float, optional</span>
+<span class="sd">        chainage, considers all the chainages if None</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; QueryData(&#39;topoid1&#39;, &#39;reach1&#39;, 10) # is a valid query.</span>
+<span class="sd">    &gt;&gt;&gt; QueryData(&#39;topoid1&#39;, &#39;reach1&#39;)     # requests all the points for `topoid1` of `reach1`.</span>
+<span class="sd">    &gt;&gt;&gt; QueryData(&#39;topoid1&#39;) requests all the points for `topid1` of the file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topoid_name</span><span class="p">,</span> <span class="n">reach_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chainage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_name</span> <span class="o">=</span> <span class="n">topoid_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reach_name</span> <span class="o">=</span> <span class="n">reach_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chainage</span> <span class="o">=</span> <span class="n">chainage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topoid_name</span>
+        <span class="n">rn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reach_name</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chainage</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;topoid_name must be a string.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rn</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;reach_name must be either None or a string.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;chainage must be either None or a number.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rn</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chainage cannot be set if reach_name is None.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">topoid_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topoid_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reach_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reach_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chainage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chainage</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;QueryData(topoid_name=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">topoid_name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;reach_name=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reach_name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;chainage=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chainage</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, DHI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

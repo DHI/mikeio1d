@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network structure &mdash; MIKE IO 1D  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=30646c52"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Res1D" href="res1d.html" />
+    <link rel="prev" title="Getting started" href="getting-started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MIKE IO 1D
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design philosophy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Network structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reaches">Reaches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grid-points">Grid Points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nodes">Nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#catchments">Catchments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="res1d.html">Res1D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xns11.html">Xns11</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MIKE IO 1D</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Network structure</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/network.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>=(network_structure)</p>
+<section id="network-structure">
+<h1>Network structure<a class="headerlink" href="#network-structure" title="Link to this heading"></a></h1>
+<p>A fundamental concept in MIKE IO 1D is the network structure. Every single result is attached to a part of the network. Knowing this structure will help you navigate to results you’re interested in. This sections provides a brief introduction to this structure. For additional information, refer to the <a class="reference external" href="https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/#dhimike1dnetworkdataaccess">MIKE 1D API</a>.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>MIKE result networks consist of the following four geometric types:</p>
+<ul class="simple">
+<li><p>Nodes</p></li>
+<li><p>Reaches (consisting of grid points)</p></li>
+<li><p>Catchments</p></li>
+<li><p>Global data</p></li>
+</ul>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="_images/NetworkExample.png"><img alt="_images/NetworkExample.png" src="_images/NetworkExample.png" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-text">Figure 1 - A network consisting of nodes and reaches.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id2">
+<a class="reference internal image-reference" href="_images/NetworkCatchments.svg"><img alt="_images/NetworkCatchments.svg" src="_images/NetworkCatchments.svg" width="50%" /></a>
+<figcaption>
+<p><span class="caption-text">Figure 2 - A network with catchments associated with nodes.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="reaches">
+<h2>Reaches<a class="headerlink" href="#reaches" title="Link to this heading"></a></h2>
+<p>A reach has many synonyms within different domain applications. In sewer models it is often called a link or pipe, in river models a branch, stream, canal or channel, and in graph and network theory it is called a link or an edge. A reach contains several ‘grid points’ along its path.</p>
+</section>
+<section id="grid-points">
+<h2>Grid Points<a class="headerlink" href="#grid-points" title="Link to this heading"></a></h2>
+<p>Grid points are the computational points along a reach. A flow model has different types of grid points:</p>
+<ul class="simple">
+<li><p>H grid point: contains water level and an associated cross section</p></li>
+<li><p>Q grid point: contains discharge or flow velocity.</p></li>
+<li><p>Structure grid point: calculates discharge over a structure depending on the water levels on each side of the structure.</p></li>
+</ul>
+</section>
+<section id="nodes">
+<h2>Nodes<a class="headerlink" href="#nodes" title="Link to this heading"></a></h2>
+<p>Nodes are attached to one or more reaches. Nodes can be one of several types, including: manholes, basins, outlets, and junction nodes. They may or may not have a volume.</p>
+</section>
+<section id="catchments">
+<h2>Catchments<a class="headerlink" href="#catchments" title="Link to this heading"></a></h2>
+<p>Catchments are geographical areas associated with a result (e.g. hydrologic models consist of several catchments). They are connected to a point on the network (e.g. node or grid point).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="res1d.html" class="btn btn-neutral float-right" title="Res1D" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, DHI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
