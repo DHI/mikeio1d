@@ -26,7 +26,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.5.dev0",
+    version="0.5.0",
     install_requires=[
         "pythonnet>=3.0.0",
         "numpy",
@@ -37,13 +37,18 @@ setuptools.setup(
         "dev": [
             "pytest",
             "black",
-            "sphinx",
-            "sphinx-rtd-theme",
             "matplotlib",
             "jupyterlab",
             "geopandas",
         ],
-        "test": ["pytest", "matplotlib", "pyarrow"],
+        "docs": [
+            "sphinx",
+            "sphinx-rtd-theme",
+            "sphinx-autobuild",
+            "sphinx-copybutton",
+            "myst-parser",
+        ],
+        "test": ["pytest", "matplotlib", "pyarrow", "nbformat", "nbconvert"],
         "all": ["matplotlib", "geopandas"],
     },
     options={

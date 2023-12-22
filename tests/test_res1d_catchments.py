@@ -12,7 +12,7 @@ from mikeio1d.result_network import ResultCatchment
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # File taken from TestSuite: RainfallRunoff\SWQ\DemoSWQ1BaseMixedRRAD.res1d
-    return os.path.join(test_folder_path, "testdata", "Catchments.res1d")
+    return os.path.join(test_folder_path, "testdata", "catchments.res1d")
 
 
 @pytest.fixture(params=[True, False])

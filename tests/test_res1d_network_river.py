@@ -15,7 +15,7 @@ from mikeio1d.query import QueryDataGlobal
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # Original file name was Exam6Base.res1d
-    return os.path.join(test_folder_path, "testdata", "NetworkRiver.res1d")
+    return os.path.join(test_folder_path, "testdata", "network_river.res1d")
 
 
 @pytest.fixture(params=[False])
@@ -217,7 +217,7 @@ def test_res1d_modification(test_file):
     # saving the modified data to a new res1d file.
     df2 = df.multiply(2.0)
     file_path = res1d.data.Connection.FilePath.Path
-    file_path = file_path.replace("NetworkRiver.res1d", "NetworkRiver.mod.res1d")
+    file_path = file_path.replace("network_river.res1d", "network_river.mod.res1d")
     res1d.modify(df2, file_path=file_path)
 
     df_mod = res1d.read()
@@ -285,17 +285,17 @@ def test_extraction_to_csv_dfs0_txt(test_file):
 
     file_path = res1d.data.Connection.FilePath.Path
 
-    file_path_csv = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.csv")
+    file_path_csv = file_path.replace("network_river.res1d", "network_river.extract.csv")
     res1d.to_csv(file_path_csv, time_step_skipping_number=10)
     file_size_csv = 21905
     assert 0.5 * file_size_csv < os.stat(file_path_csv).st_size < 2.0 * file_size_csv
 
-    file_path_dfs0 = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.dfs0")
+    file_path_dfs0 = file_path.replace("network_river.res1d", "network_river.extract.dfs0")
     res1d.to_dfs0(file_path_dfs0, time_step_skipping_number=10)
     file_size_dfs0 = 30302
     assert file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
 
-    file_path_txt = file_path.replace("NetworkRiver.res1d", "NetworkRiver.extract.txt")
+    file_path_txt = file_path.replace("network_river.res1d", "network_river.extract.txt")
     res1d.to_txt(file_path_txt, time_step_skipping_number=10)
     file_size_txt = 23400
     assert 0.5 * file_size_txt < os.stat(file_path_txt).st_size < 2.0 * file_size_txt
@@ -313,13 +313,13 @@ def test_result_quantity_methods(test_file):
     # Test the calling of methods
     discharge_in_structure.plot()
     discharge_in_structure.to_csv(
-        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.csv")
+        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.csv")
     )
     discharge_in_structure.to_dfs0(
-        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.dfs0")
+        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.dfs0")
     )
     discharge_in_structure.to_txt(
-        file_path.replace("NetworkRiver.res1d", "W_right_DischargeInStructure.extract.txt")
+        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.txt")
     )
 
 
@@ -335,13 +335,13 @@ def test_result_quantity_collection_methods(test_file):
     # Test the calling of methods
     discharge_in_structure.plot()
     discharge_in_structure.to_csv(
-        file_path.replace("NetworkRiver.res1d", "DischargeInStructure.extract.csv")
+        file_path.replace("network_river.res1d", "discharge_in_structure.extract.csv")
     )
     discharge_in_structure.to_dfs0(
-        file_path.replace("NetworkRiver.res1d", "DischargeInStructure.extract.dfs0")
+        file_path.replace("network_river.res1d", "discharge_in_structure.extract.dfs0")
     )
     discharge_in_structure.to_txt(
-        file_path.replace("NetworkRiver.res1d", "DischargeInStructure.extract.txt")
+        file_path.replace("network_river.res1d", "discharge_in_structure.extract.txt")
     )
 
 

@@ -326,11 +326,9 @@ class QueryData:
 
     Examples
     --------
-    `QueryData('topoid1', 'reach1', 10)` is a valid query.
-    `QueryData('topoid1', 'reach1')` requests all the points
-    for `topoid1` of `reach1`.
-    `QueryData('topoid1')` requests all the points for `topid1`
-    of the file.
+    >>> QueryData('topoid1', 'reach1', 10) # is a valid query.
+    >>> QueryData('topoid1', 'reach1')     # requests all the points for `topoid1` of `reach1`.
+    >>> QueryData('topoid1') requests all the points for `topid1` of the file.
     """
 
     def __init__(self, topoid_name, reach_name=None, chainage=None):
