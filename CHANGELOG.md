@@ -4,14 +4,25 @@
 
 ### Added
 
+### Fixed
+
+### Changed
+
+## [0.5] - 2023-12-22
+
+### Added
+
 - Support for Python 3.12
+- Linux support (experimental).
 - Initial support for GeoPandas (ability to export static network)
 - Geometry package for converting IRes1DLocation objects to corresponding Shapely objects
-- Linux support (experimental).
+- Updated documentation hosted on GitHub Pages.
 
 ### Fixed
 
 ### Changed
+
+- Consistent and pythonic test file structure
 
 ## [0.4.1] - 2023-12-14
 
@@ -89,7 +100,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.4...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.5...HEAD
+[0.5]: https://github.com/DHI/mikeio1d/releases/tag/v0.5
 [0.4.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.4.1
 [0.4]: https://github.com/DHI/mikeio1d/releases/tag/v0.4
 [0.3]: https://github.com/DHI/mikeio1d/releases/tag/v0.3

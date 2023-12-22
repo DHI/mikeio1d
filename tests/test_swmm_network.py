@@ -11,7 +11,7 @@ from mikeio1d.dotnet import to_numpy
 def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # Original file name was Exam6Base.swmm_out
-    return os.path.join(test_folder_path, "testdata", "Swmm.out")
+    return os.path.join(test_folder_path, "testdata", "swmm.out")
 
 
 @pytest.fixture(params=[False])
