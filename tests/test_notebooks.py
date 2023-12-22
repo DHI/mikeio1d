@@ -1,3 +1,4 @@
+import pytest
 import os
 import subprocess
 
@@ -40,6 +41,7 @@ def _get_all_notebooks_in_repo(skip=[]):
     return [fn for fn in git_files if fn.endswith(".ipynb") and not any(s in fn for s in skip)]
 
 
+@pytest.mark.skip(reason="Notebook tests do not run on CI Ubuntu yet.")
 def test_notebook(notebook):
     _process_notebook(os.path.join(PARENT_DIR, notebook))
 
