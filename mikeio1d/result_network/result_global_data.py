@@ -25,6 +25,21 @@ class ResultGlobalData(ResultLocation):
         self.global_datas = global_datas
         self.set_quantities()
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultGlobalData.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultGlobalData.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultGlobalData."""
+
+        return self.global_datas
+
     def set_quantities(self):
         """
         Override of base set_quantities.

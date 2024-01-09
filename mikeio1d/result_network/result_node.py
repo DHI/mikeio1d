@@ -44,6 +44,21 @@ class ResultNode(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultNode.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultNode.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultNode."""
+
+        return self._node
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []

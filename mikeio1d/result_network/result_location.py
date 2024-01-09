@@ -66,7 +66,8 @@ class ResultLocation:
 
     def set_quantity(self, obj, data_item, element_index=0):
         """Sets a single quantity attribute on the obj."""
-        result_quantity = ResultQuantity(self, data_item, self.res1d)
+        m1d_dataset = self.get_m1d_dataset(data_item)
+        result_quantity = ResultQuantity(self, data_item, self.res1d, m1d_dataset=m1d_dataset)
         result_quantity.element_index = element_index
 
         quantity = data_item.Quantity
@@ -78,6 +79,21 @@ class ResultLocation:
         setattr(obj, result_quantity_attribute_string, result_quantity)
 
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
+
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Base method for getting IRes1DDataSet object associated with ResultLocation.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem
+            Usually ignored, except for ResultReach.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultLocation.
+        """
+        return None
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """

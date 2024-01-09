@@ -54,6 +54,24 @@ class ResultStructure(ResultLocation):
         )
         return self.id
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultStructure.
+
+        This is the reach IRes1DDataSet object because ResultStructure objects do not
+        have a corresonding IRes1DDataSet object.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultStructure.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultStructure."""
+
+        return self.reach
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []

@@ -47,6 +47,21 @@ class ResultCatchment(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultCatchment.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultCatchment.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultCatchment."""
+
+        return self._catchment
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("id", self._catchment.Id)

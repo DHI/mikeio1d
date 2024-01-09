@@ -18,6 +18,8 @@ class ResultQuantity:
         MIKE 1D IDataItem object.
     res1d : Res1D
         Res1D object the quantity belongs to.
+    m1d_dataset: IRes1DDataSet, optional
+        IRes1DDataSet object the quantity is associated with.
 
     Attributes
     ----------
@@ -26,11 +28,12 @@ class ResultQuantity:
         which gives the concrete time series for given location.
     """
 
-    def __init__(self, result_location, data_item, res1d):
+    def __init__(self, result_location, data_item, res1d, m1d_dataset=None):
         self.result_location = result_location
         self.data_item = data_item
         self.res1d = res1d
         self.element_index = 0
+        self.m1d_dataset = m1d_dataset
 
     def add(self):
         """Add a query to ResultNetwork.queries based on the data item."""
@@ -77,7 +80,7 @@ class ResultQuantity:
 
     def get_data_entry(self):
         """Get DataEntry corresponding to ResultQuantity."""
-        return DataEntry(self.data_item, self.element_index)
+        return DataEntry(self.data_item, self.element_index, self.m1d_dataset)
 
     def get_data_entry_net(self):
         """Get DataEntryNet corresponding to ResultQuantity."""
