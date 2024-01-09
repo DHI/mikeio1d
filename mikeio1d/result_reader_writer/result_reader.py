@@ -4,6 +4,7 @@ import datetime
 
 from ..dotnet import from_dotnet_datetime
 from ..various import NAME_DELIMITER
+from ..quantities import TimeseriesId
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
@@ -169,21 +170,7 @@ class ResultReader:
         return self._time_index
 
     def get_data_set_name(self, data_set, item_id=None):
-        name = None
-
-        if hasattr(data_set, "Name"):
-            name = data_set.Name
-        elif hasattr(data_set, "Id"):
-            name = data_set.Id
-        elif data_set.Quantity is not None:
-            name = data_set.Quantity.Id
-
-        name = "" if name is None else name
-
-        # Add item id if present before the name.
-        # Needed for unique identification of structures.
-        name = self.col_name_delimiter.join([item_id, name]) if item_id is not None else name
-
+        name = TimeseriesId.get_dataset_name(data_set, item_id, self.col_name_delimiter)
         return name
 
     def get_column_name(self, data_set, data_item, i):

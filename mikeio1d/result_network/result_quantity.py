@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from .data_entry import DataEntry
+from ..quantities import TimeseriesId
 
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
@@ -85,3 +88,7 @@ class ResultQuantity:
     def get_data_entry_net(self):
         """Get DataEntryNet corresponding to ResultQuantity."""
         return DataEntryNet(self.data_item, self.element_index)
+
+    def get_timeseries_id(self) -> TimeseriesId:
+        """Get TimeseriesId corresponding to ResultQuantity."""
+        return TimeseriesId.from_result_quantity(self)

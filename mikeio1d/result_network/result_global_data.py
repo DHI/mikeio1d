@@ -38,7 +38,7 @@ class ResultGlobalData(ResultLocation):
         IRes1DDataSet
             IRes1DDataSet object associated with ResultGlobalData."""
 
-        return self.global_datas
+        return self.res1d.data.GlobalData
 
     def set_quantities(self):
         """
