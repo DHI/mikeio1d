@@ -209,6 +209,14 @@ class ResultReach(ResultLocation):
                 else:
                     result_gridpoint.add_structure_data_item(data_item)
 
+    def get_query(self, data_item):
+        raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
+
+    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        raise NotImplementedError(
+            "add_to_result_quantity_maps not implemented for ResultReach. Use ResultGridPoint."
+        )
+
     @property
     def geometry(self) -> ReachGeometry:
         """
