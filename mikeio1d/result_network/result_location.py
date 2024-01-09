@@ -1,9 +1,14 @@
+from __future__ import annotations
+
+from abc import ABC
+from abc import abstractclassmethod
+
 from .result_quantity import ResultQuantity
 from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 
 
-class ResultLocation:
+class ResultLocation(ABC):
     """
     A base class for a network location (node, reach)
     or a catchment wrapper class.
@@ -80,6 +85,7 @@ class ResultLocation:
 
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
 
+    @abstractclassmethod
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Base method for getting IRes1DDataSet object associated with ResultLocation.
 
@@ -93,8 +99,9 @@ class ResultLocation:
         IRes1DDataSet
             IRes1DDataSet object associated with ResultLocation.
         """
-        return None
+        ...
 
+    @abstractclassmethod
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """
         Base method for adding to result quantity maps, which is a dictionary
@@ -108,7 +115,7 @@ class ResultLocation:
         result_quantity : ResultQuantity
             One of the possible ResultQuantity objects corresponding to a quantity id.
         """
-        pass
+        ...
 
     def add_to_result_quantity_map(self, quantity_id, result_quantity, result_quantity_map):
         """
@@ -148,6 +155,7 @@ class ResultLocation:
         query = self.get_query(data_item)
         self.res1d.result_network.add_query(query)
 
+    @abstractclassmethod
     def get_query(self, data_item):
         """Base method for creating a query for given data item."""
-        return None
+        ...
