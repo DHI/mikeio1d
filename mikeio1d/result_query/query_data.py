@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from ..res1d import Res1D
     from ..result_network.result_quantity import ResultQuantity
 
 import numpy as np
@@ -60,6 +61,21 @@ class QueryData:
 
         data_entry = result_quantity.get_data_entry_net()
         data_entries.Add(data_entry)
+
+    def to_timeseries_id(self, res1d: Res1D) -> TimeseriesId:
+        """Convert query to timeseries id."""
+
+        query_label = str(self)
+        result_quantity: ResultQuantity = res1d.result_network.result_quantity_map.get(
+            query_label, None
+        )
+
+        return TimeseriesId.from_result_quantity(result_quantity)
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryData:
+        """Base method for creating query from TimeseriesId."""
+        raise NotImplementedError
 
     @staticmethod
     def from_dotnet_to_python(array):
