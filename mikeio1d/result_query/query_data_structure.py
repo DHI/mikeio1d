@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..quantities import TimeseriesId
+
 from ..custom_exceptions import InvalidQuantity
 from ..custom_exceptions import InvalidStructure
 from ..various import NAME_DELIMITER
@@ -42,6 +49,17 @@ class QueryDataStructure(QueryDataReach):
         self._update_location_info(result_structure)
 
         return self.from_dotnet_to_python(values)
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataStructure:
+        structure, name = timeseries_id.name.split(NAME_DELIMITER)
+        return QueryDataStructure(
+            timeseries_id.quantity,
+            structure,
+            name,
+            timeseries_id.chainage,
+            validate=False,
+        )
 
     def _update_query(self, res1d):
         result_structure = self._get_result_structure(res1d)

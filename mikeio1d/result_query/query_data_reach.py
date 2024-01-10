@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..quantities import TimeseriesId
+
 from ..various import NAME_DELIMITER
 from .query_data import QueryData
 
@@ -53,6 +60,12 @@ class QueryDataReach(QueryData):
         self._check_invalid_values(values)
 
         return self.from_dotnet_to_python(values)
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataReach:
+        return QueryDataReach(
+            timeseries_id.quantity, timeseries_id.name, timeseries_id.chainage, validate=False
+        )
 
     def _update_query(self, res1d):
         name = self._name

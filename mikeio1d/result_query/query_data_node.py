@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..quantities import TimeseriesId
+
 from .query_data import QueryData
 
 
@@ -29,3 +36,7 @@ class QueryDataNode(QueryData):
         self._check_invalid_values(values)
 
         return self.from_dotnet_to_python(values)
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataNode:
+        return QueryDataNode(timeseries_id.quantity, timeseries_id.name, validate=False)
