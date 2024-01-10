@@ -23,13 +23,13 @@ class TimeseriesId:
     A unique identifier for a timeseries result on the Mike 1D network.
     """
 
-    quantity: str
+    quantity: str = ""
     """The name of the physical quantity (e.g. 'Discharge')"""
-    group: str
+    group: str = ""
     """Dataset group the timeseries is associated with. Can be all enumerations of ItemTypeGroup (e.g. NodeItem, ReachItem, etc.)"""
-    name: str
+    name: str = ""
     """The unique name of the network element where the timeseries exists."""
-    chainage: str
+    chainage: float = float("nan")
     """Chainage of the GridPoint that this data is assosciated with (only relevant for groups of type reach)."""
     tag: str = ""
     """An additional tag used to further define uniqueness where needed."""
@@ -37,6 +37,33 @@ class TimeseriesId:
     """A fallback to enumerate ids where duplicate timeseries are found."""
     derived: bool = False
     """Whether the timeseries is derived rather than saved in the result file."""
+
+    def __eq__(self, other: TimeseriesId) -> bool:
+        """Checks equality between two TimeseriesId objects."""
+        if other is self:
+            return True
+        if not isinstance(other, TimeseriesId):
+            return False
+
+        # Note: nan != nan, so we need to check for this case
+        if self.chainage != other.chainage and not (
+            self.chainage != self.chainage and other.chainage != other.chainage
+        ):
+            return False
+
+        return (
+            self.quantity == other.quantity
+            and self.group == other.group
+            and self.name == other.name
+            and self.tag == other.tag
+            and self.duplicate == other.duplicate
+            and self.derived == other.derived
+        )
+
+    def __hash__(self) -> int:
+        """Hashes a TimeseriesId object."""
+        # Uses the hash of the string representation to handle nan values in chainage.
+        return hash(str(self))
 
     def astuple(self) -> Tuple:
         """Converts a TimeseriesId to a tuple."""
@@ -169,19 +196,16 @@ class TimeseriesId:
         item_id = m1d_dataitem.ItemId
         name = TimeseriesId.get_dataset_name(m1d_dataset, item_id)
 
-        chainage = None
+        chainage = float("nan")
         if m1d_dataitem.IndexList is not None:
             chainages = m1d_dataset.GetChainages(m1d_dataitem)
             chainage = chainages[element_index]
-
-        tag = None
 
         return TimeseriesId(
             quantity=quantity,
             group=group,
             name=name,
             chainage=chainage,
-            tag=tag,
         )
 
     @staticmethod
