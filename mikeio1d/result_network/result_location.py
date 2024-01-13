@@ -1,11 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Dict
+    from typing import List
+    from ..res1d import Res1D
+
 from abc import ABC
 from abc import abstractclassmethod
 
 from .result_quantity import ResultQuantity
 from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
+from ..quantities import TimeseriesId
 
 
 class ResultLocation(ABC):
@@ -33,11 +41,11 @@ class ResultLocation(ABC):
         For non grid point locations this is typically None.
     """
 
-    def __init__(self, data_items, res1d):
+    def __init__(self, data_items, res1d: Res1D):
         self.data_items = data_items
         self.res1d = res1d
         self.quantity_label = "q_"
-        self.result_quantity_map = {}
+        self.result_quantity_map: Dict[str, List[ResultQuantity]] = {}
         self.element_indices = None
         self._static_attributes = []
 
@@ -72,8 +80,8 @@ class ResultLocation(ABC):
     def set_quantity(self, obj, data_item, element_index=0):
         """Sets a single quantity attribute on the obj."""
         m1d_dataset = self.get_m1d_dataset(data_item)
-        result_quantity = ResultQuantity(self, data_item, self.res1d, m1d_dataset=m1d_dataset)
-        result_quantity.element_index = element_index
+        result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
+        self.res1d.result_network.add_result_quantity_to_map(result_quantity)
 
         quantity = data_item.Quantity
         quantity_id = quantity.Id
@@ -102,7 +110,7 @@ class ResultLocation(ABC):
         ...
 
     @abstractclassmethod
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """
         Base method for adding to result quantity maps, which is a dictionary
         from quantity id to a list of result quantities corresponding to that
@@ -117,7 +125,12 @@ class ResultLocation(ABC):
         """
         ...
 
-    def add_to_result_quantity_map(self, quantity_id, result_quantity, result_quantity_map):
+    def add_to_result_quantity_map(
+        self,
+        quantity_id: str,
+        result_quantity: ResultQuantity,
+        result_quantity_map: Dict[str, List[ResultQuantity]],
+    ):
         """
         Method for adding to a given result quantity map.
 
@@ -135,20 +148,23 @@ class ResultLocation(ABC):
         else:
             result_quantity_map[quantity_id] = [result_quantity]
 
-    def add_to_network_result_quantity_map(self, query, result_quantity):
+    def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeseriesId:
         """
-        Method for adding to a network result quantity map, which is a dictionary
-        from unique query label to a ResultQuantity object corresponding to that query.
+        Add a ResultQuantity to map of all possible ResultQuantities.
 
         Parameters
         ----------
-        query : QueryData
-            One of the possible QueryData objects.
         result_quantity : ResultQuantity
-            ResultQuantity object corresponding to a query label.
+            ResultQuantity object to be added to the result_quantity_map.
+
+        Returns
+        -------
+        TimeseriesId
+            The TimeseriesId key of the added ResultQuantity
         """
-        network_result_quantity_map = self.res1d.result_network.result_quantity_map
-        network_result_quantity_map[str(query)] = result_quantity
+        network = self.res1d.result_network
+        tsid = network.add_result_quantity_to_map(result_quantity)
+        return tsid
 
     def add_query(self, data_item):
         """Base method for adding a query to ResultNetwork.queries list."""

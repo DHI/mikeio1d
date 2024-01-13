@@ -44,33 +44,9 @@ class QueryData:
         if self.name is not None and not isinstance(self.name, str):
             raise TypeError("Argument 'name' must be either None or a string.")
 
-    def add_to_data_entries(self, res1d, data_entries, timeseries_ids):
-        self._check_invalid_quantity(res1d)
-
-        self._update_query(res1d)
-
-        query_label = str(self)
-        result_quantity: ResultQuantity = res1d.result_network.result_quantity_map.get(
-            query_label, None
-        )
-
-        self._check_invalid_values(result_quantity)
-
-        timeseries_id = TimeseriesId.from_result_quantity(result_quantity)
-        timeseries_ids.append(timeseries_id)
-
-        data_entry = result_quantity.get_data_entry_net()
-        data_entries.Add(data_entry)
-
-    def to_timeseries_id(self, res1d: Res1D) -> TimeseriesId:
+    def to_timeseries_id(self) -> TimeseriesId:
         """Convert query to timeseries id."""
-
-        query_label = str(self)
-        result_quantity: ResultQuantity = res1d.result_network.result_quantity_map.get(
-            query_label, None
-        )
-
-        return TimeseriesId.from_result_quantity(result_quantity)
+        raise NotImplementedError("Abstract method only implemented in subclasses.")
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryData:

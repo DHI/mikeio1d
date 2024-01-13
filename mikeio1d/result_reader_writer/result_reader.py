@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+
 import os.path
 import pandas as pd
 import datetime
@@ -143,10 +150,30 @@ class ResultReader:
 
     # endregion File loading
 
-    def read(self, queries=None):
+    def read(self, timeseries_ids: List[TimeseriesId] = None) -> pd.DataFrame:
+        """
+        Read the time series data into a data frame.
+
+        Parameters
+        ----------
+        timeseries_ids : list of TimeseriesId
+            List of TimeseriesId objects to read.
+            If None, all data sets will be read.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
         return None
 
-    def read_all(self):
+    def read_all(self) -> pd.DataFrame:
+        """
+        Read all time series data into a data frame.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
         return None
 
     def is_data_set_included(self, data_set):

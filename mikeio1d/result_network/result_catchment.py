@@ -75,8 +75,7 @@ class ResultCatchment(ResultLocation):
         catchment_result_quantity_map = self.res1d.result_network.catchments.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
 
-        query = QueryDataCatchment(quantity_id, self._catchment.Id, validate=False)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def get_query(self, data_item):
         """Get a QueryDataCatchment for given data item."""

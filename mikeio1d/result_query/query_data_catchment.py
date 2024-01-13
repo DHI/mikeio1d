@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..quantities import TimeseriesId
+    from ..res1d import Res1D
 
 from .query_data import QueryData
+from ..quantities import TimeseriesId
 
 
 class QueryDataCatchment(QueryData):
@@ -36,6 +37,14 @@ class QueryDataCatchment(QueryData):
         self._check_invalid_values(values)
 
         return self.from_dotnet_to_python(values)
+
+    def to_timeseries_id(self) -> TimeseriesId:
+        tsid = TimeseriesId(
+            quantity=self.quantity,
+            group="CatchmentItem",
+            name=self.name,
+        )
+        return tsid
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataCatchment:
