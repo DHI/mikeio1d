@@ -18,7 +18,7 @@ def test_mikeio1d_generates_expected_dataframe_for_filetype(extension):
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue
-        df = Res1D(path).read()
+        df = Res1D(path).read(column_mode="query")
         df = df.loc[
             :, ~df.columns.duplicated()
         ]  # TODO: Remove this when column names are guaranteed unique

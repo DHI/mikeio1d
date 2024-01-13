@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..res1d import Res1D
 
+from math import isnan
+
 from ..custom_exceptions import InvalidQuantity
 from ..custom_exceptions import InvalidStructure
 from ..various import NAME_DELIMITER
@@ -64,11 +66,14 @@ class QueryDataStructure(QueryDataReach):
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataStructure:
         structure, name = timeseries_id.name.split(NAME_DELIMITER)
+        chainage = timeseries_id.chainage
+        if isnan(chainage):
+            chainage = None
         return QueryDataStructure(
             timeseries_id.quantity,
             structure,
             name,
-            timeseries_id.chainage,
+            chainage,
             validate=False,
         )
 

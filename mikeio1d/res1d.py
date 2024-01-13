@@ -6,7 +6,12 @@ if TYPE_CHECKING:
     from typing import List
     from typing import Optional
 
+    import pandas as pd
+
     from .query import QueryData
+    from .result_reader_writer.result_reader import ResultReader
+
+    ColumnMode = ResultReader.ColumnMode
 
 import os.path
 
@@ -196,7 +201,8 @@ class Res1D:
     def read(
         self,
         queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
-    ):
+        column_mode: Optional[str | ColumnMode] = None,
+    ) -> pd.DataFrame:
         """
         Read loaded .res1d file data based on queries.
         Currently the supported query classes are
@@ -209,6 +215,15 @@ class Res1D:
         ----------
         queries: A single query or a list of queries.
             Default is None = reads all data.
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'timeseries' - column index of TimeSeriesId objects
+            'query' - column index of str representations of QueryData objects
+
+        Returns
+        -------
+        pd.DataFrame
 
         Examples
         --------
@@ -225,18 +240,31 @@ class Res1D:
         timeseries_ids = self._get_timeseries_ids_to_read(queries)
 
         if len(timeseries_ids) == 0:
-            return self.read_all()
+            return self.read_all(column_mode=column_mode)
 
-        df = self.result_reader.read(timeseries_ids)
+        df = self.result_reader.read(timeseries_ids, column_mode=column_mode)
 
         if self.clear_queue_after_reading:
             self.clear_queue()
 
         return df
 
-    def read_all(self):
-        """Read all data from res1d file to dataframe."""
-        return self.result_reader.read_all()
+    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read all data from res1d file to dataframe.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'timeseries' - column index of TimeSeriesId objects
+            'query' - column index of str representations of QueryData objects
+
+        Returns
+        -------
+        pd.DataFrame
+        """
+        return self.result_reader.read_all(column_mode=column_mode)
 
     def clear_queue(self):
         """Clear the current active list of queries."""

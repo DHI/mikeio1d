@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List
     from typing import Tuple
+    from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -54,24 +55,36 @@ class ResultReaderCopier(ResultReader):
 
         self.result_data_copier = ResultDataCopier(self.data)
 
-    def read(self, timeseries_ids: List[TimeSeriesId] = None) -> pd.DataFrame:
+    def read(
+        self,
+        timeseries_ids: List[TimeSeriesId] = None,
+        column_mode: Optional[str | ResultReader.ColumnMode] = None,
+    ) -> pd.DataFrame:
         if timeseries_ids is None:
-            return self.read_all()
+            return self.read_all(column_mode=column_mode)
 
         data_entries_net = self.result_data_copier.GetEmptyDataEntriesList()
         for tsid in timeseries_ids:
             data_entry = tsid.to_m1d(res1d=self.res1d)
             data_entry.add_to_data_entries(data_entries_net)
 
-        df = self.create_data_frame(data_entries_net, timeseries_ids)
+        df = self.create_data_frame(data_entries_net, timeseries_ids, column_mode=column_mode)
+
         return df
 
-    def read_all(self) -> pd.DataFrame:
+    def read_all(self, column_mode: Optional[str | ResultReader.ColumnMode] = None) -> pd.DataFrame:
         data_entries, timeseries_ids = self.get_all_data_entries_and_timeseries_ids()
-        df = self.create_data_frame(data_entries, timeseries_ids)
+
+        df = self.create_data_frame(data_entries, timeseries_ids, column_mode=column_mode)
+
         return df
 
-    def create_data_frame(self, data_entries, timeseries_ids: List[TimeSeriesId]):
+    def create_data_frame(
+        self,
+        data_entries,
+        timeseries_ids: List[TimeSeriesId],
+        column_mode: Optional[str | ResultReader.ColumnMode] = None,
+    ):
         number_of_timesteps = self.data.NumberOfTimeSteps
         number_of_items = len(data_entries)
 
@@ -82,13 +95,33 @@ class ResultReaderCopier(ResultReader):
         data_pointer_net = IntPtr(data_pointer)
         self.result_data_copier.CopyData(data_pointer_net, data_entries)
 
-        columns = TimeSeriesId.to_multiindex(timeseries_ids)
+        columns = self.create_column_index(timeseries_ids, column_mode=column_mode)
 
         df = pd.DataFrame(data_array, index=self.time_index, columns=columns)
 
         self.update_time_quantities(df)
 
         return df
+
+    def create_column_index(
+        self,
+        timeseries_ids: List[TimeSeriesId],
+        column_mode: Optional[ResultReader.ColumnMode] = None,
+    ) -> pd.MultiIndex | pd.Index:
+        """Creates a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
+        if column_mode is None:
+            column_mode = self.column_mode
+        if column_mode == ResultReader.ColumnMode.ALL:
+            return TimeSeriesId.to_multiindex(timeseries_ids)
+        elif column_mode == ResultReader.ColumnMode.TIMESERIES:
+            return pd.Index(timeseries_ids)
+        elif column_mode == ResultReader.ColumnMode.QUERY:
+            queries = [t.to_query() for t in timeseries_ids]
+            return pd.Index([str(q) for q in queries])
+        else:
+            if column_mode in ResultReader.ColumnMode:
+                raise NotImplementedError(f"The column_mode {column_mode} is not implemented.")
+            raise ValueError(f"Unknown column_mode: {column_mode}")
 
     def get_all_data_entries_and_timeseries_ids(self) -> Tuple[DataEntryNet, List[TimeSeriesId]]:
         data_entries = self.result_data_copier.GetEmptyDataEntriesList()
