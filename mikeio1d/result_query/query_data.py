@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..res1d import Res1D
-    from ..result_network.result_quantity import ResultQuantity
 
 import numpy as np
 
@@ -66,10 +65,10 @@ class QueryData:
     def name(self):
         return self._name
 
-    def _update_query(self, res1d):
+    def _update_query(self, res1d: Res1D):
         pass
 
-    def _check_invalid_quantity(self, res1d):
+    def _check_invalid_quantity(self, res1d: Res1D):
         if self._quantity not in res1d.quantities:
             raise InvalidQuantity(
                 f"Undefined quantity {self._quantity}. "

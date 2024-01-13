@@ -29,7 +29,7 @@ class QueryDataCatchment(QueryData):
     def __init__(self, quantity, name=None, validate=True):
         super().__init__(quantity, name, validate)
 
-    def get_values(self, res1d):
+    def get_values(self, res1d: Res1D):
         self._check_invalid_quantity(res1d)
 
         values = res1d.query.GetCatchmentValues(self._name, self._quantity)

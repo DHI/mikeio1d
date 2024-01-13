@@ -6,6 +6,8 @@ if TYPE_CHECKING:
     from typing import List
     from typing import Optional
 
+    from .query import QueryData
+
 import os.path
 
 from .dotnet import from_dotnet_datetime
@@ -15,19 +17,10 @@ from .dotnet import to_numpy
 from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
-from .result_network import ResultCatchment
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
 
-from .query import QueryData  # noqa: F401
-from .query import QueryDataCatchment  # noqa: F401
-from .query import QueryDataNode  # noqa: F401
-from .query import QueryDataReach  # noqa: F401
-from .query import QueryDataStructure  # noqa: F401
-from .query import QueryDataGlobal  # noqa: F401
-
-from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
 
 from .quantities import TimeSeriesId
