@@ -1,3 +1,3 @@
-from .timeseries_id import TimeSeriesId
+from .timeseries_id import TimeSeriesId  # noqa: F401
 
 all = ["TimeSeriesId"]

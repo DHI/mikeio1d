@@ -35,7 +35,7 @@ class QueryDataStructure(QueryDataReach):
         super().__init__(quantity, name, chainage, validate=validate)
         self._structure = structure
 
-    def get_values(self, res1d):
+    def get_values(self, res1d: Res1D):
         self._check_invalid_quantity(res1d)
 
         result_structure = self._get_result_structure(res1d)

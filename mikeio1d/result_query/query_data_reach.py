@@ -45,7 +45,7 @@ class QueryDataReach(QueryData):
         if self.name is None and self.chainage is not None:
             raise ValueError("Argument 'chainage' cannot be set if name is None.")
 
-    def get_values(self, res1d):
+    def get_values(self, res1d: Res1D):
         self._check_invalid_quantity(res1d)
 
         name = self._name

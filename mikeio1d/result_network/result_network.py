@@ -128,7 +128,7 @@ class ResultNetwork:
         """
         Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed.
         """
-        gpd = try_import_geopandas()
+        gpd = try_import_geopandas()  # noqa: F841
         gdf_nodes = self.nodes.to_geopandas()
         gdf_reaches = self.reaches.to_geopandas()
         gdf_catchments = self.catchments.to_geopandas()
