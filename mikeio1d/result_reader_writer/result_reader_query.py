@@ -40,6 +40,7 @@ class ResultReaderQuery(ResultReader):
             dfs.append(df)
 
         df = pd.concat(dfs, axis=1)
+        df = df.astype("float32")
         self.update_time_quantities(df)
 
         return df
@@ -64,6 +65,7 @@ class ResultReaderQuery(ResultReader):
                     dfs.append(df)
 
         df = pd.concat(dfs, axis=1)
+        df = df.astype("float32")
         self.update_time_quantities(df)
         return df
 
