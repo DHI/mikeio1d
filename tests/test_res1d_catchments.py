@@ -3,7 +3,8 @@ import pytest
 import numpy as np
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
-from mikeio1d.res1d import Res1D, QueryDataCatchment
+from mikeio1d.res1d import Res1D
+from mikeio1d.query import QueryDataCatchment
 from mikeio1d.dotnet import to_numpy
 from mikeio1d.result_network import ResultCatchment
 

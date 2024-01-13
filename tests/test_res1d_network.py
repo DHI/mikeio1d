@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
-from mikeio1d.res1d import Res1D, mike1d_quantities, QueryDataReach, QueryDataNode
+from mikeio1d.res1d import Res1D, mike1d_quantities
+from mikeio1d.query import QueryDataReach
+from mikeio1d.query import QueryDataNode
 from mikeio1d.dotnet import to_numpy
 
 

@@ -6,7 +6,9 @@ import datetime
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
 from mikeio1d.res1d import Res1D
-from mikeio1d.query import QueryDataReach, QueryDataNode, QueryDataGlobal
+from mikeio1d.query import QueryDataReach
+from mikeio1d.query import QueryDataNode
+from mikeio1d.query import QueryDataGlobal
 from mikeio1d.dotnet import to_numpy
 
 
