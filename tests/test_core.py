@@ -13,12 +13,13 @@ def testdata_name():
 
 
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
-def test_mikeio1d_generates_expected_dataframe_for_filetype(extension):
+@pytest.mark.parametrize("result_reader", ["copier", "query"])
+def test_mikeio1d_generates_expected_dataframe_for_filetype(result_reader, extension):
     for name in testdata_name():
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue
-        df = Res1D(path).read(column_mode="query")
+        df = Res1D(path, result_reader_type=result_reader).read(column_mode="query")
         df = df.loc[
             :, ~df.columns.duplicated()
         ]  # TODO: Remove this when column names are guaranteed unique
