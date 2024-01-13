@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..res1d import Res1D
 
+from math import isnan
+
 from ..various import NAME_DELIMITER
 from .query_data import QueryData
 from ..quantities import TimeSeriesId
@@ -82,9 +84,10 @@ class QueryDataReach(QueryData):
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataReach:
-        return QueryDataReach(
-            timeseries_id.quantity, timeseries_id.name, timeseries_id.chainage, validate=False
-        )
+        chainage = timeseries_id.chainage
+        if isnan(chainage):
+            chainage = None
+        return QueryDataReach(timeseries_id.quantity, timeseries_id.name, chainage, validate=False)
 
     def _update_query(self, res1d):
         name = self._name
