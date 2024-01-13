@@ -19,7 +19,8 @@ def test_mikeio1d_generates_expected_dataframe_for_filetype(result_reader, exten
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue
-        df = Res1D(path, result_reader_type=result_reader).read(column_mode="query")
+        column_mode = "query" if result_reader == "copier" else None
+        df = Res1D(path, result_reader_type=result_reader).read(column_mode=column_mode)
         df = df.loc[
             :, ~df.columns.duplicated()
         ]  # TODO: Remove this when column names are guaranteed unique

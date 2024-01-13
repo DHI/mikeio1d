@@ -1,3 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Optional
+    from typing import List
+    from .result_reader import ResultReader
+
+    ColumnMode = ResultReader.ColumnMode
+
+    from ..query import QueryData
+
+
 import pandas as pd
 
 from ..dotnet import pythonnet_implementation as impl
@@ -10,7 +24,14 @@ class ResultReaderQuery(ResultReader):
     into Pandas data frame using ResultDataQuery object.
     """
 
-    def read(self, queries=None):
+    def read(
+        self, queries: List[QueryData], column_mode: Optional[ColumnMode] = None
+    ) -> pd.DataFrame:
+        if column_mode is not None:
+            raise NotImplementedError(
+                f"ResultReaderQuery does not support column_mode {column_mode}."
+            )
+
         dfs = []
         for query in queries:
             df = pd.DataFrame(index=self.time_index)
@@ -23,7 +44,12 @@ class ResultReaderQuery(ResultReader):
 
         return df
 
-    def read_all(self):
+    def read_all(self, column_mode: Optional[ColumnMode] = None) -> pd.DataFrame:
+        if column_mode is not None:
+            raise NotImplementedError(
+                f"ResultReaderQuery does not support column_mode {column_mode}."
+            )
+
         dfs = []
         for data_set in self.data.DataSets:
             data_set = impl(data_set)
