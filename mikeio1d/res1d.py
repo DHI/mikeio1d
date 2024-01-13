@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+    from typing import Optional
+
 import os.path
 
 from .dotnet import from_dotnet_datetime
@@ -21,6 +29,8 @@ from .query import QueryDataGlobal  # noqa: F401
 
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
+
+from .quantities import TimeseriesId
 
 from System import DateTime
 
@@ -80,7 +90,7 @@ class Res1D:
         catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        clear_queries_after_reading=True,
+        clear_queue_after_reading=True,
         result_reader_type=ResultReaderType.COPIER,
     ):
         self.result_reader = ResultReaderCreator.create(
@@ -101,9 +111,8 @@ class Res1D:
 
         self.result_network = ResultNetwork(self)
         self.result_writer = ResultWriter(self)
-        self._queries = self.result_network.queries
 
-        self.clear_queries_after_reading = clear_queries_after_reading
+        self.clear_queue_after_reading = clear_queue_after_reading
 
         self.catchments = self.result_network.catchments
         self.reaches = self.result_network.reaches
@@ -130,15 +139,71 @@ class Res1D:
 
     # region Private methods
 
-    def _get_actual_queries(self, queries):
-        """Finds out which list of queries should be used."""
-        queries = self._queries if queries is None else queries
-        queries = queries if isinstance(queries, list) else [queries]
-        return queries
+    def _get_timeseries_ids_to_read(
+        self, queries: List[QueryData] | List[TimeseriesId]
+    ) -> List[TimeseriesId]:
+        """Find out which list of TimeseriesId objects should be used for reading.
+
+        If user supplies queries, then convert them to TimeseriesId. Otherwise use the
+        current queue of TimeseriesId objects.
+
+        Parameters
+        ----------
+        queries : List[QueryData] | List[TimeseriesId]
+            List of queries or time series ids supplied in read() method.
+
+        Returns
+        -------
+        List of TimeseriesId objects.
+        """
+        if queries is None:
+            return self.result_network.queue
+
+        timeseries_ids = self._validate_queries_as_timeseries_ids(queries)
+
+        return timeseries_ids
+
+    def _validate_queries_as_timeseries_ids(
+        self, queries: List[QueryData] | List[TimeseriesId]
+    ) -> List[TimeseriesId]:
+        """Validates the user supplied query(ies) and converts them to a TimeseriesId objects.
+
+        Parameters
+        ----------
+        queries : List[QueryData] | List[TimeseriesId]
+            List of queries or time series ids supplied in read() method.
+
+        Returns
+        -------
+        List of TimeSeriesId objects.
+        """
+        try:
+            iter(queries)
+        except TypeError:
+            queries = [queries]
+
+        is_already_timeseries_id = isinstance(queries[0], TimeseriesId)
+        if is_already_timeseries_id:
+            return queries
+
+        timeseries_ids = []
+        for q in queries:
+            q._update_query(self)
+            q._check_invalid_quantity(self)
+            tsid = q.to_timeseries_id()
+            if tsid.is_valid(self):
+                timeseries_ids.append(tsid)
+            else:
+                q._check_invalid_values(None)
+
+        return timeseries_ids
 
     # endregion Private methods
 
-    def read(self, queries=None):
+    def read(
+        self,
+        queries: Optional[List[QueryData] | QueryData | List[TimeseriesId] | TimeseriesId] = None,
+    ):
         """
         Read loaded .res1d file data based on queries.
         Currently the supported query classes are
@@ -164,12 +229,15 @@ class Res1D:
         >>> res1d.read(queries)
         """
 
-        if queries is None and len(self._queries) == 0:
+        timeseries_ids = self._get_timeseries_ids_to_read(queries)
+
+        if len(timeseries_ids) == 0:
             return self.read_all()
 
-        queries = self._get_actual_queries(queries)
+        df = self.result_reader.read(timeseries_ids)
 
-        df = self.result_reader.read(queries)
+        if self.clear_queue_after_reading:
+            self.clear_queue()
 
         return df
 
@@ -177,10 +245,9 @@ class Res1D:
         """Read all data from res1d file to dataframe."""
         return self.result_reader.read_all()
 
-    def clear_queries(self):
+    def clear_queue(self):
         """Clear the current active list of queries."""
-        self.result_network.queries.clear()
-        self.result_network.queries_ids.clear()
+        self.result_network.queue.clear()
 
     @property
     def time_index(self):
@@ -302,7 +369,13 @@ class Res1D:
         self.data.Connection.FilePath.Path = file_path
         self.data.Save()
 
-    def extract(self, file_path, queries=None, time_step_skipping_number=1, ext=None):
+    def extract(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeseriesId] | TimeseriesId] = None,
+        time_step_skipping_number=1,
+        ext=None,
+    ):
         """
         Extract given queries to provided file.
         File type is determined from file_path extension.
@@ -325,16 +398,16 @@ class Res1D:
         """
         ext = os.path.splitext(file_path)[-1] if ext is None else ext
 
-        queries = self._get_actual_queries(queries)
-        data_entries = self.result_network.convert_queries_to_data_entries(queries)
+        timeseries_ids = self._get_timeseries_ids_to_read(queries)
+        data_entries = [t.to_m1d(self) for t in timeseries_ids]
 
         extractor = ExtractorCreator.create(
             ext, file_path, data_entries, self.data, time_step_skipping_number
         )
         extractor.export()
 
-        if self.clear_queries_after_reading:
-            self.clear_queries()
+        if self.clear_queue_after_reading:
+            self.clear_queue()
 
     def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
         """Extract to csv file."""

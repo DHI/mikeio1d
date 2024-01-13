@@ -65,6 +65,25 @@ class TimeseriesId:
         # Uses the hash of the string representation to handle nan values in chainage.
         return hash(str(self))
 
+    def is_valid(self, res1d: Res1D) -> bool:
+        """Checks whether a TimeseriesId is valid for a given Res1D object.
+
+        A TimeseriesId is valid if it exists in the global result quantity map.
+
+        Parameters
+        ----------
+        res1d : Res1D
+            The Res1D object to check if the TimeSeriesId exists in.
+
+        Returns
+        -------
+        bool
+            True if the TimeseriesId is valid, False otherwise.
+        """
+        quantity_map = res1d.result_network.result_quantity_map
+        result_quantity = quantity_map.get(self, None)
+        return result_quantity is not None
+
     def astuple(self) -> Tuple:
         """Converts a TimeseriesId to a tuple."""
         return dataclasses.astuple(self)
@@ -98,8 +117,7 @@ class TimeseriesId:
             raise ValueError("Cannot convert derived TimeseriesId to ResultQuantity")
 
         quantity_map = res1d.result_network.result_quantity_map
-        query = self.to_query()
-        result_quantity = quantity_map.get(str(query), None)
+        result_quantity = quantity_map.get(self, None)
 
         if result_quantity is None:
             raise ValueError(f"Could not convert TimeseriesId to ResultQuantity: {self}")
@@ -129,7 +147,7 @@ class TimeseriesId:
             from ..query import QueryDataCatchment
 
             return QueryDataCatchment.from_timeseries_id(self)
-        elif self.group == "StructureItem":
+        elif self.group == "ReachStructureItem":
             from ..query import QueryDataStructure
 
             return QueryDataStructure(
@@ -138,6 +156,51 @@ class TimeseriesId:
             )
         else:
             raise ValueError(f"No query exists for group: {self.group}")
+
+    def next_duplicate(self) -> TimeseriesId:
+        """Creates a duplicate TimeseriesId object.
+
+        Returns
+        -------
+        TimeseriesId
+            A TimeseriesId object with the same fields as the original,
+            except with duplicate incremented by 1.
+        """
+        return TimeseriesId(
+            quantity=self.quantity,
+            group=self.group,
+            name=self.name,
+            chainage=self.chainage,
+            tag=self.tag,
+            duplicate=self.duplicate + 1,
+            derived=self.derived,
+        )
+
+    def prev_duplicate(self) -> TimeseriesId:
+        """Creates a duplicate TimeseriesId object.
+
+        Returns
+        -------
+        TimeseriesId
+            A TimeseriesId object with the same fields as the original,
+            except with duplicate decremented by 1.
+        """
+        if self.duplicate == 0:
+            raise ValueError("Cannot decrement duplicate below 0")
+        return TimeseriesId(
+            quantity=self.quantity,
+            group=self.group,
+            name=self.name,
+            chainage=self.chainage,
+            tag=self.tag,
+            duplicate=self.duplicate - 1,
+            derived=self.derived,
+        )
+
+    @staticmethod
+    def from_query(query: QueryData) -> TimeseriesId:
+        """Converts a QueryData object to a TimeseriesId object."""
+        return query.to_timeseries_id()
 
     @staticmethod
     def from_tuple(t: Tuple) -> TimeseriesId:
@@ -156,7 +219,7 @@ class TimeseriesId:
     def to_multiindex(timeseries_ids: List[TimeseriesId]) -> pd.MultiIndex:
         """Convert a list of TimeseriesId objects to a pandas MultiIndex."""
         return pd.MultiIndex.from_tuples(
-            [dataclasses.astuple(tsid) for tsid in timeseries_ids],
+            [tsid.astuple() for tsid in timeseries_ids],
             names=["quantity", "group", "name", "chainage", "tag", "duplicate", "derived"],
         )
 
@@ -201,6 +264,10 @@ class TimeseriesId:
             chainages = m1d_dataset.GetChainages(m1d_dataitem)
             chainage = chainages[element_index]
 
+        # DataItem objects on this DataSet have an ItemTypeGroup set to GlobalItem
+        if "DHI.Mike1D.ResultDataAccess.Epanet.Res1DTypedReach" in repr(m1d_dataset.__class__):
+            group = "ReachItem"
+
         return TimeseriesId(
             quantity=quantity,
             group=group,
@@ -210,7 +277,11 @@ class TimeseriesId:
 
     @staticmethod
     def from_result_quantity(result_quantity: ResultQuantity) -> TimeseriesId:
-        """Create a TimeseriesId object from a ResultQuantity object."""
+        """Create a TimeseriesId object from a ResultQuantity object.
+
+        Note: this method assumes there are no duplicates (e.g. duplicate = 0). To get the
+        unique TimeSeriesId of a ResultQuantity, access its timeseries_id property.
+        """
         m1d_dataitem = result_quantity.data_item
         m1d_dataset = result_quantity.m1d_dataset
         element_index = result_quantity.element_index

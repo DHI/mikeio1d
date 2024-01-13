@@ -86,8 +86,7 @@ class ResultStructure(ResultLocation):
         structure_result_quantity_map = self.res1d.result_network.structures.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
 
-        query = QueryDataStructure(quantity_id, self.id, self.reach.Name, self.chainage)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def add_res1d_structure_data_item(self, data_item):
         """

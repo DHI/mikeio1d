@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Dict
+    from .result_reader import ResultReader
+
 from ..various import NAME_DELIMITER
 
 from .result_reader_copier import ResultReaderCopier
@@ -22,8 +30,8 @@ class ResultReaderCreator:
         catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-    ):
-        reasult_readers = {
+    ) -> ResultReader:
+        reasult_readers: Dict[ResultReaderType, ResultReader] = {
             ResultReaderType.COPIER: ResultReaderCopier,
             ResultReaderType.QUERY: ResultReaderQuery,
         }

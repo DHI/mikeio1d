@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..res1d import Res1D
+    from ..result_network import ResultLocation
+
 from .data_entry import DataEntry
 from ..quantities import TimeseriesId
 
@@ -29,23 +35,34 @@ class ResultQuantity:
     element_index : int
         An integer giving an element index into the data item
         which gives the concrete time series for given location.
+    timeseries_id : TimeSeriesId
+        A unique TimeSeriesId object corresponding to the data item. This is
+        unmutable and set when the ResultQuantity is added to a network. A value
+        of None indicates that the ResultQuantity has not been added to a network.
     """
 
-    def __init__(self, result_location, data_item, res1d, m1d_dataset=None):
+    def __init__(
+        self,
+        result_location: ResultLocation,
+        data_item,
+        res1d: Res1D,
+        m1d_dataset=None,
+        element_index=0,
+    ):
         self.result_location = result_location
         self.data_item = data_item
-        self.res1d = res1d
-        self.element_index = 0
+        self.res1d: Res1D = res1d
         self.m1d_dataset = m1d_dataset
+        self.element_index = element_index
+        self._timeseries_id: TimeseriesId = None
 
     def add(self):
-        """Add a query to ResultNetwork.queries based on the data item."""
-        self.result_location.add_query(self.data_item)
+        """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
+        self.res1d.result_network.queue.append(self.timeseries_id)
 
     def read(self):
         """Read the time series data into a data frame."""
-        query = self.get_query()
-        return self.res1d.read(query)
+        return self.res1d.read(self.timeseries_id)
 
     def plot(self, **kwargs):
         """Plot the time series data."""
@@ -79,7 +96,7 @@ class ResultQuantity:
 
     def get_query(self):
         """Get query corresponding to ResultQuantity."""
-        return self.result_location.get_query(self.data_item)
+        return self._timeseries_id.to_query()
 
     def get_data_entry(self):
         """Get DataEntry corresponding to ResultQuantity."""
@@ -89,6 +106,11 @@ class ResultQuantity:
         """Get DataEntryNet corresponding to ResultQuantity."""
         return DataEntryNet(self.data_item, self.element_index)
 
-    def get_timeseries_id(self) -> TimeseriesId:
-        """Get TimeseriesId corresponding to ResultQuantity."""
-        return TimeseriesId.from_result_quantity(self)
+    @property
+    def timeseries_id(self) -> TimeseriesId:
+        """TimeseriesId corresponding to ResultQuantity."""
+        if self._timeseries_id is None:
+            raise ValueError(
+                "ResultQuantity must be added to a ResultNetwork before TimeseriesId can be accessed."
+            )
+        return self._timeseries_id

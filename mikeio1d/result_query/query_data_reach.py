@@ -3,10 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..quantities import TimeseriesId
+    from ..res1d import Res1D
 
 from ..various import NAME_DELIMITER
 from .query_data import QueryData
+from ..quantities import TimeseriesId
 
 
 class QueryDataReach(QueryData):
@@ -60,6 +61,24 @@ class QueryDataReach(QueryData):
         self._check_invalid_values(values)
 
         return self.from_dotnet_to_python(values)
+
+    def to_timeseries_id(self) -> TimeseriesId:
+        quantity = self.quantity
+        group = "ReachItem"
+        name = self.name
+        if self.chainage is not None:
+            return TimeseriesId(
+                quantity=quantity,
+                group=group,
+                name=name,
+                chainage=self.chainage,
+            )
+        else:
+            return TimeseriesId(
+                quantity=quantity,
+                group=group,
+                name=name,
+            )
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataReach:

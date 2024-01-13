@@ -206,7 +206,8 @@ def test_all_reaches_attributes(test_file):
     res1d.reaches.WaterLevel.add()
     df = res1d.read()
 
-    assert len(df.columns) == 110
+    # Previously was 110, now includes some duplicates that were missed
+    assert len(df.columns) == 119
 
     max_water_level = round(df.max().max(), 3)
     assert pytest.approx(max_water_level) == 59.2
@@ -298,7 +299,7 @@ def test_res1d_modification_filtered(test_file):
 
 def test_extraction_to_csv_dfs0_txt(test_file):
     res1d = test_file
-    res1d.clear_queries_after_reading = False
+    res1d.clear_queue_after_reading = False
 
     res1d.reaches.WaterLevel.add()
     res1d.nodes.WaterLevel.add()
@@ -307,17 +308,17 @@ def test_extraction_to_csv_dfs0_txt(test_file):
 
     file_path_csv = file_path.replace("network_river.res1d", "network_river.extract.csv")
     res1d.to_csv(file_path_csv, time_step_skipping_number=10)
-    file_size_csv = 21905
+    file_size_csv = 24819  # originally 21905, however that missed some data items
     assert 0.5 * file_size_csv < os.stat(file_path_csv).st_size < 2.0 * file_size_csv
 
     file_path_dfs0 = file_path.replace("network_river.res1d", "network_river.extract.dfs0")
     res1d.to_dfs0(file_path_dfs0, time_step_skipping_number=10)
-    file_size_dfs0 = 30302
+    file_size_dfs0 = 32388  # originally 30302, however that missed some data items
     assert file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
 
     file_path_txt = file_path.replace("network_river.res1d", "network_river.extract.txt")
     res1d.to_txt(file_path_txt, time_step_skipping_number=10)
-    file_size_txt = 23400
+    file_size_txt = 25008  # originally 23400. however that missed some data items
     assert 0.5 * file_size_txt < os.stat(file_path_txt).st_size < 2.0 * file_size_txt
 
 

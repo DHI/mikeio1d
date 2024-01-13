@@ -28,6 +28,11 @@ class ResultQuantityCollection(ResultQuantity):
         for result_quantity in self.result_quantities:
             result_quantity.add()
 
+    def read(self):
+        """Read the time series data into a data frame."""
+        timeseries_ids = [q.timeseries_id for q in self.result_quantities]
+        return self.res1d.read(timeseries_ids)
+
     def plot(self):
         """Plot the time series data."""
         if len(self.result_quantities) <= 0:
