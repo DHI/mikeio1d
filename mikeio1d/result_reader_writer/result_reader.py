@@ -11,7 +11,7 @@ import datetime
 
 from ..dotnet import from_dotnet_datetime
 from ..various import NAME_DELIMITER
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
@@ -150,14 +150,14 @@ class ResultReader:
 
     # endregion File loading
 
-    def read(self, timeseries_ids: List[TimeseriesId] = None) -> pd.DataFrame:
+    def read(self, timeseries_ids: List[TimeSeriesId] = None) -> pd.DataFrame:
         """
         Read the time series data into a data frame.
 
         Parameters
         ----------
-        timeseries_ids : list of TimeseriesId
-            List of TimeseriesId objects to read.
+        timeseries_ids : list of TimeSeriesId
+            List of TimeSeriesId objects to read.
             If None, all data sets will be read.
 
         Returns
@@ -197,7 +197,7 @@ class ResultReader:
         return self._time_index
 
     def get_data_set_name(self, data_set, item_id=None):
-        name = TimeseriesId.get_dataset_name(data_set, item_id, self.col_name_delimiter)
+        name = TimeSeriesId.get_dataset_name(data_set, item_id, self.col_name_delimiter)
         return name
 
     def get_column_name(self, data_set, data_item, i):

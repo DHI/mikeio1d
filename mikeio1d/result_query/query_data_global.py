@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from mikeio1d.res1d import Res1D
 
 from .query_data import QueryData
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class QueryDataGlobal(QueryData):
@@ -37,15 +37,15 @@ class QueryDataGlobal(QueryData):
 
         return self.from_dotnet_to_python(values)
 
-    def to_timeseries_id(self) -> TimeseriesId:
-        tsid = TimeseriesId(
+    def to_timeseries_id(self) -> TimeSeriesId:
+        tsid = TimeSeriesId(
             quantity=self.quantity,
             group="GlobalItem",
         )
         return tsid
 
     @staticmethod
-    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataGlobal:
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataGlobal:
         return QueryDataGlobal(timeseries_id.quantity, validate=False)
 
     def __repr__(self):

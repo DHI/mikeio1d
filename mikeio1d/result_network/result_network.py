@@ -17,7 +17,7 @@ from .result_catchments import ResultCatchments
 from .result_global_datas import ResultGlobalDatas
 from .result_structures import ResultStructures
 from .result_quantity import ResultQuantity
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class ResultNetwork:
@@ -40,7 +40,7 @@ class ResultNetwork:
     data_items : IDataItems.
         MIKE 1D IDataItems object.
     queue: list
-        A list of TimeseriesId objects to be used when calling res1D.read().
+        A list of TimeSeriesId objects to be used when calling res1D.read().
     nodes : ResultNodes object
         Is is a wrapper class object for all ResultData nodes.
     reaches : ResultReaches object
@@ -50,8 +50,8 @@ class ResultNetwork:
     global_data : ResultGlobalDatas object
         Is a wrapper class object for all ResultData global data items.
     result_quantity_map : dict
-        Dictionary from TimeseriesId to a corresponding ResultQuantity object.
-        The keys of this dictionary represent all possible TimeseriesId
+        Dictionary from TimeSeriesId to a corresponding ResultQuantity object.
+        The keys of this dictionary represent all possible TimeSeriesId
         objects that can be queried from the ResultNetwork.
 
     Examples
@@ -74,14 +74,14 @@ class ResultNetwork:
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
 
-        self.queue: List[TimeseriesId] = []
+        self.queue: List[TimeSeriesId] = []
 
-        self.result_quantity_map: Dict[TimeseriesId, ResultQuantity] = {}
+        self.result_quantity_map: Dict[TimeSeriesId, ResultQuantity] = {}
 
         self.res1d.result_network = self
         self.set_result_locations()
 
-    def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeseriesId:
+    def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
         """
         Add a ResultQuantity to map of all possible ResultQuantities.
 
@@ -92,10 +92,10 @@ class ResultNetwork:
 
         Returns
         -------
-        TimeseriesId
-            The TimeseriesId key of the added ResultQuantity
+        TimeSeriesId
+            The TimeSeriesId key of the added ResultQuantity
         """
-        tsid = TimeseriesId.from_result_quantity(result_quantity)
+        tsid = TimeSeriesId.from_result_quantity(result_quantity)
         while tsid in self.result_quantity_map:
             if self.result_quantity_map[tsid] == result_quantity:
                 break
@@ -116,9 +116,9 @@ class ResultNetwork:
         self.structures = ResultStructures(res1d)
         self.global_data = ResultGlobalDatas(res1d)
 
-    def add_timeseries_id(self, timeseries_id: TimeseriesId):
+    def add_timeseries_id(self, timeseries_id: TimeSeriesId):
         """
-        Add a TimeseriesId to the queue list, which can be used
+        Add a TimeSeriesId to the queue list, which can be used
         when calling res1D.read().
         """
         if timeseries_id not in self.queue:

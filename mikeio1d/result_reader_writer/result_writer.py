@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class ResultWriter:
@@ -32,10 +32,10 @@ class ResultWriter:
         Parameters
         ----------
         dataframe : pandas.DataFrame
-            Pandas dataframe object with TimeseriesId compatible multiindex.
+            Pandas dataframe object with TimeSeriesId compatible multiindex.
         """
         for header, series in dataframe.items():
-            timeseries_id = TimeseriesId.from_tuple(header)
+            timeseries_id = TimeSeriesId.from_tuple(header)
             data_entry = timeseries_id.to_m1d(self.res1d)
             data_item = data_entry.data_item
             element_index = data_entry.element_index

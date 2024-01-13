@@ -30,7 +30,7 @@ from .query import QueryDataGlobal  # noqa: F401
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
 
-from .quantities import TimeseriesId
+from .quantities import TimeSeriesId
 
 from System import DateTime
 
@@ -140,21 +140,21 @@ class Res1D:
     # region Private methods
 
     def _get_timeseries_ids_to_read(
-        self, queries: List[QueryData] | List[TimeseriesId]
-    ) -> List[TimeseriesId]:
-        """Find out which list of TimeseriesId objects should be used for reading.
+        self, queries: List[QueryData] | List[TimeSeriesId]
+    ) -> List[TimeSeriesId]:
+        """Find out which list of TimeSeriesId objects should be used for reading.
 
-        If user supplies queries, then convert them to TimeseriesId. Otherwise use the
-        current queue of TimeseriesId objects.
+        If user supplies queries, then convert them to TimeSeriesId. Otherwise use the
+        current queue of TimeSeriesId objects.
 
         Parameters
         ----------
-        queries : List[QueryData] | List[TimeseriesId]
+        queries : List[QueryData] | List[TimeSeriesId]
             List of queries or time series ids supplied in read() method.
 
         Returns
         -------
-        List of TimeseriesId objects.
+        List of TimeSeriesId objects.
         """
         if queries is None:
             return self.result_network.queue
@@ -164,13 +164,13 @@ class Res1D:
         return timeseries_ids
 
     def _validate_queries_as_timeseries_ids(
-        self, queries: List[QueryData] | List[TimeseriesId]
-    ) -> List[TimeseriesId]:
-        """Validates the user supplied query(ies) and converts them to a TimeseriesId objects.
+        self, queries: List[QueryData] | List[TimeSeriesId]
+    ) -> List[TimeSeriesId]:
+        """Validates the user supplied query(ies) and converts them to a TimeSeriesId objects.
 
         Parameters
         ----------
-        queries : List[QueryData] | List[TimeseriesId]
+        queries : List[QueryData] | List[TimeSeriesId]
             List of queries or time series ids supplied in read() method.
 
         Returns
@@ -182,7 +182,7 @@ class Res1D:
         except TypeError:
             queries = [queries]
 
-        is_already_timeseries_id = isinstance(queries[0], TimeseriesId)
+        is_already_timeseries_id = isinstance(queries[0], TimeSeriesId)
         if is_already_timeseries_id:
             return queries
 
@@ -202,7 +202,7 @@ class Res1D:
 
     def read(
         self,
-        queries: Optional[List[QueryData] | QueryData | List[TimeseriesId] | TimeseriesId] = None,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
     ):
         """
         Read loaded .res1d file data based on queries.
@@ -372,7 +372,7 @@ class Res1D:
     def extract(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeseriesId] | TimeseriesId] = None,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
         time_step_skipping_number=1,
         ext=None,
     ):

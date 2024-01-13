@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from ..result_network import ResultLocation
 
 from .data_entry import DataEntry
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
@@ -54,7 +54,7 @@ class ResultQuantity:
         self.res1d: Res1D = res1d
         self.m1d_dataset = m1d_dataset
         self.element_index = element_index
-        self._timeseries_id: TimeseriesId = None
+        self._timeseries_id: TimeSeriesId = None
 
     def add(self):
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
@@ -107,10 +107,10 @@ class ResultQuantity:
         return DataEntryNet(self.data_item, self.element_index)
 
     @property
-    def timeseries_id(self) -> TimeseriesId:
-        """TimeseriesId corresponding to ResultQuantity."""
+    def timeseries_id(self) -> TimeSeriesId:
+        """TimeSeriesId corresponding to ResultQuantity."""
         if self._timeseries_id is None:
             raise ValueError(
-                "ResultQuantity must be added to a ResultNetwork before TimeseriesId can be accessed."
+                "ResultQuantity must be added to a ResultNetwork before TimeSeriesId can be accessed."
             )
         return self._timeseries_id

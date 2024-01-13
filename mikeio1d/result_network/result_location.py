@@ -13,7 +13,7 @@ from abc import abstractclassmethod
 from .result_quantity import ResultQuantity
 from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class ResultLocation(ABC):
@@ -148,7 +148,7 @@ class ResultLocation(ABC):
         else:
             result_quantity_map[quantity_id] = [result_quantity]
 
-    def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeseriesId:
+    def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
         """
         Add a ResultQuantity to map of all possible ResultQuantities.
 
@@ -159,8 +159,8 @@ class ResultLocation(ABC):
 
         Returns
         -------
-        TimeseriesId
-            The TimeseriesId key of the added ResultQuantity
+        TimeSeriesId
+            The TimeSeriesId key of the added ResultQuantity
         """
         network = self.res1d.result_network
         tsid = network.add_result_quantity_to_map(result_quantity)

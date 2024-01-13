@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from ..res1d import Res1D
 
 from .query_data import QueryData
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class QueryDataCatchment(QueryData):
@@ -38,8 +38,8 @@ class QueryDataCatchment(QueryData):
 
         return self.from_dotnet_to_python(values)
 
-    def to_timeseries_id(self) -> TimeseriesId:
-        tsid = TimeseriesId(
+    def to_timeseries_id(self) -> TimeSeriesId:
+        tsid = TimeSeriesId(
             quantity=self.quantity,
             group="CatchmentItem",
             name=self.name,
@@ -47,5 +47,5 @@ class QueryDataCatchment(QueryData):
         return tsid
 
     @staticmethod
-    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataCatchment:
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataCatchment:
         return QueryDataCatchment(timeseries_id.quantity, timeseries_id.name, validate=False)
