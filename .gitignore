@@ -154,6 +154,6 @@ tests/testdata/network_river.extract.txt
 tests/testdata/discharge_in_structure.extract.csv
 tests/testdata/discharge_in_structure.extract.dfs0
 tests/testdata/discharge_in_structure.extract.txt
-tests/testdata/w_right_discharge_in_structure.extract.csv
-tests/testdata/w_right_discharge_in_structure.extract.dfs0
-tests/testdata/w_right_discharge_in_structure.extract.txt
+tests/testdata/W_right_discharge_in_structure.extract.csv
+tests/testdata/W_right_discharge_in_structure.extract.dfs0
+tests/testdata/W_right_discharge_in_structure.extract.txt
