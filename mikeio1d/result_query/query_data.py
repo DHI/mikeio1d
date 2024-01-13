@@ -11,7 +11,7 @@ import numpy as np
 from ..custom_exceptions import NoDataForQuery
 from ..custom_exceptions import InvalidQuantity
 from ..various import NAME_DELIMITER
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class QueryData:
@@ -44,13 +44,13 @@ class QueryData:
         if self.name is not None and not isinstance(self.name, str):
             raise TypeError("Argument 'name' must be either None or a string.")
 
-    def to_timeseries_id(self) -> TimeseriesId:
+    def to_timeseries_id(self) -> TimeSeriesId:
         """Convert query to timeseries id."""
         raise NotImplementedError("Abstract method only implemented in subclasses.")
 
     @staticmethod
-    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryData:
-        """Base method for creating query from TimeseriesId."""
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryData:
+        """Base method for creating query from TimeSeriesId."""
         raise NotImplementedError
 
     @staticmethod

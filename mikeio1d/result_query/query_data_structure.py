@@ -9,7 +9,7 @@ from ..custom_exceptions import InvalidQuantity
 from ..custom_exceptions import InvalidStructure
 from ..various import NAME_DELIMITER
 from .query_data_reach import QueryDataReach
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class QueryDataStructure(QueryDataReach):
@@ -51,9 +51,9 @@ class QueryDataStructure(QueryDataReach):
 
         return self.from_dotnet_to_python(values)
 
-    def to_timeseries_id(self) -> TimeseriesId:
+    def to_timeseries_id(self) -> TimeSeriesId:
         name = NAME_DELIMITER.join([self._structure, self.name])
-        tsid = TimeseriesId(
+        tsid = TimeSeriesId(
             quantity=self.quantity,
             group="ReachItem",
             name=name,
@@ -62,7 +62,7 @@ class QueryDataStructure(QueryDataReach):
         return tsid
 
     @staticmethod
-    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataStructure:
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataStructure:
         structure, name = timeseries_id.name.split(NAME_DELIMITER)
         return QueryDataStructure(
             timeseries_id.quantity,

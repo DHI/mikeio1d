@@ -1,3 +1,3 @@
-from .timeseries_id import TimeseriesId
+from .timeseries_id import TimeSeriesId
 
-all = ["TimeseriesId"]
+all = ["TimeSeriesId"]

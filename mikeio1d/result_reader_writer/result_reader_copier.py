@@ -12,7 +12,7 @@ import pandas as pd
 from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 from .result_reader import ResultReader
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 from System import IntPtr
 
@@ -54,7 +54,7 @@ class ResultReaderCopier(ResultReader):
 
         self.result_data_copier = ResultDataCopier(self.data)
 
-    def read(self, timeseries_ids: List[TimeseriesId] = None) -> pd.DataFrame:
+    def read(self, timeseries_ids: List[TimeSeriesId] = None) -> pd.DataFrame:
         if timeseries_ids is None:
             return self.read_all()
 
@@ -71,7 +71,7 @@ class ResultReaderCopier(ResultReader):
         df = self.create_data_frame(data_entries, timeseries_ids)
         return df
 
-    def create_data_frame(self, data_entries, timeseries_ids: List[TimeseriesId]):
+    def create_data_frame(self, data_entries, timeseries_ids: List[TimeSeriesId]):
         number_of_timesteps = self.data.NumberOfTimeSteps
         number_of_items = len(data_entries)
 
@@ -82,7 +82,7 @@ class ResultReaderCopier(ResultReader):
         data_pointer_net = IntPtr(data_pointer)
         self.result_data_copier.CopyData(data_pointer_net, data_entries)
 
-        columns = TimeseriesId.to_multiindex(timeseries_ids)
+        columns = TimeSeriesId.to_multiindex(timeseries_ids)
 
         df = pd.DataFrame(data_array, index=self.time_index, columns=columns)
 
@@ -90,9 +90,9 @@ class ResultReaderCopier(ResultReader):
 
         return df
 
-    def get_all_data_entries_and_timeseries_ids(self) -> Tuple[DataEntryNet, List[TimeseriesId]]:
+    def get_all_data_entries_and_timeseries_ids(self) -> Tuple[DataEntryNet, List[TimeSeriesId]]:
         data_entries = self.result_data_copier.GetEmptyDataEntriesList()
-        timeseries_ids: List[TimeseriesId] = []
+        timeseries_ids: List[TimeSeriesId] = []
         timeseries_ids_set = set()
         for data_set in self.data.DataSets:
             data_set = impl(data_set)
@@ -105,7 +105,7 @@ class ResultReaderCopier(ResultReader):
                     data_entry = DataEntryNet(data_item, i)
                     data_entries.Add(data_entry)
 
-                    timeseries_id = TimeseriesId.from_dataset_dataitem_and_element(
+                    timeseries_id = TimeSeriesId.from_dataset_dataitem_and_element(
                         data_set, data_item, i
                     )
                     while timeseries_id in timeseries_ids_set:

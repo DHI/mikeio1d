@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 from ..various import NAME_DELIMITER
 from .query_data import QueryData
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class QueryDataReach(QueryData):
@@ -62,26 +62,26 @@ class QueryDataReach(QueryData):
 
         return self.from_dotnet_to_python(values)
 
-    def to_timeseries_id(self) -> TimeseriesId:
+    def to_timeseries_id(self) -> TimeSeriesId:
         quantity = self.quantity
         group = "ReachItem"
         name = self.name
         if self.chainage is not None:
-            return TimeseriesId(
+            return TimeSeriesId(
                 quantity=quantity,
                 group=group,
                 name=name,
                 chainage=self.chainage,
             )
         else:
-            return TimeseriesId(
+            return TimeSeriesId(
                 quantity=quantity,
                 group=group,
                 name=name,
             )
 
     @staticmethod
-    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataReach:
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataReach:
         return QueryDataReach(
             timeseries_id.quantity, timeseries_id.name, timeseries_id.chainage, validate=False
         )

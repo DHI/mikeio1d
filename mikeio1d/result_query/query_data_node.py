@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from mikeio1d.res1d import Res1D
 
 from .query_data import QueryData
-from ..quantities import TimeseriesId
+from ..quantities import TimeSeriesId
 
 
 class QueryDataNode(QueryData):
@@ -38,8 +38,8 @@ class QueryDataNode(QueryData):
 
         return self.from_dotnet_to_python(values)
 
-    def to_timeseries_id(self) -> TimeseriesId:
-        tsid = TimeseriesId(
+    def to_timeseries_id(self) -> TimeSeriesId:
+        tsid = TimeSeriesId(
             quantity=self.quantity,
             group="NodeItem",
             name=self.name,
@@ -47,5 +47,5 @@ class QueryDataNode(QueryData):
         return tsid
 
     @staticmethod
-    def from_timeseries_id(timeseries_id: TimeseriesId) -> QueryDataNode:
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataNode:
         return QueryDataNode(timeseries_id.quantity, timeseries_id.name, validate=False)
