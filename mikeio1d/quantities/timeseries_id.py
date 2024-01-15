@@ -210,11 +210,7 @@ class TimeSeriesId:
         elif self.group == TimeSeriesIdGroup.Structure:
             from ..query import QueryDataStructure
 
-            return QueryDataStructure(
-                quantity=self.quantity,
-                structure=self.name,
-                name=self.tag,
-            )
+            return QueryDataStructure.from_timeseries_id(self)
         else:
             raise ValueError(f"No query exists for group: {self.group}")
 
