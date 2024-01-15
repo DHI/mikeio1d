@@ -12,6 +12,7 @@ from ..custom_exceptions import InvalidStructure
 from ..various import NAME_DELIMITER
 from .query_data_reach import QueryDataReach
 from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataStructure(QueryDataReach):
@@ -21,6 +22,8 @@ class QueryDataStructure(QueryDataReach):
     ----------
     quantity: str
         e.g. 'DischargeInStructure'. Call res1d.quantities to get all quantities.
+    structure: str
+        Structure name.
     name: str
         Reach name where the structure is located.
     chainage: float
@@ -36,6 +39,10 @@ class QueryDataStructure(QueryDataReach):
     def __init__(self, quantity, structure=None, name=None, chainage=None, validate=True):
         super().__init__(quantity, name, chainage, validate=validate)
         self._structure = structure
+
+    @property
+    def structure(self):
+        return self._structure
 
     def get_values(self, res1d: Res1D):
         self._check_invalid_quantity(res1d)
@@ -54,26 +61,28 @@ class QueryDataStructure(QueryDataReach):
         return self.from_dotnet_to_python(values)
 
     def to_timeseries_id(self) -> TimeSeriesId:
-        name = NAME_DELIMITER.join([self._structure, self.name])
+        chainage = self.chainage
+        if chainage is None or chainage == "":
+            chainage = float("nan")
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group="ReachItem",
-            name=name,
-            chainage=self.chainage,
+            group=TimeSeriesIdGroup.Structure,
+            name=self.structure,
+            chainage=chainage,
+            tag=self.name,
         )
         return tsid
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataStructure:
-        structure, name = timeseries_id.name.split(NAME_DELIMITER)
         chainage = timeseries_id.chainage
         if isnan(chainage):
             chainage = None
         return QueryDataStructure(
-            timeseries_id.quantity,
-            structure,
-            name,
-            chainage,
+            quantity=timeseries_id.quantity,
+            structure=timeseries_id.name,
+            name=timeseries_id.tag,
+            chainage=chainage,
             validate=False,
         )
 
