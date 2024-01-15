@@ -253,20 +253,40 @@ class ResultReader:
 
     # region Methods for LTS result files
 
-    def update_time_quantities(self, df):
+    def update_time_quantities(self, df: pd.DataFrame):
         if not self.is_lts_result_file():
             return
 
         simulation_start = from_dotnet_datetime(self.data.StartTime)
-        for label in df:
+        event_time_columns = [c for c in df.columns if self._is_lts_event_time_column(c)]
+        for column in event_time_columns:
+            seconds_after_simulation_start_array = df[column].to_numpy()
+            times = [
+                simulation_start + datetime.timedelta(seconds=float(sec))
+                for sec in seconds_after_simulation_start_array
+            ]
+            df[column] = times
+
+    def _is_lts_event_time_column(self, quantity_column: str | TimeSeriesId | tuple) -> bool:
+        """Determines if the quantity_column is the LTS event time column.
+
+        Parameters
+        ----------
+        quantity_column : str | TimeSeriesId | tuple
+            The column header containing the event statistic quantities.
+        """
+        if isinstance(quantity_column, str):
             time_suffix = f"Time{self.col_name_delimiter}"
-            if time_suffix in label:
-                seconds_after_simulation_start_array = df[label].to_numpy()
-                times = [
-                    simulation_start + datetime.timedelta(seconds=float(sec))
-                    for sec in seconds_after_simulation_start_array
-                ]
-                df[label] = times
+            return quantity_column.endswith(time_suffix)
+        elif isinstance(quantity_column, TimeSeriesId):
+            quantity = quantity_column.quantity
+            return quantity.endswith("Time")
+        elif isinstance(quantity_column, tuple):
+            tsid = TimeSeriesId.from_tuple(quantity_column)
+            quantity = tsid.quantity
+            return quantity.endswith("Time")
+        else:
+            raise TypeError(f"Unsupported type {type(quantity_column)} for quantity_column.")
 
     def is_lts_result_file(self):
         # For pythonnet version > 3.0 it is possible to call
