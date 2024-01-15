@@ -258,14 +258,18 @@ class ResultReader:
             return
 
         simulation_start = from_dotnet_datetime(self.data.StartTime)
-        event_time_columns = [c for c in df.columns if self._is_lts_event_time_column(c)]
-        for column in event_time_columns:
-            seconds_after_simulation_start_array = df[column].to_numpy()
-            times = [
-                simulation_start + datetime.timedelta(seconds=float(sec))
-                for sec in seconds_after_simulation_start_array
+
+        # Loop over all columns by number and update them by number as well.
+        for i in range(len(df.columns)):
+            if not self._is_lts_event_time_column(df.columns[i]):
+                continue
+
+            seconds_since_simulation_started = df.iloc[:, i]
+            datetime_since_simulation_started = [
+                simulation_start + datetime.timedelta(seconds=s)
+                for s in seconds_since_simulation_started
             ]
-            df[column] = times
+            df.iloc[:, i] = datetime_since_simulation_started
 
     def _is_lts_event_time_column(self, quantity_column: str | TimeSeriesId | tuple) -> bool:
         """Determines if the quantity_column is the LTS event time column.
@@ -277,7 +281,7 @@ class ResultReader:
         """
         if isinstance(quantity_column, str):
             time_suffix = f"Time{self.col_name_delimiter}"
-            return quantity_column.endswith(time_suffix)
+            return time_suffix in quantity_column
         elif isinstance(quantity_column, TimeSeriesId):
             quantity = quantity_column.quantity
             return quantity.endswith("Time")
