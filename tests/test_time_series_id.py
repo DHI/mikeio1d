@@ -5,6 +5,7 @@ import pandas as pd
 from mikeio1d import Res1D
 
 from mikeio1d.quantities import TimeSeriesId
+from mikeio1d.quantities import TimeSeriesIdGroup
 
 from mikeio1d.result_network.data_entry import DataEntry
 from mikeio1d.result_network.result_quantity import ResultQuantity
@@ -25,7 +26,7 @@ def time_series_id():
     """Fictional TimeSeriesId for testing."""
     return TimeSeriesId(
         quantity="Discharge",
-        group="NodeItem",
+        group="Node",
         name="Node1",
         chainage=10.0,
         tag="Tag1",
@@ -39,7 +40,7 @@ def time_series_id_valid_river_res1d():
     """TimeSeriesId for a that exists in network river res1d results."""
     return TimeSeriesId(
         quantity="Discharge",
-        group="ReachItem",
+        group="Reach",
         name="basin_left1",
         chainage=1.002,
     )
@@ -50,7 +51,7 @@ def time_series_id_invalid_river_res1d():
     """TimeSeriesId for a that does not exist in network river res1d results."""
     return TimeSeriesId(
         quantity="I do not exist",
-        group="ReachItem",
+        group="Reach",
         name="I do not exist",
         chainage=1.002,
         tag="Tag1",
@@ -62,7 +63,7 @@ def time_series_id_invalid_river_res1d():
 def test_time_series_id_equality(time_series_id, time_series_id_valid_river_res1d):
     time_series_id_equal = TimeSeriesId(
         quantity="Discharge",
-        group="NodeItem",
+        group="Node",
         name="Node1",
         chainage=10.0,
         tag="Tag1",
@@ -78,10 +79,33 @@ def test_time_series_id_equality(time_series_id, time_series_id_valid_river_res1
     assert time_series_id != time_series_id_valid_river_res1d
 
 
+def test_timeseries_id_equality_with_groups():
+    tsid1 = TimeSeriesId(
+        quantity="Discharge",
+        group="Node",
+        name="Node1",
+    )
+    tsid2 = TimeSeriesId(
+        quantity="Discharge",
+        group=TimeSeriesIdGroup.Node,
+        name="Node1",
+    )
+    assert tsid1 == tsid2
+
+
 def test_time_series_id_hash(time_series_id):
     time_series_id2 = TimeSeriesId(
         quantity="Discharge",
-        group="NodeItem",
+        group="Node",
+        name="Node1",
+        chainage=10.0,
+        tag="Tag1",
+        duplicate=0,
+        derived=False,
+    )
+    time_series_id3 = TimeSeriesId(
+        quantity="Discharge",
+        group=TimeSeriesIdGroup.Node,
         name="Node1",
         chainage=10.0,
         tag="Tag1",
@@ -89,6 +113,7 @@ def test_time_series_id_hash(time_series_id):
         derived=False,
     )
     assert hash(time_series_id) == hash(time_series_id2)
+    assert hash(time_series_id) == hash(time_series_id3)
     assert hash(time_series_id) != hash(time_series_id_valid_river_res1d)
 
 
@@ -101,7 +126,7 @@ def test_time_series_id_is_valid(
 
 
 def test_time_series_id_astuple(time_series_id):
-    expected_tuple = ("Discharge", "NodeItem", "Node1", 10.0, "Tag1", 0, False)
+    expected_tuple = ("Discharge", "Node", "Node1", 10.0, "Tag1", 0, False)
     assert time_series_id.astuple() == expected_tuple
 
 
@@ -119,7 +144,7 @@ def test_time_series_id_to_m1d(res1d_river_network, time_series_id_valid_river_r
 def test_time_series_id_to_m1d_errors_for_derived_quantity(res1d_river_network):
     tsid = TimeSeriesId(
         quantity="Discharge",
-        group="ReachItem",
+        group="Reach",
         name="basin_left1",
         chainage=1.002,
         derived=True,
@@ -142,7 +167,7 @@ def test_time_series_id_to_result_quantity(res1d_river_network, time_series_id_v
 def test_time_series_id_to_result_quantity_errors_for_derived_quantity(res1d_river_network):
     tsid = TimeSeriesId(
         quantity="Discharge",
-        group="ReachItem",
+        group="Reach",
         name="basin_left1",
         chainage=1.002,
         derived=True,
@@ -159,26 +184,28 @@ def assert_queries_equal(query1: QueryData, query2: QueryData):
     assert query1.quantity == query2.quantity
     if hasattr(query1, "chainage"):
         assert query1.chainage == query2.chainage
+    if hasattr(query1, "structure"):
+        assert query1.structure == query2.structure
 
 
 @pytest.mark.parametrize(
     ["tsid", "expected_query"],
     [
-        (TimeSeriesId("WaterLevel", "NodeItem", "Node1"), QueryDataNode("WaterLevel", "Node1")),
+        (TimeSeriesId("WaterLevel", "Node", "Node1"), QueryDataNode("WaterLevel", "Node1")),
         (
-            TimeSeriesId("WaterLevel", "ReachItem", "Reach1", 10.0),
+            TimeSeriesId("WaterLevel", "Reach", "Reach1", 10.0),
             QueryDataReach("WaterLevel", "Reach1", 10.0),
         ),
         (
-            TimeSeriesId("WaterLevel", "CatchmentItem", "Catchment1"),
+            TimeSeriesId("WaterLevel", "Catchment", "Catchment1"),
             QueryDataCatchment("WaterLevel", "Catchment1"),
         ),
         (
-            TimeSeriesId("WaterLevel", "GlobalItem"),
+            TimeSeriesId("WaterLevel", "Global"),
             QueryDataGlobal("WaterLevel"),
         ),
         (
-            TimeSeriesId("Discharge", "ReachStructureItem", "Structure1", tag="River"),
+            TimeSeriesId("Discharge", "Structure", "Structure1", tag="River"),
             QueryDataStructure("Discharge", "Structure1", "River"),
         ),
     ],
@@ -187,10 +214,11 @@ def test_time_series_id_to_query(tsid, expected_query):
     query = tsid.to_query()
     assert_queries_equal(query, expected_query)
 
+
 def test_time_series_id_to_query_errors_for_derived_quantity():
     tsid = TimeSeriesId(
         quantity="Discharge",
-        group="ReachItem",
+        group="Reach",
         name="basin_left1",
         chainage=1.002,
         derived=True,
@@ -220,21 +248,21 @@ def test_time_series_id_chainage_nan():
     with pytest.raises(ValueError):
         TimeSeriesId(
             quantity="Discharge",
-            group="ReachItem",
+            group="Reach",
             name="basin_left1",
             chainage=None,
         )
     with pytest.raises(ValueError):
         TimeSeriesId(
             quantity="Discharge",
-            group="ReachItem",
+            group="Reach",
             name="basin_left1",
             chainage="",
         )
     with pytest.raises(ValueError):
         TimeSeriesId(
             quantity="Discharge",
-            group="ReachItem",
+            group="Reach",
             name="basin_left1",
             chainage="chainage: 100.0",
         )
@@ -243,19 +271,19 @@ def test_time_series_id_chainage_nan():
 @pytest.mark.parametrize(
     ["query", "expected_tsid"],
     [
-        (QueryDataNode("Discharge", "Node1"), TimeSeriesId("Discharge", "NodeItem", "Node1")),
+        (QueryDataNode("Discharge", "Node1"), TimeSeriesId("Discharge", "Node", "Node1")),
         (
             QueryDataReach("Discharge", "Reach1", 10.0),
-            TimeSeriesId("Discharge", "ReachItem", "Reach1", 10.0),
+            TimeSeriesId("Discharge", "Reach", "Reach1", 10.0),
         ),
         (
             QueryDataCatchment("Discharge", "Catchment1"),
-            TimeSeriesId("Discharge", "CatchmentItem", "Catchment1"),
+            TimeSeriesId("Discharge", "Catchment", "Catchment1"),
         ),
-        (QueryDataGlobal("Discharge"), TimeSeriesId("Discharge", "GlobalItem")),
+        (QueryDataGlobal("Discharge"), TimeSeriesId("Discharge", "Global")),
         (
             QueryDataStructure("Discharge", "Structure1", "River"),
-            TimeSeriesId("Discharge", "ReachStructureItem", "Structure1", tag="River"),
+            TimeSeriesId("Discharge", "Structure", "Structure1", tag="River"),
         ),
     ],
 )
@@ -265,7 +293,7 @@ def test_time_series_id_from_query(query, expected_tsid):
 
 
 def test_time_series_id_from_tuple():
-    t = ("Discharge", "NodeItem", "Node1", 10.0, "Tag1", 0, False)
+    t = ("Discharge", "Node", "Node1", 10.0, "Tag1", 0, False)
     time_series_id = TimeSeriesId.from_tuple(t)
     assert time_series_id.name == "Node1"
     assert time_series_id.quantity == "Discharge"
@@ -275,7 +303,7 @@ def test_time_series_id_to_multiindex():
     time_series_ids = [
         TimeSeriesId(
             quantity="Discharge",
-            group="NodeItem",
+            group="Node",
             name="Node1",
             chainage=10.0,
             tag="Tag1",
@@ -284,7 +312,7 @@ def test_time_series_id_to_multiindex():
         ),
         TimeSeriesId(
             quantity="Discharge",
-            group="NodeItem",
+            group="Node",
             name="Node2",
             chainage=20.0,
             tag="Tag2",
@@ -294,15 +322,15 @@ def test_time_series_id_to_multiindex():
     ]
     multiindex = TimeSeriesId.to_multiindex(time_series_ids)
     assert len(multiindex) == 2
-    assert multiindex[0] == ("Discharge", "NodeItem", "Node1", 10.0, "Tag1", 0, False)
-    assert multiindex[1] == ("Discharge", "NodeItem", "Node2", 20.0, "Tag2", 0, False)
+    assert multiindex[0] == ("Discharge", "Node", "Node1", 10.0, "Tag1", 0, False)
+    assert multiindex[1] == ("Discharge", "Node", "Node2", 20.0, "Tag2", 0, False)
 
 
 def test_time_series_id_from_multiindex():
     multiindex = pd.MultiIndex.from_tuples(
         [
-            ("Discharge", "NodeItem", "Node1", 10.0, "Tag1", 0, False),
-            ("Discharge", "NodeItem", "Node2", 20.0, "Tag2", 0, False),
+            ("Discharge", "Node", "Node1", 10.0, "Tag1", 0, False),
+            ("Discharge", "Node", "Node2", 20.0, "Tag2", 0, False),
         ],
         names=["quantity", "group", "name", "chainage", "tag", "duplicate", "derived"],
     )
@@ -323,7 +351,7 @@ def test_time_series_id_from_dataset_dataitem_and_element(reach: ResultReach):
     )
     expected_time_series_id = TimeSeriesId(
         quantity="WaterLevel",
-        group="ReachItem",
+        group="Reach",
         name="100l1",
         chainage=0,
         tag="",

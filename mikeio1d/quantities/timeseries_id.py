@@ -11,10 +11,51 @@ if TYPE_CHECKING:
 
 import dataclasses
 from dataclasses import dataclass
+from enum import Enum
 import pandas as pd
 
 from ..various import NAME_DELIMITER
 from ..result_network.data_entry import DataEntry
+
+
+class TimeSeriesIdGroup(str, Enum):
+    """Enumeration of all possible groups for a TimeSeriesId."""
+
+    Global = "Global"
+    Node = "Node"
+    Reach = "Reach"
+    Catchment = "Catchment"
+    Structure = "Structure"
+
+    def __hash__(self) -> int:
+        return self.value.__hash__()
+
+    def __repr__(self) -> str:
+        return self.value.__repr__()
+
+    def __str__(self) -> str:
+        return self.value.__str__()
+
+    @staticmethod
+    def from_m1d_data_item(m1d_data_item) -> str:
+        """Get the group of a TimeSeriesId from an IRes1DDataItem object."""
+        m1d_group = m1d_data_item.ItemTypeGroup.ToString()
+        if m1d_group == "GlobalItem":
+            return TimeSeriesIdGroup.Global.value
+        elif m1d_group == "NodeItem":
+            return TimeSeriesIdGroup.Node.value
+        elif m1d_group == "ReachItem":
+            # assume that if ItemId is not empty, it's a structure
+            if m1d_data_item.ItemId:
+                return TimeSeriesIdGroup.Structure.value
+            else:
+                return TimeSeriesIdGroup.Reach.value
+        elif m1d_group == "CatchmentItem":
+            return TimeSeriesIdGroup.Catchment.value
+        elif m1d_group == "ReachStructureItem":
+            return TimeSeriesIdGroup.Structure.value
+        else:
+            raise ValueError(f"Unknown group: {m1d_data_item.ItemTypeGroup}")
 
 
 @dataclass(frozen=True)
@@ -25,20 +66,24 @@ class TimeSeriesId:
 
     quantity: str = ""
     """The name of the physical quantity (e.g. 'Discharge')"""
-    group: str = ""
-    """Dataset group the timeseries is associated with. Can be all enumerations of ItemTypeGroup (e.g. NodeItem, ReachItem, etc.)"""
+    group: str | TimeSeriesIdGroup = ""
+    """Dataset group the timeseries is associated with. Can be all enumerations of TimeSeriesIdGroup (e.g. 'Node', 'Reach', etc.)"""
     name: str = ""
     """The unique name of the network element where the timeseries exists."""
     chainage: float = float("nan")
     """Chainage of the GridPoint that this data is assosciated with (only relevant for groups of type reach)."""
     tag: str = ""
-    """An additional tag used to further define uniqueness where needed."""
+    """An additional tag used to further define uniqueness where needed (e.g. river that structure exists on)."""
     duplicate: int = 0
     """A fallback to enumerate ids where duplicate timeseries are found."""
     derived: bool = False
     """Whether the timeseries is derived rather than saved in the result file."""
 
     def __post_init__(self):
+        self._validate_group()
+        self._validate_chainage()
+
+    def _validate_chainage(self):
         if self.chainage is None:
             raise ValueError("chainage cannot be None: use float('nan') instead")
         elif self.chainage == "":
@@ -47,6 +92,11 @@ class TimeSeriesId:
             float(self.chainage)
         except ValueError:
             raise ValueError("chainage must be a float or an object that can be cast to a float")
+
+    def _validate_group(self):
+        if self.group in TimeSeriesIdGroup:
+            return
+        raise ValueError(f"Invalid group for TimeSeriesId: {self.group}")
 
     def __eq__(self, other: TimeSeriesId) -> bool:
         """Checks equality between two TimeSeriesId objects."""
@@ -140,29 +190,30 @@ class TimeSeriesId:
             raise ValueError("Cannot convert derived TimeSeriesId to QueryData")
 
         # Note: imports are here to avoid circular imports
-        if self.group == "GlobalItem":
+        if self.group == TimeSeriesIdGroup.Global:
             from ..query import QueryDataGlobal
 
             return QueryDataGlobal.from_timeseries_id(self)
-        elif self.group == "NodeItem":
+        elif self.group == TimeSeriesIdGroup.Node:
             from ..query import QueryDataNode
 
             return QueryDataNode.from_timeseries_id(self)
 
-        elif self.group == "ReachItem":
+        elif self.group == TimeSeriesIdGroup.Reach:
             from ..query import QueryDataReach
 
             return QueryDataReach.from_timeseries_id(self)
-        elif self.group == "CatchmentItem":
+        elif self.group == TimeSeriesIdGroup.Catchment:
             from ..query import QueryDataCatchment
 
             return QueryDataCatchment.from_timeseries_id(self)
-        elif self.group == "ReachStructureItem":
+        elif self.group == TimeSeriesIdGroup.Structure:
             from ..query import QueryDataStructure
 
             return QueryDataStructure(
                 quantity=self.quantity,
                 structure=self.name,
+                name=self.tag,
             )
         else:
             raise ValueError(f"No query exists for group: {self.group}")
@@ -272,9 +323,7 @@ class TimeSeriesId:
             The index of the element within the IRes1DDataItem."""
 
         quantity = m1d_dataitem.Quantity.Id
-        group = m1d_dataitem.ItemTypeGroup.ToString()
-        item_id = m1d_dataitem.ItemId
-        name = TimeSeriesId.get_dataset_name(m1d_dataset, item_id)
+        group = TimeSeriesIdGroup.from_m1d_data_item(m1d_dataitem)
 
         chainage = float("nan")
         if m1d_dataitem.IndexList is not None:
@@ -283,13 +332,22 @@ class TimeSeriesId:
 
         # DataItem objects on this DataSet have an ItemTypeGroup set to GlobalItem
         if "DHI.Mike1D.ResultDataAccess.Epanet.Res1DTypedReach" in repr(m1d_dataset.__class__):
-            group = "ReachItem"
+            group = TimeSeriesIdGroup.Reach
+
+        item_id = m1d_dataitem.ItemId
+        if group == TimeSeriesIdGroup.Structure:
+            name = item_id
+            tag = TimeSeriesId.get_dataset_name(m1d_dataset, None)
+        else:
+            name = TimeSeriesId.get_dataset_name(m1d_dataset, item_id)
+            tag = ""
 
         return TimeSeriesId(
             quantity=quantity,
             group=group,
             name=name,
             chainage=chainage,
+            tag=tag,
         )
 
     @staticmethod

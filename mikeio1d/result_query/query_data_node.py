@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 from .query_data import QueryData
 from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataNode(QueryData):
@@ -41,7 +42,7 @@ class QueryDataNode(QueryData):
     def to_timeseries_id(self) -> TimeSeriesId:
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group="NodeItem",
+            group=TimeSeriesIdGroup.Node,
             name=self.name,
         )
         return tsid

@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 from .query_data import QueryData
 from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataGlobal(QueryData):
@@ -40,7 +41,7 @@ class QueryDataGlobal(QueryData):
     def to_timeseries_id(self) -> TimeSeriesId:
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group="GlobalItem",
+            group=TimeSeriesIdGroup.Global,
         )
         return tsid
 

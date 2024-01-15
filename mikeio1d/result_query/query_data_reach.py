@@ -10,6 +10,7 @@ from math import isnan
 from ..various import NAME_DELIMITER
 from .query_data import QueryData
 from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataReach(QueryData):
@@ -66,7 +67,7 @@ class QueryDataReach(QueryData):
 
     def to_timeseries_id(self) -> TimeSeriesId:
         quantity = self.quantity
-        group = "ReachItem"
+        group = TimeSeriesIdGroup.Reach
         name = self.name
         if self.chainage is not None:
             return TimeSeriesId(
