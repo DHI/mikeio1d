@@ -94,7 +94,7 @@ class TimeSeriesId:
             raise ValueError("chainage must be a float or an object that can be cast to a float")
 
     def _validate_group(self):
-        if self.group in TimeSeriesIdGroup:
+        if self.group in set(TimeSeriesIdGroup):
             return
         raise ValueError(f"Invalid group for TimeSeriesId: {self.group}")
 
