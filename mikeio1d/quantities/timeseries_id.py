@@ -38,6 +38,16 @@ class TimeSeriesId:
     derived: bool = False
     """Whether the timeseries is derived rather than saved in the result file."""
 
+    def __post_init__(self):
+        if self.chainage is None:
+            raise ValueError("chainage cannot be None: use float('nan') instead")
+        elif self.chainage == "":
+            raise ValueError("chainage cannot be empty: use float('nan') instead")
+        try:
+            float(self.chainage)
+        except ValueError:
+            raise ValueError("chainage must be a float or an object that can be cast to a float")
+
     def __eq__(self, other: TimeSeriesId) -> bool:
         """Checks equality between two TimeSeriesId objects."""
         if other is self:
