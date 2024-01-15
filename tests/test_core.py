@@ -53,10 +53,9 @@ def test_mikeio1d_generates_dataframe_reading_time_series_ids(result_reader, ext
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue
-        column_mode = "query" if result_reader == "copier" else None
         res = Res1D(path, result_reader_type=result_reader)
         sample_tsids = sample_random_time_series_ids(res)
-        df = res.read(sample_tsids, column_mode=column_mode)
+        df = res.read(sample_tsids)
         assert len(df) > 0
 
 
@@ -67,8 +66,7 @@ def test_mikeio1d_generates_dataframe_reading_queries(result_reader, extension):
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue
-        column_mode = "query" if result_reader == "copier" else None
         res = Res1D(path, result_reader_type=result_reader)
         sample_queries = sample_random_queries(res)
-        df = res.read(sample_queries, column_mode=column_mode)
+        df = res.read(sample_queries)
         assert len(df) > 0
