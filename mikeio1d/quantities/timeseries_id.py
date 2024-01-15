@@ -236,18 +236,25 @@ class TimeSeriesId:
     @staticmethod
     def from_multiindex(index: pd.MultiIndex) -> List[TimeSeriesId]:
         """Convert a pandas MultiIndex to a list of TimeSeriesId objects."""
-        return [
-            TimeSeriesId(
-                quantity=quantity,
-                group=group,
-                name=name,
-                chainage=chainage,
-                tag=tag,
-                duplicate=duplicate,
-                derived=derived,
+        if isinstance(index[0], tuple):
+            return [
+                TimeSeriesId(
+                    quantity=quantity,
+                    group=group,
+                    name=name,
+                    chainage=chainage,
+                    tag=tag,
+                    duplicate=duplicate,
+                    derived=derived,
+                )
+                for quantity, group, name, chainage, tag, duplicate, derived in index
+            ]
+        elif isinstance(index[0], TimeSeriesId):
+            return index.to_list()
+        else:
+            raise ValueError(
+                f"Cannot convert index of type '{type(index[0])}' to list of TimeSeriesId objects"
             )
-            for quantity, group, name, chainage, tag, duplicate, derived in index
-        ]
 
     @staticmethod
     def from_dataset_dataitem_and_element(

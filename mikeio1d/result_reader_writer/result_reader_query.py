@@ -16,6 +16,7 @@ import pandas as pd
 
 from ..dotnet import pythonnet_implementation as impl
 from .result_reader import ResultReader
+from ..quantities import TimeSeriesId
 
 
 class ResultReaderQuery(ResultReader):
@@ -25,12 +26,13 @@ class ResultReaderQuery(ResultReader):
     """
 
     def read(
-        self, queries: List[QueryData], column_mode: Optional[ColumnMode] = None
+        self, timeseries_ids: List[TimeSeriesId], column_mode: Optional[ColumnMode] = None
     ) -> pd.DataFrame:
         if column_mode is not None:
             raise NotImplementedError(
                 f"ResultReaderQuery does not support column_mode {column_mode}."
             )
+        queries = [t.to_query() for t in timeseries_ids]
 
         dfs = []
         for query in queries:
