@@ -7,6 +7,8 @@ if TYPE_CHECKING:
     from typing import Optional
 
 from enum import Enum
+from abc import ABC
+from abc import abstractmethod
 
 import os.path
 import pandas as pd
@@ -38,7 +40,7 @@ class ColumnMode(str, Enum):
     """Uses a column Index with headers as TimeSeriesId objects"""
 
 
-class ResultReader:
+class ResultReader(ABC):
     """
     Class for reading the ResultData object TimeData
     into Pandas data frame.
@@ -172,6 +174,7 @@ class ResultReader:
 
     # endregion File loading
 
+    @abstractmethod
     def read(
         self,
         timeseries_ids: List[TimeSeriesId] = None,
@@ -192,8 +195,9 @@ class ResultReader:
         -------
         pd.DataFrame
         """
-        return None
+        ...
 
+    @abstractmethod
     def read_all(self, column_mode: Optional[str | ColumnMode]) -> pd.DataFrame:
         """
         Read all time series data into a data frame.
@@ -207,7 +211,7 @@ class ResultReader:
         -------
         pd.DataFrame
         """
-        return None
+        ...
 
     def is_data_set_included(self, data_set):
         """Skip filtered data sets"""
