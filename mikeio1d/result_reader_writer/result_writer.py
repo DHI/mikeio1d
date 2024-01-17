@@ -96,14 +96,16 @@ class ResultWriter:
         if isinstance(values, pd.DataFrame):
             values = values.iloc[:, 0]
 
-        length = len(values)
-        if length != len(time_index):
-            raise ValueError(
-                f"Length of values ({length}) and time_index ({len(time_index)}) must be equal."
-            )
+        self._validate_time_index_values_pair(time_index, values)
 
-        for i in range(length):
+        for i in range(len(values)):
             time = time_index[i]
             value = float(values[i])
             timestep_index = res1d_time_index.get_loc(time)
             data_item.TimeData.SetValue(timestep_index, element_index, value)
+
+    def _validate_time_index_values_pair(self, time_index, values):
+        if len(time_index) != len(values):
+            raise ValueError(
+                f"Length of time_index ({len(time_index)}) and values ({len(values)}) must be equal."
+            )
