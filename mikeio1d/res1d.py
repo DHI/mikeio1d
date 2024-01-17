@@ -32,8 +32,11 @@ from .query import QueryDataReach  # noqa: F401
 from .query import QueryDataStructure  # noqa: F401
 from .query import QueryDataGlobal  # noqa: F401
 
+from .result_query.query_data_adapter import QueryDataAdapter
+
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
+from .various import make_list_if_not_iterable
 
 from .quantities import TimeSeriesId
 
@@ -164,44 +167,14 @@ class Res1D:
         if queries is None:
             return self.result_network.queue
 
-        timeseries_ids = self._validate_queries_as_timeseries_ids(queries)
+        queries = make_list_if_not_iterable(queries)
 
-        return timeseries_ids
-
-    def _validate_queries_as_timeseries_ids(
-        self, queries: List[QueryData] | List[TimeSeriesId]
-    ) -> List[TimeSeriesId]:
-        """Validates the user supplied query(ies) and converts them to a TimeSeriesId objects.
-
-        Parameters
-        ----------
-        queries : List[QueryData] | List[TimeSeriesId]
-            List of queries or time series ids supplied in read() method.
-
-        Returns
-        -------
-        List of TimeSeriesId objects.
-        """
-        try:
-            iter(queries)
-        except TypeError:
-            queries = [queries]
-
-        is_already_timeseries_id = isinstance(queries[0], TimeSeriesId)
-        if is_already_timeseries_id:
+        is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
+        if is_already_time_series_ids:
             return queries
 
-        timeseries_ids = []
-        for q in queries:
-            q._update_query(self)
-            q._check_invalid_quantity(self)
-            tsid = q.to_timeseries_id()
-            if tsid.is_valid(self):
-                timeseries_ids.append(tsid)
-            else:
-                q._check_invalid_values(None)
-
-        return timeseries_ids
+        queries = QueryDataAdapter.convert_queries_to_time_series_ids(self, queries)
+        return queries
 
     # endregion Private methods
 
