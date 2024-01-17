@@ -6,6 +6,8 @@ if TYPE_CHECKING:
     from typing import List
     from typing import Optional
 
+    from datetime import datetime
+
     import pandas as pd
 
     from .query import QueryData
@@ -251,26 +253,28 @@ class Res1D:
         self.result_network.queue.clear()
 
     @property
-    def time_index(self):
+    def time_index(self) -> pd.DatetimeIndex:
         """pandas.DatetimeIndex of the time index."""
         return self.result_reader.time_index
 
     @property
-    def start_time(self):
+    def start_time(self) -> datetime:
+        """Start time of the result file."""
         if self._start_time is not None:
             return self._start_time
 
         return from_dotnet_datetime(self.data.StartTime)
 
     @property
-    def end_time(self):
+    def end_time(self) -> datetime:
+        """End time of the result file."""
         if self._end_time is not None:
             return self._end_time
 
         return from_dotnet_datetime(self.data.EndTime)
 
     @property
-    def quantities(self):
+    def quantities(self) -> List[str]:
         """Quantities in res1d file."""
         return self.result_reader.quantities
 
@@ -343,7 +347,7 @@ class Res1D:
 
     # endregion Query wrapper
 
-    def modify(self, data_frame, file_path=None):
+    def modify(self, data_frame: pd.DataFrame, file_path=None):
         """
         Modifies the ResultData object TimeData based on the provided data frame.
 
@@ -410,14 +414,29 @@ class Res1D:
         if self.clear_queue_after_reading:
             self.clear_queue()
 
-    def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
+    def to_csv(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+    ):
         """Extract to csv file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
-    def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
+    def to_dfs0(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+    ):
         """Extract to dfs0 file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
-    def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
+    def to_txt(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+    ):
         """Extract to txt file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
