@@ -66,7 +66,9 @@ def make_list_if_not_iterable(obj) -> list:
     list
         List with one element if obj is not iterable, otherwise obj.
     """
-    if not hasattr(obj, "__iter__"):
+    try:
+        iter(obj)
+    except TypeError:
         return [obj]
     else:
         return obj
