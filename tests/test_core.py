@@ -10,6 +10,8 @@ from mikeio1d import Res1D
 from mikeio1d.quantities import TimeSeriesId
 from mikeio1d.query import QueryData
 
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
+
 
 def testdata_name():
     import dataclasses
@@ -24,7 +26,7 @@ def test_mikeio1d_generates_expected_dataframe_for_filetype_read_all(result_read
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue
-        column_mode = "query" if result_reader == "copier" else None
+        column_mode = ColumnMode.STRING if result_reader == "copier" else None
         df = Res1D(path, result_reader_type=result_reader).read(column_mode=column_mode)
         df = df.loc[
             :, ~df.columns.duplicated()

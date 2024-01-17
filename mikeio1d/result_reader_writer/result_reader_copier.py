@@ -117,7 +117,7 @@ class ResultReaderCopier(ResultReader):
             return TimeSeriesId.to_multiindex(timeseries_ids)
         elif column_mode == ColumnMode.TIMESERIES:
             return pd.Index(timeseries_ids)
-        elif column_mode == ColumnMode.QUERY:
+        elif column_mode == ColumnMode.STRING:
             queries = [t.to_query() for t in timeseries_ids]
             return pd.Index([str(q) for q in queries])
         else:

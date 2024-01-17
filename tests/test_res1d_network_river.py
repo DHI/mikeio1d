@@ -110,7 +110,7 @@ def test_structure_attributes(test_file):
             ).T.max(),
             3,
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["DischargeInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 11.018
 
@@ -121,7 +121,7 @@ def test_structure_attributes(test_file):
             ).T.max(),
             3,
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["DischargeInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 13.543
 
@@ -132,7 +132,7 @@ def test_structure_attributes(test_file):
             ).T.max(),
             3,
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["FlowAreaInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 9.851
 
@@ -143,7 +143,7 @@ def test_structure_attributes(test_file):
             ).T.max(),
             3,
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["FlowAreaInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 11.252
 
@@ -240,7 +240,8 @@ def test_all_structures_attributes(test_file):
 
 
 @pytest.mark.parametrize(
-    "column_mode, expected_exception", [("all", None), ("timeseries", None), ("query", ValueError)]
+    "column_mode, expected_exception",
+    [(ColumnMode.ALL, None), (ColumnMode.TIMESERIES, None), (ColumnMode.STRING, ValueError)],
 )
 def test_res1d_modification(test_file, column_mode, expected_exception):
     res1d = test_file
@@ -282,7 +283,8 @@ def test_res1d_modification(test_file, column_mode, expected_exception):
 
 
 @pytest.mark.parametrize(
-    "column_mode, expected_exception", [("all", None), ("timeseries", None), ("query", ValueError)]
+    "column_mode, expected_exception",
+    [(ColumnMode.ALL, None), (ColumnMode.TIMESERIES, None), (ColumnMode.STRING, ValueError)],
 )
 def test_res1d_modification_filtered(test_file, column_mode, expected_exception):
     res1d = test_file

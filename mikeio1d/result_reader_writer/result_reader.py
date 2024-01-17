@@ -34,10 +34,10 @@ class ColumnMode(str, Enum):
 
     ALL = "all"
     """Uses a column MultiIndex with all possible metadata."""
-    QUERY = "query"
-    """Uses a column Index with headers as the string representation of QueryData objects."""
     TIMESERIES = "timeseries"
     """Uses a column Index with headers as TimeSeriesId objects"""
+    STRING = "str"
+    """Uses a column Index with headers as the string representation of QueryData objects."""
 
 
 class ResultReader(ABC):
@@ -105,11 +105,11 @@ class ResultReader(ABC):
 
         self.quantities = [quantity.Id for quantity in self.data.Quantities]
 
-        self.column_mode: ColumnMode = ColumnMode.QUERY
+        self.column_mode: ColumnMode = ColumnMode.STRING
         """Specifies the type of column index of returned DataFrames.
         
         'all' - Uses a column MultiIndex with all possible metadata
-        'query' - Uses a column Index with headers as the string representation of QueryData objects
+        'str' - Uses a column Index with headers as the string representation of QueryData objects
         'timeseries' - Uses a column Index with headers as TimeSeriesId objects
         """
 
