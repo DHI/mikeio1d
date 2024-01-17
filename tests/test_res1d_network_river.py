@@ -239,8 +239,12 @@ def test_all_structures_attributes(test_file):
     assert pytest.approx(max_discharge) == 100.247
 
 
-def test_res1d_modification(test_file):
+@pytest.mark.parametrize(
+    "column_mode, expected_exception", [("all", None), ("timeseries", None), ("query", ValueError)]
+)
+def test_res1d_modification(test_file, column_mode, expected_exception):
     res1d = test_file
+    res1d.result_reader.column_mode = column_mode
 
     # Test the reading of all the data into data frame
     df = res1d.read()
@@ -254,6 +258,12 @@ def test_res1d_modification(test_file):
     df2 = df.multiply(2.0)
     file_path = res1d.data.Connection.FilePath.Path
     file_path = file_path.replace("network_river.res1d", "network_river.mod.res1d")
+
+    if expected_exception is not None:
+        with pytest.raises(expected_exception):
+            res1d.modify(df2, file_path=file_path)
+        return
+
     res1d.modify(df2, file_path=file_path)
 
     df_mod = res1d.read()
@@ -271,8 +281,12 @@ def test_res1d_modification(test_file):
     assert pytest.approx(max_value_new) == 2.0 * max_value
 
 
-def test_res1d_modification_filtered(test_file):
+@pytest.mark.parametrize(
+    "column_mode, expected_exception", [("all", None), ("timeseries", None), ("query", ValueError)]
+)
+def test_res1d_modification_filtered(test_file, column_mode, expected_exception):
     res1d = test_file
+    res1d.result_reader.column_mode = column_mode
 
     # Test the reading of all the data into data frame
     df = res1d.read()
@@ -283,6 +297,12 @@ def test_res1d_modification_filtered(test_file):
 
     # Test the modification of ResultData
     df2 = df.multiply(2.0)
+
+    if expected_exception is not None:
+        with pytest.raises(expected_exception):
+            res1d.modify(df2)
+        return
+
     res1d.modify(df2)
 
     df_mod = res1d.read()

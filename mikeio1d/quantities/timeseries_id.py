@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Any
     from typing import List
     from typing import Tuple
     from ..res1d import Res1D
@@ -396,3 +397,25 @@ class TimeSeriesId:
         name = delimiter.join([item_id, name]) if item_id is not None else name
 
         return name
+
+    @staticmethod
+    def try_from_obj(obj: Any) -> TimeSeriesId:
+        """
+        Try to convert an object to a TimeSeriesId object.
+
+        Parameters
+        ----------
+        obj : Any
+            The object to convert to a TimeSeriesId.
+
+        Returns
+        -------
+        TimeSeriesId
+            The converted TimeSeriesId object.
+        """
+        if isinstance(obj, TimeSeriesId):
+            return obj
+        elif isinstance(obj, tuple):
+            return TimeSeriesId.from_tuple(obj)
+        else:
+            raise ValueError(f"Cannot convert type '{type(obj)}' to TimeSeriesId")
