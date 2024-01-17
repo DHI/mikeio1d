@@ -130,11 +130,11 @@ def test_time_series_id_astuple(time_series_id):
     assert time_series_id.astuple() == expected_tuple
 
 
-def test_time_series_id_to_m1d(res1d_river_network, time_series_id_valid_river_res1d):
+def test_time_series_id_to_data_entry(res1d_river_network, time_series_id_valid_river_res1d):
     with pytest.raises(TypeError):
         # requires res1d context
-        time_series_id_valid_river_res1d.to_m1d()
-    m1d = time_series_id_valid_river_res1d.to_m1d(res1d_river_network)
+        time_series_id_valid_river_res1d.to_data_entry()
+    m1d = time_series_id_valid_river_res1d.to_data_entry(res1d_river_network)
     assert isinstance(m1d, DataEntry)
     assert m1d.m1d_dataset.Name == "basin_left1"
     assert m1d.data_item.Quantity.Id == "Discharge"
@@ -150,7 +150,7 @@ def test_time_series_id_to_m1d_errors_for_derived_quantity(res1d_river_network):
         derived=True,
     )
     with pytest.raises(ValueError):
-        tsid.to_m1d(res1d_river_network)
+        tsid.to_data_entry(res1d_river_network)
 
 
 def test_time_series_id_to_result_quantity(res1d_river_network, time_series_id_valid_river_res1d):

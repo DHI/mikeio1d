@@ -420,7 +420,7 @@ class Res1D:
         ext = os.path.splitext(file_path)[-1] if ext is None else ext
 
         timeseries_ids = self._get_timeseries_ids_to_read(queries)
-        data_entries = [t.to_m1d(self) for t in timeseries_ids]
+        data_entries = [t.to_data_entry(self) for t in timeseries_ids]
 
         extractor = ExtractorCreator.create(
             ext, file_path, data_entries, self.data, time_step_skipping_number

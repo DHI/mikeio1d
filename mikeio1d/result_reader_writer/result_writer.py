@@ -36,7 +36,7 @@ class ResultWriter:
         """
         for header, series in dataframe.items():
             timeseries_id = TimeSeriesId.from_tuple(header)
-            data_entry = timeseries_id.to_m1d(self.res1d)
+            data_entry = timeseries_id.to_data_entry(self.res1d)
             data_item = data_entry.data_item
             element_index = data_entry.element_index
 
