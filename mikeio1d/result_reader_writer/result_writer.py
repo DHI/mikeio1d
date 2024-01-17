@@ -34,9 +34,13 @@ class ResultWriter:
         dataframe : pandas.DataFrame
             Pandas dataframe object with TimeSeriesId compatible multiindex.
         """
+        try:
+            TimeSeriesId.try_from_obj(dataframe.columns[0])
+        except ValueError:
+            raise ValueError("The dataframe columns must be TimeSeriesId compatible multiindex.")
 
         for header, series in dataframe.items():
-            timeseries_id = TimeSeriesId.from_tuple(header)
+            timeseries_id = TimeSeriesId.try_from_obj(header)
             data_entry = timeseries_id.to_data_entry(self.res1d)
             data_item = data_entry.data_item
             element_index = data_entry.element_index
