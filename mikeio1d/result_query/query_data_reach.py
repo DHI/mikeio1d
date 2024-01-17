@@ -67,7 +67,7 @@ class QueryDataReach(QueryData):
 
     def to_timeseries_id(self) -> TimeSeriesId:
         quantity = self.quantity
-        group = TimeSeriesIdGroup.Reach
+        group = TimeSeriesIdGroup.REACH
         name = self.name
         if self.chainage is not None:
             return TimeSeriesId(

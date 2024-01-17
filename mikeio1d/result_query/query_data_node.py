@@ -42,7 +42,7 @@ class QueryDataNode(QueryData):
     def to_timeseries_id(self) -> TimeSeriesId:
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group=TimeSeriesIdGroup.Node,
+            group=TimeSeriesIdGroup.NODE,
             name=self.name,
         )
         return tsid

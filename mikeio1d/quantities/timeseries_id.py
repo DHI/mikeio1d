@@ -17,15 +17,17 @@ import pandas as pd
 from ..various import NAME_DELIMITER
 from ..result_network.data_entry import DataEntry
 
+from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
+
 
 class TimeSeriesIdGroup(str, Enum):
     """Enumeration of all possible groups for a TimeSeriesId."""
 
-    Global = "Global"
-    Node = "Node"
-    Reach = "Reach"
-    Catchment = "Catchment"
-    Structure = "Structure"
+    GLOBAL = "Global"
+    NODE = "Node"
+    REACH = "Reach"
+    CATCHMENT = "Catchment"
+    STRUCTURE = "Structure"
 
     def __hash__(self) -> int:
         return self.value.__hash__()
@@ -39,23 +41,23 @@ class TimeSeriesIdGroup(str, Enum):
     @staticmethod
     def from_m1d_data_item(m1d_data_item) -> str:
         """Get the group of a TimeSeriesId from an IRes1DDataItem object."""
-        m1d_group = m1d_data_item.ItemTypeGroup.ToString()
-        if m1d_group == "GlobalItem":
-            return TimeSeriesIdGroup.Global.value
-        elif m1d_group == "NodeItem":
-            return TimeSeriesIdGroup.Node.value
-        elif m1d_group == "ReachItem":
+        m1d_group = m1d_data_item.ItemTypeGroup
+        if m1d_group == ItemTypeGroup.GlobalItem:
+            return TimeSeriesIdGroup.GLOBAL.value
+        elif m1d_group == ItemTypeGroup.NodeItem:
+            return TimeSeriesIdGroup.NODE.value
+        elif m1d_group == ItemTypeGroup.ReachItem:
             # assume that if ItemId is not empty, it's a structure
             if m1d_data_item.ItemId:
-                return TimeSeriesIdGroup.Structure.value
+                return TimeSeriesIdGroup.STRUCTURE.value
             else:
-                return TimeSeriesIdGroup.Reach.value
-        elif m1d_group == "CatchmentItem":
-            return TimeSeriesIdGroup.Catchment.value
-        elif m1d_group == "ReachStructureItem":
-            return TimeSeriesIdGroup.Structure.value
+                return TimeSeriesIdGroup.REACH.value
+        elif m1d_group == ItemTypeGroup.CatchmentItem:
+            return TimeSeriesIdGroup.CATCHMENT.value
+        elif m1d_group == ItemTypeGroup.ReachStructureItem:
+            return TimeSeriesIdGroup.STRUCTURE.value
         else:
-            raise ValueError(f"Unknown group: {m1d_data_item.ItemTypeGroup}")
+            raise ValueError(f"Unknown group: {m1d_data_item.ItemTypeGroup.ToString()}")
 
 
 @dataclass(frozen=True)
@@ -190,24 +192,24 @@ class TimeSeriesId:
             raise ValueError("Cannot convert derived TimeSeriesId to QueryData")
 
         # Note: imports are here to avoid circular imports
-        if self.group == TimeSeriesIdGroup.Global:
+        if self.group == TimeSeriesIdGroup.GLOBAL:
             from ..query import QueryDataGlobal
 
             return QueryDataGlobal.from_timeseries_id(self)
-        elif self.group == TimeSeriesIdGroup.Node:
+        elif self.group == TimeSeriesIdGroup.NODE:
             from ..query import QueryDataNode
 
             return QueryDataNode.from_timeseries_id(self)
 
-        elif self.group == TimeSeriesIdGroup.Reach:
+        elif self.group == TimeSeriesIdGroup.REACH:
             from ..query import QueryDataReach
 
             return QueryDataReach.from_timeseries_id(self)
-        elif self.group == TimeSeriesIdGroup.Catchment:
+        elif self.group == TimeSeriesIdGroup.CATCHMENT:
             from ..query import QueryDataCatchment
 
             return QueryDataCatchment.from_timeseries_id(self)
-        elif self.group == TimeSeriesIdGroup.Structure:
+        elif self.group == TimeSeriesIdGroup.STRUCTURE:
             from ..query import QueryDataStructure
 
             return QueryDataStructure.from_timeseries_id(self)
@@ -328,10 +330,10 @@ class TimeSeriesId:
 
         # DataItem objects on this DataSet have an ItemTypeGroup set to GlobalItem
         if "DHI.Mike1D.ResultDataAccess.Epanet.Res1DTypedReach" in repr(m1d_dataset.__class__):
-            group = TimeSeriesIdGroup.Reach
+            group = TimeSeriesIdGroup.REACH
 
         item_id = m1d_dataitem.ItemId
-        if group == TimeSeriesIdGroup.Structure:
+        if group == TimeSeriesIdGroup.STRUCTURE:
             name = item_id
             tag = TimeSeriesId.get_dataset_name(m1d_dataset, None)
         else:

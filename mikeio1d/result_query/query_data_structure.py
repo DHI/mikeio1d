@@ -66,7 +66,7 @@ class QueryDataStructure(QueryDataReach):
             chainage = float("nan")
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group=TimeSeriesIdGroup.Structure,
+            group=TimeSeriesIdGroup.STRUCTURE,
             name=self.structure,
             chainage=chainage,
             tag=self.name,
