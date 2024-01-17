@@ -172,13 +172,13 @@ def test_catchment_attributes(test_file):
     column_mode = res1d.result_reader.column_mode
     if column_mode == ColumnMode.ALL:
         actual_max = round(df.T.query("quantity=='TotalRunOff' and name=='20_2_2'").T.max(), 3)
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["TotalRunOff:20_2_2"].max(), 3)
     assert pytest.approx(actual_max) == 0.236
 
     if column_mode == ColumnMode.ALL:
         actual_max = round(df.T.query("quantity=='TotalRunOff' and name=='22_8_8'").T.max(), 3)
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["TotalRunOff:22_8_8"].max(), 3)
     assert pytest.approx(actual_max) == 0.231
 

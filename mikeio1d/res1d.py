@@ -199,7 +199,7 @@ class Res1D:
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'timeseries' - column index of TimeSeriesId objects
-            'query' - column index of str representations of QueryData objects
+            'str' - column index of str representations of QueryData objects
 
         Returns
         -------
@@ -238,7 +238,7 @@ class Res1D:
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'timeseries' - column index of TimeSeriesId objects
-            'query' - column index of str representations of QueryData objects
+            'str' - column index of str representations of QueryData objects
 
         Returns
         -------

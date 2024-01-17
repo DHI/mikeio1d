@@ -249,13 +249,13 @@ def test_node_attributes(test_file):
 
     if column_mode == ColumnMode.ALL:
         actual_max = round(df.T.query("quantity=='WaterLevel' and name=='1'").T.max(), 3)
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["WaterLevel:1"].max(), 3)
     assert pytest.approx(actual_max) == 195.669
 
     if column_mode == ColumnMode.ALL:
         actual_max = round(df.T.query("quantity=='WaterLevel' and name=='2'").T.max(), 3)
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["WaterLevel:2"].max(), 3)
     assert pytest.approx(actual_max) == 195.823
 
@@ -280,7 +280,7 @@ def test_reach_attributes(test_file):
         actual_max = round(
             df.T.query("quantity=='WaterLevel' and name=='104l1' and chainage==34.4131").T.max(), 3
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["WaterLevel:104l1:34.4131"].max(), 3)
     assert pytest.approx(actual_max) == 197.046
 
@@ -288,7 +288,7 @@ def test_reach_attributes(test_file):
         actual_max = round(
             df.T.query("quantity=='WaterLevel' and name=='9l1' and chainage==10").T.max(), 3
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["WaterLevel:9l1:10"].max(), 3)
     assert pytest.approx(actual_max) == 195.165
 
@@ -296,7 +296,7 @@ def test_reach_attributes(test_file):
         actual_max = round(
             df.T.query("quantity=='Discharge' and name=='100l1' and chainage==23.8414").T.max(), 3
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["Discharge:100l1:23.8414"].max(), 3)
     assert pytest.approx(actual_max) == 0.1
 
@@ -304,7 +304,7 @@ def test_reach_attributes(test_file):
         actual_max = round(
             df.T.query("quantity=='Discharge' and name=='9l1' and chainage==5").T.max(), 3
         )
-    elif column_mode == ColumnMode.QUERY:
+    elif column_mode == ColumnMode.STRING:
         actual_max = round(df["Discharge:9l1:5"].max(), 3)
     assert pytest.approx(actual_max) == 0.761
 
