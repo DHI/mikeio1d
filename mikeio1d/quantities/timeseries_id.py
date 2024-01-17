@@ -150,7 +150,7 @@ class TimeSeriesId:
         """Converts a TimeSeriesId to a tuple."""
         return dataclasses.astuple(self)
 
-    def to_m1d(self, res1d: Res1D) -> DataEntry:
+    def to_data_entry(self, res1d: Res1D) -> DataEntry:
         """Converts a TimeSeriesId to its assosciated Mike1D objects.
 
         Returns

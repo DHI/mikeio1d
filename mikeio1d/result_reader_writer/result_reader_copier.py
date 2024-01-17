@@ -65,7 +65,7 @@ class ResultReaderCopier(ResultReader):
 
         data_entries_net = self.result_data_copier.GetEmptyDataEntriesList()
         for tsid in timeseries_ids:
-            data_entry = tsid.to_m1d(res1d=self.res1d)
+            data_entry = tsid.to_data_entry(res1d=self.res1d)
             data_entry.add_to_data_entries(data_entries_net)
 
         df = self.create_data_frame(data_entries_net, timeseries_ids, column_mode=column_mode)
