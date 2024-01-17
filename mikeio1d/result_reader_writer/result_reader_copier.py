@@ -13,6 +13,7 @@ import pandas as pd
 from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 from .result_reader import ResultReader
+from .result_reader import ColumnMode
 from ..quantities import TimeSeriesId
 
 from System import IntPtr
@@ -58,7 +59,7 @@ class ResultReaderCopier(ResultReader):
     def read(
         self,
         timeseries_ids: List[TimeSeriesId] = None,
-        column_mode: Optional[str | ResultReader.ColumnMode] = None,
+        column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
         if timeseries_ids is None:
             return self.read_all(column_mode=column_mode)
@@ -72,7 +73,7 @@ class ResultReaderCopier(ResultReader):
 
         return df
 
-    def read_all(self, column_mode: Optional[str | ResultReader.ColumnMode] = None) -> pd.DataFrame:
+    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
         data_entries, timeseries_ids = self.get_all_data_entries_and_timeseries_ids()
 
         df = self.create_data_frame(data_entries, timeseries_ids, column_mode=column_mode)
@@ -83,7 +84,7 @@ class ResultReaderCopier(ResultReader):
         self,
         data_entries,
         timeseries_ids: List[TimeSeriesId],
-        column_mode: Optional[str | ResultReader.ColumnMode] = None,
+        column_mode: Optional[str | ColumnMode] = None,
     ):
         number_of_timesteps = self.data.NumberOfTimeSteps
         number_of_items = len(data_entries)
@@ -106,20 +107,20 @@ class ResultReaderCopier(ResultReader):
     def create_column_index(
         self,
         timeseries_ids: List[TimeSeriesId],
-        column_mode: Optional[ResultReader.ColumnMode] = None,
+        column_mode: Optional[ColumnMode] = None,
     ) -> pd.MultiIndex | pd.Index:
         """Creates a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
         if column_mode is None:
             column_mode = self.column_mode
-        if column_mode == ResultReader.ColumnMode.ALL:
+        if column_mode == ColumnMode.ALL:
             return TimeSeriesId.to_multiindex(timeseries_ids)
-        elif column_mode == ResultReader.ColumnMode.TIMESERIES:
+        elif column_mode == ColumnMode.TIMESERIES:
             return pd.Index(timeseries_ids)
-        elif column_mode == ResultReader.ColumnMode.QUERY:
+        elif column_mode == ColumnMode.QUERY:
             queries = [t.to_query() for t in timeseries_ids]
             return pd.Index([str(q) for q in queries])
         else:
-            if column_mode in ResultReader.ColumnMode:
+            if column_mode in ColumnMode:
                 raise NotImplementedError(f"The column_mode {column_mode} is not implemented.")
             raise ValueError(f"Unknown column_mode: {column_mode}")
 

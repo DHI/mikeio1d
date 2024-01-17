@@ -27,6 +27,17 @@ from DHI.Mike1D.Generic import Connection
 from DHI.Mike1D.Generic import Diagnostics
 
 
+class ColumnMode(str, Enum):
+    """Specifies the type of column index of returned DataFrames."""
+
+    ALL = "all"
+    """Uses a column MultiIndex with all possible metadata."""
+    QUERY = "query"
+    """Uses a column Index with headers as the string representation of QueryData objects."""
+    TIMESERIES = "timeseries"
+    """Uses a column Index with headers as TimeSeriesId objects"""
+
+
 class ResultReader:
     """
     Class for reading the ResultData object TimeData
@@ -55,16 +66,6 @@ class ResultReader:
     put_chainage_in_col_name : bool
         Flag specifying to add chainage into data frame column label.
     """
-
-    class ColumnMode(str, Enum):
-        """Specifies the type of column index of returned DataFrames."""
-
-        ALL = "all"
-        """Uses a column MultiIndex with all possible metadata."""
-        QUERY = "query"
-        """Uses a column Index with headers as the string representation of QueryData objects."""
-        TIMESERIES = "timeseries"
-        """Uses a column Index with headers as TimeSeriesId objects"""
 
     def __init__(
         self,
@@ -102,7 +103,7 @@ class ResultReader:
 
         self.quantities = [quantity.Id for quantity in self.data.Quantities]
 
-        self.column_mode: ResultReader.ColumnMode = self.ColumnMode.ALL
+        self.column_mode: ColumnMode = ColumnMode.ALL
         """Specifies the type of column index of returned DataFrames.
         
         'all' - Uses a column MultiIndex with all possible metadata
@@ -174,7 +175,7 @@ class ResultReader:
     def read(
         self,
         timeseries_ids: List[TimeSeriesId] = None,
-        column_mode: Optional[str | ResultReader.ColumnMode] = None,
+        column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
         """
         Read the time series data into a data frame.
@@ -184,7 +185,7 @@ class ResultReader:
         timeseries_ids : list of TimeSeriesId
             List of TimeSeriesId objects to read.
             If None, all data sets will be read.
-        column_mode : str | ResultReader.ColumnMode (optional)
+        column_mode : str | ColumnMode (optional)
             Specifies the type of column index of returned DataFrame.
 
         Returns
@@ -193,13 +194,13 @@ class ResultReader:
         """
         return None
 
-    def read_all(self, column_mode: Optional[str | ResultReader.ColumnMode]) -> pd.DataFrame:
+    def read_all(self, column_mode: Optional[str | ColumnMode]) -> pd.DataFrame:
         """
         Read all time series data into a data frame.
 
         Parameters
         ----------
-        column_mode : str | ResultReader.ColumnMode (optional)
+        column_mode : str | ColumnMode (optional)
             Specifies the type of column index of returned DataFrame.
 
         Returns

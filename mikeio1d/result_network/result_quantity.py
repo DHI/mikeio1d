@@ -110,7 +110,6 @@ class ResultQuantity:
     def timeseries_id(self) -> TimeSeriesId:
         """TimeSeriesId corresponding to ResultQuantity."""
         if self._timeseries_id is None:
-            raise ValueError(
-                "ResultQuantity must be added to a ResultNetwork before TimeSeriesId can be accessed."
-            )
+            message = "ResultQuantity must be added to a ResultNetwork before TimeSeriesId can be accessed."
+            ValueError(message)
         return self._timeseries_id

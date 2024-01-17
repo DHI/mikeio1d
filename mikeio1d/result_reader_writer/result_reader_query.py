@@ -6,8 +6,7 @@ if TYPE_CHECKING:
     from typing import Optional
     from typing import List
     from .result_reader import ResultReader
-
-    ColumnMode = ResultReader.ColumnMode
+    from .result_reader import ColumnMode
 
     from ..query import QueryData
 
