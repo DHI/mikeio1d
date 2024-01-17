@@ -34,6 +34,7 @@ class ResultWriter:
         dataframe : pandas.DataFrame
             Pandas dataframe object with TimeSeriesId compatible multiindex.
         """
+
         for header, series in dataframe.items():
             timeseries_id = TimeSeriesId.from_tuple(header)
             data_entry = timeseries_id.to_data_entry(self.res1d)

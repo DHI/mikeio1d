@@ -9,6 +9,7 @@ mpl.use("Agg")
 from mikeio1d.res1d import Res1D
 from mikeio1d.query import QueryDataStructure
 from mikeio1d.query import QueryDataGlobal
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
 
 @pytest.fixture
@@ -100,36 +101,50 @@ def test_structure_attributes(test_file):
 
     df = res1d.read()
 
-    actual_max = round(
-        df.T.query(
-            "quantity=='DischargeInStructure' and name=='W_right:link_basin_right' and chainage==18"
-        ).T.max(),
-        3,
-    )
+    column_mode = res1d.result_reader.column_mode
+
+    if column_mode == ColumnMode.ALL:
+        actual_max = round(
+            df.T.query(
+                "quantity=='DischargeInStructure' and name=='W_right:link_basin_right' and chainage==18"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.QUERY:
+        actual_max = round(df["DischargeInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 11.018
 
-    actual_max = round(
-        df.T.query(
-            "quantity=='DischargeInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
-        ).T.max(),
-        3,
-    )
+    if column_mode == ColumnMode.ALL:
+        actual_max = round(
+            df.T.query(
+                "quantity=='DischargeInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.QUERY:
+        actual_max = round(df["DischargeInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 13.543
 
-    actual_max = round(
-        df.T.query(
-            "quantity=='FlowAreaInStructure' and name=='W_right:link_basin_right' and chainage==18"
-        ).T.max(),
-        3,
-    )
+    if column_mode == ColumnMode.ALL:
+        actual_max = round(
+            df.T.query(
+                "quantity=='FlowAreaInStructure' and name=='W_right:link_basin_right' and chainage==18"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.QUERY:
+        actual_max = round(df["FlowAreaInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 9.851
 
-    actual_max = round(
-        df.T.query(
-            "quantity=='FlowAreaInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
-        ).T.max(),
-        3,
-    )
+    if column_mode == ColumnMode.ALL:
+        actual_max = round(
+            df.T.query(
+                "quantity=='FlowAreaInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.QUERY:
+        actual_max = round(df["FlowAreaInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 11.252
 
 
