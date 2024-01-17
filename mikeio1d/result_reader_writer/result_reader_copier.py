@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List
     from typing import Tuple
+    from typing import Set
     from typing import Optional
 
 import numpy as np
@@ -139,12 +140,44 @@ class ResultReaderCopier(ResultReader):
                     data_entry = DataEntryNet(data_item, i)
                     data_entries.Add(data_entry)
 
-                    timeseries_id = TimeSeriesId.from_dataset_dataitem_and_element(
-                        data_set, data_item, i
+                    timeseries_id = self.get_unique_timeseries_id(
+                        timeseries_ids_set, data_set, data_item, i
                     )
-                    while timeseries_id in timeseries_ids_set:
-                        timeseries_id = timeseries_id.next_duplicate()
                     timeseries_ids.append(timeseries_id)
-                    timeseries_ids_set.add(timeseries_id)
 
         return data_entries, timeseries_ids
+
+    def get_unique_timeseries_id(
+        self,
+        existing_timeseries_ids: Set[TimeSeriesId],
+        m1d_data_set,
+        m1d_data_item,
+        i: int,
+    ) -> TimeSeriesId:
+        """
+        Returns a unique TimeSeriesId for given data set, data item and element index.
+
+        Parameters
+        ----------
+        existing_timeseries_ids : set
+            Set of existing TimeSeriesId objects.
+        m1d_data_set : IDataSet
+            MIKE 1D IDataSet object.
+        m1d_data_item : IDataItem
+            MIKE 1D IDataItem object.
+        i : int
+            Element index into data item.
+
+        Returns
+        -------
+        TimeSeriesId
+            A unique TimeSeriesId object.
+        """
+        timeseries_id = TimeSeriesId.from_dataset_dataitem_and_element(
+            m1d_data_set, m1d_data_item, i
+        )
+        while timeseries_id in existing_timeseries_ids:
+            timeseries_id = timeseries_id.next_duplicate()
+
+        existing_timeseries_ids.add(timeseries_id)
+        return timeseries_id
