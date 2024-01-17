@@ -87,7 +87,7 @@ def test_timeseries_id_equality_with_groups():
     )
     tsid2 = TimeSeriesId(
         quantity="Discharge",
-        group=TimeSeriesIdGroup.Node,
+        group=TimeSeriesIdGroup.NODE,
         name="Node1",
     )
     assert tsid1 == tsid2
@@ -105,7 +105,7 @@ def test_time_series_id_hash(time_series_id):
     )
     time_series_id3 = TimeSeriesId(
         quantity="Discharge",
-        group=TimeSeriesIdGroup.Node,
+        group=TimeSeriesIdGroup.NODE,
         name="Node1",
         chainage=10.0,
         tag="Tag1",

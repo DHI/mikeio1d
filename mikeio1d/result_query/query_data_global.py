@@ -41,7 +41,7 @@ class QueryDataGlobal(QueryData):
     def to_timeseries_id(self) -> TimeSeriesId:
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group=TimeSeriesIdGroup.Global,
+            group=TimeSeriesIdGroup.GLOBAL,
         )
         return tsid
 

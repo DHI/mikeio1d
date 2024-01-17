@@ -42,7 +42,7 @@ class QueryDataCatchment(QueryData):
     def to_timeseries_id(self) -> TimeSeriesId:
         tsid = TimeSeriesId(
             quantity=self.quantity,
-            group=TimeSeriesIdGroup.Catchment,
+            group=TimeSeriesIdGroup.CATCHMENT,
             name=self.name,
         )
         return tsid
