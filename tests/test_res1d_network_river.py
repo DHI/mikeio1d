@@ -334,13 +334,13 @@ def test_result_quantity_methods(test_file):
     # Test the calling of methods
     discharge_in_structure.plot()
     discharge_in_structure.to_csv(
-        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.csv")
+        file_path.replace("network_river.res1d", "w_right_discharge_in_structure.extract.csv")
     )
     discharge_in_structure.to_dfs0(
-        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.dfs0")
+        file_path.replace("network_river.res1d", "w_right_discharge_in_structure.extract.dfs0")
     )
     discharge_in_structure.to_txt(
-        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.txt")
+        file_path.replace("network_river.res1d", "w_right_discharge_in_structure.extract.txt")
     )
 
 
