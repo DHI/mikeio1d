@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     import pandas as pd
 
     from .query import QueryData
-    from .result_reader_writer.result_reader import ResultReader
-
-    ColumnMode = ResultReader.ColumnMode
+    from .result_reader_writer.result_reader import ColumnMode
 
 import os.path
 
