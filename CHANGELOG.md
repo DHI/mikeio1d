@@ -4,6 +4,8 @@
 
 ### Added
 
+- Merging of regular and LTS extreme/periodic res1d files
+
 ### Fixed
 
 ### Changed

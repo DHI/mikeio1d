@@ -8,6 +8,9 @@
     <Reference Include="DHI.Generic.MikeZero.EUM">
       <HintPath>..\..\mikeio1d\bin\DHI.Generic.MikeZero.EUM.dll</HintPath>
     </Reference>
+    <Reference Include="DHI.Generic.MikeZero.DFS">
+      <HintPath>..\..\mikeio1d\bin\DHI.Generic.MikeZero.DFS.dll</HintPath>
+    </Reference>
     <Reference Include="DHI.corlib">
       <HintPath>..\..\mikeio1d\bin\DHI.corlib.dll</HintPath>
     </Reference>
