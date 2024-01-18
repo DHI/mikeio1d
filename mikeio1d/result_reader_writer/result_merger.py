@@ -1,7 +1,7 @@
 from System.Collections.Generic import List
 from System import String
 
-from DHI.Mike1D.MikeIO import LTSResultMerger
+from DHI.Mike1D.MikeIO import ResultMerger as Res1DResultMerger
 
 
 class ResultMerger:
@@ -12,12 +12,10 @@ class ResultMerger:
     ----------
     file_names : list of str
         List of res1d file names to merge.
-
     """
 
     def __init__(self, file_names):
         self.file_names = file_names
-        self.result_data_merged = None
 
     def merge(self, merged_file_name):
         """
@@ -29,12 +27,8 @@ class ResultMerger:
         merged_file_name : str
             File name of the res1d file to store the merged data.
         """
-        if self.result_data_merged is None:
-            file_names_dotnet = self._get_file_name_dotnet()
-            self.result_data_merged = LTSResultMerger.Merge(file_names_dotnet)
-
-        self.result_data_merged.Connection.FilePath.Path = merged_file_name
-        self.result_data_merged.Save()
+        file_names_dotnet = self._get_file_name_dotnet()
+        Res1DResultMerger.Merge(file_names_dotnet, merged_file_name)
 
     def _get_file_name_dotnet(self):
         file_names_dotnet = List[String]()

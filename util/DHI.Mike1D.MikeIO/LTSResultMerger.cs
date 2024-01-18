@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DHI.Generic.MikeZero;
 using DHI.Mike1D.Generic;
@@ -10,18 +9,8 @@ namespace DHI.Mike1D.MikeIO
   /// <summary>
   /// Class for merging Long Term Statistics (LTS) result files.
   /// </summary>
-  public abstract class LTSResultMerger
+  public abstract class LTSResultMerger : ResultMerger
   {
-    /// <summary>
-    /// Instances of ResultData which will be merged.
-    /// </summary>
-    protected IList<ResultData> _resultDataCollection;
-
-    /// <summary>
-    /// Result data, where the merged results will be stored.
-    /// </summary>
-    protected ResultData _resultData;
-
     /// <summary>
     /// Data entries corresponding to the <see cref="_resultData"/>.
     /// </summary>
@@ -38,85 +27,22 @@ namespace DHI.Mike1D.MikeIO
     protected Dictionary<DataEntryId, LTSResultEvents> _mapIdToResultEvents;
 
     /// <inheritdoc cref="LTSResultMerger" />
-    public LTSResultMerger(IList<ResultData> resultDataCollection)
+    public LTSResultMerger(IList<ResultData> resultDataCollection) : base(resultDataCollection)
     {
-      _resultDataCollection = resultDataCollection;
-      _resultData = _resultDataCollection.First();
+      LoadData();
       _dataEntries = _resultData.GetAllDataEntries();
     }
 
-    /// <summary>
-    /// Create particular LTSResultMerger class depending on the result type.
-    /// </summary>
-    public static LTSResultMerger Create(IList<ResultData> resultDataCollection)
+    private void LoadData()
     {
-      var resultData = resultDataCollection.FirstOrDefault();
-      if (resultData == null)
-        throw new Exception("Empty result data list provided.");
-
-      var resultType = resultData.ResultType;
-      switch (resultType)
-      {
-        case ResultTypes.LTSEvents:
-          return new LTSResultMergerExtreme(resultDataCollection);
-
-        case ResultTypes.LTSAnnual:
-        case ResultTypes.LTSMonthly:
-          return new LTSResultMergerPeriodic(resultDataCollection);
-        default:
-          throw new NotSupportedException($"Not supported result type {resultType}");
-      }
-    }
-
-    #region Static Merge methods
-
-    /// <summary>
-    /// Merge result files given by their file names
-    /// </summary>
-    public static ResultData Merge(IList<string> resultFileNames)
-    {
-      var resultFilePaths = resultFileNames.Select(name => new FilePath(name)).ToList();
-      return Merge(resultFilePaths);
-    }
-
-    /// <summary>
-    /// Merge result files given by their FilePath specification.
-    /// </summary>
-    public static ResultData Merge(IList<FilePath> resultFilePaths)
-    {
-      var resultData = resultFilePaths.Select(path => LoadFile(path.FullFilePath)).ToList();
-      return Merge(resultData);
-    }
-
-    /// <summary>
-    /// Merge result files given by their ResultData specification.
-    /// </summary>
-    public static ResultData Merge(IList<ResultData> resultDataCollection)
-    {
-      var merger = LTSResultMerger.Create(resultDataCollection);
-      return merger.Merge();
-    }
-
-    /// <summary>
-    /// Loads a file based on the filename.
-    /// </summary>
-    private static ResultData LoadFile(string fileName)
-    {
-      var res = new ResultData();
-      res.Connection = Connection.Create(fileName);
-
       var diagnostics = new Diagnostics("LTS result merging");
-      res.Load(diagnostics);
-
-      return res;
+      foreach (var resultData in _resultDataCollection)
+        if (resultData.LoadStatus == LoadStatus.Header)
+          resultData.LoadData(diagnostics);
     }
 
-    #endregion Static Merge methods
-
-    /// <summary>
-    /// Performs the actual merging of result files.
-    /// </summary>
-    public ResultData Merge()
+    /// <inheritdoc />
+    public override ResultData Merge(string mergedFileName = null)
     {
       CreateMaps();
       MergeDataEntries();
@@ -124,6 +50,7 @@ namespace DHI.Mike1D.MikeIO
       ProcessResults();
       UpdateTimesList();
       UpdateResultData();
+      SaveToFile(mergedFileName);
 
       return _resultData;
     }
@@ -245,5 +172,18 @@ namespace DHI.Mike1D.MikeIO
     /// Update <see cref="_resultData"/> with actual merged LTS data.
     /// </summary>
     protected abstract void UpdateResultData();
+
+    /// <summary>
+    /// Save the current <see cref="_resultData"/> to a given file.
+    /// </summary>
+    /// <param name="mergedFileName">File name to save to.</param>
+    public virtual void SaveToFile(string mergedFileName = null)
+    {
+      if (string.IsNullOrWhiteSpace(mergedFileName))
+        return;
+
+      _resultData.Connection.FilePath.Path = mergedFileName;
+      _resultData.Save();
+    }
   }
 }
