@@ -10,32 +10,32 @@ namespace DHI.Mike1D.MikeIO
   /// <summary>
   /// Class for merging Long Term Statistics (LTS) result files.
   /// </summary>
-  public class LTSResultMerger
+  public abstract class LTSResultMerger
   {
     /// <summary>
     /// Instances of ResultData which will be merged.
     /// </summary>
-    private IList<ResultData> _resultDataCollection;
+    protected IList<ResultData> _resultDataCollection;
 
     /// <summary>
     /// Result data, where the merged results will be stored.
     /// </summary>
-    private ResultData _resultData;
+    protected ResultData _resultData;
 
     /// <summary>
     /// Data entries corresponding to the <see cref="_resultData"/>.
     /// </summary>
-    private List<DataEntry> _dataEntries;
+    protected List<DataEntry> _dataEntries;
 
     /// <summary>
     /// Map from data entry ID to actual data entry.
     /// </summary>
-    private Dictionary<DataEntryId, DataEntry> _mapIdToDataEntry;
+    protected Dictionary<DataEntryId, DataEntry> _mapIdToDataEntry;
 
     /// <summary>
     /// Map from data entry ID to list of LTS result events.
     /// </summary>
-    private Dictionary<DataEntryId, LTSResultEvents> _mapIdToResultEvents;
+    protected Dictionary<DataEntryId, LTSResultEvents> _mapIdToResultEvents;
 
     /// <inheritdoc cref="LTSResultMerger" />
     public LTSResultMerger(IList<ResultData> resultDataCollection)
@@ -43,6 +43,29 @@ namespace DHI.Mike1D.MikeIO
       _resultDataCollection = resultDataCollection;
       _resultData = _resultDataCollection.First();
       _dataEntries = _resultData.GetAllDataEntries();
+    }
+
+    /// <summary>
+    /// Create particular LTSResultMerger class depending on the result type.
+    /// </summary>
+    public static LTSResultMerger Create(IList<ResultData> resultDataCollection)
+    {
+      var resultData = resultDataCollection.FirstOrDefault();
+      if (resultData == null)
+        throw new Exception("Empty result data list provided.");
+
+      var resultType = resultData.ResultType;
+      switch (resultType)
+      {
+        case ResultTypes.LTSEvents:
+          return new LTSResultMergerExtreme(resultDataCollection);
+
+        case ResultTypes.LTSAnnual:
+        case ResultTypes.LTSMonthly:
+          return new LTSResultMergerPeriodic(resultDataCollection);
+        default:
+          throw new NotSupportedException($"Not supported result type {resultType}");
+      }
     }
 
     #region Static Merge methods
@@ -70,7 +93,7 @@ namespace DHI.Mike1D.MikeIO
     /// </summary>
     public static ResultData Merge(IList<ResultData> resultDataCollection)
     {
-      var merger = new LTSResultMerger(resultDataCollection);
+      var merger = LTSResultMerger.Create(resultDataCollection);
       return merger.Merge();
     }
 
@@ -97,7 +120,8 @@ namespace DHI.Mike1D.MikeIO
     {
       CreateMaps();
       MergeDataEntries();
-      SortResultEvents();
+      SortResults();
+      ProcessResults();
       UpdateTimesList();
       UpdateResultData();
 
@@ -132,58 +156,62 @@ namespace DHI.Mike1D.MikeIO
     /// Merges data entries, which means that the full LTS event result list
     /// is created from all the specified res1d files.
     /// </summary>
-    private void MergeDataEntries()
+    protected void MergeDataEntries()
     {
       foreach (var resultData in _resultDataCollection)
       {
         var dataEntries = resultData.GetAllDataEntries();
         var mapIdToDataEntry = CreateMapIdToDataEntry(dataEntries);
         foreach (var dataEntry in dataEntries)
-          MergeDataEntry(dataEntry, mapIdToDataEntry);
+          MergeDataEntry(dataEntry, mapIdToDataEntry, resultData);
       }
     }
 
-    private void MergeDataEntry(DataEntry dataEntry, Dictionary<DataEntryId, DataEntry> mapIdToDataEntry)
-    {
-      var dataItem = dataEntry.DataItem;
-      bool isTimeQuantity = dataItem.Quantity.Description.Contains(", Time");
-      if (isTimeQuantity)
-        return;
+    /// <summary>
+    /// Merge in a particular DataEntry.
+    /// </summary>
+    /// <param name="dataEntry">The DataEntry to merge in</param>
+    /// <param name="mapIdToDataEntry">A map from DataEntryId to DataEntry used for finding DataEntry for derived quantity</param>
+    /// <param name="resultData">ResultData where DataEntry comes from</param>
+    protected abstract void MergeDataEntry(
+        DataEntry dataEntry,
+        Dictionary<DataEntryId, DataEntry> mapIdToDataEntry,
+        ResultData resultData);
 
-      var dataEntryTime = GetDataEntryForTimeQuantity(dataEntry, mapIdToDataEntry);
-      var dataItemTime = dataEntryTime.DataItem;
-      // TODO: Consider if the case of no Time quantity should be included
-      if (dataItemTime == null)
-        return;
+    /// <summary>
+    /// Check if the quantity is a derived LTS quantity.
+    /// <para>
+    /// For example, derived LTS quantity is the time of the event
+    /// and for extreme statistics we have (derived quantity ID on the right):
+    ///   DischargeMaximum - DischargeMaximumTime
+    /// For periodic statistics we have as an example:
+    ///   DischargeIntegratedMonthly - DischargeIntegratedMonthlyCount
+    ///   DischargeIntegratedMonthly - DischargeIntegratedMonthlyDuration
+    /// </para>
+    /// </summary>
+    protected abstract bool IsDerivedQuantity(IQuantity quantity);
 
-      var ltsResultEvents = _mapIdToResultEvents[dataEntry.EntryId];
-      int elementIndex = dataEntry.ElementIndex;
-      for (int j = 0; j < dataItem.NumberOfTimeSteps; j++)
-      {
-
-        var ltsResultEvent = new LTSResultEvent
-        {
-          Value = dataItem.GetValue(j, elementIndex),
-          Time = dataItemTime.GetValue(j, elementIndex)
-        };
-        ltsResultEvents.Add(ltsResultEvent);
-      }
-    }
-
-    private static DataEntry GetDataEntryForTimeQuantity(DataEntry dataEntry, Dictionary<DataEntryId, DataEntry> mapIdToDataEntry)
+    /// <summary>
+    /// Get the DataEntry of a derived quantity.
+    /// </summary>
+    /// <param name="extraId">Extra ID string defining the derived quantity</param>
+    /// <param name="dataEntry">DataEntry corresponding to original LTS quantity</param>
+    /// <param name="mapIdToDataEntry">A map from DataEntryId to DataEntry</param>
+    /// <returns>DataEntry for derived quantity</returns>
+    public static DataEntry GetDataEntryForDerivedQuantity(string extraId, DataEntry dataEntry, Dictionary<DataEntryId, DataEntry> mapIdToDataEntry)
     {
       var quantity = dataEntry.DataItem.Quantity;
-      var quantityTime = Create(quantity, "Time");
+      var quantityTime = Create(quantity, extraId);
       var entryId = dataEntry.EntryId;
-      var entryIdTime = new DataEntryId(quantityTime.Id, entryId);
-      var dataEntryTime = mapIdToDataEntry[entryIdTime];
-      return dataEntryTime;
+      var entryIdDerived = new DataEntryId(quantityTime.Id, entryId);
+      var dataEntryDerived = mapIdToDataEntry[entryIdDerived];
+      return dataEntryDerived;
     }
 
     /// <summary>
     /// Create a quantity with "extra" string added to Id and description.
     /// </summary>
-    private static IQuantity Create(IQuantity quantity, string extra, eumItem item = eumItem.eumITimeScale, eumUnit? unit = null)
+    public static IQuantity Create(IQuantity quantity, string extra, eumItem item = eumItem.eumITimeScale, eumUnit? unit = null)
     {
       var ex = new ExtraForQuantities(extra);
       string id = quantity.Id + ex.ExtraForId;
@@ -198,53 +226,24 @@ namespace DHI.Mike1D.MikeIO
 
     #endregion
 
-    private void SortResultEvents()
-    {
-      _mapIdToResultEvents.Values.ToList().ForEach(x => x.SortOnValue());
-    }
+    /// <summary>
+    /// Sort LTSResultEvents on value or time inside <see cref="_mapIdToDataEntry"/>
+    /// </summary>
+    protected abstract void SortResults();
 
-    #region UpdateTimesList
+    /// <summary>
+    /// Apply processing on LTSResultEvents inside <see cref="_mapIdToDataEntry"/>
+    /// </summary>
+    protected abstract void ProcessResults();
 
-    private void UpdateTimesList()
-    {
-      var numberOfEventsEnumerable = _mapIdToResultEvents.Values.ToList().Select(x => x.Count);
-      int largestNumberOfEvents = numberOfEventsEnumerable.Max();
-      _resultData.TimesList = GetTimesListForEventResults(largestNumberOfEvents);
-    }
+    /// <summary>
+    /// Create a new ResultData.TimesList for merged <see cref="_resultData"/>
+    /// </summary>
+    protected abstract void UpdateTimesList();
 
-    private static IListDateTimes GetTimesListForEventResults(int largestNumberOfEvents)
-    {
-      var timesList = new ListDateTimes();
-      var startLabel = new DateTime(100, 1, 1);
-      for (int i = 0; i < largestNumberOfEvents; i++)
-      {
-        var eventLabel = startLabel.AddSeconds(i);
-        timesList.Add(eventLabel);
-      }
-      return timesList;
-    }
-
-    #endregion UpdateTimesList
-
-    private void UpdateResultData()
-    {
-      foreach (var mapIdToResultEvent in _mapIdToResultEvents)
-      {
-        var entryId = mapIdToResultEvent.Key;
-        var ltsResultEvents = mapIdToResultEvent.Value;
-        if (ltsResultEvents.Count == 0)
-          continue;
-
-        var dataEntry = _mapIdToDataEntry[entryId];
-        var dataEntryTime = GetDataEntryForTimeQuantity(dataEntry, _mapIdToDataEntry);
-
-        for (int i = 0; i < ltsResultEvents.Count; i++)
-        {
-          var ltsResultEvent = ltsResultEvents[i];
-          dataEntry.SetValue(i, ltsResultEvent.Value);
-          dataEntryTime.SetValue(i, ltsResultEvent.Time);
-        }
-      }
-    }
+    /// <summary>
+    /// Update <see cref="_resultData"/> with actual merged LTS data.
+    /// </summary>
+    protected abstract void UpdateResultData();
   }
 }

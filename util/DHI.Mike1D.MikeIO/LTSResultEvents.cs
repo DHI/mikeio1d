@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DHI.Mike1D.MikeIO
@@ -25,6 +26,14 @@ namespace DHI.Mike1D.MikeIO
         cvalue = e1.Time.CompareTo(e2.Time);
       return cvalue;
     }
+
+    /// <summary>
+    /// Sort the event list on time stamps.
+    /// </summary>
+    public void SortOnTimePeriod()
+    {
+      Sort((e1, e2) => ((LTSResultEventPeriodic)e1).TimePeriod.CompareTo(((LTSResultEventPeriodic)e2).TimePeriod));
+    }
   }
 
   /// <summary>
@@ -41,5 +50,26 @@ namespace DHI.Mike1D.MikeIO
     /// Time of the LTS event.
     /// </summary>
     public double Time;
+  }
+
+  /// <summary>
+  /// An LTS periodic event.
+  /// </summary>
+  public class LTSResultEventPeriodic : LTSResultEvent
+  {
+    /// <summary>
+    /// Number of events (Count) in a period.
+    /// </summary>
+    public int Count;
+
+    /// <summary>
+    /// Duration of events in a period.
+    /// </summary>
+    public double Duration;
+
+    /// <summary>
+    /// Time period (year or month) represented as DateTime.
+    /// </summary>
+    public DateTime TimePeriod;
   }
 }
