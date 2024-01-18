@@ -216,7 +216,7 @@ def test_res1d_filter_readall(test_file_path, helpers):
     res1d = None
 
 
-def test_res1d_merging(test_file_path):
+def test_res1d_merging_same_file(test_file_path):
     # Use the same file twice to create a merged LTS statistics file
     file_names = [test_file_path, test_file_path]
     merged_file_name = test_file_path.replace(".res1d", ".merged.res1d")
@@ -227,8 +227,8 @@ def test_res1d_merging(test_file_path):
 
     # Test one node location for particular values
     df_node = res1d.nodes.B4_1320.WaterLevelMaximum.read()
-    b4_1320_event1 = float(df_node.iloc[0])
-    b4_1320_event2 = float(df_node.iloc[1])
+    b4_1320_event1 = df_node.iloc[0].iloc[0]
+    b4_1320_event2 = df_node.iloc[1].iloc[0]
     assert b4_1320_event1 == b4_1320_event2
     assert pytest.approx(np.round(b4_1320_event1, 3)) == 17.511
 
@@ -239,8 +239,8 @@ def test_res1d_merging(test_file_path):
 
     # Test one reach location for particular values
     df_reach = res1d.reaches.B4_1491l1.m_216.DischargeMaximum.read()
-    b4_1491l1_event1 = float(df_reach.iloc[0])
-    b4_1491l1_event2 = float(df_reach.iloc[1])
+    b4_1491l1_event1 = df_reach.iloc[0].iloc[0]
+    b4_1491l1_event2 = df_reach.iloc[1].iloc[0]
     assert b4_1491l1_event1 == b4_1491l1_event2
     assert pytest.approx(np.round(b4_1491l1_event1, 3)) == 0.151
 
