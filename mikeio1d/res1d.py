@@ -198,6 +198,7 @@ class Res1D:
         column_mode : str | ColumnMode (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
 
@@ -237,6 +238,7 @@ class Res1D:
         column_mode : str | ColumnMode (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
 

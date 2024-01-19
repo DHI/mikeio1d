@@ -1,3 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Optional
+    from ..result_reader_writer.result_reader import ColumnMode
+
+    import pandas as pd
+
 from .result_quantity import ResultQuantity
 
 
@@ -28,10 +38,20 @@ class ResultQuantityCollection(ResultQuantity):
         for result_quantity in self.result_quantities:
             result_quantity.add()
 
-    def read(self):
-        """Read the time series data into a data frame."""
+    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read the time series data into a data frame.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+            'str' - column index of str representations of QueryData objects
+        """
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
-        return self.res1d.read(timeseries_ids)
+        return self.res1d.read(timeseries_ids, column_mode=column_mode)
 
     def plot(self):
         """Plot the time series data."""
