@@ -312,14 +312,11 @@ class TimeSeriesId:
             if not is_only_one_unique_value:
                 continue
             level_value = level_values[0]
-            is_all_default_values = level_value == field.default
-            # Note: nan != nan, so we need to check for this case
-            if is_all_default_values and not (
+            is_all_default_values = (level_value == field.default) or (
                 level_value != level_value and field.default != field.default
-            ):
-                continue
+            )
             if is_all_default_values:
-                index.droplevel(field.name)
+                index = index.droplevel(field.name)
 
         return index
 
