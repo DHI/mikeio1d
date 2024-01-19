@@ -107,7 +107,7 @@ class ResultReader(ABC):
 
         self.quantities = [quantity.Id for quantity in self.data.Quantities]
 
-        self.column_mode: ColumnMode = ColumnMode.COMPACT
+        self.column_mode: ColumnMode = ColumnMode.STRING
         """Specifies the type of column index of returned DataFrames.
         
         'all' - Uses a column MultiIndex with all possible metadata
