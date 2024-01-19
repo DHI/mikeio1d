@@ -3,8 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Optional
     from ..res1d import Res1D
     from ..result_network import ResultLocation
+    from ..result_reader_writer.result_reader import ColumnMode
+
+    import pandas as pd
 
 from .data_entry import DataEntry
 from ..quantities import TimeSeriesId
@@ -60,9 +64,19 @@ class ResultQuantity:
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
         self.res1d.result_network.queue.append(self.timeseries_id)
 
-    def read(self):
-        """Read the time series data into a data frame."""
-        return self.res1d.read(self.timeseries_id)
+    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read the time series data into a data frame.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+            'str' - column index of str representations of QueryData objects
+        """
+        return self.res1d.read(self.timeseries_id, column_mode=column_mode)
 
     def plot(self, **kwargs):
         """Plot the time series data."""
