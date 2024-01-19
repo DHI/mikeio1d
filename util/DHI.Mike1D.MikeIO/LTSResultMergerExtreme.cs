@@ -61,12 +61,6 @@ namespace DHI.Mike1D.MikeIO
     #endregion
 
     /// <inheritdoc />
-    protected override void SortResults()
-    {
-      _mapIdToResultEvents.Values.ToList().ForEach(x => x.SortOnValue());
-    }
-
-    /// <inheritdoc />
     protected override void ProcessResults()
     {
     }

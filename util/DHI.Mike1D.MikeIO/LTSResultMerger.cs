@@ -156,7 +156,10 @@ namespace DHI.Mike1D.MikeIO
     /// <summary>
     /// Sort LTSResultEvents on value or time inside <see cref="_mapIdToDataEntry"/>
     /// </summary>
-    protected abstract void SortResults();
+    protected virtual void SortResults()
+    {
+      _mapIdToResultEvents.Values.ToList().ForEach(x => x.Sort());
+    }
 
     /// <summary>
     /// Apply processing on LTSResultEvents inside <see cref="_mapIdToDataEntry"/>
