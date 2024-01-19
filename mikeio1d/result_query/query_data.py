@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..res1d import Res1D
 
+from abc import ABC
+from abc import abstractmethod
+
 import numpy as np
 
 from ..custom_exceptions import NoDataForQuery
@@ -13,7 +16,7 @@ from ..various import NAME_DELIMITER
 from ..quantities import TimeSeriesId
 
 
-class QueryData:
+class QueryData(ABC):
     """
     Base query class that declares what data to extract from a .res1d file.
 
@@ -43,14 +46,16 @@ class QueryData:
         if self.name is not None and not isinstance(self.name, str):
             raise TypeError("Argument 'name' must be either None or a string.")
 
+    @abstractmethod
     def to_timeseries_id(self) -> TimeSeriesId:
         """Convert query to timeseries id."""
-        raise NotImplementedError("Abstract method only implemented in subclasses.")
+        ...
 
     @staticmethod
+    @abstractmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryData:
-        """Base method for creating query from TimeSeriesId."""
-        raise NotImplementedError
+        """Create query from TimeSeriesId."""
+        ...
 
     @staticmethod
     def from_dotnet_to_python(array):
@@ -65,8 +70,9 @@ class QueryData:
     def name(self):
         return self._name
 
+    @abstractmethod
     def _update_query(self, res1d: Res1D):
-        pass
+        ...
 
     def _check_invalid_quantity(self, res1d: Res1D):
         if self._quantity not in res1d.quantities:

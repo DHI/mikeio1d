@@ -45,6 +45,9 @@ class QueryDataGlobal(QueryData):
         )
         return tsid
 
+    def _update_query(self, res1d: Res1D):
+        pass
+
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataGlobal:
         return QueryDataGlobal(timeseries_id.quantity, validate=False)

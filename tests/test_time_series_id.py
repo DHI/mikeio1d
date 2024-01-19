@@ -17,6 +17,7 @@ from mikeio1d.query import QueryDataGlobal
 from mikeio1d.query import QueryDataNode
 from mikeio1d.query import QueryDataReach
 from mikeio1d.query import QueryDataStructure
+from mikeio1d.query import QueryDataCreator
 
 from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
@@ -213,7 +214,7 @@ def assert_queries_equal(query1: QueryData, query2: QueryData):
     ],
 )
 def test_time_series_id_to_query(tsid, expected_query):
-    query = tsid.to_query()
+    query = QueryDataCreator.from_timeseries_id(tsid)
     assert_queries_equal(query, expected_query)
 
 
@@ -226,7 +227,7 @@ def test_time_series_id_to_query_errors_for_derived_quantity():
         derived=True,
     )
     with pytest.raises(ValueError):
-        tsid.to_query()
+        QueryDataCreator.from_timeseries_id(tsid)
 
 
 def test_time_series_id_next_duplicate(time_series_id):

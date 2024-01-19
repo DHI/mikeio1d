@@ -16,6 +16,7 @@ from ..various import NAME_DELIMITER
 from .result_reader import ResultReader
 from .result_reader import ColumnMode
 from ..quantities import TimeSeriesId
+from ..result_query import QueryDataCreator
 
 from System import IntPtr
 
@@ -121,7 +122,7 @@ class ResultReaderCopier(ResultReader):
         elif column_mode == ColumnMode.TIMESERIES:
             return pd.Index(timeseries_ids)
         elif column_mode == ColumnMode.STRING:
-            queries = [t.to_query() for t in timeseries_ids]
+            queries = [QueryDataCreator.from_timeseries_id(t) for t in timeseries_ids]
             return pd.Index([str(q) for q in queries])
         else:
             if column_mode in ColumnMode:

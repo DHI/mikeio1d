@@ -32,7 +32,7 @@ from .query import QueryDataReach  # noqa: F401
 from .query import QueryDataStructure  # noqa: F401
 from .query import QueryDataGlobal  # noqa: F401
 
-from .result_query.query_data_adapter import QueryDataAdapter
+from .result_query.query_data_converter import QueryDataConverter
 
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
@@ -173,7 +173,7 @@ class Res1D:
         if is_already_time_series_ids:
             return queries
 
-        queries = QueryDataAdapter.convert_queries_to_time_series_ids(self, queries)
+        queries = QueryDataConverter.convert_queries_to_time_series_ids(self, queries)
         return queries
 
     # endregion Private methods

@@ -16,6 +16,7 @@ import pandas as pd
 from ..dotnet import pythonnet_implementation as impl
 from .result_reader import ResultReader
 from ..quantities import TimeSeriesId
+from ..result_query import QueryDataCreator
 
 
 class ResultReaderQuery(ResultReader):
@@ -31,7 +32,7 @@ class ResultReaderQuery(ResultReader):
             raise NotImplementedError(
                 f"ResultReaderQuery does not support column_mode {column_mode}."
             )
-        queries = [t.to_query() for t in timeseries_ids]
+        queries = [QueryDataCreator.from_timeseries_id(t) for t in timeseries_ids]
 
         dfs = []
         for query in queries:

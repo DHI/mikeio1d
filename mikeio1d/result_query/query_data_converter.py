@@ -11,13 +11,13 @@ if TYPE_CHECKING:
 from ..quantities import TimeSeriesId
 
 
-class QueryDataAdapter:
-    """Adapter class for converting QueryData TimeSeriesId.
+class QueryDataConverter:
+    """Converter class for converting QueryData objects to TimeSeriesId objects.
 
     Parameters
     ----------
     query : QueryData
-        Query object to adapt.
+        Query object to convert.
 
     """
 
@@ -61,4 +61,21 @@ class QueryDataAdapter:
         List[TimeSeriesId]
             List of timeseries ids.
         """
-        return [QueryDataAdapter(query).to_timeseries_id(res1d) for query in queries]
+        return [QueryDataConverter(query).to_timeseries_id(res1d) for query in queries]
+
+    @staticmethod
+    def convert_time_series_id_to_query(time_series_id: TimeSeriesId) -> QueryData:
+        """
+        Convert TimeSeriesId object to QueryData object.
+
+        Parameters
+        ----------
+        time_series_id : TimeSeriesId
+            TimeSeriesId object to convert.
+
+        Returns
+        -------
+        QueryData
+            QueryData object.
+        """
+        return QueryData.from_timeseries_id(time_series_id)
