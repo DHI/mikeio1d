@@ -60,12 +60,6 @@ namespace DHI.Mike1D.MikeIO
     }
 
     /// <inheritdoc />
-    protected override void SortResults()
-    {
-      _mapIdToResultEvents.Values.ToList().ForEach(x => x.SortOnTimePeriod());
-    }
-
-    /// <inheritdoc />
     protected override void ProcessResults()
     {
       foreach (var mapIdToResultEvent in _mapIdToResultEvents)
