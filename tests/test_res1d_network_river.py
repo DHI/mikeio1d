@@ -103,7 +103,7 @@ def test_structure_attributes(test_file):
 
     column_mode = res1d.result_reader.column_mode
 
-    if column_mode == ColumnMode.ALL:
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
         actual_max = round(
             df.T.query(
                 "quantity=='DischargeInStructure' and name=='W_right:link_basin_right' and chainage==18"
@@ -114,7 +114,7 @@ def test_structure_attributes(test_file):
         actual_max = round(df["DischargeInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 11.018
 
-    if column_mode == ColumnMode.ALL:
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
         actual_max = round(
             df.T.query(
                 "quantity=='DischargeInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
@@ -136,7 +136,7 @@ def test_structure_attributes(test_file):
         actual_max = round(df["FlowAreaInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 9.851
 
-    if column_mode == ColumnMode.ALL:
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
         actual_max = round(
             df.T.query(
                 "quantity=='FlowAreaInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"

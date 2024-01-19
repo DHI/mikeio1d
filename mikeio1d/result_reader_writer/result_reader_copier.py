@@ -97,7 +97,10 @@ class ResultReaderCopier(ResultReader):
         data_pointer_net = IntPtr(data_pointer)
         self.result_data_copier.CopyData(data_pointer_net, data_entries)
 
-        columns = self.create_column_index(timeseries_ids, column_mode=column_mode)
+        try:
+            columns = self.create_column_index(timeseries_ids, column_mode=column_mode)
+        except:
+            raise ValueError(f"Could not create column index for column_mode {column_mode}.")
 
         df = pd.DataFrame(data_array, index=self.time_index, columns=columns)
 
@@ -113,8 +116,11 @@ class ResultReaderCopier(ResultReader):
         """Creates a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
         if column_mode is None:
             column_mode = self.column_mode
+
         if column_mode == ColumnMode.ALL:
             return TimeSeriesId.to_multiindex(timeseries_ids)
+        elif column_mode == ColumnMode.COMPACT:
+            return TimeSeriesId.to_multiindex(timeseries_ids, compact=True)
         elif column_mode == ColumnMode.TIMESERIES:
             return pd.Index(timeseries_ids)
         elif column_mode == ColumnMode.STRING:
