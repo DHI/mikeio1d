@@ -4,9 +4,11 @@ import numpy as np
 import pandas as pd
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
-from mikeio1d.res1d import Res1D, QueryDataCatchment
+from mikeio1d.res1d import Res1D
+from mikeio1d.query import QueryDataCatchment
 from mikeio1d.dotnet import to_numpy
 from mikeio1d.result_network import ResultCatchment
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
 
 @pytest.fixture
@@ -175,10 +177,17 @@ def test_catchment_attributes(test_file):
     catchments.c_22_8_8.TotalRunOff.add()
     df = res1d.read()
 
-    actual_max = round(df["TotalRunOff:20_2_2"].max(), 3)
+    column_mode = res1d.result_reader.column_mode
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(df.T.query("quantity=='TotalRunOff' and name=='20_2_2'").T.max(), 3)
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["TotalRunOff:20_2_2"].max(), 3)
     assert pytest.approx(actual_max) == 0.236
 
-    actual_max = round(df["TotalRunOff:22_8_8"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(df.T.query("quantity=='TotalRunOff' and name=='22_8_8'").T.max(), 3)
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["TotalRunOff:22_8_8"].max(), 3)
     assert pytest.approx(actual_max) == 0.231
 
 

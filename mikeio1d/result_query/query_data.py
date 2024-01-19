@@ -1,11 +1,22 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..res1d import Res1D
+
+from abc import ABC
+from abc import abstractmethod
+
 import numpy as np
 
 from ..custom_exceptions import NoDataForQuery
 from ..custom_exceptions import InvalidQuantity
 from ..various import NAME_DELIMITER
+from ..quantities import TimeSeriesId
 
 
-class QueryData:
+class QueryData(ABC):
     """
     Base query class that declares what data to extract from a .res1d file.
 
@@ -35,20 +46,16 @@ class QueryData:
         if self.name is not None and not isinstance(self.name, str):
             raise TypeError("Argument 'name' must be either None or a string.")
 
-    def add_to_data_entries(self, res1d, data_entries, column_names):
-        self._check_invalid_quantity(res1d)
+    @abstractmethod
+    def to_timeseries_id(self) -> TimeSeriesId:
+        """Convert query to timeseries id."""
+        ...
 
-        self._update_query(res1d)
-
-        query_label = str(self)
-        result_quantity = res1d.result_network.result_quantity_map.get(query_label, None)
-
-        self._check_invalid_values(result_quantity)
-
-        column_names.append(query_label)
-
-        data_entry = result_quantity.get_data_entry_net()
-        data_entries.Add(data_entry)
+    @staticmethod
+    @abstractmethod
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryData:
+        """Create query from TimeSeriesId."""
+        ...
 
     @staticmethod
     def from_dotnet_to_python(array):
@@ -63,10 +70,11 @@ class QueryData:
     def name(self):
         return self._name
 
-    def _update_query(self, res1d):
-        pass
+    @abstractmethod
+    def _update_query(self, res1d: Res1D):
+        ...
 
-    def _check_invalid_quantity(self, res1d):
+    def _check_invalid_quantity(self, res1d: Res1D):
         if self._quantity not in res1d.quantities:
             raise InvalidQuantity(
                 f"Undefined quantity {self._quantity}. "
