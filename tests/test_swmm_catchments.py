@@ -6,6 +6,7 @@ from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
 from mikeio1d.res1d import Res1D
 from mikeio1d.query import QueryDataCatchment
 from mikeio1d.dotnet import to_numpy
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
 
 @pytest.fixture
@@ -101,11 +102,13 @@ def test_dotnet_methods(test_file):
 def test_swmm_out_filter(test_file_path, helpers):
     catchments = ["5", "6"]
     swmm_out = Res1D(test_file_path, catchments=catchments)
+    swmm_out.result_reader.column_mode = ColumnMode.ALL
 
     df_5 = swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "5"))
     df_6 = swmm_out.read(QueryDataCatchment("SWMM_SUBCATCH_RUNOFF", "6"))
 
     swmm_out_full = Res1D(test_file_path)
+    swmm_out_full.result_reader.column_mode = ColumnMode.ALL
     df_full = swmm_out_full.read()
 
     helpers.assert_shared_columns_equal(df_full, df_5)
