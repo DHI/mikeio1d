@@ -78,7 +78,22 @@
            <div itemprop="articleBody">
              
   <h1>Source code for mikeio1d.res1d</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os.path</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+    <span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryData</span>
+    <span class="kn">from</span> <span class="nn">.result_reader_writer.result_reader</span> <span class="kn">import</span> <span class="n">ColumnMode</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="kn">from</span> <span class="nn">.dotnet</span> <span class="kn">import</span> <span class="n">from_dotnet_datetime</span>
 <span class="kn">from</span> <span class="nn">.dotnet</span> <span class="kn">import</span> <span class="n">to_dotnet_datetime</span>
@@ -87,20 +102,23 @@
 <span class="kn">from</span> <span class="nn">.result_extractor</span> <span class="kn">import</span> <span class="n">ExtractorCreator</span>
 <span class="kn">from</span> <span class="nn">.result_extractor</span> <span class="kn">import</span> <span class="n">ExtractorOutputFileType</span>
 <span class="kn">from</span> <span class="nn">.result_network</span> <span class="kn">import</span> <span class="n">ResultNetwork</span>
-<span class="kn">from</span> <span class="nn">.result_network</span> <span class="kn">import</span> <span class="n">ResultCatchment</span>
 <span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultReaderCreator</span>
 <span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultReaderType</span>
 <span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultWriter</span>
 
-<span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryData</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryDataCatchment</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryDataNode</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryDataReach</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryDataStructure</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">QueryDataGlobal</span>  <span class="c1"># noqa: F401</span>
 
+<span class="kn">from</span> <span class="nn">.result_query.query_data_converter</span> <span class="kn">import</span> <span class="n">QueryDataConverter</span>
+
 <span class="kn">from</span> <span class="nn">.various</span> <span class="kn">import</span> <span class="n">mike1d_quantities</span>  <span class="c1"># noqa: F401</span>
 <span class="kn">from</span> <span class="nn">.various</span> <span class="kn">import</span> <span class="n">NAME_DELIMITER</span>
+<span class="kn">from</span> <span class="nn">.various</span> <span class="kn">import</span> <span class="n">make_list_if_not_iterable</span>
+
+<span class="kn">from</span> <span class="nn">.quantities</span> <span class="kn">import</span> <span class="n">TimeSeriesId</span>
 
 <span class="kn">from</span> <span class="nn">System</span> <span class="kn">import</span> <span class="n">DateTime</span>
 
@@ -162,7 +180,7 @@
         <span class="n">catchments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">col_name_delimiter</span><span class="o">=</span><span class="n">NAME_DELIMITER</span><span class="p">,</span>
         <span class="n">put_chainage_in_col_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">clear_queries_after_reading</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">clear_queue_after_reading</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">result_reader_type</span><span class="o">=</span><span class="n">ResultReaderType</span><span class="o">.</span><span class="n">COPIER</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span> <span class="o">=</span> <span class="n">ResultReaderCreator</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
@@ -183,9 +201,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span> <span class="o">=</span> <span class="n">ResultNetwork</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result_writer</span> <span class="o">=</span> <span class="n">ResultWriter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queries</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">clear_queries_after_reading</span> <span class="o">=</span> <span class="n">clear_queries_after_reading</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_queue_after_reading</span> <span class="o">=</span> <span class="n">clear_queue_after_reading</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">catchments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">catchments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reaches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">reaches</span>
@@ -212,17 +229,44 @@
 
     <span class="c1"># region Private methods</span>
 
-    <span class="k">def</span> <span class="nf">_get_actual_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds out which list of queries should be used.&quot;&quot;&quot;</span>
-        <span class="n">queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queries</span> <span class="k">if</span> <span class="n">queries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">queries</span>
-        <span class="n">queries</span> <span class="o">=</span> <span class="n">queries</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">queries</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">_get_timeseries_ids_to_read</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">QueryData</span><span class="p">]</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find out which list of TimeSeriesId objects should be used for reading.</span>
+
+<span class="sd">        If user supplies queries, then convert them to TimeSeriesId. Otherwise use the</span>
+<span class="sd">        current queue of TimeSeriesId objects.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        queries : List[QueryData] | List[TimeSeriesId]</span>
+<span class="sd">            List of queries or time series ids supplied in read() method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List of TimeSeriesId objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">queries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queue</span>
+
+        <span class="n">queries</span> <span class="o">=</span> <span class="n">make_list_if_not_iterable</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+
+        <span class="n">is_already_time_series_ids</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">queries</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">TimeSeriesId</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_already_time_series_ids</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">queries</span>
+
+        <span class="n">queries</span> <span class="o">=</span> <span class="n">QueryDataConverter</span><span class="o">.</span><span class="n">convert_queries_to_time_series_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">queries</span>
 
     <span class="c1"># endregion Private methods</span>
 
 <div class="viewcode-block" id="Res1D.read">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.read">[docs]</a>
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">queries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">QueryData</span><span class="p">]</span> <span class="o">|</span> <span class="n">QueryData</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">|</span> <span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">column_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">ColumnMode</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read loaded .res1d file data based on queries.</span>
 <span class="sd">        Currently the supported query classes are</span>
@@ -235,6 +279,16 @@
 <span class="sd">        ----------</span>
 <span class="sd">        queries: A single query or a list of queries.</span>
 <span class="sd">            Default is None = reads all data.</span>
+<span class="sd">        column_mode : str | ColumnMode (optional)</span>
+<span class="sd">            Specifies the type of column index of returned DataFrame.</span>
+<span class="sd">            &#39;all&#39; - column MultiIndex with levels matching TimeSeriesId objects.</span>
+<span class="sd">            &#39;compact&#39; - same as &#39;all&#39;, but removes levels with default values.</span>
+<span class="sd">            &#39;timeseries&#39; - column index of TimeSeriesId objects</span>
+<span class="sd">            &#39;str&#39; - column index of str representations of QueryData objects</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -248,52 +302,70 @@
 <span class="sd">        &gt;&gt;&gt; res1d.read(queries)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">queries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_all</span><span class="p">()</span>
+        <span class="n">timeseries_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_timeseries_ids_to_read</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
 
-        <span class="n">queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_actual_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">timeseries_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_all</span><span class="p">(</span><span class="n">column_mode</span><span class="o">=</span><span class="n">column_mode</span><span class="p">)</span>
 
-        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">timeseries_ids</span><span class="p">,</span> <span class="n">column_mode</span><span class="o">=</span><span class="n">column_mode</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_queue_after_reading</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_queue</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">df</span></div>
 
 
 <div class="viewcode-block" id="Res1D.read_all">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.read_all">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read all data from res1d file to dataframe.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span><span class="o">.</span><span class="n">read_all</span><span class="p">()</span></div>
+    <span class="k">def</span> <span class="nf">read_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">ColumnMode</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read all data from res1d file to dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        column_mode : str | ColumnMode (optional)</span>
+<span class="sd">            Specifies the type of column index of returned DataFrame.</span>
+<span class="sd">            &#39;all&#39; - column MultiIndex with levels matching TimeSeriesId objects.</span>
+<span class="sd">            &#39;compact&#39; - same as &#39;all&#39;, but removes levels with default values.</span>
+<span class="sd">            &#39;timeseries&#39; - column index of TimeSeriesId objects</span>
+<span class="sd">            &#39;str&#39; - column index of str representations of QueryData objects</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span><span class="o">.</span><span class="n">read_all</span><span class="p">(</span><span class="n">column_mode</span><span class="o">=</span><span class="n">column_mode</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Res1D.clear_queries">
-<a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.clear_queries">[docs]</a>
-    <span class="k">def</span> <span class="nf">clear_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Res1D.clear_queue">
+<a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.clear_queue">[docs]</a>
+    <span class="k">def</span> <span class="nf">clear_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear the current active list of queries.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queries_ids</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">time_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">time_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;pandas.DatetimeIndex of the time index.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span><span class="o">.</span><span class="n">time_index</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start time of the result file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span>
 
         <span class="k">return</span> <span class="n">from_dotnet_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">StartTime</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">end_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">end_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;End time of the result file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_time</span>
 
         <span class="k">return</span> <span class="n">from_dotnet_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">EndTime</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">quantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">quantities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Quantities in res1d file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_reader</span><span class="o">.</span><span class="n">quantities</span>
 
@@ -368,7 +440,7 @@
 
 <div class="viewcode-block" id="Res1D.modify">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.modify">[docs]</a>
-    <span class="k">def</span> <span class="nf">modify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">modify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Modifies the ResultData object TimeData based on the provided data frame.</span>
 
@@ -401,7 +473,13 @@
 
 <div class="viewcode-block" id="Res1D.extract">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.extract">[docs]</a>
-    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_path</span><span class="p">,</span>
+        <span class="n">queries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">QueryData</span><span class="p">]</span> <span class="o">|</span> <span class="n">QueryData</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">|</span> <span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">ext</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract given queries to provided file.</span>
 <span class="sd">        File type is determined from file_path extension.</span>
@@ -424,35 +502,50 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">ext</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ext</span>
 
-        <span class="n">queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_actual_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
-        <span class="n">data_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">convert_queries_to_data_entries</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+        <span class="n">timeseries_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_timeseries_ids_to_read</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+        <span class="n">data_entries</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_data_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timeseries_ids</span><span class="p">]</span>
 
         <span class="n">extractor</span> <span class="o">=</span> <span class="n">ExtractorCreator</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">ext</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">data_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">time_step_skipping_number</span>
         <span class="p">)</span>
         <span class="n">extractor</span><span class="o">.</span><span class="n">export</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_queries_after_reading</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clear_queries</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_queue_after_reading</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_queue</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Res1D.to_csv">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.to_csv">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_path</span><span class="p">,</span>
+        <span class="n">queries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">QueryData</span><span class="p">]</span> <span class="o">|</span> <span class="n">QueryData</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">|</span> <span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract to csv file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="p">,</span> <span class="n">ExtractorOutputFileType</span><span class="o">.</span><span class="n">CSV</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Res1D.to_dfs0">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.to_dfs0">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dfs0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_dfs0</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_path</span><span class="p">,</span>
+        <span class="n">queries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">QueryData</span><span class="p">]</span> <span class="o">|</span> <span class="n">QueryData</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">|</span> <span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract to dfs0 file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="p">,</span> <span class="n">ExtractorOutputFileType</span><span class="o">.</span><span class="n">DFS0</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Res1D.to_txt">
 <a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.to_txt">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_txt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_path</span><span class="p">,</span>
+        <span class="n">queries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">QueryData</span><span class="p">]</span> <span class="o">|</span> <span class="n">QueryData</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">|</span> <span class="n">TimeSeriesId</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_step_skipping_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract to txt file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="p">,</span> <span class="n">ExtractorOutputFileType</span><span class="o">.</span><span class="n">TXT</span><span class="p">)</span></div>
 </div>

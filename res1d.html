@@ -55,8 +55,9 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Res1D</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#res1d-api">Res1D API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mikeio1d.Res1D"><code class="docutils literal notranslate"><span class="pre">Res1D</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.clear_queries"><code class="docutils literal notranslate"><span class="pre">Res1D.clear_queries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.clear_queue"><code class="docutils literal notranslate"><span class="pre">Res1D.clear_queue()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.data"><code class="docutils literal notranslate"><span class="pre">Res1D.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.end_time"><code class="docutils literal notranslate"><span class="pre">Res1D.end_time</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.extract"><code class="docutils literal notranslate"><span class="pre">Res1D.extract()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.file_path"><code class="docutils literal notranslate"><span class="pre">Res1D.file_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.modify"><code class="docutils literal notranslate"><span class="pre">Res1D.modify()</span></code></a></li>
@@ -67,6 +68,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.read_all"><code class="docutils literal notranslate"><span class="pre">Res1D.read_all()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.save"><code class="docutils literal notranslate"><span class="pre">Res1D.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.searcher"><code class="docutils literal notranslate"><span class="pre">Res1D.searcher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.start_time"><code class="docutils literal notranslate"><span class="pre">Res1D.start_time</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.time_index"><code class="docutils literal notranslate"><span class="pre">Res1D.time_index</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.to_csv"><code class="docutils literal notranslate"><span class="pre">Res1D.to_csv()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.to_dfs0"><code class="docutils literal notranslate"><span class="pre">Res1D.to_dfs0()</span></code></a></li>
@@ -110,7 +112,7 @@
 <h2>Res1D API<a class="headerlink" href="#res1d-api" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mikeio1d.Res1D">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mikeio1d.</span></span><span class="sig-name descname"><span class="pre">Res1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lazy_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catchments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name_delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">put_chainage_in_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_queries_after_reading</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_reader_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'copier'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mikeio1d.</span></span><span class="sig-name descname"><span class="pre">Res1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lazy_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catchments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name_delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">put_chainage_in_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_queue_after_reading</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_reader_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'copier'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D" title="Link to this definition"></a></dt>
 <dd><p>Class for reading data from 1D network result files into Pandas data frame.
 Currently supported formats are:</p>
 <ul class="simple">
@@ -147,8 +149,8 @@ ID ‘node1’, ‘node2’ and reaches with ID ‘reach1’, ‘reach2’:</p>
 </pre></div>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="mikeio1d.Res1D.clear_queries">
-<span class="sig-name descname"><span class="pre">clear_queries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.clear_queries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.clear_queries" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="mikeio1d.Res1D.clear_queue">
+<span class="sig-name descname"><span class="pre">clear_queue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.clear_queue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.clear_queue" title="Link to this definition"></a></dt>
 <dd><p>Clear the current active list of queries.</p>
 </dd></dl>
 
@@ -158,6 +160,12 @@ ID ‘node1’, ‘node2’ and reaches with ID ‘reach1’, ‘reach2’:</p>
 <dd><p>.NET object ResultData with the loaded res1d data.</p>
 <p>More information about ResultData class see:
 <a class="reference external" href="https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm">https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm</a></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mikeio1d.Res1D.end_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">end_time</span></span><a class="headerlink" href="#mikeio1d.Res1D.end_time" title="Link to this definition"></a></dt>
+<dd><p>End time of the result file.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -224,7 +232,7 @@ Can be ‘csv’, ‘dfs0’, ‘txt’.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mikeio1d.Res1D.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.read" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.read" title="Link to this definition"></a></dt>
 <dd><p>Read loaded .res1d file data based on queries.
 Currently the supported query classes are</p>
 <ul class="simple">
@@ -234,7 +242,17 @@ Currently the supported query classes are</p>
 </ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>queries</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">A</span> <span class="pre">single</span> <span class="pre">query</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">a</span> <span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">queries.</span></code>) – Default is None = reads all data.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>queries</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">A</span> <span class="pre">single</span> <span class="pre">query</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">a</span> <span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">queries.</span></code>) – Default is None = reads all data.</p></li>
+<li><p><strong>column_mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">ColumnMode</span> <span class="pre">(optional)</span></code>) – Specifies the type of column index of returned DataFrame.
+‘all’ - column MultiIndex with levels matching TimeSeriesId objects.
+‘compact’ - same as ‘all’, but removes levels with default values.
+‘timeseries’ - column index of TimeSeriesId objects
+‘str’ - column index of str representations of QueryData objects</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -251,8 +269,20 @@ Currently the supported query classes are</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mikeio1d.Res1D.read_all">
-<span class="sig-name descname"><span class="pre">read_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.read_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.read_all" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">read_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.read_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.read_all" title="Link to this definition"></a></dt>
 <dd><p>Read all data from res1d file to dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>column_mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">ColumnMode</span> <span class="pre">(optional)</span></code>) – Specifies the type of column index of returned DataFrame.
+‘all’ - column MultiIndex with levels matching TimeSeriesId objects.
+‘compact’ - same as ‘all’, but removes levels with default values.
+‘timeseries’ - column index of TimeSeriesId objects
+‘str’ - column index of str representations of QueryData objects</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -272,6 +302,12 @@ Currently the supported query classes are</p>
 <dd><p>.NET object ResultDataSearcher to use for searching res1d data items on network.</p>
 <p>More information about ResultDataSearcher class see:
 <a class="reference external" href="https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm">https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm</a></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mikeio1d.Res1D.start_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_time</span></span><a class="headerlink" href="#mikeio1d.Res1D.start_time" title="Link to this definition"></a></dt>
+<dd><p>Start time of the result file.</p>
 </dd></dl>
 
 <dl class="py property">
