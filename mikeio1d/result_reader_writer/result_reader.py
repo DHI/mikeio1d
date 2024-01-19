@@ -34,6 +34,8 @@ class ColumnMode(str, Enum):
 
     ALL = "all"
     """Uses a column MultiIndex with all possible metadata."""
+    COMPACT = "compact"
+    """Uses a column MultiIndex with only the relevant metadata."""
     TIMESERIES = "timeseries"
     """Uses a column Index with headers as TimeSeriesId objects"""
     STRING = "str"
@@ -105,12 +107,13 @@ class ResultReader(ABC):
 
         self.quantities = [quantity.Id for quantity in self.data.Quantities]
 
-        self.column_mode: ColumnMode = ColumnMode.STRING
+        self.column_mode: ColumnMode = ColumnMode.COMPACT
         """Specifies the type of column index of returned DataFrames.
         
         'all' - Uses a column MultiIndex with all possible metadata
-        'str' - Uses a column Index with headers as the string representation of QueryData objects
+        'compact' - Uses a column MultiIndex with only the relevant metadata
         'timeseries' - Uses a column Index with headers as TimeSeriesId objects
+        'str' - Uses a column Index with headers as the string representation of QueryData objects
         """
 
     # region File loading
@@ -264,9 +267,15 @@ class ResultReader(ABC):
 
         simulation_start = from_dotnet_datetime(self.data.StartTime)
 
+        column_level_names = None
+        if isinstance(df.columns, pd.MultiIndex):
+            column_level_names = df.columns.names
+
         # Loop over all columns by number and update them by number as well.
         for i in range(len(df.columns)):
-            if not self._is_lts_event_time_column(df.columns[i]):
+            if not self._is_lts_event_time_column(
+                df.columns[i], column_level_names=column_level_names
+            ):
                 continue
 
             seconds_since_simulation_started = df.iloc[:, i]
@@ -276,13 +285,20 @@ class ResultReader(ABC):
             ]
             df.iloc[:, i] = datetime_since_simulation_started
 
-    def _is_lts_event_time_column(self, quantity_column: str | TimeSeriesId | tuple) -> bool:
+    def _is_lts_event_time_column(
+        self,
+        quantity_column: str | TimeSeriesId | tuple,
+        column_level_names: Optional[List[str]] = None,
+    ) -> bool:
         """Determines if the quantity_column is the LTS event time column.
 
         Parameters
         ----------
         quantity_column : str | TimeSeriesId | tuple
             The column header containing the event statistic quantities.
+        column_level_names : list of str, optional
+            The column level names of the data frame, by default None.
+            Only used if the data frame has a MultiIndex column index.
         """
         if isinstance(quantity_column, str):
             time_suffix = f"Time{self.col_name_delimiter}"
@@ -291,7 +307,7 @@ class ResultReader(ABC):
             quantity = quantity_column.quantity
             return quantity.endswith("Time")
         elif isinstance(quantity_column, tuple):
-            tsid = TimeSeriesId.from_tuple(quantity_column)
+            tsid = TimeSeriesId.from_tuple(quantity_column, column_level_names=column_level_names)
             quantity = tsid.quantity
             return quantity.endswith("Time")
         else:

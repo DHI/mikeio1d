@@ -72,3 +72,21 @@ def test_mikeio1d_generates_dataframe_reading_queries(result_reader, extension):
         sample_queries = sample_random_queries(res)
         df = res.read(sample_queries)
         assert len(df) > 0
+
+
+@pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
+@pytest.mark.parametrize(
+    "column_mode", [ColumnMode.ALL, ColumnMode.COMPACT, ColumnMode.TIMESERIES, ColumnMode.STRING]
+)
+def test_mikeio1d_all_column_modes_basic(extension, column_mode):
+    """Basic check that no errors are raised for reading in all column modes."""
+    for name in testdata_name():
+        path = getattr(testdata, name)
+        if not path.endswith(extension):
+            continue
+        res = Res1D(path)
+        sample_queries = sample_random_queries(res)
+        df = res.read(sample_queries, column_mode=column_mode)
+        assert len(df) > 0
+        df = res.read(column_mode=column_mode)
+        assert len(df) > 0

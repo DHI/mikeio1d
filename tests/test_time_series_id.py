@@ -18,6 +18,8 @@ from mikeio1d.query import QueryDataNode
 from mikeio1d.query import QueryDataReach
 from mikeio1d.query import QueryDataStructure
 
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
+
 from mikeio1d.dotnet import pythonnet_implementation as impl
 
 
@@ -340,6 +342,24 @@ def test_time_series_id_from_multiindex():
     assert time_series_ids[0].quantity == "Discharge"
     assert time_series_ids[1].name == "Node2"
     assert time_series_ids[1].quantity == "Discharge"
+
+
+def test_time_series_id_from_multiindex_compact():
+    multiindex = pd.MultiIndex.from_tuples(
+        [
+            ("Discharge", "Node", "Node1"),
+            ("Discharge", "Node", "Node2"),
+        ],
+        names=["quantity", "group", "name"],
+    )
+    expected = [
+        TimeSeriesId("Discharge", "Node", "Node1"),
+        TimeSeriesId("Discharge", "Node", "Node2"),
+    ]
+    time_series_ids = TimeSeriesId.from_multiindex(multiindex)
+    assert len(time_series_ids) == 2
+    for tsid, expected_tsid in zip(time_series_ids, expected):
+        assert tsid == expected_tsid
 
 
 def test_time_series_id_from_dataset_dataitem_and_element(reach: ResultReach):

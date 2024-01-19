@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Any
+    from typing import Optional
     from typing import List
     from typing import Tuple
     from ..res1d import Res1D
@@ -12,6 +13,8 @@ if TYPE_CHECKING:
 
 import dataclasses
 from dataclasses import dataclass
+from dataclasses import fields
+
 from enum import Enum
 import pandas as pd
 
@@ -263,48 +266,103 @@ class TimeSeriesId:
         return query.to_timeseries_id()
 
     @staticmethod
-    def from_tuple(t: Tuple) -> TimeSeriesId:
+    def from_tuple(t: Tuple, column_level_names: Optional[List[str]] = None) -> TimeSeriesId:
         """Convert a tuple to a TimeSeriesId object."""
-        return TimeSeriesId(
-            quantity=t[0],
-            group=t[1],
-            name=t[2],
-            chainage=t[3],
-            tag=t[4],
-            duplicate=t[5],
-            derived=t[6],
-        )
+        if not column_level_names:
+            return TimeSeriesId(
+                quantity=t[0],
+                group=t[1],
+                name=t[2],
+                chainage=t[3],
+                tag=t[4],
+                duplicate=t[5],
+                derived=t[6],
+            )
+        else:
+            return TimeSeriesId(**dict(zip(column_level_names, t)))
 
     @staticmethod
-    def to_multiindex(timeseries_ids: List[TimeSeriesId]) -> pd.MultiIndex:
-        """Convert a list of TimeSeriesId objects to a pandas MultiIndex."""
-        return pd.MultiIndex.from_tuples(
+    def to_multiindex(timeseries_ids: List[TimeSeriesId], compact=False) -> pd.MultiIndex:
+        """
+        Convert a list of TimeSeriesId objects to a pandas MultiIndex.
+
+        Parameters
+        ----------
+        timeseries_ids : List[TimeSeriesId]
+            The list of TimeSeriesId objects to convert.
+        compact : bool, optional
+            Whether to compact the MultiIndex by removing redundant levels, by default False
+
+        Returns
+        -------
+        pd.MultiIndex
+            The converted MultiIndex.
+        """
+        index = pd.MultiIndex.from_tuples(
             [tsid.astuple() for tsid in timeseries_ids],
             names=["quantity", "group", "name", "chainage", "tag", "duplicate", "derived"],
         )
+
+        if not compact:
+            return index
+
+        for field in fields(TimeSeriesId):
+            level_values = index.get_level_values(field.name)
+            is_only_one_unique_value = len(level_values.unique()) == 1
+            if not is_only_one_unique_value:
+                continue
+            level_value = level_values[0]
+            is_all_default_values = level_value == field.default
+            # Note: nan != nan, so we need to check for this case
+            if is_all_default_values and not (
+                level_value != level_value and field.default != field.default
+            ):
+                continue
+            if is_all_default_values:
+                index.droplevel(field.name)
+
+        return index
 
     @staticmethod
     def from_multiindex(index: pd.MultiIndex) -> List[TimeSeriesId]:
         """Convert a pandas MultiIndex to a list of TimeSeriesId objects."""
         if isinstance(index[0], tuple):
-            return [
-                TimeSeriesId(
-                    quantity=quantity,
-                    group=group,
-                    name=name,
-                    chainage=chainage,
-                    tag=tag,
-                    duplicate=duplicate,
-                    derived=derived,
-                )
-                for quantity, group, name, chainage, tag, duplicate, derived in index
-            ]
+            if TimeSeriesId._is_multiindex_complete(index):
+                return [
+                    TimeSeriesId(
+                        quantity=quantity,
+                        group=group,
+                        name=name,
+                        chainage=chainage,
+                        tag=tag,
+                        duplicate=duplicate,
+                        derived=derived,
+                    )
+                    for quantity, group, name, chainage, tag, duplicate, derived in index
+                ]
+            else:
+                # Assumes default values for missing fields
+                available_fields = TimeSeriesId._get_multiindex_as_list_of_dicts(index)
+                return [TimeSeriesId(**v) for v in available_fields]
+
         elif isinstance(index[0], TimeSeriesId):
             return index.to_list()
         else:
             raise ValueError(
                 f"Cannot convert index of type '{type(index[0])}' to list of TimeSeriesId objects"
             )
+
+    @staticmethod
+    def _get_multiindex_as_list_of_dicts(index: pd.MultiIndex) -> List[dict]:
+        """Convert a pandas MultiIndex to a list of dicts, where keys are the level name and values are the column names."""
+        return [dict(zip(index.names, col)) for col in index.values]
+
+    @staticmethod
+    def _is_multiindex_complete(index: pd.MultiIndex) -> bool:
+        """Check whether the levels of a MultiIndex match the fields of TimeSeriesId."""
+        index_fields = set(index.names)
+        timeseries_id_fields = set([field.name for field in fields(TimeSeriesId)])
+        return index_fields == timeseries_id_fields
 
     @staticmethod
     def from_dataset_dataitem_and_element(
