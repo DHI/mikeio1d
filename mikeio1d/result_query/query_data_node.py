@@ -47,6 +47,9 @@ class QueryDataNode(QueryData):
         )
         return tsid
 
+    def _update_query(self, res1d: Res1D):
+        pass
+
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataNode:
         return QueryDataNode(timeseries_id.quantity, timeseries_id.name, validate=False)

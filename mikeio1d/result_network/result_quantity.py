@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 from .data_entry import DataEntry
 from ..quantities import TimeSeriesId
+from ..result_query import QueryDataCreator
 
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
@@ -110,7 +111,7 @@ class ResultQuantity:
 
     def get_query(self):
         """Get query corresponding to ResultQuantity."""
-        return self._timeseries_id.to_query()
+        return QueryDataCreator.from_timeseries_id(self._timeseries_id)
 
     def get_data_entry(self):
         """Get DataEntry corresponding to ResultQuantity."""

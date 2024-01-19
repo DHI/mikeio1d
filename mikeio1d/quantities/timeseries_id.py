@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ..res1d import Res1D
     from ..result_network.result_quantity import ResultQuantity
     from ..query import QueryData
+    from ..result_network.data_entry import DataEntry
 
 import dataclasses
 from dataclasses import dataclass
@@ -19,7 +20,6 @@ from enum import Enum
 import pandas as pd
 
 from ..various import NAME_DELIMITER
-from ..result_network.data_entry import DataEntry
 
 from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
@@ -189,36 +189,6 @@ class TimeSeriesId:
             raise ValueError(f"Could not convert TimeSeriesId to ResultQuantity: {self}")
 
         return result_quantity
-
-    def to_query(self) -> QueryData:
-        """Converts a TimeSeriesId to a QueryData object."""
-        if self.derived:
-            raise ValueError("Cannot convert derived TimeSeriesId to QueryData")
-
-        # Note: imports are here to avoid circular imports
-        if self.group == TimeSeriesIdGroup.GLOBAL:
-            from ..query import QueryDataGlobal
-
-            return QueryDataGlobal.from_timeseries_id(self)
-        elif self.group == TimeSeriesIdGroup.NODE:
-            from ..query import QueryDataNode
-
-            return QueryDataNode.from_timeseries_id(self)
-
-        elif self.group == TimeSeriesIdGroup.REACH:
-            from ..query import QueryDataReach
-
-            return QueryDataReach.from_timeseries_id(self)
-        elif self.group == TimeSeriesIdGroup.CATCHMENT:
-            from ..query import QueryDataCatchment
-
-            return QueryDataCatchment.from_timeseries_id(self)
-        elif self.group == TimeSeriesIdGroup.STRUCTURE:
-            from ..query import QueryDataStructure
-
-            return QueryDataStructure.from_timeseries_id(self)
-        else:
-            raise ValueError(f"No query exists for group: {self.group}")
 
     def next_duplicate(self) -> TimeSeriesId:
         """Creates a duplicate TimeSeriesId object.
