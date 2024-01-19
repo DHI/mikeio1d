@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import List
+    from typing import Dict
     from geopandas import GeoDataFrame
 
 import pandas as pd
@@ -14,6 +16,8 @@ from .result_reaches import ResultReaches
 from .result_catchments import ResultCatchments
 from .result_global_datas import ResultGlobalDatas
 from .result_structures import ResultStructures
+from .result_quantity import ResultQuantity
+from ..quantities import TimeSeriesId
 
 
 class ResultNetwork:
@@ -35,10 +39,8 @@ class ResultNetwork:
         MIKE 1D ResultData object.
     data_items : IDataItems.
         MIKE 1D IDataItems object.
-    queries_ids : set
-        A set of string representing query ids, i.e., query.__repr__()
-    queries : list of QueryData objects
-        A list of actual QueryData object, which are used when res1d.read() is called.
+    queue: list
+        A list of TimeSeriesId objects to be used when calling res1D.read().
     nodes : ResultNodes object
         Is is a wrapper class object for all ResultData nodes.
     reaches : ResultReaches object
@@ -48,8 +50,9 @@ class ResultNetwork:
     global_data : ResultGlobalDatas object
         Is a wrapper class object for all ResultData global data items.
     result_quantity_map : dict
-        Dictionary from unique query label to a ResultQuantity object corresponding
-        to that query. The keys of this dictionary should represent all possible query labels.
+        Dictionary from TimeSeriesId to a corresponding ResultQuantity object.
+        The keys of this dictionary represent all possible TimeSeriesId
+        objects that can be queried from the ResultNetwork.
 
     Examples
     --------
@@ -71,13 +74,36 @@ class ResultNetwork:
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
 
-        self.queries_ids = set()
-        self.queries = []
+        self.queue: List[TimeSeriesId] = []
 
-        self.result_quantity_map = {}
+        self.result_quantity_map: Dict[TimeSeriesId, ResultQuantity] = {}
 
         self.res1d.result_network = self
         self.set_result_locations()
+
+    def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
+        """
+        Add a ResultQuantity to map of all possible ResultQuantities.
+
+        Parameters
+        ----------
+        result_quantity : ResultQuantity
+            ResultQuantity object to be added to the result_quantity_map.
+
+        Returns
+        -------
+        TimeSeriesId
+            The TimeSeriesId key of the added ResultQuantity
+        """
+        tsid = TimeSeriesId.from_result_quantity(result_quantity)
+        while tsid in self.result_quantity_map:
+            if self.result_quantity_map[tsid] == result_quantity:
+                break
+            tsid = tsid.next_duplicate()
+        result_quantity._timeseries_id = tsid
+        self.result_quantity_map[tsid] = result_quantity
+
+        return tsid
 
     def set_result_locations(self):
         """
@@ -90,34 +116,19 @@ class ResultNetwork:
         self.structures = ResultStructures(res1d)
         self.global_data = ResultGlobalDatas(res1d)
 
-    def add_query(self, query):
+    def add_timeseries_id(self, timeseries_id: TimeSeriesId):
         """
-        Add a query to the queries list, which can be used
+        Add a TimeSeriesId to the queue list, which can be used
         when calling res1D.read().
         """
-        query_string = query.__repr__()
-        queries = self.queries
-        queries_ids = self.queries_ids
-        if query_string not in queries_ids:
-            queries_ids.add(query_string)
-            queries.append(query)
-
-    def convert_queries_to_data_entries(self, queries):
-        data_entries = []
-
-        for query in queries:
-            query_label = str(query)
-            result_quantity = self.result_quantity_map[query_label]
-            data_entry = result_quantity.get_data_entry()
-            data_entries.append(data_entry)
-
-        return data_entries
+        if timeseries_id not in self.queue:
+            self.queue.append(timeseries_id)
 
     def to_geopandas(self) -> GeoDataFrame:
         """
         Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed.
         """
-        gpd = try_import_geopandas()
+        gpd = try_import_geopandas()  # noqa: F841
         gdf_nodes = self.nodes.to_geopandas()
         gdf_reaches = self.reaches.to_geopandas()
         gdf_catchments = self.catchments.to_geopandas()

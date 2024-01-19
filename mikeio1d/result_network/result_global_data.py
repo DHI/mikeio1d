@@ -25,6 +25,21 @@ class ResultGlobalData(ResultLocation):
         self.global_datas = global_datas
         self.set_quantities()
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultGlobalData.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultGlobalData.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultGlobalData."""
+
+        return self.res1d.data.GlobalData
+
     def set_quantities(self):
         """
         Override of base set_quantities.
@@ -36,8 +51,7 @@ class ResultGlobalData(ResultLocation):
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add global data result quantity to result quantity maps."""
-        query = QueryDataGlobal(quantity_id)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def get_query(self, data_item):
         """Get a QueryDataGlobal for given data item."""

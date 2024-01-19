@@ -1,7 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..res1d import Res1D
+
+from math import isnan
+
 from ..custom_exceptions import InvalidQuantity
 from ..custom_exceptions import InvalidStructure
 from ..various import NAME_DELIMITER
 from .query_data_reach import QueryDataReach
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataStructure(QueryDataReach):
@@ -11,6 +22,8 @@ class QueryDataStructure(QueryDataReach):
     ----------
     quantity: str
         e.g. 'DischargeInStructure'. Call res1d.quantities to get all quantities.
+    structure: str
+        Structure name.
     name: str
         Reach name where the structure is located.
     chainage: float
@@ -27,7 +40,11 @@ class QueryDataStructure(QueryDataReach):
         super().__init__(quantity, name, chainage, validate=validate)
         self._structure = structure
 
-    def get_values(self, res1d):
+    @property
+    def structure(self):
+        return self._structure
+
+    def get_values(self, res1d: Res1D):
         self._check_invalid_quantity(res1d)
 
         result_structure = self._get_result_structure(res1d)
@@ -42,6 +59,32 @@ class QueryDataStructure(QueryDataReach):
         self._update_location_info(result_structure)
 
         return self.from_dotnet_to_python(values)
+
+    def to_timeseries_id(self) -> TimeSeriesId:
+        chainage = self.chainage
+        if chainage is None or chainage == "":
+            chainage = float("nan")
+        tsid = TimeSeriesId(
+            quantity=self.quantity,
+            group=TimeSeriesIdGroup.STRUCTURE,
+            name=self.structure,
+            chainage=chainage,
+            tag=self.name,
+        )
+        return tsid
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataStructure:
+        chainage = timeseries_id.chainage
+        if isnan(chainage):
+            chainage = None
+        return QueryDataStructure(
+            quantity=timeseries_id.quantity,
+            structure=timeseries_id.name,
+            name=timeseries_id.tag,
+            chainage=chainage,
+            validate=False,
+        )
 
     def _update_query(self, res1d):
         result_structure = self._get_result_structure(res1d)

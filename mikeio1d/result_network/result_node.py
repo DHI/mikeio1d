@@ -44,6 +44,21 @@ class ResultNode(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultNode.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultNode.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultNode."""
+
+        return self._node
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []
@@ -69,8 +84,7 @@ class ResultNode(ResultLocation):
         nodes_result_quantity_map = self.res1d.result_network.nodes.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, nodes_result_quantity_map)
 
-        query = QueryDataNode(quantity_id, self._node.ID, validate=False)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def get_query(self, data_item):
         """Get a QueryDataNode for given data item."""

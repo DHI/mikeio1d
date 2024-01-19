@@ -4,8 +4,12 @@ import numpy as np
 import pandas as pd
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
-from mikeio1d.res1d import Res1D, mike1d_quantities, QueryDataReach, QueryDataNode
+from mikeio1d.res1d import Res1D
+from mikeio1d.various import mike1d_quantities
+from mikeio1d.query import QueryDataReach
+from mikeio1d.query import QueryDataNode
 from mikeio1d.dotnet import to_numpy
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
 
 @pytest.fixture
@@ -186,12 +190,14 @@ def test_res1d_filter(test_file_path, helpers):
     nodes = ["1", "2"]
     reaches = ["9l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    res1d.result_reader.column_mode = ColumnMode.ALL
 
     df_9l1 = res1d.read(QueryDataReach("WaterLevel", "9l1", 10))
     df_1 = res1d.read(QueryDataNode("WaterLevel", "1"))
     df_2 = res1d.read(QueryDataNode("WaterLevel", "2"))
 
     res1d_full = Res1D(test_file_path)
+    res1d_full.result_reader.column_mode = ColumnMode.ALL
     df_full = res1d_full.read()
 
     helpers.assert_shared_columns_equal(df_full, df_9l1)
@@ -220,16 +226,16 @@ def test_res1d_filter_readall(test_file_path, helpers):
 
 def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
     res1d_full = Res1D(flow_split_file_path)
-    df_full = res1d_full.read()
+    df_full = res1d_full.read(column_mode=ColumnMode.ALL)
 
     for node in res1d_full.nodes:
         res1d = Res1D(flow_split_file_path, nodes=[str(node)])
-        df = res1d.read()
+        df = res1d.read(column_mode=ColumnMode.ALL)
         helpers.assert_shared_columns_equal(df_full, df)
 
     for reach in res1d_full.reaches:
         res1d = Res1D(flow_split_file_path, reaches=[str(reach)])
-        df = res1d.read()
+        df = res1d.read(column_mode=ColumnMode.ALL)
         helpers.assert_shared_columns_equal(df_full, df)
 
 
@@ -241,10 +247,18 @@ def test_node_attributes(test_file):
     nodes.n_2.WaterLevel.add()
     df = res1d.read()
 
-    actual_max = round(df["WaterLevel:1"].max(), 3)
+    column_mode = res1d.result_reader.column_mode
+
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(df.T.query("quantity=='WaterLevel' and name=='1'").T.max(), 3)
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["WaterLevel:1"].max(), 3)
     assert pytest.approx(actual_max) == 195.669
 
-    actual_max = round(df["WaterLevel:2"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(df.T.query("quantity=='WaterLevel' and name=='2'").T.max(), 3)
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["WaterLevel:2"].max(), 3)
     assert pytest.approx(actual_max) == 195.823
 
 
@@ -262,16 +276,38 @@ def test_reach_attributes(test_file):
 
     df = res1d.read()
 
-    actual_max = round(df["WaterLevel:104l1:34.4131"].max(), 3)
+    column_mode = res1d.result_reader.column_mode
+
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query("quantity=='WaterLevel' and name=='104l1' and chainage==34.4131").T.max(), 3
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["WaterLevel:104l1:34.4131"].max(), 3)
     assert pytest.approx(actual_max) == 197.046
 
-    actual_max = round(df["WaterLevel:9l1:10"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query("quantity=='WaterLevel' and name=='9l1' and chainage==10").T.max(), 3
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["WaterLevel:9l1:10"].max(), 3)
     assert pytest.approx(actual_max) == 195.165
 
-    actual_max = round(df["Discharge:100l1:23.8414"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query("quantity=='Discharge' and name=='100l1' and chainage==23.8414").T.max(), 3
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["Discharge:100l1:23.8414"].max(), 3)
     assert pytest.approx(actual_max) == 0.1
 
-    actual_max = round(df["Discharge:9l1:5"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query("quantity=='Discharge' and name=='9l1' and chainage==5").T.max(), 3
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["Discharge:9l1:5"].max(), 3)
     assert pytest.approx(actual_max) == 0.761
 
 

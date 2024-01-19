@@ -9,6 +9,7 @@ mpl.use("Agg")
 from mikeio1d.res1d import Res1D
 from mikeio1d.query import QueryDataStructure
 from mikeio1d.query import QueryDataGlobal
+from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
 
 @pytest.fixture
@@ -100,16 +101,50 @@ def test_structure_attributes(test_file):
 
     df = res1d.read()
 
-    actual_max = round(df["DischargeInStructure:W_right:link_basin_right:18"].max(), 3)
+    column_mode = res1d.result_reader.column_mode
+
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query(
+                "quantity=='DischargeInStructure' and name=='W_right:link_basin_right' and chainage==18"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["DischargeInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 11.018
 
-    actual_max = round(df["DischargeInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query(
+                "quantity=='DischargeInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["DischargeInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 13.543
 
-    actual_max = round(df["FlowAreaInStructure:W_right:link_basin_right:18"].max(), 3)
+    if column_mode == ColumnMode.ALL:
+        actual_max = round(
+            df.T.query(
+                "quantity=='FlowAreaInStructure' and name=='W_right:link_basin_right' and chainage==18"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["FlowAreaInStructure:W_right:link_basin_right:18"].max(), 3)
     assert pytest.approx(actual_max) == 9.851
 
-    actual_max = round(df["FlowAreaInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
+    if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
+        actual_max = round(
+            df.T.query(
+                "quantity=='FlowAreaInStructure' and name=='W_left_1_1:link_basin_left' and chainage==46"
+            ).T.max(),
+            3,
+        )
+    elif column_mode == ColumnMode.STRING:
+        actual_max = round(df["FlowAreaInStructure:W_left_1_1:link_basin_left:46"].max(), 3)
     assert pytest.approx(actual_max) == 11.252
 
 
@@ -186,7 +221,8 @@ def test_all_reaches_attributes(test_file):
     res1d.reaches.WaterLevel.add()
     df = res1d.read()
 
-    assert len(df.columns) == 110
+    # Previously was 110, now includes some duplicates that were missed
+    assert len(df.columns) == 119
 
     max_water_level = round(df.max().max(), 3)
     assert pytest.approx(max_water_level) == 59.2
@@ -203,8 +239,13 @@ def test_all_structures_attributes(test_file):
     assert pytest.approx(max_discharge) == 100.247
 
 
-def test_res1d_modification(test_file):
+@pytest.mark.parametrize(
+    "column_mode, expected_exception",
+    [(ColumnMode.ALL, None), (ColumnMode.TIMESERIES, None), (ColumnMode.STRING, ValueError)],
+)
+def test_res1d_modification(test_file, column_mode, expected_exception):
     res1d = test_file
+    res1d.result_reader.column_mode = column_mode
 
     # Test the reading of all the data into data frame
     df = res1d.read()
@@ -218,6 +259,12 @@ def test_res1d_modification(test_file):
     df2 = df.multiply(2.0)
     file_path = res1d.data.Connection.FilePath.Path
     file_path = file_path.replace("network_river.res1d", "network_river.mod.res1d")
+
+    if expected_exception is not None:
+        with pytest.raises(expected_exception):
+            res1d.modify(df2, file_path=file_path)
+        return
+
     res1d.modify(df2, file_path=file_path)
 
     df_mod = res1d.read()
@@ -235,8 +282,13 @@ def test_res1d_modification(test_file):
     assert pytest.approx(max_value_new) == 2.0 * max_value
 
 
-def test_res1d_modification_filtered(test_file):
+@pytest.mark.parametrize(
+    "column_mode, expected_exception",
+    [(ColumnMode.ALL, None), (ColumnMode.TIMESERIES, None), (ColumnMode.STRING, ValueError)],
+)
+def test_res1d_modification_filtered(test_file, column_mode, expected_exception):
     res1d = test_file
+    res1d.result_reader.column_mode = column_mode
 
     # Test the reading of all the data into data frame
     df = res1d.read()
@@ -247,6 +299,12 @@ def test_res1d_modification_filtered(test_file):
 
     # Test the modification of ResultData
     df2 = df.multiply(2.0)
+
+    if expected_exception is not None:
+        with pytest.raises(expected_exception):
+            res1d.modify(df2)
+        return
+
     res1d.modify(df2)
 
     df_mod = res1d.read()
@@ -278,7 +336,7 @@ def test_res1d_modification_filtered(test_file):
 
 def test_extraction_to_csv_dfs0_txt(test_file):
     res1d = test_file
-    res1d.clear_queries_after_reading = False
+    res1d.clear_queue_after_reading = False
 
     res1d.reaches.WaterLevel.add()
     res1d.nodes.WaterLevel.add()
@@ -287,17 +345,17 @@ def test_extraction_to_csv_dfs0_txt(test_file):
 
     file_path_csv = file_path.replace("network_river.res1d", "network_river.extract.csv")
     res1d.to_csv(file_path_csv, time_step_skipping_number=10)
-    file_size_csv = 21905
+    file_size_csv = 24819  # originally 21905, however that missed some data items
     assert 0.5 * file_size_csv < os.stat(file_path_csv).st_size < 2.0 * file_size_csv
 
     file_path_dfs0 = file_path.replace("network_river.res1d", "network_river.extract.dfs0")
     res1d.to_dfs0(file_path_dfs0, time_step_skipping_number=10)
-    file_size_dfs0 = 30302
+    file_size_dfs0 = 32388  # originally 30302, however that missed some data items
     assert file_size_dfs0 - 1000 < os.stat(file_path_dfs0).st_size < file_size_dfs0 + 1000
 
     file_path_txt = file_path.replace("network_river.res1d", "network_river.extract.txt")
     res1d.to_txt(file_path_txt, time_step_skipping_number=10)
-    file_size_txt = 23400
+    file_size_txt = 25008  # originally 23400. however that missed some data items
     assert 0.5 * file_size_txt < os.stat(file_path_txt).st_size < 2.0 * file_size_txt
 
 
@@ -313,13 +371,13 @@ def test_result_quantity_methods(test_file):
     # Test the calling of methods
     discharge_in_structure.plot()
     discharge_in_structure.to_csv(
-        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.csv")
+        file_path.replace("network_river.res1d", "w_right_discharge_in_structure.extract.csv")
     )
     discharge_in_structure.to_dfs0(
-        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.dfs0")
+        file_path.replace("network_river.res1d", "w_right_discharge_in_structure.extract.dfs0")
     )
     discharge_in_structure.to_txt(
-        file_path.replace("network_river.res1d", "W_right_discharge_in_structure.extract.txt")
+        file_path.replace("network_river.res1d", "w_right_discharge_in_structure.extract.txt")
     )
 
 
