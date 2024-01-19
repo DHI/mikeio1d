@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from ..quantities import TimeSeriesId
+
 
 class ResultWriter:
     """
@@ -22,25 +24,29 @@ class ResultWriter:
         self.res1d = res1d
         self.result_network = res1d.result_network
 
-    def modify(self, data_frame):
+    def modify(self, dataframe: pd.DataFrame):
         """
         Modifies the ResultData object TimeData based on the provided data frame.
         It will override the relevant TimeData values by the values of the data frame.
 
         Parameters
         ----------
-        data_frame : pandas.DataFrame
-            Pandas data frame object with column names based on query labels
+        dataframe : pandas.DataFrame
+            Pandas dataframe object with TimeSeriesId compatible multiindex.
         """
-        result_quantity_map = self.result_network.result_quantity_map
+        try:
+            TimeSeriesId.try_from_obj(dataframe.columns[0])
+        except ValueError:
+            raise ValueError("The dataframe columns must be TimeSeriesId compatible multiindex.")
 
-        for query_label in data_frame:
-            result_quantity = result_quantity_map[query_label]
-            element_index = result_quantity.element_index
-            data_item = result_quantity.data_item
+        for header, series in dataframe.items():
+            timeseries_id = TimeSeriesId.try_from_obj(header)
+            data_entry = timeseries_id.to_data_entry(self.res1d)
+            data_item = data_entry.data_item
+            element_index = data_entry.element_index
 
-            values = data_frame[query_label]
-            time_index = data_frame.index
+            values = series.values
+            time_index = series.index
             self.set_values(time_index, values, data_item, element_index)
 
     def set_values(self, time_index, values, data_item, element_index):
@@ -59,7 +65,7 @@ class ResultWriter:
             Element index into data item.
         """
         if len(values) == data_item.TimeData.NumberOfTimeSteps:
-            self.set_values_all(values.values, data_item, element_index)
+            self.set_values_all(values, data_item, element_index)
         else:
             self.set_values_indexed(time_index, values, data_item, element_index)
 
@@ -90,7 +96,16 @@ class ResultWriter:
         if isinstance(values, pd.DataFrame):
             values = values.iloc[:, 0]
 
-        for time in time_index:
-            value = float(values[time])
-            i = res1d_time_index.get_loc(time)
-            data_item.TimeData.SetValue(i, element_index, value)
+        self._validate_time_index_values_pair(time_index, values)
+
+        for i in range(len(values)):
+            time = time_index[i]
+            value = float(values[i])
+            timestep_index = res1d_time_index.get_loc(time)
+            data_item.TimeData.SetValue(timestep_index, element_index, value)
+
+    def _validate_time_index_values_pair(self, time_index, values):
+        if len(time_index) != len(values):
+            raise ValueError(
+                f"Length of time_index ({len(time_index)}) and values ({len(values)}) must be equal."
+            )

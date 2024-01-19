@@ -1,3 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+    from typing import Optional
+
+    from datetime import datetime
+
+    import pandas as pd
+
+    from .query import QueryData
+    from .result_reader_writer.result_reader import ColumnMode
+
 import os.path
 
 from .dotnet import from_dotnet_datetime
@@ -7,20 +22,23 @@ from .dotnet import to_numpy
 from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
-from .result_network import ResultCatchment
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
 
-from .query import QueryData  # noqa: F401
 from .query import QueryDataCatchment  # noqa: F401
 from .query import QueryDataNode  # noqa: F401
 from .query import QueryDataReach  # noqa: F401
 from .query import QueryDataStructure  # noqa: F401
 from .query import QueryDataGlobal  # noqa: F401
 
+from .result_query.query_data_converter import QueryDataConverter
+
 from .various import mike1d_quantities  # noqa: F401
 from .various import NAME_DELIMITER
+from .various import make_list_if_not_iterable
+
+from .quantities import TimeSeriesId
 
 from System import DateTime
 
@@ -80,7 +98,7 @@ class Res1D:
         catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        clear_queries_after_reading=True,
+        clear_queue_after_reading=True,
         result_reader_type=ResultReaderType.COPIER,
     ):
         self.result_reader = ResultReaderCreator.create(
@@ -101,9 +119,8 @@ class Res1D:
 
         self.result_network = ResultNetwork(self)
         self.result_writer = ResultWriter(self)
-        self._queries = self.result_network.queries
 
-        self.clear_queries_after_reading = clear_queries_after_reading
+        self.clear_queue_after_reading = clear_queue_after_reading
 
         self.catchments = self.result_network.catchments
         self.reaches = self.result_network.reaches
@@ -130,15 +147,42 @@ class Res1D:
 
     # region Private methods
 
-    def _get_actual_queries(self, queries):
-        """Finds out which list of queries should be used."""
-        queries = self._queries if queries is None else queries
-        queries = queries if isinstance(queries, list) else [queries]
+    def _get_timeseries_ids_to_read(
+        self, queries: List[QueryData] | List[TimeSeriesId]
+    ) -> List[TimeSeriesId]:
+        """Find out which list of TimeSeriesId objects should be used for reading.
+
+        If user supplies queries, then convert them to TimeSeriesId. Otherwise use the
+        current queue of TimeSeriesId objects.
+
+        Parameters
+        ----------
+        queries : List[QueryData] | List[TimeSeriesId]
+            List of queries or time series ids supplied in read() method.
+
+        Returns
+        -------
+        List of TimeSeriesId objects.
+        """
+        if queries is None:
+            return self.result_network.queue
+
+        queries = make_list_if_not_iterable(queries)
+
+        is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
+        if is_already_time_series_ids:
+            return queries
+
+        queries = QueryDataConverter.convert_queries_to_time_series_ids(self, queries)
         return queries
 
     # endregion Private methods
 
-    def read(self, queries=None):
+    def read(
+        self,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        column_mode: Optional[str | ColumnMode] = None,
+    ) -> pd.DataFrame:
         """
         Read loaded .res1d file data based on queries.
         Currently the supported query classes are
@@ -151,6 +195,16 @@ class Res1D:
         ----------
         queries: A single query or a list of queries.
             Default is None = reads all data.
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+            'str' - column index of str representations of QueryData objects
+
+        Returns
+        -------
+        pd.DataFrame
 
         Examples
         --------
@@ -164,45 +218,63 @@ class Res1D:
         >>> res1d.read(queries)
         """
 
-        if queries is None and len(self._queries) == 0:
-            return self.read_all()
+        timeseries_ids = self._get_timeseries_ids_to_read(queries)
 
-        queries = self._get_actual_queries(queries)
+        if len(timeseries_ids) == 0:
+            return self.read_all(column_mode=column_mode)
 
-        df = self.result_reader.read(queries)
+        df = self.result_reader.read(timeseries_ids, column_mode=column_mode)
+
+        if self.clear_queue_after_reading:
+            self.clear_queue()
 
         return df
 
-    def read_all(self):
-        """Read all data from res1d file to dataframe."""
-        return self.result_reader.read_all()
+    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read all data from res1d file to dataframe.
 
-    def clear_queries(self):
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+            'str' - column index of str representations of QueryData objects
+
+        Returns
+        -------
+        pd.DataFrame
+        """
+        return self.result_reader.read_all(column_mode=column_mode)
+
+    def clear_queue(self):
         """Clear the current active list of queries."""
-        self.result_network.queries.clear()
-        self.result_network.queries_ids.clear()
+        self.result_network.queue.clear()
 
     @property
-    def time_index(self):
+    def time_index(self) -> pd.DatetimeIndex:
         """pandas.DatetimeIndex of the time index."""
         return self.result_reader.time_index
 
     @property
-    def start_time(self):
+    def start_time(self) -> datetime:
+        """Start time of the result file."""
         if self._start_time is not None:
             return self._start_time
 
         return from_dotnet_datetime(self.data.StartTime)
 
     @property
-    def end_time(self):
+    def end_time(self) -> datetime:
+        """End time of the result file."""
         if self._end_time is not None:
             return self._end_time
 
         return from_dotnet_datetime(self.data.EndTime)
 
     @property
-    def quantities(self):
+    def quantities(self) -> List[str]:
         """Quantities in res1d file."""
         return self.result_reader.quantities
 
@@ -275,7 +347,7 @@ class Res1D:
 
     # endregion Query wrapper
 
-    def modify(self, data_frame, file_path=None):
+    def modify(self, data_frame: pd.DataFrame, file_path=None):
         """
         Modifies the ResultData object TimeData based on the provided data frame.
 
@@ -302,7 +374,13 @@ class Res1D:
         self.data.Connection.FilePath.Path = file_path
         self.data.Save()
 
-    def extract(self, file_path, queries=None, time_step_skipping_number=1, ext=None):
+    def extract(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+        ext=None,
+    ):
         """
         Extract given queries to provided file.
         File type is determined from file_path extension.
@@ -325,25 +403,40 @@ class Res1D:
         """
         ext = os.path.splitext(file_path)[-1] if ext is None else ext
 
-        queries = self._get_actual_queries(queries)
-        data_entries = self.result_network.convert_queries_to_data_entries(queries)
+        timeseries_ids = self._get_timeseries_ids_to_read(queries)
+        data_entries = [t.to_data_entry(self) for t in timeseries_ids]
 
         extractor = ExtractorCreator.create(
             ext, file_path, data_entries, self.data, time_step_skipping_number
         )
         extractor.export()
 
-        if self.clear_queries_after_reading:
-            self.clear_queries()
+        if self.clear_queue_after_reading:
+            self.clear_queue()
 
-    def to_csv(self, file_path, queries=None, time_step_skipping_number=1):
+    def to_csv(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+    ):
         """Extract to csv file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
-    def to_dfs0(self, file_path, queries=None, time_step_skipping_number=1):
+    def to_dfs0(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+    ):
         """Extract to dfs0 file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
-    def to_txt(self, file_path, queries=None, time_step_skipping_number=1):
+    def to_txt(
+        self,
+        file_path,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        time_step_skipping_number=1,
+    ):
         """Extract to txt file."""
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)

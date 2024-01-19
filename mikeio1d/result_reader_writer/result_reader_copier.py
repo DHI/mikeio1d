@@ -1,9 +1,22 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+    from typing import Tuple
+    from typing import Set
+    from typing import Optional
+
 import numpy as np
 import pandas as pd
 
 from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 from .result_reader import ResultReader
+from .result_reader import ColumnMode
+from ..quantities import TimeSeriesId
+from ..result_query import QueryDataCreator
 
 from System import IntPtr
 
@@ -45,21 +58,36 @@ class ResultReaderCopier(ResultReader):
 
         self.result_data_copier = ResultDataCopier(self.data)
 
-    def read(self, queries=None):
-        column_names = []
-        data_entries = self.result_data_copier.GetEmptyDataEntriesList()
-        for query in queries:
-            query.add_to_data_entries(self.res1d, data_entries, column_names)
+    def read(
+        self,
+        timeseries_ids: List[TimeSeriesId] = None,
+        column_mode: Optional[str | ColumnMode] = None,
+    ) -> pd.DataFrame:
+        if timeseries_ids is None:
+            return self.read_all(column_mode=column_mode)
 
-        df = self.create_data_frame(data_entries, column_names)
+        data_entries_net = self.result_data_copier.GetEmptyDataEntriesList()
+        for tsid in timeseries_ids:
+            data_entry = tsid.to_data_entry(res1d=self.res1d)
+            data_entry.add_to_data_entries(data_entries_net)
+
+        df = self.create_data_frame(data_entries_net, timeseries_ids, column_mode=column_mode)
+
         return df
 
-    def read_all(self):
-        data_entries, column_names = self.get_all_data_entries_and_column_names()
-        df = self.create_data_frame(data_entries, column_names)
+    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        data_entries, timeseries_ids = self.get_all_data_entries_and_timeseries_ids()
+
+        df = self.create_data_frame(data_entries, timeseries_ids, column_mode=column_mode)
+
         return df
 
-    def create_data_frame(self, data_entries, column_names):
+    def create_data_frame(
+        self,
+        data_entries,
+        timeseries_ids: List[TimeSeriesId],
+        column_mode: Optional[str | ColumnMode] = None,
+    ):
         number_of_timesteps = self.data.NumberOfTimeSteps
         number_of_items = len(data_entries)
 
@@ -70,26 +98,90 @@ class ResultReaderCopier(ResultReader):
         data_pointer_net = IntPtr(data_pointer)
         self.result_data_copier.CopyData(data_pointer_net, data_entries)
 
-        df = pd.DataFrame(data_array, index=self.time_index, columns=column_names)
+        columns = self.create_column_index(timeseries_ids, column_mode=column_mode)
+
+        df = pd.DataFrame(data_array, index=self.time_index, columns=columns)
 
         self.update_time_quantities(df)
 
         return df
 
-    def get_all_data_entries_and_column_names(self):
+    def create_column_index(
+        self,
+        timeseries_ids: List[TimeSeriesId],
+        column_mode: Optional[ColumnMode] = None,
+    ) -> pd.MultiIndex | pd.Index:
+        """Creates a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
+        if column_mode is None:
+            column_mode = self.column_mode
+
+        if column_mode == ColumnMode.ALL:
+            return TimeSeriesId.to_multiindex(timeseries_ids)
+        elif column_mode == ColumnMode.COMPACT:
+            return TimeSeriesId.to_multiindex(timeseries_ids, compact=True)
+        elif column_mode == ColumnMode.TIMESERIES:
+            return pd.Index(timeseries_ids)
+        elif column_mode == ColumnMode.STRING:
+            queries = [QueryDataCreator.from_timeseries_id(t) for t in timeseries_ids]
+            return pd.Index([str(q) for q in queries])
+        else:
+            if column_mode in ColumnMode:
+                raise NotImplementedError(f"The column_mode {column_mode} is not implemented.")
+            raise ValueError(f"Unknown column_mode: {column_mode}")
+
+    def get_all_data_entries_and_timeseries_ids(self) -> Tuple[DataEntryNet, List[TimeSeriesId]]:
         data_entries = self.result_data_copier.GetEmptyDataEntriesList()
-        column_names = []
+        timeseries_ids: List[TimeSeriesId] = []
+        timeseries_ids_set = set()
         for data_set in self.data.DataSets:
             data_set = impl(data_set)
             if not self.is_data_set_included(data_set):
                 continue
 
             for data_item in data_set.DataItems:
+                data_item = impl(data_item)
                 for i in range(data_item.NumberOfElements):
                     data_entry = DataEntryNet(data_item, i)
                     data_entries.Add(data_entry)
 
-                    column_name = self.get_column_name(data_set, data_item, i)
-                    column_names.append(column_name)
+                    timeseries_id = self.get_unique_timeseries_id(
+                        timeseries_ids_set, data_set, data_item, i
+                    )
+                    timeseries_ids.append(timeseries_id)
 
-        return data_entries, column_names
+        return data_entries, timeseries_ids
+
+    def get_unique_timeseries_id(
+        self,
+        existing_timeseries_ids: Set[TimeSeriesId],
+        m1d_data_set,
+        m1d_data_item,
+        i: int,
+    ) -> TimeSeriesId:
+        """
+        Returns a unique TimeSeriesId for given data set, data item and element index.
+
+        Parameters
+        ----------
+        existing_timeseries_ids : set
+            Set of existing TimeSeriesId objects.
+        m1d_data_set : IDataSet
+            MIKE 1D IDataSet object.
+        m1d_data_item : IDataItem
+            MIKE 1D IDataItem object.
+        i : int
+            Element index into data item.
+
+        Returns
+        -------
+        TimeSeriesId
+            A unique TimeSeriesId object.
+        """
+        timeseries_id = TimeSeriesId.from_dataset_dataitem_and_element(
+            m1d_data_set, m1d_data_item, i
+        )
+        while timeseries_id in existing_timeseries_ids:
+            timeseries_id = timeseries_id.next_duplicate()
+
+        existing_timeseries_ids.add(timeseries_id)
+        return timeseries_id

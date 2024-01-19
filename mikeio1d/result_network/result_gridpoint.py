@@ -34,6 +34,24 @@ class ResultGridPoint(ResultLocation):
         self.structure_data_items = []
         self.element_indices = []
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultGridPoint.
+
+        This is the reach IRes1DDataSet object because grid points do not
+        have a corresponding IRes1DDataSet object.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultGridPoint.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultGridPoint."""
+
+        return self.reach
+
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add grid point result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
@@ -44,8 +62,7 @@ class ResultGridPoint(ResultLocation):
         reaches_result_quantity_map = self.res1d.result_network.reaches.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, reaches_result_quantity_map)
 
-        query = QueryDataReach(quantity_id, self.reach.Name, self.gridpoint.Chainage)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def get_query(self, data_item):
         """Get a QueryDataReach for given data item."""

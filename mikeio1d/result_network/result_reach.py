@@ -110,6 +110,33 @@ class ResultReach(ResultLocation):
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint.set_quantities()
         self.set_static_attributes()
+        self.dataset = self.reaches
+
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultReach.
+
+        A ResultReach may consist of several IRes1DDataSet objects. Therefore,
+        a IRes1DDataItem must be provided to identify the correct IRes1DDataSet.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem
+            The IRes1DDataItem associated with the returned IRes1DDataSet.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultReach."""
+
+        if m1d_dataitem is None:
+            raise ValueError("m1d_dataitem must be provided for ResultReach.")
+
+        for m1d_reach in self.reaches:
+            if m1d_reach.DataItems.Contains(m1d_dataitem):
+                return m1d_reach
+        raise Exception(
+            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ", m1d_dataitem
+        )
 
     def set_gridpoints(self, reach):
         """
@@ -181,6 +208,14 @@ class ResultReach(ResultLocation):
                     result_gridpoint.add_data_item(data_item, element_index)
                 else:
                     result_gridpoint.add_structure_data_item(data_item)
+
+    def get_query(self, data_item):
+        raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
+
+    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        raise NotImplementedError(
+            "add_to_result_quantity_maps not implemented for ResultReach. Use ResultGridPoint."
+        )
 
     @property
     def geometry(self) -> ReachGeometry:

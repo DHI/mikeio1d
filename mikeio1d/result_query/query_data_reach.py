@@ -1,5 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..res1d import Res1D
+
+from math import isnan
+
 from ..various import NAME_DELIMITER
 from .query_data import QueryData
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataReach(QueryData):
@@ -37,7 +48,7 @@ class QueryDataReach(QueryData):
         if self.name is None and self.chainage is not None:
             raise ValueError("Argument 'chainage' cannot be set if name is None.")
 
-    def get_values(self, res1d):
+    def get_values(self, res1d: Res1D):
         self._check_invalid_quantity(res1d)
 
         name = self._name
@@ -53,6 +64,31 @@ class QueryDataReach(QueryData):
         self._check_invalid_values(values)
 
         return self.from_dotnet_to_python(values)
+
+    def to_timeseries_id(self) -> TimeSeriesId:
+        quantity = self.quantity
+        group = TimeSeriesIdGroup.REACH
+        name = self.name
+        if self.chainage is not None:
+            return TimeSeriesId(
+                quantity=quantity,
+                group=group,
+                name=name,
+                chainage=self.chainage,
+            )
+        else:
+            return TimeSeriesId(
+                quantity=quantity,
+                group=group,
+                name=name,
+            )
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataReach:
+        chainage = timeseries_id.chainage
+        if isnan(chainage):
+            chainage = None
+        return QueryDataReach(timeseries_id.quantity, timeseries_id.name, chainage, validate=False)
 
     def _update_query(self, res1d):
         name = self._name

@@ -1,4 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mikeio1d.res1d import Res1D
+
 from .query_data import QueryData
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataNode(QueryData):
@@ -29,3 +38,18 @@ class QueryDataNode(QueryData):
         self._check_invalid_values(values)
 
         return self.from_dotnet_to_python(values)
+
+    def to_timeseries_id(self) -> TimeSeriesId:
+        tsid = TimeSeriesId(
+            quantity=self.quantity,
+            group=TimeSeriesIdGroup.NODE,
+            name=self.name,
+        )
+        return tsid
+
+    def _update_query(self, res1d: Res1D):
+        pass
+
+    @staticmethod
+    def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataNode:
+        return QueryDataNode(timeseries_id.quantity, timeseries_id.name, validate=False)
