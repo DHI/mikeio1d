@@ -50,3 +50,25 @@ def pyproj_crs_from_projection_string(projection_string: str):
     except Exception:
         warnings.warn("Could not parse projection string. Returning None.")
         return None
+
+
+def make_list_if_not_iterable(obj) -> list:
+    """
+    Boxes non-iterable objects into a list.
+
+    Parameters
+    ----------
+    obj : object
+        Object to box.
+
+    Returns
+    -------
+    list
+        List with one element if obj is not iterable, otherwise obj.
+    """
+    try:
+        iter(obj)
+    except TypeError:
+        return [obj]
+    else:
+        return obj

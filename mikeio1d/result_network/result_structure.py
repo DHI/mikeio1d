@@ -54,6 +54,24 @@ class ResultStructure(ResultLocation):
         )
         return self.id
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultStructure.
+
+        This is the reach IRes1DDataSet object because ResultStructure objects do not
+        have a corresonding IRes1DDataSet object.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultStructure.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultStructure."""
+
+        return self.reach
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []
@@ -68,8 +86,7 @@ class ResultStructure(ResultLocation):
         structure_result_quantity_map = self.res1d.result_network.structures.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
 
-        query = QueryDataStructure(quantity_id, self.id, self.reach.Name, self.chainage)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def add_res1d_structure_data_item(self, data_item):
         """

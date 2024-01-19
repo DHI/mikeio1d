@@ -4,11 +4,19 @@
 
 ### Added
 
-- Merging of regular and LTS extreme/periodic res1d files
+- Introduced TimeSeriesId to uniquely identify results.
+- Read methods now include 'column_mode' parameter that enables multiindex reading (e.g. column_mode='compact').
+- Added more type hints to improve IDE auto-completion and docstring peeking.
+- Merging of regular and LTS extreme/periodic res1d files.
 
 ### Fixed
 
+-
+
 ### Changed
+
+- Result reading/writing fundamentally uses TimeSeriesId now instead of QueryData
+- Following are now abstract base classes: ResultReader, QueryData, ResultLocation
 
 ## [0.5] - 2023-12-22
 

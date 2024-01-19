@@ -47,6 +47,21 @@ class ResultCatchment(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultCatchment.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultCatchment.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultCatchment."""
+
+        return self._catchment
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("id", self._catchment.Id)
@@ -60,8 +75,7 @@ class ResultCatchment(ResultLocation):
         catchment_result_quantity_map = self.res1d.result_network.catchments.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
 
-        query = QueryDataCatchment(quantity_id, self._catchment.Id, validate=False)
-        self.add_to_network_result_quantity_map(query, result_quantity)
+        self.add_to_network_result_quantity_map(result_quantity)
 
     def get_query(self, data_item):
         """Get a QueryDataCatchment for given data item."""

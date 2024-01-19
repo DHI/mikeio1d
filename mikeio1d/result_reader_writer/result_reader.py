@@ -1,9 +1,22 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+    from typing import Optional
+
+from enum import Enum
+from abc import ABC
+from abc import abstractmethod
+
 import os.path
 import pandas as pd
 import datetime
 
 from ..dotnet import from_dotnet_datetime
 from ..various import NAME_DELIMITER
+from ..quantities import TimeSeriesId
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
@@ -16,7 +29,20 @@ from DHI.Mike1D.Generic import Connection
 from DHI.Mike1D.Generic import Diagnostics
 
 
-class ResultReader:
+class ColumnMode(str, Enum):
+    """Specifies the type of column index of returned DataFrames."""
+
+    ALL = "all"
+    """Uses a column MultiIndex with all possible metadata."""
+    COMPACT = "compact"
+    """Uses a column MultiIndex with only the relevant metadata."""
+    TIMESERIES = "timeseries"
+    """Uses a column Index with headers as TimeSeriesId objects"""
+    STRING = "str"
+    """Uses a column Index with headers as the string representation of QueryData objects."""
+
+
+class ResultReader(ABC):
     """
     Class for reading the ResultData object TimeData
     into Pandas data frame.
@@ -81,6 +107,15 @@ class ResultReader:
 
         self.quantities = [quantity.Id for quantity in self.data.Quantities]
 
+        self.column_mode: ColumnMode = ColumnMode.STRING
+        """Specifies the type of column index of returned DataFrames.
+        
+        'all' - Uses a column MultiIndex with all possible metadata
+        'compact' - Uses a column MultiIndex with only the relevant metadata
+        'timeseries' - Uses a column Index with headers as TimeSeriesId objects
+        'str' - Uses a column Index with headers as the string representation of QueryData objects
+        """
+
     # region File loading
 
     def _load_header(self):
@@ -142,11 +177,44 @@ class ResultReader:
 
     # endregion File loading
 
-    def read(self, queries=None):
-        return None
+    @abstractmethod
+    def read(
+        self,
+        timeseries_ids: List[TimeSeriesId] = None,
+        column_mode: Optional[str | ColumnMode] = None,
+    ) -> pd.DataFrame:
+        """
+        Read the time series data into a data frame.
 
-    def read_all(self):
-        return None
+        Parameters
+        ----------
+        timeseries_ids : list of TimeSeriesId
+            List of TimeSeriesId objects to read.
+            If None, all data sets will be read.
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
+        ...
+
+    @abstractmethod
+    def read_all(self, column_mode: Optional[str | ColumnMode]) -> pd.DataFrame:
+        """
+        Read all time series data into a data frame.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
+        ...
 
     def is_data_set_included(self, data_set):
         """Skip filtered data sets"""
@@ -169,21 +237,7 @@ class ResultReader:
         return self._time_index
 
     def get_data_set_name(self, data_set, item_id=None):
-        name = None
-
-        if hasattr(data_set, "Name"):
-            name = data_set.Name
-        elif hasattr(data_set, "Id"):
-            name = data_set.Id
-        elif data_set.Quantity is not None:
-            name = data_set.Quantity.Id
-
-        name = "" if name is None else name
-
-        # Add item id if present before the name.
-        # Needed for unique identification of structures.
-        name = self.col_name_delimiter.join([item_id, name]) if item_id is not None else name
-
+        name = TimeSeriesId.get_dataset_name(data_set, item_id, self.col_name_delimiter)
         return name
 
     def get_column_name(self, data_set, data_item, i):
@@ -207,20 +261,57 @@ class ResultReader:
 
     # region Methods for LTS result files
 
-    def update_time_quantities(self, df):
+    def update_time_quantities(self, df: pd.DataFrame):
         if not self.is_lts_result_file():
             return
 
         simulation_start = from_dotnet_datetime(self.data.StartTime)
-        for label in df:
+
+        column_level_names = None
+        if isinstance(df.columns, pd.MultiIndex):
+            column_level_names = df.columns.names
+
+        # Loop over all columns by number and update them by number as well.
+        for i in range(len(df.columns)):
+            if not self._is_lts_event_time_column(
+                df.columns[i], column_level_names=column_level_names
+            ):
+                continue
+
+            seconds_since_simulation_started = df.iloc[:, i]
+            datetime_since_simulation_started = [
+                simulation_start + datetime.timedelta(seconds=s)
+                for s in seconds_since_simulation_started
+            ]
+            df.iloc[:, i] = datetime_since_simulation_started
+
+    def _is_lts_event_time_column(
+        self,
+        quantity_column: str | TimeSeriesId | tuple,
+        column_level_names: Optional[List[str]] = None,
+    ) -> bool:
+        """Determines if the quantity_column is the LTS event time column.
+
+        Parameters
+        ----------
+        quantity_column : str | TimeSeriesId | tuple
+            The column header containing the event statistic quantities.
+        column_level_names : list of str, optional
+            The column level names of the data frame, by default None.
+            Only used if the data frame has a MultiIndex column index.
+        """
+        if isinstance(quantity_column, str):
             time_suffix = f"Time{self.col_name_delimiter}"
-            if time_suffix in label:
-                seconds_after_simulation_start_array = df[label].to_numpy()
-                times = [
-                    simulation_start + datetime.timedelta(seconds=float(sec))
-                    for sec in seconds_after_simulation_start_array
-                ]
-                df[label] = times
+            return time_suffix in quantity_column
+        elif isinstance(quantity_column, TimeSeriesId):
+            quantity = quantity_column.quantity
+            return quantity.endswith("Time")
+        elif isinstance(quantity_column, tuple):
+            tsid = TimeSeriesId.from_tuple(quantity_column, column_level_names=column_level_names)
+            quantity = tsid.quantity
+            return quantity.endswith("Time")
+        else:
+            raise TypeError(f"Unsupported type {type(quantity_column)} for quantity_column.")
 
     def is_lts_result_file(self):
         # For pythonnet version > 3.0 it is possible to call
