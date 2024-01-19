@@ -190,12 +190,14 @@ def test_res1d_filter(test_file_path, helpers):
     nodes = ["1", "2"]
     reaches = ["9l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
+    res1d.result_reader.column_mode = ColumnMode.ALL
 
     df_9l1 = res1d.read(QueryDataReach("WaterLevel", "9l1", 10))
     df_1 = res1d.read(QueryDataNode("WaterLevel", "1"))
     df_2 = res1d.read(QueryDataNode("WaterLevel", "2"))
 
     res1d_full = Res1D(test_file_path)
+    res1d_full.result_reader.column_mode = ColumnMode.ALL
     df_full = res1d_full.read()
 
     helpers.assert_shared_columns_equal(df_full, df_9l1)
@@ -224,16 +226,16 @@ def test_res1d_filter_readall(test_file_path, helpers):
 
 def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
     res1d_full = Res1D(flow_split_file_path)
-    df_full = res1d_full.read()
+    df_full = res1d_full.read(column_mode=ColumnMode.ALL)
 
     for node in res1d_full.nodes:
         res1d = Res1D(flow_split_file_path, nodes=[str(node)])
-        df = res1d.read()
+        df = res1d.read(column_mode=ColumnMode.ALL)
         helpers.assert_shared_columns_equal(df_full, df)
 
     for reach in res1d_full.reaches:
         res1d = Res1D(flow_split_file_path, reaches=[str(reach)])
-        df = res1d.read()
+        df = res1d.read(column_mode=ColumnMode.ALL)
         helpers.assert_shared_columns_equal(df_full, df)
 
 
