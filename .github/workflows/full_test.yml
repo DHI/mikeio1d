@@ -44,10 +44,10 @@ jobs:
         pip install .[test]
     - name: Test with pytest (basic)
       run: |
-        pytest
+        pytest -m ""
     - name: Install mikeio1d (optional dependencies)
       run: |
         pip install .[all]
     - name: Test with pytest (optional dependencies)
       run: |
-        pytest
+        pytest -m ""
