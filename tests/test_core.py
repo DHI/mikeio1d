@@ -19,6 +19,7 @@ def testdata_name():
     return list(dataclasses.asdict(testdata).keys())
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
 @pytest.mark.parametrize("result_reader", ["copier", "query"])
 def test_mikeio1d_generates_expected_dataframe_for_filetype_read_all(result_reader, extension):
@@ -48,6 +49,7 @@ def sample_random_queries(res: Res1D) -> List[str]:
     return sample_queries
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
 @pytest.mark.parametrize("result_reader", ["copier", "query"])
 def test_mikeio1d_generates_dataframe_reading_time_series_ids(result_reader, extension):
@@ -61,6 +63,7 @@ def test_mikeio1d_generates_dataframe_reading_time_series_ids(result_reader, ext
         assert len(df) > 0
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
 @pytest.mark.parametrize("result_reader", ["copier", "query"])
 def test_mikeio1d_generates_dataframe_reading_queries(result_reader, extension):
@@ -74,6 +77,7 @@ def test_mikeio1d_generates_dataframe_reading_queries(result_reader, extension):
         assert len(df) > 0
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
 @pytest.mark.parametrize(
     "column_mode", [ColumnMode.ALL, ColumnMode.COMPACT, ColumnMode.TIMESERIES, ColumnMode.STRING]
