@@ -129,8 +129,13 @@ class Res1D:
         self.global_data = self.result_network.global_data
 
     def __repr__(self):
-        out = ["<mikeio1d.Res1D>"]
+        return "<mikeio1d.Res1D>"
 
+    # region Private methods
+
+    def info(self):
+        """Prints information about the result file."""
+        out = []
         if self.file_path:
             out.append(f"Start time: {str(self.start_time)}")
             out.append(f"End time: {str(self.end_time)}")
@@ -143,9 +148,8 @@ class Res1D:
             for i, quantity in enumerate(self.data.Quantities):
                 out.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
 
-        return str.join("\n", out)
-
-    # region Private methods
+        out = str.join("\n", out)
+        print(out)
 
     def _get_timeseries_ids_to_read(
         self, queries: List[QueryData] | List[TimeSeriesId]
