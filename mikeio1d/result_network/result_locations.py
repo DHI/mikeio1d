@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from typing import Dict
+
 if TYPE_CHECKING:
     from typing import List
     from .result_location import ResultLocation
+
+from .result_location import ResultLocation
 
 from ..dotnet import pythonnet_implementation as impl
 from .result_quantity_collection import ResultQuantityCollection
@@ -12,7 +16,7 @@ from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 
 
-class ResultLocations(dict):
+class ResultLocations(Dict[str, ResultLocation]):
     """
     A base class for a network locations (nodes, reaches)
     or a catchments wrapper class.
@@ -52,15 +56,15 @@ class ResultLocations(dict):
             self.__repr__(),
             [
                 (f"Names ({total_names})", self.names),
-                (f"Quantities ({total_quantities})", self.quantities),
+                (f"Quantities ({total_quantities})", list(self.quantities.keys())),
             ],
         )
         return repr
 
     @property
-    def quantities(self) -> List[str]:
+    def quantities(self) -> Dict[str, ResultQuantityCollection]:
         """A list of available quantities."""
-        return list(self.result_quantity_map.keys())
+        return {k: getattr(self, k) for k in self.result_quantity_map}
 
     @property
     def names(self) -> List[str]:

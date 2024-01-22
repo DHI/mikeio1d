@@ -60,6 +60,14 @@ class ResultQuantity:
         self.m1d_dataset = m1d_dataset
         self.element_index = element_index
         self._timeseries_id: TimeSeriesId = None
+        self._name = data_item.Quantity.Id
+
+    def __repr__(self) -> str:
+        return f"<Quantity: {self.name}>"
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     def add(self):
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
