@@ -13,6 +13,12 @@ if TYPE_CHECKING:
     from .query import QueryData
     from .result_reader_writer.result_reader import ColumnMode
 
+    from .result_network import ResultCatchments
+    from .result_network import ResultNodes
+    from .result_network import ResultReaches
+    from .result_network import ResultStructures
+    from .result_network import ResultGlobalDatas
+
 import os.path
 
 from .dotnet import from_dotnet_datetime
@@ -118,15 +124,23 @@ class Res1D:
         self._end_time = None
 
         self.result_network = ResultNetwork(self)
+        self.network = self.result_network
         self.result_writer = ResultWriter(self)
 
         self.clear_queue_after_reading = clear_queue_after_reading
 
+        self.network = self.result_network  # alias
+        """Network of the result file."""
         self.catchments = self.result_network.catchments
-        self.reaches = self.result_network.reaches
+        """Catchments of the result file."""
+        self.reaches: ResultReaches = self.result_network.reaches
+        """Reaches of the result file."""
         self.nodes = self.result_network.nodes
+        """Nodes of the result file."""
         self.structures = self.result_network.structures
+        """Structures of the result file."""
         self.global_data = self.result_network.global_data
+        """Global data of the result file."""
 
     def __repr__(self):
         return "<mikeio1d.Res1D>"
