@@ -53,14 +53,21 @@ class ResultLocation(ABC):
         return f"<{self.__class__.__name__}>"
 
     def _repr_html_(self) -> str:
+        attributes = {k: getattr(self, k) for k in self._static_attributes}
+        total_attributes = len(attributes)
+        total_quantities = len(self.quantities)
         repr = build_html_repr_from_sections(
             self.__repr__(),
             [
-                ("Attributes", {k: getattr(self, k) for k in self._static_attributes}),
-                ("Quantities", list(self.result_quantity_map.keys())),
+                (f"Attributes ({total_attributes})", attributes),
+                (f"Quantities ({total_quantities})", self.quantities),
             ],
         )
         return repr
+
+    @property
+    def quantities(self):
+        return list(self.result_quantity_map.keys())
 
     def set_static_attribute(self, key, value):
         """Add static attribute. This shows up in the html repr"""
