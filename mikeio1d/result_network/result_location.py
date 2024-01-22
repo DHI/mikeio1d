@@ -66,7 +66,8 @@ class ResultLocation(ABC):
         return repr
 
     @property
-    def quantities(self):
+    def quantities(self) -> List[str]:
+        """A list of available quantities."""
         return list(self.result_quantity_map.keys())
 
     def set_static_attribute(self, key, value):

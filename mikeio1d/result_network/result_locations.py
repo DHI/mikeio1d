@@ -46,10 +46,12 @@ class ResultLocations(dict):
         return f"<{self.__class__.__name__}>"
 
     def _repr_html_(self) -> str:
+        total_names = len(self)
         total_quantities = len(self.quantities)
         repr = build_html_repr_from_sections(
             self.__repr__(),
             [
+                (f"Names ({total_names})", self.names),
                 (f"Quantities ({total_quantities})", self.quantities),
             ],
         )
@@ -57,7 +59,18 @@ class ResultLocations(dict):
 
     @property
     def quantities(self) -> List[str]:
+        """A list of available quantities."""
         return list(self.result_quantity_map.keys())
+
+    @property
+    def names(self) -> List[str]:
+        """A list of location names (e.g. MUIDs)."""
+        return list(self.keys())
+
+    @property
+    def locations(self) -> List[ResultLocation]:
+        """A list of location objects (e.g. <ResultNode>)."""
+        return list(self.values())
 
     def set_quantity_collections(self):
         """Sets all quantity collection attributes."""
