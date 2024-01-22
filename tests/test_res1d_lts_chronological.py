@@ -41,12 +41,11 @@ def test_quantities(test_file):
     assert len(quantities) == 21
 
 
-def test_repr(test_file):
+def test_info(test_file):
     res1d = test_file
-    res1d_repr = res1d.__repr__()
-    res1d_repr_ref = (
-        "<mikeio1d.Res1D>\n"
-        + "Start time: 1957-01-01 00:00:00\n"
+    res1d_info = res1d._get_info()
+    res1d_info_ref = (
+        "Start time: 1957-01-01 00:00:00\n"
         + "End time: 1963-01-01 00:00:00\n"
         + "# Timesteps: 73\n"
         + "# Catchments: 0\n"
@@ -75,7 +74,7 @@ def test_repr(test_file):
         + "19 - Component_1TransportIntegratedMonthlyWeirs <kg>\n"
         + "20 - Component_2TransportIntegratedMonthlyWeirs <kg>"
     )
-    assert res1d_repr == res1d_repr_ref
+    assert res1d_info == res1d_info_ref
 
 
 def test_data_item_dicts(test_file):

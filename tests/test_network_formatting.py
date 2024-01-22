@@ -46,7 +46,7 @@ def test_single_node_html_repr(node):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities</summary><ul><li>WaterLevel</li></ul></details>"""
+    <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>WaterLevel</li></ul></details>"""
     assert html_repr == expected_html_repr
 
 
@@ -60,13 +60,13 @@ def test_single_catchment_html_repr(catchment):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities</summary><ul><li>TotalRunOff</li><li>ActualRainfall</li><li>ZinkLoadRR</li><li>ZinkMassAccumulatedRR</li><li>ZinkRR</li></ul></details>"""
+    <details><summary>Attributes (3)</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities (5)</summary><ul><li>TotalRunOff</li><li>ActualRainfall</li><li>ZinkLoadRR</li><li>ZinkMassAccumulatedRR</li><li>ZinkRR</li></ul></details>"""
     assert html_repr == expected_html_repr
 
 
 def test_single_reach_html_repr(river_reach):
     html_repr = river_reach._repr_html_()
-    excepted_html_repr = """&lt;Reach: river&gt;
+    expected_html_repr = """&lt;Reach: river&gt;
     <style>
         ul {
             margin: 0px;
@@ -74,8 +74,8 @@ def test_single_reach_html_repr(river_reach):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 94</li></ul></details><details><summary>Quantities</summary><ul><li>WaterLevel</li><li>ManningResistanceNumber</li><li>Discharge</li><li>FlowVelocity</li></ul></details>"""
-    assert html_repr == excepted_html_repr
+    <details><summary>Attributes (5)</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 94</li></ul></details><details><summary>Quantities (4)</summary><ul><li>WaterLevel</li><li>ManningResistanceNumber</li><li>Discharge</li><li>FlowVelocity</li></ul></details>"""
+    assert html_repr == expected_html_repr
 
 
 def test_single_structure_html_repr(structure):
@@ -88,5 +88,5 @@ def test_single_structure_html_repr(structure):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities</summary><ul><li>Discharge</li></ul></details>"""
+    <details><summary>Attributes (3)</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge</li></ul></details>"""
     assert html_repr == expected_html_repr
