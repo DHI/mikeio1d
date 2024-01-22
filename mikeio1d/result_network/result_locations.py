@@ -1,6 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+    from .result_location import ResultLocation
+
 from ..dotnet import pythonnet_implementation as impl
 from .result_quantity_collection import ResultQuantityCollection
 from .various import make_proper_variable_name
+from .various import build_html_repr_from_sections
 
 
 class ResultLocations(dict):
@@ -32,6 +41,23 @@ class ResultLocations(dict):
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
         self.result_quantity_map = {}
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}>"
+
+    def _repr_html_(self) -> str:
+        total_quantities = len(self.quantities)
+        repr = build_html_repr_from_sections(
+            self.__repr__(),
+            [
+                (f"Quantities ({total_quantities})", self.quantities),
+            ],
+        )
+        return repr
+
+    @property
+    def quantities(self) -> List[str]:
+        return list(self.result_quantity_map.keys())
 
     def set_quantity_collections(self):
         """Sets all quantity collection attributes."""
