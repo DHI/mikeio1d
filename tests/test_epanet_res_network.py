@@ -32,12 +32,11 @@ def test_quantities(test_file):
     assert len(quantities) == 12
 
 
-def test_repr(test_file):
+def test_info(test_file):
     epanet_res = test_file
-    epanet_res_repr = epanet_res.__repr__()
-    epanet_res_repr_ref = (
-        "<mikeio1d.Res1D>\n"
-        + "Start time: 2022-10-13 00:00:00\n"
+    epanet_res_info = epanet_res._get_info()
+    epanet_res_info_ref = (
+        "Start time: 2022-10-13 00:00:00\n"
         + "End time: 2022-10-14 00:00:00\n"
         + "# Timesteps: 25\n"
         + "# Catchments: 0\n"
@@ -57,7 +56,8 @@ def test_repr(test_file):
         + "10 - ReactorRate <->\n"
         + "11 - FrictionFactor <->"
     )
-    assert epanet_res_repr == epanet_res_repr_ref
+
+    assert epanet_res_info == epanet_res_info_ref
 
 
 def test_data_item_dicts(test_file):
