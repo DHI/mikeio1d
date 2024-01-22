@@ -145,25 +145,29 @@ class Res1D:
     def __repr__(self):
         return "<mikeio1d.Res1D>"
 
+    def _get_info(self) -> info:
+        info = []
+        if self.file_path:
+            info.append(f"Start time: {str(self.start_time)}")
+            info.append(f"End time: {str(self.end_time)}")
+            info.append(f"# Timesteps: {str(self.data.NumberOfTimeSteps)}")
+            info.append(f"# Catchments: {self.data.Catchments.get_Count()}")
+            info.append(f"# Nodes: {self.data.Nodes.get_Count()}")
+            info.append(f"# Reaches: {self.data.Reaches.get_Count()}")
+
+            info.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
+            for i, quantity in enumerate(self.data.Quantities):
+                info.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
+
+        info = str.join("\n", info)
+        return info
+
     # region Private methods
 
     def info(self):
         """Prints information about the result file."""
-        out = []
-        if self.file_path:
-            out.append(f"Start time: {str(self.start_time)}")
-            out.append(f"End time: {str(self.end_time)}")
-            out.append(f"# Timesteps: {str(self.data.NumberOfTimeSteps)}")
-            out.append(f"# Catchments: {self.data.Catchments.get_Count()}")
-            out.append(f"# Nodes: {self.data.Nodes.get_Count()}")
-            out.append(f"# Reaches: {self.data.Reaches.get_Count()}")
-
-            out.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
-            for i, quantity in enumerate(self.data.Quantities):
-                out.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
-
-        out = str.join("\n", out)
-        print(out)
+        info = self._get_info()
+        print(info)
 
     def _get_timeseries_ids_to_read(
         self, queries: List[QueryData] | List[TimeSeriesId]
