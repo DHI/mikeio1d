@@ -37,10 +37,9 @@ def test_quantities(test_file):
 
 def test_repr(test_file):
     res1d = test_file
-    res1d_repr = res1d.__repr__()
-    res1d_repr_ref = (
-        "<mikeio1d.Res1D>\n"
-        + "Start time: 2000-02-18 00:06:00\n"
+    res1d_info = res1d._get_info()
+    res1d_info_ref = (
+        "Start time: 2000-02-18 00:06:00\n"
         + "End time: 2000-02-18 12:06:00\n"
         + "# Timesteps: 73\n"
         + "# Catchments: 0\n"
@@ -61,7 +60,7 @@ def test_repr(test_file):
         + "11 - Gate level:Sensor:SensorGateLevel <m>\n"
         + "12 - Discharge:Sensor:SensorGauge1 <m^3/s>"
     )
-    assert res1d_repr == res1d_repr_ref
+    assert res1d_info == res1d_info_ref
 
 
 def test_data_item_dicts(test_file):

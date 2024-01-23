@@ -33,12 +33,11 @@ def test_quantities(test_file):
     assert len(quantities) == 36
 
 
-def test_repr(test_file):
+def test_info(test_file):
     swmm_out = test_file
-    swmm_out_repr = swmm_out.__repr__()
-    swmm_out_repr_ref = (
-        "<mikeio1d.Res1D>\n"
-        + "Start time: 1998-01-01 01:00:00.001000\n"
+    swmm_out_info = swmm_out._get_info()
+    swmm_out_info_ref = (
+        "Start time: 1998-01-01 01:00:00.001000\n"
         + "End time: 1998-01-02 12:00:00.001000\n"
         + "# Timesteps: 36\n"
         + "# Catchments: 8\n"
@@ -82,7 +81,7 @@ def test_repr(test_file):
         + "34 - SWMM_SYS_EVAP <->\n"
         + "35 - SWMM_SYS_PET <->"
     )
-    assert swmm_out_repr == swmm_out_repr_ref
+    assert swmm_out_info == swmm_out_info_ref
 
 
 def test_data_item_dicts(test_file):
