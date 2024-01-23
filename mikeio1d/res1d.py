@@ -40,6 +40,8 @@ from .various import make_list_if_not_iterable
 
 from .quantities import TimeSeriesId
 
+from .pandas_extension import Mikeio1dAccessor  # noqa: F401
+
 from System import DateTime
 
 
