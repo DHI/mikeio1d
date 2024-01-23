@@ -32,12 +32,11 @@ def test_quantities(test_file):
     assert len(quantities) == 5
 
 
-def test_repr(test_file):
+def test_info(test_file):
     epanet_resx = test_file
-    epanet_resx_repr = epanet_resx.__repr__()
+    epanet_resx_info = epanet_resx._get_info()
     epanet_repr_ref = (
-        "<mikeio1d.Res1D>\n"
-        + "Start time: 2022-10-13 00:00:00\n"
+        "Start time: 2022-10-13 00:00:00\n"
         + "End time: 2022-10-14 00:00:00\n"
         + "# Timesteps: 25\n"
         + "# Catchments: 0\n"
@@ -50,7 +49,7 @@ def test_repr(test_file):
         + "3 - Pump energy costs </kWh>\n"
         + "4 - Pump energy <kW>"
     )
-    assert epanet_resx_repr == epanet_repr_ref
+    assert epanet_resx_info == epanet_repr_ref
 
 
 def test_data_item_dicts(test_file):

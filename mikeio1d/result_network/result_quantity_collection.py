@@ -31,6 +31,16 @@ class ResultQuantityCollection(ResultQuantity):
         self.result_quantities = result_quantities
         self.res1d = res1d
 
+    def __repr__(self) -> str:
+        return f"<QuantityCollection ({len(self.result_quantities)}): {self.name}>"
+
+    @property
+    def name(self) -> str:
+        """Name of the quantity id assosciated with collection."""
+        if len(self.result_quantities) <= 0:
+            return "EMPTY"
+        return self.result_quantities[0].name
+
     def add(self):
         """
         Add queries to ResultNetwork.queries from a list of result quantities.

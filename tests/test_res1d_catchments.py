@@ -33,12 +33,11 @@ def test_quantities(test_file):
     assert len(quantities) == 5
 
 
-def test_repr(test_file):
+def test_info(test_file):
     res1d = test_file
-    res1d_repr = res1d.__repr__()
-    res1d_repr_ref = (
-        "<mikeio1d.Res1D>\n"
-        + "Start time: 1994-08-07 16:35:00\n"
+    res1d_info = res1d._get_info()
+    res1d_info_ref = (
+        "Start time: 1994-08-07 16:35:00\n"
         + "End time: 1994-08-07 18:35:00\n"
         + "# Timesteps: 108\n"
         + "# Catchments: 31\n"
@@ -51,7 +50,7 @@ def test_repr(test_file):
         + "3 - ZinkMassAccumulatedRR <kg>\n"
         + "4 - ZinkRR <mg/l>"
     )
-    assert res1d_repr == res1d_repr_ref
+    assert res1d_info == res1d_info_ref
 
 
 def test_data_item_dicts(test_file):
