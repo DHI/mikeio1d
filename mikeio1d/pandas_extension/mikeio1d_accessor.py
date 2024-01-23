@@ -3,6 +3,7 @@ import pandas as pd
 from .transposed_groupby import TransposedGroupBy
 from .result_reaches_helpers import agg_chainage
 from .result_reaches_helpers import groupby_chainage
+from .various import compact_dataframe
 
 
 @pd.api.extensions.register_dataframe_accessor("m1d")
@@ -60,3 +61,10 @@ class Mikeio1dAccessor:
         """
         df = self._obj
         return df.T.query(*args, **kwargs).T
+
+    def compact(self, *args, **kwargs) -> pd.DataFrame:
+        """
+        Convenience wrapper for compact_dataframe.
+        """
+        df = self._obj
+        return compact_dataframe(df, *args, **kwargs)
