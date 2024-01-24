@@ -6,7 +6,14 @@ from typing import Dict
 
 if TYPE_CHECKING:
     from typing import List
+    from typing import Optional
+
+    import pandas as pd
+
+    from ..res1d import Res1D
     from .result_location import ResultLocation
+    from .result_quantity import ResultQuantity
+    from ..result_reader_writer.result_reader import ColumnMode
 
 from .result_location import ResultLocation
 
@@ -39,12 +46,12 @@ class ResultLocations(Dict[str, ResultLocation]):
         Dictionary from quantity id to a list of ResultQuantity objects.
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         self.res1d = res1d
         self.quantity_label = "q_"
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
-        self.result_quantity_map = {}
+        self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
@@ -75,6 +82,22 @@ class ResultLocations(Dict[str, ResultLocation]):
     def locations(self) -> List[ResultLocation]:
         """A list of location objects (e.g. <ResultNode>)."""
         return list(self.values())
+
+    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read the time series data into a data frame.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+        """
+        result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
+        timesries_ids = [q.timeseries_id for q in result_quantities]
+        df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
+        return df
 
     def set_quantity_collections(self):
         """Sets all quantity collection attributes."""
