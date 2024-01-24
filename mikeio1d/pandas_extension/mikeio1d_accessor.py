@@ -8,6 +8,16 @@ from .various import compact_dataframe
 
 @pd.api.extensions.register_dataframe_accessor("m1d")
 class Mikeio1dAccessor:
+    """
+    This class uses Pandas Extension API to register a custom accessor for DataFrames. More
+    information can be found here:
+
+    https://pandas.pydata.org/docs/development/extending.html#registering-custom-accessors
+
+    The accessor provides convenience methods for working with DataFrames with a MultiIndex.
+    The intent is as a facade for various helper functions that live elsewhere in the package.
+    """
+
     def __init__(self, pandas_obj):
         self._validate(pandas_obj)
         self._obj = pandas_obj
