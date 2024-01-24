@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Dict
+    from typing import Callable
     from geopandas import GeoDataFrame
 
 from ..dotnet import pythonnet_implementation as impl
@@ -11,6 +13,7 @@ from .result_catchment import ResultCatchment
 from .various import make_proper_variable_name
 from ..various import try_import_geopandas
 from ..various import pyproj_crs_from_projection_string
+from ..pandas_extension import ResultFrameAggregator
 
 
 class ResultCatchments(ResultLocations):
@@ -63,9 +66,22 @@ class ResultCatchments(ResultLocations):
         """
         self[catchment.id] = catchment
 
-    def to_geopandas(self) -> GeoDataFrame:
+    def to_geopandas(
+        self,
+        agg: str | Callable = None,
+        agg_kwargs: Dict[str : str | Callable] = {},
+    ) -> GeoDataFrame:
         """
         Convert catchments to a geopandas.GeoDataFrame object.
+
+        By default, the result quantities are aggregated unless agg is specified.
+
+        Parameters
+        ----------
+        agg : str or callable, default None
+            Aggregation strategy. How to aggregate the quantities in time and space.
+        agg_kwargs : dict, default {}
+            Aggregation strategy for specific levels (e.g. {time='min', chainage='first'}).
 
         Returns
         -------
@@ -80,7 +96,18 @@ class ResultCatchments(ResultLocations):
 
         ids = self._catchment_ids
         geometries = self._geometries
-        data = {"id": ids, "geometry": geometries}
+        data = {"name": ids, "geometry": geometries}
         crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
         gdf = gpd.GeoDataFrame(data=data, crs=crs)
+
+        if agg is None:
+            return gdf
+
+        rfa = ResultFrameAggregator(agg, **agg_kwargs)
+
+        df_quantities = self.read(column_mode="compact")
+        df_quantities = rfa.aggregate(df_quantities)
+
+        gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
+
         return gdf
