@@ -5,11 +5,9 @@ from pandas.testing import assert_frame_equal
 from mikeio1d.pandas_extension import TransposedGroupBy
 from mikeio1d.pandas_extension import groupby_chainage
 from mikeio1d.pandas_extension import agg_chainage
+from mikeio1d.pandas_extension import groupby_level
 
 from mikeio1d.result_reader_writer.result_reader import ColumnMode
-from mikeio1d.pandas_extension import TransposedGroupBy
-import pandas as pd
-from mikeio1d.pandas_extension import TransposedGroupBy, groupby_chainage, agg_chainage
 
 
 @pytest.fixture
@@ -21,6 +19,13 @@ def sample_dataframe(res1d_river_network) -> pd.DataFrame:
 def test_groupby_chainage(sample_dataframe):
     # Test groupby_chainage function
     groupby = groupby_chainage(sample_dataframe)
+    assert isinstance(groupby, TransposedGroupBy)
+    assert groupby.max().max().max() == pytest.approx(sample_dataframe.max().max())
+    assert groupby.min().min().min() == pytest.approx(sample_dataframe.min().min())
+
+
+def test_groupby_level(sample_dataframe):
+    groupby = groupby_level(sample_dataframe, level_name="chainage")
     assert isinstance(groupby, TransposedGroupBy)
     assert groupby.max().max().max() == pytest.approx(sample_dataframe.max().max())
     assert groupby.min().min().min() == pytest.approx(sample_dataframe.min().min())
@@ -87,4 +92,10 @@ def test_m1d_query(sample_dataframe):
 def test_m1d_groupby(sample_dataframe):
     df_expected = sample_dataframe.T.groupby("quantity").max().T
     df = sample_dataframe.m1d.groupby("quantity").max()
+    assert_frame_equal(df, df_expected)
+
+
+def test_m1d_groupby_level(sample_dataframe):
+    df_expected = groupby_level(sample_dataframe, level_name="quantity").max()
+    df = sample_dataframe.m1d.groupby_level("quantity").max()
     assert_frame_equal(df, df_expected)
