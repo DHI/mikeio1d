@@ -54,7 +54,7 @@ def pyproj_crs_from_projection_string(projection_string: str):
 
 def make_list_if_not_iterable(obj) -> list:
     """
-    Boxes non-iterable objects into a list.
+    Boxes non-iterable objects into a list. For strings, the string is boxed into a list.
 
     Parameters
     ----------
@@ -71,4 +71,6 @@ def make_list_if_not_iterable(obj) -> list:
     except TypeError:
         return [obj]
     else:
+        if isinstance(obj, str):
+            return [obj]
         return obj
