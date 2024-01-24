@@ -74,5 +74,5 @@ def groupby_level(df: pd.DataFrame, level_name: str) -> pd.DataFrame:
         raise ValueError(f"Level name {level_name} not found in columns.")
 
     fixed_level_names = [n for n in df.columns.names if n != level_name]
-    groupby = df.T.groupby(fixed_level_names)
+    groupby = df.T.groupby(fixed_level_names, sort=False)
     return TransposedGroupBy(groupby)
