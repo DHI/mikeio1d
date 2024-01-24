@@ -32,6 +32,8 @@ def compact_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("DataFrame must have a hierarchical column index to compact.")
 
     for field in fields(TimeSeriesId):
+        if field.name not in index.names:
+            continue
         level_values = index.get_level_values(field.name)
         is_only_one_unique_value = len(level_values.unique()) == 1
         if not is_only_one_unique_value:
