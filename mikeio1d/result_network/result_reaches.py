@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Callable
+    from typing import Dict
     from geopandas import GeoDataFrame
 
 from .result_locations import ResultLocations
@@ -11,6 +13,7 @@ from .various import make_proper_variable_name
 from ..various import try_import_geopandas
 from ..various import pyproj_crs_from_projection_string
 from ..dotnet import pythonnet_implementation as impl
+from ..pandas_extension import ResultFrameAggregator
 
 
 class ResultReaches(ResultLocations):
@@ -82,19 +85,51 @@ class ResultReaches(ResultLocations):
         self[reach.Name] = result_reach
         return result_reach
 
-    def to_geopandas(self) -> GeoDataFrame:
+    def to_geopandas(
+        self,
+        agg: str | Callable = None,
+        agg_kwargs: Dict[str : str | Callable] = {},
+    ) -> GeoDataFrame:
         """
         Convert reaches to a geopandas.GeoDataFrame object.
+
+        By default, the result quantities are not aggregated unless agg is specified.
+
+        Parameters
+        ----------
+        agg : str or callable, default None
+            Aggregation strategy. How to aggregate the quantities in time and space.
+        agg_kwargs : dict, default {}
+            Aggregation strategy for specific levels (e.g. {time='min', chainage='first'}).
 
         Returns
         -------
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with reaches as LineString geometries.
+
+        Examples
+        --------
+        # Convert reaches to a GeoDataFrame (without quantities)
+        >>> gdf = res1d.result_network.reaches.to_geopandas()
+
+        # Convert reaches to a GeoDataFrame with aggregated quantities
+        >>> gdf = res1d.result_network.reaches.to_geopandas(agg='mean')
         """
         gpd = try_import_geopandas()
         ids = [reach.name for reach in self.values()]
         geometries = [reach.geometry.to_shapely() for reach in self.values()]
-        data = {"id": ids, "geometry": geometries}
+        data = {"name": ids, "geometry": geometries}
         crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
         gdf = gpd.GeoDataFrame(data=data, crs=crs)
+
+        if agg is None:
+            return gdf
+
+        rfa = ResultFrameAggregator(agg, **agg_kwargs)
+
+        df_quantities = self.read(column_mode="compact")
+        df_quantities = rfa.aggregate(df_quantities)
+
+        gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
+
         return gdf
