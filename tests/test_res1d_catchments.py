@@ -236,10 +236,12 @@ def test_res1d_merging(test_file_path_for_merging):
     file_b = test_file_path_for_merging.replace(".res1d", "_b.res1d")
     file_c = test_file_path_for_merging.replace(".res1d", "_c.res1d")
 
-    Res1D.merge([file_a, file_b], file_c)
+    res1d_a = Res1D(file_a)
+    res1d_b = Res1D(file_b)
+    Res1D.merge([res1d_a, res1d_b], file_c)
 
-    df_a = Res1D(file_a).read()
-    df_b = Res1D(file_b).read().tail(-1)
+    df_a = res1d_a.read()
+    df_b = res1d_b.read().tail(-1)
     df_c = Res1D(file_c).read()
 
     df_merged = pd.concat([df_a, df_b])

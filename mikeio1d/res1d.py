@@ -443,16 +443,38 @@ class Res1D:
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
 
     @staticmethod
-    def merge(file_names, merged_file_name):
+    def merge(file_names: List[str] | List[Res1D], merged_file_name: str):
         """
         Merges res1d files.
 
+        It is possible to merge three kinds of result files:
+        * Regular res1d (HD, RR, etc.)
+        * LTS extreme statistics
+        * LTS chronological statistics
+
+        For regular res1d files the requirement is that the simulation start time
+        of the first file matches the simulation end time of the second file
+        (the same principle for subsequent files).
+
+        For LTS result files, meaningful merged result file is obtained when
+        simulation periods for the files do not overlap.
+
         Parameters
         ----------
-        file_names : list of str
+        file_names : list of str or Res1D objects
             List of res1d file names to merge.
         merged_file_name : str
             File name of the res1d file to store the merged data.
         """
+        file_names = Res1D._convert_res1d_to_str_for_file_names(file_names)
         result_merger = ResultMerger(file_names)
         result_merger.merge(merged_file_name)
+
+    @staticmethod
+    def _convert_res1d_to_str_for_file_names(file_names: List[str] | List[Res1D]):
+        file_names_new = []
+        for i in range(len(file_names)):
+            entry = file_names[i]
+            file_name = entry.file_path if isinstance(entry, Res1D) else entry
+            file_names_new.append(file_name)
+        return file_names_new
