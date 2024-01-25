@@ -364,7 +364,7 @@ def test_result_quantity_methods(test_file):
     discharge_in_structure = res1d.structures.W_right.DischargeInStructure
 
     df = discharge_in_structure.to_dataframe()
-    max_value = round(df.max()[0], 3)
+    max_value = round(df.max().iloc[0], 3)
     assert pytest.approx(max_value) == 11.018
 
     # Test the calling of methods

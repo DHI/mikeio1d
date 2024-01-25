@@ -140,7 +140,10 @@ def test_read_reach(test_file, quantity, reach_id, chainage, expected_max):
 
 @pytest.mark.parametrize(
     "quantity,node_id,expected_max",
-    [("WaterLevelMaximum", "B4.1320", 17.511), ("WaterLevelMaximum", "B4.1480", 16.957)],
+    [
+        ("WaterLevelMaximum", "B4.1320", 17.511),
+        ("WaterLevelMaximum", "B4.1480", 16.957),
+    ],
 )
 def test_read_node(test_file, quantity, node_id, expected_max):
     data = test_file.query.GetNodeValues(node_id, quantity)
@@ -215,3 +218,44 @@ def test_res1d_filter_readall(test_file_path, helpers):
 
     # Release the .NET object
     res1d = None
+
+
+def test_res1d_merging_same_file(test_file_path):
+    # Use the same file twice to create a merged LTS statistics file
+    file_names = [test_file_path, test_file_path]
+    merged_file_name = test_file_path.replace(".res1d", ".merged.res1d")
+    Res1D.merge(file_names, merged_file_name)
+
+    # Read the merged file
+    res1d = Res1D(merged_file_name)
+
+    # Test one node location for particular values
+    df_node = res1d.nodes.B4_1320.WaterLevelMaximum.read()
+    b4_1320_event1 = df_node.iloc[0].iloc[0]
+    b4_1320_event2 = df_node.iloc[1].iloc[0]
+    assert b4_1320_event1 == b4_1320_event2
+    assert pytest.approx(np.round(b4_1320_event1, 3)) == 17.511
+
+    df_node_time = res1d.nodes.B4_1320.WaterLevelMaximumTime.read()
+    b4_1320_time1 = df_node_time.iloc[0]
+    b4_1320_time2 = df_node_time.iloc[1]
+    assert (b4_1320_time1 == b4_1320_time2).values[0]
+
+    # Test one reach location for particular values
+    df_reach = res1d.reaches.B4_1491l1.m_216.DischargeMaximum.read()
+    b4_1491l1_event1 = df_reach.iloc[0].iloc[0]
+    b4_1491l1_event2 = df_reach.iloc[1].iloc[0]
+    assert b4_1491l1_event1 == b4_1491l1_event2
+    assert pytest.approx(np.round(b4_1491l1_event1, 3)) == 0.151
+
+    df_reach_time = res1d.reaches.B4_1491l1.m_216.DischargeMaximumTime.read()
+    b4_1491l1_time1 = df_reach_time.iloc[0]
+    b4_1491l1_time2 = df_reach_time.iloc[1]
+    assert (b4_1491l1_time1 == b4_1491l1_time2).values[0]
+
+    # Validate all merged events. Every event now needs to appear twice.
+    df = res1d.read_all()
+    # TODO: Maybe it is possible to vectorize this check.
+    for col in df:
+        for i in range(0, len(df[col]), 2):
+            assert df[col][i] == df[col][i + 1]

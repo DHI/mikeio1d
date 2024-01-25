@@ -1,6 +1,7 @@
 import os
 import pytest
 import numpy as np
+import pandas as pd
 
 from mikeio1d.custom_exceptions import NoDataForQuery, InvalidQuantity
 from mikeio1d.res1d import Res1D
@@ -15,6 +16,13 @@ def test_file_path():
     test_folder_path = os.path.dirname(os.path.abspath(__file__))
     # File taken from TestSuite: RainfallRunoff\SWQ\DemoSWQ1BaseMixedRRAD.res1d
     return os.path.join(test_folder_path, "testdata", "catchments.res1d")
+
+
+@pytest.fixture
+def test_file_path_for_merging():
+    test_folder_path = os.path.dirname(os.path.abspath(__file__))
+    # File taken from TestSuite: RainfallRunoff\SWQ\DemoSWQ1BaseMixedRRAD.res1d
+    return os.path.join(test_folder_path, "testdata", "catchment_merge.res1d")
 
 
 @pytest.fixture(params=[True, False])
@@ -220,3 +228,20 @@ def test_catchment_static_attributes(res1d_catchments):
         catchment.id
         catchment.area
         catchment.type
+
+
+def test_res1d_merging(test_file_path_for_merging):
+    file_a = test_file_path_for_merging.replace(".res1d", "_a.res1d")
+    file_b = test_file_path_for_merging.replace(".res1d", "_b.res1d")
+    file_c = test_file_path_for_merging.replace(".res1d", "_c.res1d")
+
+    res1d_a = Res1D(file_a)
+    res1d_b = Res1D(file_b)
+    Res1D.merge([res1d_a, res1d_b], file_c)
+
+    df_a = res1d_a.read()
+    df_b = res1d_b.read().tail(-1)
+    df_c = Res1D(file_c).read()
+
+    df_merged = pd.concat([df_a, df_b])
+    pd.testing.assert_frame_equal(df_merged, df_c)

@@ -7,11 +7,11 @@
 - Introduced TimeSeriesId to uniquely identify results.
 - Read methods now include 'column_mode' parameter that enables multiindex reading (e.g. column_mode='compact').
 - Added more type hints to improve IDE auto-completion and docstring peeking.
-
+- Merging of regular and LTS extreme/periodic res1d files.
 
 ### Fixed
 
-- 
+-
 
 ### Changed
 
