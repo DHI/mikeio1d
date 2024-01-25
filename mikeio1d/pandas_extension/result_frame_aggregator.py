@@ -160,14 +160,14 @@ class ResultFrameAggregator:
         """
         Entity levels are the geometric entities that the DataFrames are ultimately grouped by.
         """
-        return self._aggregation_levels[:-1]
+        return self._entity_levels
 
     @property
     def agg_levels(self) -> List[str]:
         """
         Agg levels are the levels that are aggregated along.
         """
-        return self._aggregation_levels
+        return self._agg_levels
 
     @property
     def agg_strategies(self) -> Dict[str, Any]:
@@ -223,7 +223,7 @@ class ResultFrameAggregator:
 
     def _remove_group_level(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Remove the group level, if it exists.
+        Remove the group level, if it exists. If there are multiple groups, raise an error.
         """
         if self._has_level_name(df, "group"):
             group_values = df.columns.get_level_values("group")
