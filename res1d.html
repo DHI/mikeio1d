@@ -63,6 +63,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.file_path"><code class="docutils literal notranslate"><span class="pre">Res1D.file_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.global_data"><code class="docutils literal notranslate"><span class="pre">Res1D.global_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.info"><code class="docutils literal notranslate"><span class="pre">Res1D.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.merge"><code class="docutils literal notranslate"><span class="pre">Res1D.merge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.modify"><code class="docutils literal notranslate"><span class="pre">Res1D.modify()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.network"><code class="docutils literal notranslate"><span class="pre">Res1D.network</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#mikeio1d.Res1D.nodes"><code class="docutils literal notranslate"><span class="pre">Res1D.nodes</span></code></a></li>
@@ -219,6 +220,29 @@ Can be ‘csv’, ‘dfs0’, ‘txt’.</p></li>
 <dt class="sig sig-object py" id="mikeio1d.Res1D.info">
 <span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.info" title="Link to this definition"></a></dt>
 <dd><p>Prints information about the result file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mikeio1d.Res1D.merge">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merged_file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mikeio1d/res1d.html#Res1D.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mikeio1d.Res1D.merge" title="Link to this definition"></a></dt>
+<dd><p>Merges res1d files.</p>
+<p>It is possible to merge three kinds of result files:
+* Regular res1d (HD, RR, etc.)
+* LTS extreme statistics
+* LTS chronological statistics</p>
+<p>For regular res1d files the requirement is that the simulation start time
+of the first file matches the simulation end time of the second file
+(the same principle for subsequent files).</p>
+<p>For LTS result files, meaningful merged result file is obtained when
+simulation periods for the files do not overlap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Res1D</span> <span class="pre">objects</span></code>) – List of res1d file names to merge.</p></li>
+<li><p><strong>merged_file_name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – File name of the res1d file to store the merged data.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

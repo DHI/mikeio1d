@@ -108,6 +108,7 @@
 <span class="kn">from</span> <span class="nn">.result_extractor</span> <span class="kn">import</span> <span class="n">ExtractorCreator</span>
 <span class="kn">from</span> <span class="nn">.result_extractor</span> <span class="kn">import</span> <span class="n">ExtractorOutputFileType</span>
 <span class="kn">from</span> <span class="nn">.result_network</span> <span class="kn">import</span> <span class="n">ResultNetwork</span>
+<span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultMerger</span>
 <span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultReaderCreator</span>
 <span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultReaderType</span>
 <span class="kn">from</span> <span class="nn">.result_reader_writer</span> <span class="kn">import</span> <span class="n">ResultWriter</span>
@@ -575,7 +576,47 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract to txt file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">time_step_skipping_number</span><span class="p">,</span> <span class="n">ExtractorOutputFileType</span><span class="o">.</span><span class="n">TXT</span><span class="p">)</span></div>
-</div>
+
+
+<div class="viewcode-block" id="Res1D.merge">
+<a class="viewcode-back" href="../../res1d.html#mikeio1d.Res1D.merge">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">file_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Res1D</span><span class="p">],</span> <span class="n">merged_file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merges res1d files.</span>
+
+<span class="sd">        It is possible to merge three kinds of result files:</span>
+<span class="sd">        * Regular res1d (HD, RR, etc.)</span>
+<span class="sd">        * LTS extreme statistics</span>
+<span class="sd">        * LTS chronological statistics</span>
+
+<span class="sd">        For regular res1d files the requirement is that the simulation start time</span>
+<span class="sd">        of the first file matches the simulation end time of the second file</span>
+<span class="sd">        (the same principle for subsequent files).</span>
+
+<span class="sd">        For LTS result files, meaningful merged result file is obtained when</span>
+<span class="sd">        simulation periods for the files do not overlap.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_names : list of str or Res1D objects</span>
+<span class="sd">            List of res1d file names to merge.</span>
+<span class="sd">        merged_file_name : str</span>
+<span class="sd">            File name of the res1d file to store the merged data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_names</span> <span class="o">=</span> <span class="n">Res1D</span><span class="o">.</span><span class="n">_convert_res1d_to_str_for_file_names</span><span class="p">(</span><span class="n">file_names</span><span class="p">)</span>
+        <span class="n">result_merger</span> <span class="o">=</span> <span class="n">ResultMerger</span><span class="p">(</span><span class="n">file_names</span><span class="p">)</span>
+        <span class="n">result_merger</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">merged_file_name</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_convert_res1d_to_str_for_file_names</span><span class="p">(</span><span class="n">file_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Res1D</span><span class="p">]):</span>
+        <span class="n">file_names_new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_names</span><span class="p">)):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">file_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">file_path</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">Res1D</span><span class="p">)</span> <span class="k">else</span> <span class="n">entry</span>
+            <span class="n">file_names_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_names_new</span></div>
 
 </pre></div>
 
