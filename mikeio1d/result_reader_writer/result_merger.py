@@ -1,4 +1,11 @@
-from System.Collections.Generic import List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+
+from System.Collections.Generic import List as DotNetList
 from System import String
 
 from DHI.Mike1D.MikeIO import ResultMerger as Res1DResultMerger
@@ -14,10 +21,10 @@ class ResultMerger:
         List of res1d file names to merge.
     """
 
-    def __init__(self, file_names):
+    def __init__(self, file_names: List[str]):
         self.file_names = file_names
 
-    def merge(self, merged_file_name):
+    def merge(self, merged_file_name: str):
         """
         Merges the data from in file_names to a file
         specified by merged_file_name.
@@ -31,7 +38,7 @@ class ResultMerger:
         Res1DResultMerger.Merge(file_names_dotnet, merged_file_name)
 
     def _get_file_name_dotnet(self):
-        file_names_dotnet = List[String]()
+        file_names_dotnet = DotNetList[String]()
         for file_name in self.file_names:
             file_names_dotnet.Add(file_name)
         return file_names_dotnet
