@@ -253,3 +253,28 @@ def test_global_data_attributes(test_file):
 
     actual_max = round(df["DischargeIntegratedMonthlyTotalOutflow"].max(), 3)
     assert pytest.approx(actual_max) == 5971.352
+
+
+def test_res1d_merging_same_file(test_file_path):
+    # Use the same file twice to create a merged LTS statistics file
+    file_names = [test_file_path, test_file_path]
+    merged_file_name = test_file_path.replace(".res1d", ".merged.res1d")
+    Res1D.merge(file_names, merged_file_name)
+
+    # Read the merged file
+    res1d = Res1D(merged_file_name)
+
+    # Test one reach location for particular values
+    df_reach = res1d.reaches.B4_1320l1.m_101_251.DischargeIntegratedMonthly.read()
+    assert pytest.approx(np.round(df_reach.max(), 3)) == 2 * 1215.915
+
+    df_reach_count = res1d.reaches.B4_1320l1.m_101_251.DischargeIntegratedMonthlyCount.read()
+    assert pytest.approx(np.round(df_reach_count.max(), 3)) == 2 * 3
+
+    df_reach_duration = res1d.reaches.B4_1320l1.m_101_251.DischargeIntegratedMonthlyDuration.read()
+    assert pytest.approx(np.round(df_reach_duration.max(), 3)) == 2 * 10.703
+
+    res1d_ori = Res1D(test_file_path)
+    df_ori = res1d_ori.read()
+    df_merged = res1d.read()
+    pd.testing.assert_frame_equal(2 * df_ori, df_merged)
