@@ -56,6 +56,8 @@ class ResultFrameAggregator:
         kwargs.setdefault("time", agg)
         if kwargs["time"] is None:
             raise ValueError("Must specify an aggregation strategy for time.")
+        if agg is None:
+            agg = kwargs["time"]
 
         self._override_name = override_name
 
