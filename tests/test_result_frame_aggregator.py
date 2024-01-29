@@ -5,6 +5,7 @@ from mikeio1d.pandas_extension import ResultFrameAggregator
 import random
 
 import pandas as pd
+from pandas.testing import assert_index_equal
 import numpy as np
 from numpy.testing import assert_array_equal
 
@@ -21,6 +22,10 @@ def df_dummy():
 
 @pytest.fixture()
 def df_simple():
+    return create_simple_dataframe()
+
+
+def create_simple_dataframe() -> pd.DataFrame:
     tuples = [
         ("A", "B", "B"),
         ("A", "B", "A"),
@@ -262,6 +267,12 @@ class TestResultFrameAggregatorUnit:
         df_agg = rfa._aggregate_along_level(df_simple, "LA", "max")
         assert df_agg.shape == (2, 4)
         assert "LA" not in df_agg.columns.names
+        assert list(df_agg.columns.values) == [
+            ("B", "B"),
+            ("B", "A"),
+            ("A", "B"),
+            ("A", "A"),
+        ]
         remaining_levels = ["LB", "LC"]
         for L in remaining_levels:
             assert_array_equal(
@@ -273,6 +284,10 @@ class TestResultFrameAggregatorUnit:
         assert df_agg.shape == (2, 2)
         assert "LB" not in df_agg.columns.names
         remaining_levels = ["LA", "LC"]
+        assert list(df_agg.columns.values) == [
+            ("A", "B"),
+            ("A", "A"),
+        ]
         assert_array_equal(df_agg.columns.get_level_values("LA"), ["A", "A"])
         assert_array_equal(df_agg.columns.get_level_values("LC"), ["B", "A"])
         assert_array_equal(df_agg.values, [[2, 3], [12, 13]])
@@ -281,6 +296,11 @@ class TestResultFrameAggregatorUnit:
         assert df_agg.shape == (2, 2)
         assert "LC" not in df_agg.columns.names
         remaining_levels = ["LA", "LB"]
+        assert list(df_agg.columns.values) == [
+            ("A", "B"),
+            ("A", "A"),
+        ]
+        assert list(df_agg.columns.values) == [("A", "B"), ("A", "A")]
         assert_array_equal(df_agg.columns.get_level_values("LA"), ["A", "A"])
         assert_array_equal(df_agg.columns.get_level_values("LB"), ["B", "A"])
         assert_array_equal(df_agg.values, [[1, 3], [11, 13]])
@@ -294,8 +314,23 @@ class TestResultFrameAggregatorUnit:
         df_agg = rfa._aggregate_along_level(df_simple, "LC", "sum")
         assert_array_equal(df_agg.values, [[1, 5], [21, 25]])
 
-    def test_aggregate_along_time(self):
-        pass
+    def test_aggregate_along_time(self, df_simple):
+        rfa = ResultFrameAggregator("max")
+        df_agg = rfa._aggregate_along_time(df_simple, "max")
+        assert_index_equal(df_simple.columns, df_agg.columns)
+        assert_array_equal(df_agg.values, [[10, 11, 12, 13]])
 
-    def test_finalize_df_post_aggregate(self):
-        pass
+        df_agg = rfa._aggregate_along_time(df_simple, ["min", "max"])
+        assert_index_equal(df_simple.columns, df_agg.columns)
+        assert_array_equal(df_agg.values, [[0, 1, 2, 3], [10, 11, 12, 13]])
+
+    def test_finalize_df_post_aggregate(self, df_dummy):
+        # Aggregator requires all groups be of same type
+        df_dummy = df_dummy.T.query("group=='A'").T
+        rfa = ResultFrameAggregator("max")
+        df_agg = rfa.aggregate(df_dummy)
+        expected_columns = set()
+        for c in df_dummy.columns.get_level_values("quantity"):
+            expected_columns.add(f"max_{c}")
+        columns = set(df_agg.columns.values)
+        assert expected_columns == columns
