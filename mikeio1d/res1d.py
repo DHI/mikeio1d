@@ -189,10 +189,10 @@ class Res1D:
         -------
         List of TimeSeriesId objects.
         """
-        if queries is None:
-            return self.result_network.queue
-
         queries = make_list_if_not_iterable(queries)
+
+        if queries is None or len(queries) == 0:
+            return self.result_network.queue
 
         is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
         if is_already_time_series_ids:
