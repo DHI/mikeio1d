@@ -334,3 +334,41 @@ class TestResultFrameAggregatorUnit:
             expected_columns.add(f"max_{c}")
         columns = set(df_agg.columns.values)
         assert expected_columns == columns
+
+
+class TestResultFrameAggregator:
+    def test_max_aggregation(self, res1d_river_network):
+        df_reaches = res1d_river_network.reaches.read(column_mode="all")
+        rfa = ResultFrameAggregator("max")
+        df_agg = rfa.aggregate(df_reaches)
+
+        assert list(df_agg.columns.values) == [
+            "max_Discharge",
+            "max_FlowVelocity",
+            "max_ManningResistanceNumber",
+            "max_WaterLevel",
+        ]
+
+        assert list(df_agg.index) == [
+            "basin_left1",
+            "basin_left2",
+            "basin_right",
+            "link_basin_left",
+            "link_basin_left1_2",
+            "link_basin_left2_2",
+            "link_basin_right",
+            "river",
+            "tributary",
+        ]
+
+        # cheap expected value check
+        df_agg_std = df_agg.std()
+        assert list(df_agg_std.index) == [
+            "max_Discharge",
+            "max_FlowVelocity",
+            "max_ManningResistanceNumber",
+            "max_WaterLevel",
+        ]
+        assert list(df_agg_std.values) == pytest.approx(
+            [32.83624888, 1.28741954, 3.25905542, 0.4820685]
+        )
