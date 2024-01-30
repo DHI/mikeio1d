@@ -362,6 +362,9 @@ class TimeSeriesId:
         if group == TimeSeriesIdGroup.STRUCTURE:
             name = item_id
             tag = TimeSeriesId.get_dataset_name(m1d_dataset, None)
+        elif group == TimeSeriesIdGroup.REACH:
+            name = TimeSeriesId.get_dataset_name(m1d_dataset, item_id)
+            tag = TimeSeriesId._get_reach_span_tag(m1d_dataset)
         else:
             name = TimeSeriesId.get_dataset_name(m1d_dataset, item_id)
             tag = ""
@@ -373,6 +376,23 @@ class TimeSeriesId:
             chainage=chainage,
             tag=tag,
         )
+
+    @staticmethod
+    def _get_reach_span_tag(m1d_dataset) -> str:
+        """
+        Creates a tag for an IRes1DDataSet based on its chainage span.
+        """
+        if not hasattr(m1d_dataset, "GridPoints"):
+            return ""
+
+        if m1d_dataset.GridPoints.Count == 0:
+            return ""
+
+        start_gp = m1d_dataset.GridPoints[0]
+        end_gp = m1d_dataset.GridPoints[m1d_dataset.GridPoints.Count - 1]
+
+        tag = f"{start_gp.Chainage:.1f}-{end_gp.Chainage:.1f}"
+        return tag
 
     @staticmethod
     def from_result_quantity(result_quantity: ResultQuantity) -> TimeSeriesId:
