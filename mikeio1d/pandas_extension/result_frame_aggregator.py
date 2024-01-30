@@ -36,10 +36,12 @@ class ResultFrameAggregator:
     ----------
     entity_levels : list of str
         Entity levels are the geometric entities that the DataFrames are ultimately grouped by.
+    quantity_levels: list or str
+        Quantity levels are the levels which uniquely identify a quantity.
     agg_levels : list of str
         Agg levels are the levels that are aggregated along.
     agg_strategies : dict of str: callable
-        Agg strategies are the strategies used for aggregation.
+        Agg strategies are the strategies used for aggregation along the agg_levels.
 
     Examples
     --------
