@@ -170,12 +170,13 @@ class TestResultFrameAggregatorUnit:
         with pytest.raises(ValueError):
             rfa._validate_agg_strategy("time", None)
 
-    def test_aggregate(self):
-        pass
-
     def test_entity_levels(self):
         rfa = ResultFrameAggregator("max")
-        assert rfa.entity_levels == ("quantity", "group", "name", "tag", "derived")
+        assert rfa.entity_levels == ("group", "name", "tag")
+
+    def test_quantity_levels(self):
+        rfa = ResultFrameAggregator("max")
+        assert rfa.quantity_levels == ("quantity", "derived")
 
     def test_agg_levels(self):
         rfa = ResultFrameAggregator("max")
