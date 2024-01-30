@@ -338,8 +338,9 @@ class TestResultFrameAggregatorUnit:
 
 
 class TestResultFrameAggregator:
-    def test_max_aggregation(self, res1d_river_network):
-        df_reaches = res1d_river_network.reaches.read(column_mode="all")
+    @pytest.mark.parametrize("column_mode", ["all", "compact"])
+    def test_max_aggregation(self, res1d_river_network, column_mode):
+        df_reaches = res1d_river_network.reaches.read(column_mode=column_mode)
         rfa = ResultFrameAggregator("max")
         df_agg = rfa.aggregate(df_reaches)
 

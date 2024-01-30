@@ -155,9 +155,6 @@ class ResultFrameAggregator:
         """
         self._validate_df(df)
 
-        # df = compact_dataframe(df)
-        # df = self._remove_group_level(df)
-
         for agg_level in self._agg_levels[:-1]:
             agg = self.get_agg_strategy(agg_level)
             df = self._aggregate_along_level(df, agg_level, agg)
@@ -283,8 +280,11 @@ class ResultFrameAggregator:
 
         levels_to_keep = ["quantity", self._agg_level_name]
         for level in self._quantity_levels:
-            if level not in levels_to_keep:
-                quantity_index = quantity_index.droplevel(level)
+            if level in levels_to_keep:
+                continue
+            if level not in quantity_index.names:
+                continue
+            quantity_index = quantity_index.droplevel(level)
 
         quantity_index = quantity_index.map("_".join)
 
@@ -301,6 +301,8 @@ class ResultFrameAggregator:
         for level in self._entity_levels:
             if level in levels_to_keep:
                 continue
+            if level not in entity_index.names:
+                continue
 
             is_singular = entity_index.get_level_values(level).nunique() == 1
             if is_singular:
@@ -314,7 +316,12 @@ class ResultFrameAggregator:
         """
 
         df = df.rename_axis(self._agg_level_name)
-        df = df.stack(self._quantity_levels).T
+        for level in self._quantity_levels:
+            if level not in df.columns.names:
+                continue
+            df = df.stack(level)
+
+        df = df.T
 
         df.columns = self._finalize_quantity_index(df.columns)
         df.index = self._finalize_entity_index(df.index)
