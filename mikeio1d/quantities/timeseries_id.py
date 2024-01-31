@@ -364,7 +364,7 @@ class TimeSeriesId:
             tag = TimeSeriesId.get_dataset_name(m1d_dataset, None)
         elif group == TimeSeriesIdGroup.REACH:
             name = TimeSeriesId.get_dataset_name(m1d_dataset, item_id)
-            tag = TimeSeriesId._get_reach_span_tag(m1d_dataset)
+            tag = TimeSeriesId.create_reach_span_tag(m1d_dataset)
         else:
             name = TimeSeriesId.get_dataset_name(m1d_dataset, item_id)
             tag = ""
@@ -378,9 +378,19 @@ class TimeSeriesId:
         )
 
     @staticmethod
-    def _get_reach_span_tag(m1d_dataset) -> str:
+    def create_reach_span_tag(m1d_dataset) -> str:
         """
-        Creates a tag for an IRes1DDataSet based on its chainage span.
+        Creates a tag for an IRes1DReach object based on its chainage span.
+
+        Parameters
+        ----------
+        m1d_dataset : IRes1DReach
+            The MIKE 1D reach to create a tag for.
+
+        Returns
+        -------
+        str
+            The tag for the reach (e.g. '0.0-100.0')
         """
         if not hasattr(m1d_dataset, "GridPoints"):
             return ""
