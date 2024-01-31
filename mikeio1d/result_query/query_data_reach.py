@@ -35,6 +35,7 @@ class QueryDataReach(QueryData):
     def __init__(self, quantity, name=None, chainage=None, validate=True):
         super().__init__(quantity, name, validate=False)
         self._chainage = chainage
+        self._m1d_dataset = None
 
         if validate:
             self._validate()
@@ -69,18 +70,21 @@ class QueryDataReach(QueryData):
         quantity = self.quantity
         group = TimeSeriesIdGroup.REACH
         name = self.name
+        tag = TimeSeriesId.create_reach_span_tag(self._m1d_dataset)
         if self.chainage is not None:
             return TimeSeriesId(
                 quantity=quantity,
                 group=group,
                 name=name,
                 chainage=self.chainage,
+                tag=tag,
             )
         else:
             return TimeSeriesId(
                 quantity=quantity,
                 group=group,
                 name=name,
+                tag=tag,
             )
 
     @staticmethod
@@ -101,6 +105,8 @@ class QueryDataReach(QueryData):
         reach = res1d.searcher.FindReach(name, chainage)
         if reach is None:
             return
+
+        self._m1d_dataset = reach
 
         data_item = res1d.query.FindDataItem(reach, quantity)
         if data_item is None:
