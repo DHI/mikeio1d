@@ -46,6 +46,7 @@ def time_series_id_valid_river_res1d():
         group="Reach",
         name="basin_left1",
         chainage=1.002,
+        tag="0.0-246.6",
     )
 
 
@@ -375,7 +376,7 @@ def test_time_series_id_from_dataset_dataitem_and_element(reach: ResultReach):
         group="Reach",
         name="100l1",
         chainage=0,
-        tag="",
+        tag="0.0-47.7",
         duplicate=0,
         derived=False,
     )
