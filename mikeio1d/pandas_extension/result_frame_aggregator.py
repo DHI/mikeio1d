@@ -290,16 +290,14 @@ class ResultFrameAggregator:
         if not self._has_level_name(df, level):
             return df
 
-        agg = make_list_if_not_iterable(agg)
-        df = groupby_level(df, level_name=level).agg(agg)
+        df = groupby_level(df, level_name=level).agg([agg])
         return df
 
     def _aggregate_along_time(self, df: pd.DataFrame, agg: Any) -> pd.DataFrame:
         """
         Aggregate along the time dimension.
         """
-        agg = make_list_if_not_iterable(agg)
-        return df.agg(agg)
+        return df.agg([agg])
 
     def _finalize_quantity_index(self, quantity_index: pd.Index) -> pd.Index:
         """

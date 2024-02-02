@@ -154,6 +154,9 @@ class TestResultFrameAggregatorUnit:
             rfa._agg_functions = {"duplicate": None, "time": "max"}
             rfa._validate_agg_functions()
         with pytest.raises(ValueError):
+            rfa._agg_functions = {"time": ["min", "max"]}
+            rfa._validate_agg_functions()
+        with pytest.raises(ValueError):
             rfa._agg_functions = {"chainage": "max", "time": {}}
             rfa._validate_agg_functions()
         with pytest.raises(ValueError):
@@ -321,9 +324,9 @@ class TestResultFrameAggregatorUnit:
         assert_index_equal(df_simple.columns, df_agg.columns)
         assert_array_equal(df_agg.values, [[10, 11, 12, 13]])
 
-        df_agg = rfa._aggregate_along_time(df_simple, ["min", "max"])
+        df_agg = rfa._aggregate_along_time(df_simple, "min")
         assert_index_equal(df_simple.columns, df_agg.columns)
-        assert_array_equal(df_agg.values, [[0, 1, 2, 3], [10, 11, 12, 13]])
+        assert_array_equal(df_agg.values, [[0, 1, 2, 3]])
 
     def test_finalize_df_post_aggregate(self, df_dummy):
         # Aggregator requires all groups be of same type
