@@ -70,16 +70,23 @@ class ResultNodes(ResultLocations):
         agg_kwargs: Dict[str : str | Callable] = {},
     ) -> GeoDataFrame:
         """
-        Convert nodes to a geopandas.GeoDataFrame object.
+        Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.
 
-        By default, the result quantities are aggregated unless agg is specified.
+        By default, quantities are not included. To include quantities, use the `agg` and `agg_kwargs` parameters.
 
         Parameters
         ----------
         agg : str or callable, default None
-            Aggregation strategy. How to aggregate the quantities in time and space.
+            Defines how to aggregate the quantities in time and space.
+            Accepts any str or callable that is accepted by pandas.DataFrame.agg.
+
+            Examples:
+            - 'mean'  : mean value of all quantities
+            - 'max'   : maximum value of all quantities
+            -  np.max : maximum value of all quantities
+
         agg_kwargs : dict, default {}
-            Aggregation strategy for specific levels (e.g. {time='min', chainage='first'}).
+            Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
 
         Returns
         -------
