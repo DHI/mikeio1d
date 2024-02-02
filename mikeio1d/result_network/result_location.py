@@ -71,7 +71,8 @@ class ResultLocation(ABC):
         return repr
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """Read the time series data into a data frame.
+        """
+        Read the time series data for all quantities at this location into a DataFrame.
 
         Parameters
         ----------
