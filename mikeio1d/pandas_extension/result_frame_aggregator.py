@@ -14,9 +14,7 @@ from dataclasses import fields
 import pandas as pd
 
 from . import groupby_level
-from . import compact_dataframe
 
-from mikeio1d.various import make_list_if_not_iterable
 from mikeio1d.quantities import TimeSeriesId
 
 
@@ -118,7 +116,7 @@ class ResultFrameAggregator:
 
     def _validate_levels(self):
         """
-        Validate that the entity levels and agg levels are consistent with TimeSeriesId.
+        Validate that entity, quantity, and agg levels are consistent with TimeSeriesId.
         """
         entity_levels = set(self._entity_levels)
         agg_levels = set(self._agg_levels)
@@ -171,17 +169,17 @@ class ResultFrameAggregator:
         Validate that the agg function is a callable or a string.
         """
         if level_name not in self._agg_levels:
-            raise ValueError(f"Level name {level_name} is not a valid level for aggregation.")
+            raise ValueError(f"Level name '{level_name}' is not a valid level for aggregation.")
 
         valid_agg_types = (str, Callable)
         if not isinstance(agg, valid_agg_types):
             raise ValueError(
-                f"Agg function for level {level_name} invalid. Must be one of {valid_agg_types}"
+                f"Agg function for level '{level_name}' invalid. Must be one of {valid_agg_types}"
             )
 
     def aggregate(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Aggregate along the chainage and time dimensions.
+        Aggregate along the duplicate, chainage, and time dimensions.
         """
         self._validate_df(df)
 
@@ -199,28 +197,31 @@ class ResultFrameAggregator:
     @property
     def entity_levels(self) -> List[str]:
         """
-        Entity levels are the geometric entities that the DataFrames are ultimately grouped by.
+        The DataFrame column levels used to uniquely identify an entity.
+        (e.g. ['group','name','tag']).
         """
         return self._entity_levels
 
     @property
     def agg_levels(self) -> List[str]:
         """
-        Agg levels are the levels that are aggregated along.
+        The DataFrame column levels that will be aggregated along, in order.
+        (e.g. ['duplicate','chainage','time']).
         """
         return self._agg_levels
 
     @property
     def quantity_levels(self) -> List[str]:
         """
-        Quantity levels are the levels which uniquely identify a quantity.
+        The DataFrame column levels used to uniquely identify a quantity
+        (e.g. ['quantity','derived']).
         """
         return self._quantity_levels
 
     @property
     def agg_functions(self) -> Dict[str, Any]:
         """
-        Agg functions are the functions used for aggregation.
+        A dictionary with keys matching agg_levels, and values being the aggregation functions.
         """
         return self._agg_functions
 
@@ -269,23 +270,9 @@ class ResultFrameAggregator:
     def _has_level_name(self, df: pd.DataFrame, level_name) -> bool:
         return level_name in df.columns.names
 
-    def _remove_group_level(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Remove the group level, if it exists. If there are multiple groups, raise an error.
-        """
-        if self._has_level_name(df, "group"):
-            group_values = df.columns.get_level_values("group")
-            number_of_unique_group_values = len(set(group_values))
-            if number_of_unique_group_values != 1:
-                raise ValueError(
-                    f"DataFrame has multiple groups: {set(group_values)}. Cannot aggregate."
-                )
-            df = df.droplevel("group", axis=1)
-        return df
-
     def _aggregate_along_level(self, df: pd.DataFrame, level: str, agg: Any) -> pd.DataFrame:
         """
-        Aggregate along the field dimension.
+        Aggregate along the specified column level.
         """
         if not self._has_level_name(df, level):
             return df
@@ -295,7 +282,7 @@ class ResultFrameAggregator:
 
     def _aggregate_along_time(self, df: pd.DataFrame, agg: Any) -> pd.DataFrame:
         """
-        Aggregate along the time dimension.
+        Aggregate along the time dimension (the rows of the DataFrame).
         """
         return df.agg([agg])
 

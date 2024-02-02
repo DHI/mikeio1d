@@ -251,20 +251,6 @@ class TestResultFrameAggregatorUnit:
         else:
             assert rfa._has_level_name(df_dummy, level)
 
-    def test_remove_group_level(self, df_dummy):
-        rfa = ResultFrameAggregator("max")
-        assert rfa._has_level_name(df_dummy, "group")
-
-        with pytest.raises(ValueError):
-            rfa._remove_group_level(df_dummy)
-
-        df_dummy_A = df_dummy.T.query('group == "A"').T
-        assert rfa._has_level_name(df_dummy_A, "group")
-
-        df_removed = rfa._remove_group_level(df_dummy_A)
-        assert not rfa._has_level_name(df_removed, "group")
-        assert rfa._has_level_name(df_dummy_A, "group")
-
     def test_aggregate_along_level(self, df_simple):
         rfa = ResultFrameAggregator("max")
 
