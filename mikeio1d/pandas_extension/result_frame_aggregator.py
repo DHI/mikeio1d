@@ -13,54 +13,80 @@ from dataclasses import fields
 
 import pandas as pd
 
-from mikeio1d.pandas_extension import groupby_level
-from mikeio1d.pandas_extension import compact_dataframe
+from . import groupby_level
+from . import compact_dataframe
+
 from mikeio1d.various import make_list_if_not_iterable
 from mikeio1d.quantities import TimeSeriesId
 
 
 class ResultFrameAggregator:
     """
-    Aggregates a MIKE IO 1D result DataFrame into scalar values associate with entities.
+    Aggregates a MIKE IO 1D result DataFrame with hierarchical columns along specific levels.
+
+    Levels are categorized as entity levels, quantity levels, and aggregation levels.
+    Aggregation is only performed along aggregation levels. Quantity levels define the
+    resulting DataFrame's columns. Entity levels define the resulting DataFrame's indices.
 
     Parameters
     ----------
-    agg : str or callable
-        Default aggregation strategy for all levels.
-    override_name : str
-        Set a custom name for the overall aggregation.
+    agg : str or callable, optional
+        Default aggregation function to be applied along DataFrame column levels.
+        Any str or callable accepted by pd.DataFrame.agg may be used.
+
+        Example:
+        - "max"   :  Take the maximum value.
+        - "min"   :  Take the minimum value.
+        -  np.mean: Take the mean value.
+
+        If not specified, then the 'time' parameter must be provided and is used as default.
+    override_name : str, optional
+        Set a custom name for the overall aggregation. By default uses the agg function name.
     **kwargs
-        Aggregation strategies for specific levels (e.g. time='min', chainage='mean')
+        Aggregation functions for specific DataFrame column levels (e.g. time='min', chainage='mean')
 
     Attributes
     ----------
     entity_levels : list of str
-        Entity levels are the geometric entities that the DataFrames are ultimately grouped by.
+        The DataFrame column levels used to uniquely identify an entity.
+        (e.g. ['group','name','tag']).
     quantity_levels: list or str
-        Quantity levels are the levels which uniquely identify a quantity.
+        The DataFrame column levels used to uniquely identify a quantity
+        (e.g. ['quantity','derived']).
     agg_levels : list of str
-        Agg levels are the levels that are aggregated along.
-    agg_strategies : dict of str: callable
-        Agg strategies are the strategies used for aggregation along the agg_levels.
+        The DataFrame column levels that will be aggregated along, in order.
+        (e.g. ['duplicate','chainage','time']).
+    agg_functions : dict of str: callable
+        A dictionary with keys matching agg_levels, and values being the aggregation functions.
 
     Examples
     --------
-    # Aggregate along chainage and time, taking the max of each quantity
+    # See which levels will be aggregated, and in what order.
+    >>> agg = ResultFrameAggregator('max')
+    >>> agg.agg_levels
+    ['duplicate', 'chainage', 'time']
+
+    # Aggregate along duplicate, chainage, and time, taking the max of each quantity
     >>> agg = ResultFrameAggregator('max')
     >>> agg.aggregate(df)
 
-    # Always take the first chainage value, but take the max of time
+    # Always take the first chainage value, but take the max of all other levels.
     >>> agg = ResultFrameAggregator('max', chainage='first')
     >>> agg.aggregate(df)
 
     # Same result as above, but with explicit argument names.
-    >>> agg = ResultFrameAggregator(time='max', chainage='first')
+    >>> agg = ResultFrameAggregator(duplicate='max', time='max', chainage='first')
+    >>> agg.aggregate(df)
+
+    # Same as above, but recognizing that time='max' becomes the default for unspecifed levels.
+    >>> agg = ResultFrameAggregator(chainage='first' time='max')
+    >>> agg.aggregate(df)
     """
 
     def __init__(self, agg: str | Callable = None, override_name: str = None, **kwargs):
         kwargs.setdefault("time", agg)
         if kwargs["time"] is None:
-            raise ValueError("Must specify an aggregation strategy for time.")
+            raise ValueError("Must specify an aggregation function for time.")
         if agg is None:
             agg = kwargs["time"]
 
@@ -70,23 +96,23 @@ class ResultFrameAggregator:
         self._entity_levels = ("group", "name", "tag")
         self._agg_levels = ("duplicate", "chainage", "time")
         self._quantity_levels = ("quantity", "derived")
-        self._agg_strategies = self._init_agg_strategies(agg, kwargs)
+        self._agg_functions = self._init_agg_functions(agg, kwargs)
 
         self._validate()
 
-    def _init_agg_strategies(self, agg, agg_kwargs: Dict) -> Dict[str, Any]:
+    def _init_agg_functions(self, agg, agg_kwargs: Dict) -> Dict[str, Any]:
         """
-        Initialize the aggregation strategies. Default is to use same everywhere.
+        Initialize the aggregation functions. Default is to use same everywhere.
         """
-        strategies = {k: agg for k in self._agg_levels}
+        functions = {k: agg for k in self._agg_levels}
         for k, v in agg_kwargs.items():
-            if k in strategies:
-                strategies[k] = v
-        return strategies
+            if k in functions:
+                functions[k] = v
+        return functions
 
     def _validate(self):
         self._validate_levels()
-        self._validate_agg_strategies()
+        self._validate_agg_functions()
 
     def _validate_levels(self):
         """
@@ -127,20 +153,20 @@ class ResultFrameAggregator:
         if self._agg_levels[0] != "duplicate":
             raise ValueError("Agg levels should start with 'duplicate'.")
 
-    def _validate_agg_strategies(self):
+    def _validate_agg_functions(self):
         """
-        Validate that the agg strategies are complete and valid.
+        Validate that the agg functions are complete and valid.
         """
-        strategies = set(self._agg_strategies.keys())
-        if not strategies == set(self._agg_levels):
-            raise ValueError("Missing aggregation strategy for one of the agg_levels.")
+        functions = set(self._agg_functions.keys())
+        if not functions == set(self._agg_levels):
+            raise ValueError("Missing aggregation function for one of the agg_levels.")
 
-        for level_name, agg in self._agg_strategies.items():
-            self._validate_agg_strategy(level_name, agg)
+        for level_name, agg in self._agg_functions.items():
+            self._validate_agg_function(level_name, agg)
 
-    def _validate_agg_strategy(self, level_name: str, agg: Any):
+    def _validate_agg_function(self, level_name: str, agg: Any):
         """
-        Validate that the agg strategy is a callable or a string.
+        Validate that the agg function is a callable or a string.
         """
         if level_name not in self._agg_levels:
             raise ValueError(f"Level name {level_name} is not a valid level for aggregation.")
@@ -148,7 +174,7 @@ class ResultFrameAggregator:
         valid_agg_types = (str, Callable)
         if not isinstance(agg, valid_agg_types):
             raise ValueError(
-                f"Agg strategy for level {level_name} invalid. Must be one of {valid_agg_types}"
+                f"Agg function for level {level_name} invalid. Must be one of {valid_agg_types}"
             )
 
     def aggregate(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -158,10 +184,10 @@ class ResultFrameAggregator:
         self._validate_df(df)
 
         for agg_level in self._agg_levels[:-1]:
-            agg = self.get_agg_strategy(agg_level)
+            agg = self.get_agg_function(agg_level)
             df = self._aggregate_along_level(df, agg_level, agg)
 
-        agg_time = self.get_agg_strategy("time")
+        agg_time = self.get_agg_function("time")
         df = self._aggregate_along_time(df, agg_time)
 
         df = self._finalize_df_post_aggregate(df)
@@ -190,29 +216,29 @@ class ResultFrameAggregator:
         return self._quantity_levels
 
     @property
-    def agg_strategies(self) -> Dict[str, Any]:
+    def agg_functions(self) -> Dict[str, Any]:
         """
-        Agg strategies are the strategies used for aggregation.
+        Agg functions are the functions used for aggregation.
         """
-        return self._agg_strategies
+        return self._agg_functions
 
-    def set_agg_strategy(self, level_name: str, agg: Any):
+    def set_agg_function(self, level_name: str, agg: Any):
         """
-        Set the aggregation strategy for a level.
+        Set the aggregation function for a level.
 
         Parameters
         ----------
         level_name : str
             The level name to aggregate along. Must be one of the agg_levels.
         agg : pd.DataFrame.agg func-like
-            The aggregation strategy.
+            The aggregation function.
         """
-        self._validate_agg_strategy(level_name, agg)
-        self._agg_strategies[level_name] = agg
+        self._validate_agg_function(level_name, agg)
+        self._agg_functions[level_name] = agg
 
-    def get_agg_strategy(self, level_name: str) -> Any:
+    def get_agg_function(self, level_name: str) -> Any:
         """
-        Get the aggregation strategy for a level.
+        Get the aggregation function for a level.
 
         Parameters
         ----------
@@ -222,12 +248,12 @@ class ResultFrameAggregator:
         Returns
         -------
         agg : pd.DataFrame.agg func-like
-            The aggregation strategy.
+            The aggregation function.
         """
-        agg = self._agg_strategies.get(level_name, None)
+        agg = self._agg_functions.get(level_name, None)
 
         if agg is None:
-            raise ValueError(f"No aggregation strategy for level {level_name}.")
+            raise ValueError(f"No aggregation function for level {level_name}.")
 
         return agg
 
