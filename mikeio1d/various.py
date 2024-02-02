@@ -1,6 +1,8 @@
 import clr
 import warnings
 
+from collections.abc import Iterable
+
 from System import Enum
 from DHI.Mike1D.Generic import PredefinedQuantity
 
@@ -54,7 +56,9 @@ def pyproj_crs_from_projection_string(projection_string: str):
 
 def make_list_if_not_iterable(obj) -> list:
     """
-    Boxes non-iterable objects into a list. For strings, the string is boxed into a list.
+    Boxes non-iterable objects into a list. Only intended to clean user input once.
+
+    For strings, the string is boxed into a list.
     For None, an empty list is returned.
 
     Parameters
@@ -70,11 +74,10 @@ def make_list_if_not_iterable(obj) -> list:
     if obj is None:
         return []
 
-    try:
-        iter(obj)
-    except TypeError:
+    if not isinstance(obj, Iterable):
         return [obj]
-    else:
-        if isinstance(obj, str):
-            return [obj]
-        return obj
+
+    if isinstance(obj, str):
+        return [obj]
+
+    return obj
