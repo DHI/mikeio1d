@@ -333,7 +333,8 @@ class TestResultFrameAggregator:
         df_reaches = res1d_river_network.reaches.river.Discharge.read(column_mode=column_mode)
         rfa = ResultFrameAggregator(agg)
         df_agg = rfa.aggregate(df_reaches)
-        agg_value = df_agg.values[0][0]
+        df_agg = df_agg.groupby("name").agg(agg)  # test max of entire reach (not segments)
+        agg_value = df_agg.iloc[0, 0]
         assert agg_value == pytest.approx(expected, abs=1e-4)
 
     @pytest.mark.parametrize("column_mode", ["all", "compact"])
@@ -341,6 +342,7 @@ class TestResultFrameAggregator:
         df_reaches = res1d_river_network.reaches.read(column_mode=column_mode)
         rfa = ResultFrameAggregator("max")
         df_agg = rfa.aggregate(df_reaches)
+        df_agg = df_agg.groupby("name").agg("max")  # test for entire reach (not segments)
 
         assert list(df_agg.columns.values) == [
             "max_Discharge",
