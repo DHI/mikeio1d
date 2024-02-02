@@ -84,7 +84,8 @@ class ResultLocations(Dict[str, ResultLocation]):
         return list(self.values())
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """Read the time series data into a data frame.
+        """
+        Read the time series data for all quantities at these locations into a DataFrame.
 
         Parameters
         ----------
