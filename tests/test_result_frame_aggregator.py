@@ -125,9 +125,9 @@ class TestResultFrameAggregatorUnit:
             ),
         ],
     )
-    def test_init_agg_strategies(self, args, kwargs, expected):
+    def test_init_agg_functions(self, args, kwargs, expected):
         rfa = ResultFrameAggregator(*args, **kwargs)
-        assert rfa._agg_strategies == expected
+        assert rfa._agg_functions == expected
 
     def test_validate_levels(self):
         rfa = ResultFrameAggregator("max")
@@ -143,32 +143,32 @@ class TestResultFrameAggregatorUnit:
             rfa._agg_levels = ("duplicate", "chainage", "chainage")
             rfa._validate_levels()
 
-    def test_validate_agg_strategies(self):
+    def test_validate_agg_functions(self):
         rfa = ResultFrameAggregator("max")
-        rfa._validate_agg_strategies()
+        rfa._validate_agg_functions()
 
         with pytest.raises(ValueError):
-            rfa._agg_strategies = {"duplicate": ["max"], "chainage": "max"}
-            rfa._validate_agg_strategies()
+            rfa._agg_functions = {"duplicate": ["max"], "chainage": "max"}
+            rfa._validate_agg_functions()
         with pytest.raises(ValueError):
-            rfa._agg_strategies = {"duplicate": None, "time": "max"}
-            rfa._validate_agg_strategies()
+            rfa._agg_functions = {"duplicate": None, "time": "max"}
+            rfa._validate_agg_functions()
         with pytest.raises(ValueError):
-            rfa._agg_strategies = {"chainage": "max", "time": {}}
-            rfa._validate_agg_strategies()
+            rfa._agg_functions = {"chainage": "max", "time": {}}
+            rfa._validate_agg_functions()
         with pytest.raises(ValueError):
-            rfa._agg_strategies = {}
-            rfa._validate_agg_strategies()
+            rfa._agg_functions = {}
+            rfa._validate_agg_functions()
 
-    def test_validate_agg_strategy(self):
+    def test_validate_agg_function(self):
         rfa = ResultFrameAggregator("max", {"chainage": np.min})
-        rfa._validate_agg_strategy("time", "max")
+        rfa._validate_agg_function("time", "max")
 
         with pytest.raises(ValueError):
-            rfa._validate_agg_strategy("time", ["max"])
+            rfa._validate_agg_function("time", ["max"])
 
         with pytest.raises(ValueError):
-            rfa._validate_agg_strategy("time", None)
+            rfa._validate_agg_function("time", None)
 
     def test_entity_levels(self):
         rfa = ResultFrameAggregator("max")
@@ -182,40 +182,40 @@ class TestResultFrameAggregatorUnit:
         rfa = ResultFrameAggregator("max")
         assert rfa.agg_levels == ("duplicate", "chainage", "time")
 
-    def test_agg_strategies(self):
+    def test_agg_functions(self):
         rfa = ResultFrameAggregator("max")
-        assert rfa.agg_strategies == {
+        assert rfa.agg_functions == {
             "duplicate": "max",
             "chainage": "max",
             "time": "max",
         }
         rfa = ResultFrameAggregator(time="max", chainage="first", duplicate="last")
-        assert rfa.agg_strategies == {
+        assert rfa.agg_functions == {
             "duplicate": "last",
             "chainage": "first",
             "time": "max",
         }
 
-    def test_set_agg_strategy(self):
+    def test_set_agg_function(self):
         rfa = ResultFrameAggregator("max")
-        rfa.set_agg_strategy("time", "mean")
-        assert rfa.agg_strategies["time"] == "mean"
+        rfa.set_agg_function("time", "mean")
+        assert rfa.agg_functions["time"] == "mean"
 
         with pytest.raises(ValueError):
-            rfa.set_agg_strategy("time", ["mean"])
+            rfa.set_agg_function("time", ["mean"])
 
         with pytest.raises(ValueError):
-            rfa.set_agg_strategy("time", None)
+            rfa.set_agg_function("time", None)
 
-    def test_get_agg_strategy(self):
+    def test_get_agg_function(self):
         rfa = ResultFrameAggregator("max")
-        assert rfa.get_agg_strategy("time") == "max"
+        assert rfa.get_agg_function("time") == "max"
 
         with pytest.raises(ValueError):
-            rfa.get_agg_strategy("times")
+            rfa.get_agg_function("times")
 
-        rfa.set_agg_strategy("chainage", "min")
-        assert rfa.get_agg_strategy("chainage") == "min"
+        rfa.set_agg_function("chainage", "min")
+        assert rfa.get_agg_function("chainage") == "min"
 
     @pytest.mark.parametrize(
         ["df", "expect_error"],
