@@ -96,19 +96,21 @@ class ResultFrameAggregator:
         self._entity_levels = ("group", "name", "tag")
         self._agg_levels = ("duplicate", "chainage", "time")
         self._quantity_levels = ("quantity", "derived")
-        self._agg_functions = self._init_agg_functions(agg, kwargs)
+        self._agg_functions = self._create_agg_functions_dict(agg, kwargs)
 
         self._validate()
 
-    def _init_agg_functions(self, agg, agg_kwargs: Dict) -> Dict[str, Any]:
+    def _create_agg_functions_dict(
+        self, agg_default: str | Callable, agg_kwargs: Dict
+    ) -> Dict[str, Any]:
         """
-        Initialize the aggregation functions. Default is to use same everywhere.
+        Creates the 'agg_functions' attribute dictionary from the supplied aggregation functions.
         """
-        functions = {k: agg for k in self._agg_levels}
-        for k, v in agg_kwargs.items():
-            if k in functions:
-                functions[k] = v
-        return functions
+        agg_functions = {level: agg_default for level in self._agg_levels}
+        for level, func in agg_kwargs.items():
+            if level in agg_functions:
+                agg_functions[level] = func
+        return agg_functions
 
     def _validate(self):
         self._validate_levels()
