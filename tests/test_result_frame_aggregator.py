@@ -327,6 +327,15 @@ class TestResultFrameAggregatorUnit:
 
 
 class TestResultFrameAggregator:
+    @pytest.mark.parametrize("agg,expected", [("max", 102.7227), ("min", -0.1209)])
+    @pytest.mark.parametrize("column_mode", ["all", "compact"])
+    def test_aggregation_for_river_discharge(self, res1d_river_network, agg, expected, column_mode):
+        df_reaches = res1d_river_network.reaches.river.Discharge.read(column_mode=column_mode)
+        rfa = ResultFrameAggregator(agg)
+        df_agg = rfa.aggregate(df_reaches)
+        agg_value = df_agg.values[0][0]
+        assert agg_value == pytest.approx(expected, abs=1e-4)
+
     @pytest.mark.parametrize("column_mode", ["all", "compact"])
     def test_max_aggregation(self, res1d_river_network, column_mode):
         df_reaches = res1d_river_network.reaches.read(column_mode=column_mode)
