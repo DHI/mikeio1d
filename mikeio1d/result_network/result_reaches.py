@@ -11,6 +11,7 @@ from .various import make_proper_variable_name
 from ..various import try_import_geopandas
 from ..various import pyproj_crs_from_projection_string
 from ..dotnet import pythonnet_implementation as impl
+from ..geometry.geopandas import GeopandasReachesConverter
 
 
 class ResultReaches(ResultLocations):
@@ -82,7 +83,7 @@ class ResultReaches(ResultLocations):
         self[reach.Name] = result_reach
         return result_reach
 
-    def to_geopandas(self) -> GeoDataFrame:
+    def to_geopandas(self, segmented=True) -> GeoDataFrame:
         """
         Convert reaches to a geopandas.GeoDataFrame object.
 
@@ -91,10 +92,6 @@ class ResultReaches(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with reaches as LineString geometries.
         """
-        gpd = try_import_geopandas()
-        ids = [reach.name for reach in self.values()]
-        geometries = [reach.geometry.to_shapely() for reach in self.values()]
-        data = {"id": ids, "geometry": geometries}
-        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(data=data, crs=crs)
-        return gdf
+        gpd_converter = GeopandasReachesConverter()
+
+        return gpd_converter.to_geopandas(self)
