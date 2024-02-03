@@ -132,5 +132,9 @@ class ResultNetwork:
         gdf_nodes = self.nodes.to_geopandas()
         gdf_reaches = self.reaches.to_geopandas()
         gdf_catchments = self.catchments.to_geopandas()
-        gdf = pd.concat([gdf_nodes, gdf_reaches, gdf_catchments], ignore_index=True)
+
+        gdfs = [gdf_nodes, gdf_reaches, gdf_catchments]
+        gdfs = [gdf for gdf in gdfs if not gdf.empty]
+
+        gdf = pd.concat(gdfs, ignore_index=True)
         return gdf
