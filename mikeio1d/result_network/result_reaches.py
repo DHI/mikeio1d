@@ -8,10 +8,9 @@ if TYPE_CHECKING:
 from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
-from ..various import try_import_geopandas
-from ..various import pyproj_crs_from_projection_string
 from ..dotnet import pythonnet_implementation as impl
 from ..geometry.geopandas import GeopandasReachesConverter
+from ..geometry.geopandas import GeopandasReachesConverterSegmented
 
 
 class ResultReaches(ResultLocations):
@@ -87,11 +86,20 @@ class ResultReaches(ResultLocations):
         """
         Convert reaches to a geopandas.GeoDataFrame object.
 
+        Parameters
+        ----------
+        segmented : bool, (default=True)
+            True - one LineString per IRes1DReach object.
+            False - one LineString per reach name.
+
         Returns
         -------
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with reaches as LineString geometries.
         """
-        gpd_converter = GeopandasReachesConverter()
+        if segmented:
+            gpd_converter = GeopandasReachesConverterSegmented()
+        else:
+            gpd_converter = GeopandasReachesConverter()
 
         return gpd_converter.to_geopandas(self)

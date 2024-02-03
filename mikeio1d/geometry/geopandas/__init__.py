@@ -1,3 +1,4 @@
 from .geopandas_reaches_converter import GeopandasReachesConverter
+from .geopandas_reaches_converter_segmented import GeopandasReachesConverterSegmented
 
-__all__ = ["GeopandasReachesConverter"]
+__all__ = ["GeopandasReachesConverter", "GeopandasReachesConverterSegmented"]
