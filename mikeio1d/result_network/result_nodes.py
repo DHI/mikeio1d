@@ -9,8 +9,7 @@ from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_node import ResultNode
 from .various import make_proper_variable_name
-from ..various import try_import_geopandas
-from ..various import pyproj_crs_from_projection_string
+from ..geometry.geopandas import GeoPandasNodesConverter
 
 
 class ResultNodes(ResultLocations):
@@ -70,14 +69,6 @@ class ResultNodes(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with nodes as Point geometries.
         """
-        gpd = try_import_geopandas()
-        if not self._geometries or not self._node_ids:
-            values = self.values()
-            self._node_ids = [node.id for node in values]
-            self._geometries = [node.geometry.to_shapely() for node in values]
-        ids = self._node_ids
-        geometries = self._geometries
-        data = {"id": ids, "geometry": geometries}
-        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(data=data, crs=crs)
+        gpd_converter = GeoPandasNodesConverter()
+        gdf = gpd_converter.to_geopandas(self)
         return gdf
