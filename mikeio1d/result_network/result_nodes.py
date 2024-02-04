@@ -9,7 +9,6 @@ from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_node import ResultNode
 from .various import make_proper_variable_name
-from ..geometry.geopandas import GeoPandasNodesConverter
 
 
 class ResultNodes(ResultLocations):
@@ -69,6 +68,8 @@ class ResultNodes(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with nodes as Point geometries.
         """
+        from ..geometry.geopandas import GeoPandasNodesConverter
+
         gpd_converter = GeoPandasNodesConverter()
         gdf = gpd_converter.to_geopandas(self)
         return gdf

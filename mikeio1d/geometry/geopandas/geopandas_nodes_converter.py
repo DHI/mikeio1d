@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
     from result_network import ResultNodes
 
+from geopandas import GeoDataFrame
 
 from .geopandas_converter import GeoPandasConverter
 from ..node_point import NodePoint
@@ -31,5 +32,5 @@ class GeoPandasNodesConverter(GeoPandasConverter):
     def to_geopandas(self, nodes: ResultNodes) -> GeoDataFrame:
         data = self._create_dataframe_data_dict(nodes)
         crs = self.get_crs(nodes.res1d)
-        gdf = self.gpd.GeoDataFrame(data=data, crs=crs)
+        gdf = GeoDataFrame(data=data, crs=crs)
         return gdf

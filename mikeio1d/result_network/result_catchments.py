@@ -9,7 +9,6 @@ from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_catchment import ResultCatchment
 from .various import make_proper_variable_name
-from ..geometry.geopandas import GeoPandasCatchmentsConverter
 
 
 class ResultCatchments(ResultLocations):
@@ -71,6 +70,8 @@ class ResultCatchments(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with catchments as Polygon geometries.
         """
+        from ..geometry.geopandas import GeoPandasCatchmentsConverter
+
         gpd_converter = GeoPandasCatchmentsConverter()
         gdf = gpd_converter.to_geopandas(self)
         return gdf

@@ -9,6 +9,8 @@ if TYPE_CHECKING:
     from mikeio1d.result_network import ResultReach
     from mikeio1d.result_network import ResultReaches
 
+from geopandas import GeoDataFrame
+
 from .geopandas_converter import GeoPandasConverter
 from ..reach_geometry import ReachGeometry
 
@@ -33,5 +35,5 @@ class GeopandasReachesConverter(GeoPandasConverter):
             "name": names,
         }
         crs = self.get_crs(reaches.res1d)
-        gdf = self.gpd.GeoDataFrame(data=data, crs=crs, geometry=geometries)
+        gdf = GeoDataFrame(data=data, crs=crs, geometry=geometries)
         return gdf
