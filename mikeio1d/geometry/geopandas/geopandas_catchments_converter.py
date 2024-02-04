@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
     from result_network import ResultCatchments
 
+from geopandas import GeoDataFrame
 
 from .geopandas_converter import GeoPandasConverter
 from ..catchment_geometry import CatchmentGeometry
@@ -34,5 +35,5 @@ class GeoPandasCatchmentsConverter(GeoPandasConverter):
     def to_geopandas(self, catchments: ResultCatchments) -> GeoDataFrame:
         data = self._create_dataframe_data_dict(catchments)
         crs = self.get_crs(catchments.res1d)
-        gdf = self.gpd.GeoDataFrame(data=data, crs=crs)
+        gdf = GeoDataFrame(data=data, crs=crs)
         return gdf

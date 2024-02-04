@@ -9,8 +9,6 @@ from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
 from ..dotnet import pythonnet_implementation as impl
-from ..geometry.geopandas import GeopandasReachesConverter
-from ..geometry.geopandas import GeopandasReachesConverterSegmented
 
 
 class ResultReaches(ResultLocations):
@@ -97,6 +95,9 @@ class ResultReaches(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with reaches as LineString geometries.
         """
+        from mikeio1d.geometry.geopandas import GeopandasReachesConverter
+        from mikeio1d.geometry.geopandas import GeopandasReachesConverterSegmented
+
         if segmented:
             gpd_converter = GeopandasReachesConverterSegmented()
         else:
