@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from geopandas import GeoDataFrame
-
 if TYPE_CHECKING:
     from geopandas import GeoDataFrame
     from mikeio1d.result_network import ResultReaches
