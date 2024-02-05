@@ -8,6 +8,7 @@
 - Read methods now include 'column_mode' parameter that enables multiindex reading (e.g. column_mode='compact').
 - Added more type hints to improve IDE auto-completion and docstring peeking.
 - Merging of regular and LTS extreme/periodic res1d files.
+- Convert reaches to GeoPandas in two modes: 'segmented' and 'combined'.
 
 ### Fixed
 
@@ -17,6 +18,7 @@
 
 - Result reading/writing fundamentally uses TimeSeriesId now instead of QueryData
 - Following are now abstract base classes: ResultReader, QueryData, ResultLocation
+- GeoPandas conversion now includes extra columns matching some TimeSeriesId fields.
 
 ## [0.5] - 2023-12-22
 
