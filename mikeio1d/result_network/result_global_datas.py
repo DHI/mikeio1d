@@ -1,6 +1,7 @@
 from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_global_data import ResultGlobalData
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultGlobalDatas(ResultLocations):
@@ -25,6 +26,7 @@ class ResultGlobalDatas(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
+        self._group = TimeSeriesIdGroup.GLOBAL
         self.result_global_data_list = []
         self.set_global_data()
 
