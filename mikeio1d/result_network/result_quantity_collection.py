@@ -4,7 +4,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Optional
+    from typing import List
+
     from ..result_reader_writer.result_reader import ColumnMode
+    from ..quantities import TimeSeriesId
 
     import pandas as pd
 
@@ -73,6 +76,11 @@ class ResultQuantityCollection(ResultQuantity):
         # the same quantity and for plotting.
         self.data_item = self.result_quantities[0].data_item
         return ResultQuantity.plot(self, **kwargs)
+
+    def get_timeseries_ids(self) -> List[TimeSeriesId]:
+        """Get TimeSeriesId objects corresponding to ResultQuantityCollection."""
+        timeseries_ids = [q.timeseries_id for q in self.result_quantities]
+        return timeseries_ids
 
     def get_query(self):
         """Get queries corresponding to ResultQuantityCollection."""
