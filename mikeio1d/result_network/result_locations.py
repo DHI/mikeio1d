@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from .result_location import ResultLocation
     from .result_quantity import ResultQuantity
     from ..result_reader_writer.result_reader import ColumnMode
+    from ..quantities import TimeSeriesIdGroup
 
 from .result_location import ResultLocation
 
@@ -52,6 +53,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
         self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
+        self._group = None
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
@@ -67,6 +69,11 @@ class ResultLocations(Dict[str, ResultLocation]):
             ],
         )
         return repr
+
+    @property
+    def group(self) -> TimeSeriesIdGroup:
+        """The TimeSeriesIdGroup associated with these locations."""
+        return self._group
 
     @property
     def quantities(self) -> Dict[str, ResultQuantityCollection]:
