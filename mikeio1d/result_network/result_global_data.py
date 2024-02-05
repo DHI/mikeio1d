@@ -1,5 +1,6 @@
 from ..query import QueryDataGlobal
 from .result_location import ResultLocation
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultGlobalData(ResultLocation):
@@ -21,6 +22,7 @@ class ResultGlobalData(ResultLocation):
 
     def __init__(self, data_item, global_datas, res1d):
         ResultLocation.__init__(self, [data_item], res1d)
+        self._group = TimeSeriesIdGroup.GLOBAL
         self.data_item = data_item
         self.global_datas = global_datas
         self.set_quantities()
