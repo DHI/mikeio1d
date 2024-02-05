@@ -95,12 +95,12 @@ class ResultReaches(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with reaches as LineString geometries.
         """
-        from mikeio1d.geometry.geopandas import GeopandasReachesConverter
-        from mikeio1d.geometry.geopandas import GeopandasReachesConverterSegmented
+        from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
+        from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented
 
         if segmented:
-            gpd_converter = GeopandasReachesConverterSegmented()
+            gpd_converter = GeoPandasReachesConverterSegmented()
         else:
-            gpd_converter = GeopandasReachesConverter()
+            gpd_converter = GeoPandasReachesConverter()
 
         return gpd_converter.to_geopandas(self)
