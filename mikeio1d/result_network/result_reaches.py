@@ -9,6 +9,7 @@ from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
 from ..dotnet import pythonnet_implementation as impl
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultReaches(ResultLocations):
@@ -38,6 +39,7 @@ class ResultReaches(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
+        self._group = TimeSeriesIdGroup.REACH
         self.reach_label = "r_"
         self.result_reach_map = {}
 

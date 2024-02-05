@@ -66,6 +66,11 @@ class ResultLocation(ABC):
         return repr
 
     @property
+    def group(self) -> List[str]:
+        """The TimeSeriesIdGroup assosciated with this location."""
+        return self._group
+
+    @property
     def quantities(self) -> List[str]:
         """A list of available quantities."""
         return list(self.result_quantity_map.keys())

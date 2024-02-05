@@ -9,6 +9,7 @@ from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesIdGroup
 
 from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
 
@@ -43,6 +44,7 @@ class ResultReach(ResultLocation):
     def __init__(self, reaches, res1d):
         data_items = []
         ResultLocation.__init__(self, data_items, res1d)
+        self._group = TimeSeriesIdGroup.REACH
 
         self.chainage_label = "m_"
 

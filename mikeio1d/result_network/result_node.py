@@ -10,6 +10,7 @@ from warnings import warn
 from ..query import QueryDataNode
 from .result_location import ResultLocation
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultNode(ResultLocation):
@@ -24,6 +25,7 @@ class ResultNode(ResultLocation):
 
     def __init__(self, node, res1d):
         ResultLocation.__init__(self, node.DataItems, res1d)
+        self._group = TimeSeriesIdGroup.NODE
         self._node = node
         self.set_quantities()
         self.set_static_attributes()

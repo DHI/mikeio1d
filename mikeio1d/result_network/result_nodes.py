@@ -9,6 +9,7 @@ from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_node import ResultNode
 from .various import make_proper_variable_name
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultNodes(ResultLocations):
@@ -32,6 +33,7 @@ class ResultNodes(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
+        self._group = TimeSeriesIdGroup.NODE
         self.node_label = "n_"
 
         res1d.result_network.nodes = self
