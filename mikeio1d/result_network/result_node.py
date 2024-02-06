@@ -28,6 +28,7 @@ class ResultNode(ResultLocation):
         self._group = TimeSeriesIdGroup.NODE
         self._node = node
         self.set_quantities()
+        self.set_derived_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:
