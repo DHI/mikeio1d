@@ -57,6 +57,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         for reach in reaches:
             self.add_res1d_reach(reach)
 
+        self.set_derived_quantities()
+        self.set_static_attributes()
+
     def __repr__(self) -> str:
         return f"<Reach: {self.name}>"
 
@@ -121,7 +124,6 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_gridpoint_data_items(reach)
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint.set_quantities()
-        self.set_static_attributes()
         self.dataset = self.reaches
 
     def get_m1d_dataset(self, m1d_dataitem=None):

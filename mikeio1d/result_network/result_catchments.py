@@ -40,6 +40,7 @@ class ResultCatchments(ResultLocations):
         res1d.result_network.catchments = self
         self.set_catchments()
         self.set_quantity_collections()
+        self.set_derived_quantities()
 
         self._catchment_ids = None
         self._geometries = None

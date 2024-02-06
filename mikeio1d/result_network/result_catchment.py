@@ -28,6 +28,7 @@ class ResultCatchment(ResultLocation):
         self._group = TimeSeriesIdGroup.CATCHMENT
         self._catchment = catchment
         self.set_quantities()
+        self.set_derived_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:

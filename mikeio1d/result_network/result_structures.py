@@ -34,6 +34,7 @@ class ResultStructures(ResultLocations):
         res1d.result_network.structures = self
         self.set_structures()
         self.set_quantity_collections()
+        self.set_derived_quantities()
 
     def set_structures(self):
         """
