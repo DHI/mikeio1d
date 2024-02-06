@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from .result_quantity import ResultQuantity
     from ..result_reader_writer.result_reader import ColumnMode
     from ..quantities import TimeSeriesIdGroup
+    from ..quantities import DerivedQuantity
 
 from .result_location import ResultLocation
 from .result_quantity import ResultQuantity
@@ -23,6 +24,8 @@ from ..dotnet import pythonnet_implementation as impl
 from .result_quantity_collection import ResultQuantityCollection
 from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
+from ..quantities import derived_quantity_manager
+from .result_quantity_derived_collection import ResultQuantityDerivedCollection
 
 
 class ResultLocations(Dict[str, ResultLocation]):
@@ -46,6 +49,8 @@ class ResultLocations(Dict[str, ResultLocation]):
         with a number. The value used is quantity_label = 'q_'
     result_quantity_map : dict
         Dictionary from quantity id to a list of ResultQuantity objects.
+    result_quantity_derived_map : dict
+        Dictionary from derived quantity id to a ResultQuantityDerivedCollection object.
     """
 
     def __init__(self, res1d: Res1D):
@@ -54,6 +59,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         self.data = res1d.data
         self.data_items = res1d.data.DataItems
         self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
+        self.result_quantity_derived_map = {}
         self._group = None
 
     def __repr__(self) -> str:
@@ -121,6 +127,32 @@ class ResultLocations(Dict[str, ResultLocation]):
                 quantity_id, self.quantity_label
             )
             setattr(self, result_quantity_attribute_string, result_quantity_collection)
+
+    def set_derived_quantities(self):
+        """Sets all derived quantity attributes."""
+        derived_quantities = []
+        for source_quantity in self.result_quantity_map:
+            dq = derived_quantity_manager.get_quantity_where(
+                self.res1d, source_quantity, self.group
+            )
+            derived_quantities.extend(dq)
+
+        for derived_quantity in derived_quantities:
+            self.set_quantity_derived(derived_quantity)
+
+    def set_quantity_derived(self, derived_quantity: DerivedQuantity):
+        """Sets a single derived quantity attribute on the obj."""
+        result_quantity_derived = ResultQuantityDerivedCollection(
+            derived_quantity, self, self.res1d
+        )
+        quantity_id = result_quantity_derived.name
+
+        self.result_quantity_derived_map[result_quantity_derived.name] = result_quantity_derived
+
+        result_quantity_attribute_string = make_proper_variable_name(
+            quantity_id, self.quantity_label
+        )
+        setattr(self, result_quantity_attribute_string, result_quantity_derived)
 
     def set_res1d_object_to_dict(self, dict_key, obj):
         """

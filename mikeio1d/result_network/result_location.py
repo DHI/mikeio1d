@@ -16,9 +16,12 @@ from abc import ABC
 from abc import abstractclassmethod
 
 from .result_quantity import ResultQuantity
+from .result_quantity_derived import ResultQuantityDerived
 from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 from ..quantities import TimeSeriesId
+from ..quantities import DerivedQuantity
+from ..quantities import derived_quantity_manager
 
 
 class ResultLocation(ABC):
@@ -41,6 +44,8 @@ class ResultLocation(ABC):
     result_quantity_map : dict
         Dictionary from quantity id to a list of ResultQuantity objects.
         For ResultLocation this list contains a single element.
+    result_quantity_map_derived : dict
+        Dictionary from quantity id to a list of ResultQuantityDerived objects.
     element_indices : list
         List of integers representing element index for entries in data_items.
         For non grid point locations this is typically None.
@@ -51,6 +56,7 @@ class ResultLocation(ABC):
         self.res1d = res1d
         self.quantity_label = "q_"
         self.result_quantity_map: Dict[str, List[ResultQuantity]] = {}
+        self.result_quantity_derived_map: Dict[str, ResultQuantityDerived] = {}
         self.element_indices = None
         self._static_attributes = []
 
@@ -131,6 +137,30 @@ class ResultLocation(ABC):
         setattr(obj, result_quantity_attribute_string, result_quantity)
 
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
+
+    def set_derived_quantities(self):
+        """Sets all derived quantity attributes."""
+        derived_quantities = []
+        for source_quantity in self.result_quantity_map:
+            dq = derived_quantity_manager.get_quantity_where(
+                self.res1d, source_quantity, self.group
+            )
+            derived_quantities.extend(dq)
+
+        for derived_quantity in derived_quantities:
+            self.set_quantity_derived(derived_quantity)
+
+    def set_quantity_derived(self, derived_quantity: DerivedQuantity):
+        """Sets a single derived quantity attribute on the obj."""
+        result_quantity_derived = ResultQuantityDerived(derived_quantity, self, self.res1d)
+        quantity_id = result_quantity_derived.name
+
+        self.result_quantity_derived_map[result_quantity_derived.name] = result_quantity_derived
+
+        result_quantity_attribute_string = make_proper_variable_name(
+            quantity_id, self.quantity_label
+        )
+        setattr(self, result_quantity_attribute_string, result_quantity_derived)
 
     @abstractclassmethod
     def get_m1d_dataset(self, m1d_dataitem=None):

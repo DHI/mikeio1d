@@ -43,6 +43,7 @@ class ResultStructure(ResultLocation):
         for data_item in data_items:
             self.add_res1d_structure_data_item(data_item)
 
+        self.set_derived_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:

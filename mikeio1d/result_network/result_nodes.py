@@ -42,6 +42,7 @@ class ResultNodes(ResultLocations):
         res1d.result_network.nodes = self
         self.set_nodes()
         self.set_quantity_collections()
+        self.set_derived_quantities()
 
         self._node_ids = None
         self._geometries = None
