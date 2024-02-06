@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from ..result_network.result_quantity import ResultQuantity
     from ..query import QueryData
     from ..result_network.data_entry import DataEntry
+    from ..result_network import ResultLocation
 
 import dataclasses
 from dataclasses import dataclass
@@ -189,6 +190,22 @@ class TimeSeriesId:
             raise ValueError(f"Could not convert TimeSeriesId to ResultQuantity: {self}")
 
         return result_quantity
+
+    def get_location(self, res1d: Res1D) -> ResultLocation:
+        """
+        Gets the ResultLocation associated with the TimeSeriesId.
+
+        Returns
+        -------
+        ResultLocation
+            The ResultLocation associated with the TimeSeriesId (e.g. ResultNode, ResultReach, etc.)
+        """
+        if self.derived:
+            raise NotImplementedError("Cannot convert derived TimeSeriesId to ResultLocation")
+
+        result_quantity = self.to_result_quantity(res1d)
+        location = result_quantity.result_location
+        return location
 
     def next_duplicate(self) -> TimeSeriesId:
         """Creates a duplicate TimeSeriesId object.
