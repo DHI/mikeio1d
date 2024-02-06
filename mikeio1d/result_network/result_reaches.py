@@ -49,6 +49,7 @@ class ResultReaches(ResultLocations):
         res1d.result_network.reaches = self
         self.set_reaches()
         self.set_quantity_collections()
+        self.set_derived_quantities()
 
     def set_reaches(self):
         """
