@@ -1,6 +1,7 @@
 from .result_locations import ResultLocations
 from .result_structure import ResultStructure
 from .various import make_proper_variable_name
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultStructures(ResultLocations):
@@ -26,12 +27,14 @@ class ResultStructures(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
+        self._group = TimeSeriesIdGroup.STRUCTURE
         self.structure_label = "s_"
         self.result_structure_map = {}
 
         res1d.result_network.structures = self
         self.set_structures()
         self.set_quantity_collections()
+        self.set_derived_quantities()
 
     def set_structures(self):
         """

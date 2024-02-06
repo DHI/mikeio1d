@@ -3,6 +3,7 @@ from warnings import warn
 from ..dotnet import pythonnet_implementation as impl
 from ..query import QueryDataStructure
 from .result_location import ResultLocation
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultStructure(ResultLocation):
@@ -33,6 +34,7 @@ class ResultStructure(ResultLocation):
         empty_list = []
         ResultLocation.__init__(self, empty_list, res1d)
 
+        self._group = TimeSeriesIdGroup.STRUCTURE
         self.id = structure_id
         self.reach = reach
         self.chainage = None
@@ -41,6 +43,7 @@ class ResultStructure(ResultLocation):
         for data_item in data_items:
             self.add_res1d_structure_data_item(data_item)
 
+        self.set_derived_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:
