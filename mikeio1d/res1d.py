@@ -47,6 +47,7 @@ from .various import NAME_DELIMITER
 from .various import make_list_if_not_iterable
 
 from .quantities import TimeSeriesId
+from .quantities import derived_quantity_manager  # noqa: F401
 
 from .pandas_extension import Mikeio1dAccessor  # noqa: F401
 
