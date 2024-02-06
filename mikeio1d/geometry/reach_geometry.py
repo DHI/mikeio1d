@@ -20,20 +20,24 @@ class ReachGeometry:
         self._points = sorted(points)
 
     @staticmethod
-    def from_res1d_reaches(res1d_reaches):
+    def from_m1d_reaches(m1d_reaches) -> ReachGeometry:
         """
         Create a ReachGeometry from a list of IRes1DReach objects.
 
         Parameters
         ----------
-        res1d_reaches : List[IRes1DReach]
+        m1d_reaches : IRes1DReach | List[IRes1DReach]
+
+        Returns
+        -------
+        ReachGeometry
         """
 
-        if not isinstance(res1d_reaches, Iterable):
-            res1d_reaches = [res1d_reaches]
+        if not isinstance(m1d_reaches, Iterable):
+            m1d_reaches = [m1d_reaches]
 
         points = []
-        for reach in res1d_reaches:
+        for reach in m1d_reaches:
             points.extend([ReachPoint.from_digipoint(dp) for dp in reach.DigiPoints])
             points.extend([ReachPoint.from_gridpoint(gp) for gp in reach.GridPoints])
 
