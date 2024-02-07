@@ -3,12 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Callable
+    from typing import Dict
     from geopandas import GeoDataFrame
 
 from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
 from ..dotnet import pythonnet_implementation as impl
+from ..pandas_extension import ResultFrameAggregator
 
 
 class ResultReaches(ResultLocations):
@@ -80,12 +83,30 @@ class ResultReaches(ResultLocations):
         self[reach.Name] = result_reach
         return result_reach
 
-    def to_geopandas(self, segmented=True) -> GeoDataFrame:
+    def to_geopandas(
+        self,
+        agg: str | Callable = None,
+        agg_kwargs: Dict[str : str | Callable] = {},
+        segmented: bool = True,
+    ) -> GeoDataFrame:
         """
         Convert reaches to a geopandas.GeoDataFrame object.
 
+        By default, quantities are not included. To include quantities, use the `agg` and `agg_kwargs` parameters.
+
         Parameters
         ----------
+        agg : str or callable, default None
+            Defines how to aggregate the quantities in time and space.
+            Accepts any str or callable that is accepted by pandas.DataFrame.agg.
+
+            Examples:
+            - 'mean'  : mean value of all quantities
+            - 'max'   : maximum value of all quantities
+            -  np.max : maximum value of all quantities
+
+        agg_kwargs : dict, default {}
+            Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
         segmented : bool, (default=True)
             True - one LineString per IRes1DReach object.
             False - one LineString per reach name.
@@ -94,6 +115,14 @@ class ResultReaches(ResultLocations):
         -------
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with reaches as LineString geometries.
+
+        Examples
+        --------
+        # Convert reaches to a GeoDataFrame (without quantities)
+        >>> gdf = res1d.result_network.reaches.to_geopandas()
+
+        # Convert reaches to a GeoDataFrame with aggregated quantities
+        >>> gdf = res1d.result_network.reaches.to_geopandas(agg='mean')
         """
         from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
         from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented
@@ -103,4 +132,16 @@ class ResultReaches(ResultLocations):
         else:
             gpd_converter = GeoPandasReachesConverter()
 
-        return gpd_converter.to_geopandas(self)
+        gdf = gpd_converter.to_geopandas(self)
+
+        if agg is None:
+            return gdf
+
+        rfa = ResultFrameAggregator(agg, **agg_kwargs)
+
+        df_quantities = self.read(column_mode="compact")
+        df_quantities = rfa.aggregate(df_quantities)
+
+        gdf = gdf.merge(df_quantities, left_on=["name", "tag"], right_index=True)
+
+        return gdf
