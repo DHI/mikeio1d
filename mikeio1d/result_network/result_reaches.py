@@ -10,8 +10,6 @@ if TYPE_CHECKING:
 from .result_locations import ResultLocations
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
-from ..various import try_import_geopandas
-from ..various import pyproj_crs_from_projection_string
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 
@@ -89,6 +87,7 @@ class ResultReaches(ResultLocations):
         self,
         agg: str | Callable = None,
         agg_kwargs: Dict[str : str | Callable] = {},
+        segmented: bool = True,
     ) -> GeoDataFrame:
         """
         Convert reaches to a geopandas.GeoDataFrame object.
@@ -108,6 +107,9 @@ class ResultReaches(ResultLocations):
 
         agg_kwargs : dict, default {}
             Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
+        segmented : bool, (default=True)
+            True - one LineString per IRes1DReach object.
+            False - one LineString per reach name.
 
         Returns
         -------
@@ -122,12 +124,15 @@ class ResultReaches(ResultLocations):
         # Convert reaches to a GeoDataFrame with aggregated quantities
         >>> gdf = res1d.result_network.reaches.to_geopandas(agg='mean')
         """
-        gpd = try_import_geopandas()
-        ids = [reach.name for reach in self.values()]
-        geometries = [reach.geometry.to_shapely() for reach in self.values()]
-        data = {"name": ids, "geometry": geometries}
-        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(data=data, crs=crs)
+        from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
+        from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented
+
+        if segmented:
+            gpd_converter = GeoPandasReachesConverterSegmented()
+        else:
+            gpd_converter = GeoPandasReachesConverter()
+
+        gdf = gpd_converter.to_geopandas(self)
 
         if agg is None:
             return gdf

@@ -11,8 +11,6 @@ from ..dotnet import pythonnet_implementation as impl
 from .result_locations import ResultLocations
 from .result_catchment import ResultCatchment
 from .various import make_proper_variable_name
-from ..various import try_import_geopandas
-from ..various import pyproj_crs_from_projection_string
 from ..pandas_extension import ResultFrameAggregator
 
 
@@ -95,17 +93,10 @@ class ResultCatchments(ResultLocations):
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with catchments as Polygon geometries.
         """
-        gpd = try_import_geopandas()
-        if not self._catchment_ids or not self._geometries:
-            values = self.values()
-            self._catchment_ids = [catchment.id for catchment in values]
-            self._geometries = [catchment.geometry.to_shapely() for catchment in values]
+        from ..geometry.geopandas import GeoPandasCatchmentsConverter
 
-        ids = self._catchment_ids
-        geometries = self._geometries
-        data = {"name": ids, "geometry": geometries}
-        crs = pyproj_crs_from_projection_string(self.res1d.projection_string)
-        gdf = gpd.GeoDataFrame(data=data, crs=crs)
+        gpd_converter = GeoPandasCatchmentsConverter()
+        gdf = gpd_converter.to_geopandas(self)
 
         if agg is None:
             return gdf
