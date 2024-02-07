@@ -5,7 +5,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Dict
     from typing import List
+    from typing import Optional
+
+    import pandas as pd
+
     from ..res1d import Res1D
+    from ..result_reader_writer.result_reader import ColumnMode
 
 from abc import ABC
 from abc import abstractclassmethod
@@ -64,6 +69,23 @@ class ResultLocation(ABC):
             ],
         )
         return repr
+
+    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """
+        Read the time series data for all quantities at this location into a DataFrame.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+        """
+        result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
+        timesries_ids = [q.timeseries_id for q in result_quantities]
+        df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
+        return df
 
     @property
     def quantities(self) -> List[str]:

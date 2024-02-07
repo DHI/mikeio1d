@@ -4,6 +4,7 @@ from .transposed_groupby import TransposedGroupBy
 from .result_reaches_helpers import agg_chainage
 from .result_reaches_helpers import groupby_chainage
 from .various import compact_dataframe
+from .various import groupby_level
 
 
 @pd.api.extensions.register_dataframe_accessor("m1d")
@@ -54,6 +55,15 @@ class Mikeio1dAccessor:
         self._validate_has_chainage()
         df: pd.DataFrame = self._obj
         return groupby_chainage(df, *args, **kwargs)
+
+    def groupby_level(self, level_name: str) -> pd.DataFrame:
+        """
+        Convenience wrapper for groupby_level. The groupby is performed on
+        the columns of the DataFrame, which are in the form of a MultiIndex.
+        """
+        self._validate(self._obj)
+        df: pd.DataFrame = self._obj
+        return groupby_level(df, level_name)
 
     def groupby(self, *args, **kwargs) -> TransposedGroupBy:
         """
