@@ -274,10 +274,10 @@
 <span class="sd">        -------</span>
 <span class="sd">        List of TimeSeriesId objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">queries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queue</span>
-
         <span class="n">queries</span> <span class="o">=</span> <span class="n">make_list_if_not_iterable</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">queries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_network</span><span class="o">.</span><span class="n">queue</span>
 
         <span class="n">is_already_time_series_ids</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">queries</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">TimeSeriesId</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_already_time_series_ids</span><span class="p">:</span>
