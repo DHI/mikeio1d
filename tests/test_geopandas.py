@@ -41,9 +41,10 @@ def test_reaches_to_geopandas_basic(res1d_network):
     assert all(isinstance(x, LineString) for x in gdf.geometry)
 
 
-def test_reaches_to_geopandas_with_quantities_basic(res1d_river_network):
+@pytest.mark.parametrize("segmented", [True, False])
+def test_reaches_to_geopandas_with_quantities_basic(res1d_river_network, segmented):
     """Test that reaches.to_geopandas() returns a GeoDataFrame with quantities."""
-    gdf = res1d_river_network.result_network.reaches.to_geopandas("max")
+    gdf = res1d_river_network.result_network.reaches.to_geopandas("max", segmented=segmented)
     assert isinstance(gdf, GeoDataFrame)
     assert "max_Discharge" in gdf.columns
 
