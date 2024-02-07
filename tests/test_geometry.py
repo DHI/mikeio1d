@@ -80,7 +80,7 @@ class TestReachGeometry:
         assert reach_geometry.chainage_from_geometric_distance((1**2 + 1**2) ** 0.5) == 10
 
     def test_from_res1d_reaches(self, river_reach):
-        g = ReachGeometry.from_res1d_reaches(river_reach.reaches)
+        g = ReachGeometry.from_m1d_reaches(river_reach.reaches)
         expected_n_gridpoints = sum([reach.GridPoints.Count for reach in river_reach.reaches])
         assert len(g.gridpoints) == expected_n_gridpoints
         expected_n_digipoints = sum([reach.DigiPoints.Count for reach in river_reach.reaches])
@@ -113,7 +113,7 @@ class TestReachGeometry:
         assert g.length == pytest.approx(2024.2276598819008)
 
     def test_reaches_point_interpolation_matches_mikeplus(self, river_reach):
-        g = ReachGeometry.from_res1d_reaches(river_reach.reaches)
+        g = ReachGeometry.from_m1d_reaches(river_reach.reaches)
         shape = g.to_shapely()
         # from MIKE+ chainage_points
         expected_coords = {
@@ -155,7 +155,7 @@ def test_geometry_from_nodes_runs(many_nodes):
 
 def test_geometry_from_reaches_runs(many_reaches):
     for reach in many_reaches:
-        g = ReachGeometry.from_res1d_reaches(reach.reaches).to_shapely()
+        g = ReachGeometry.from_m1d_reaches(reach.reaches).to_shapely()
         assert isinstance(g, shapely.LineString)
 
 

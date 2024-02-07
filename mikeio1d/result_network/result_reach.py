@@ -225,4 +225,4 @@ class ResultReach(ResultLocation):
         try_import_shapely()
         from ..geometry import ReachGeometry
 
-        return ReachGeometry.from_res1d_reaches(self.reaches)
+        return ReachGeometry.from_m1d_reaches(self.reaches)
