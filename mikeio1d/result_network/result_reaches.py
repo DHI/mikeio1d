@@ -142,9 +142,6 @@ class ResultReaches(ResultLocations):
         df_quantities = self.read(column_mode="compact")
         df_quantities = rfa.aggregate(df_quantities)
 
-        # don't consider tags for now, only 'name'
-        df_quantities = df_quantities.groupby("name").agg(rfa.get_agg_function("time"))
-
-        gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
+        gdf = gdf.merge(df_quantities, left_on=["name", "tag"], right_index=True)
 
         return gdf
