@@ -8,7 +8,7 @@
 
 project = "MIKE IO 1D"
 copyright = "2023, DHI"
-author = "Gediminas Kirsanskas"
+author = "Gediminas Kirsanskas, Ryan Murray"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

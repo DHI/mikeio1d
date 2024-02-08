@@ -4,19 +4,28 @@
 
 ### Added
 
+
+### Fixed
+
+
+### Changed
+
+
+## [0.6] - 2024-02-08
+
+### Added
+
 - Introduced TimeSeriesId to uniquely identify results.
 - Read methods now include 'column_mode' parameter that enables multiindex reading (e.g. column_mode='compact').
 - Added more type hints to improve IDE auto-completion and docstring peeking.
 - Merging of regular and LTS extreme/periodic res1d files.
 - Convert reaches to GeoPandas in two modes: 'segmented' and 'combined'.
-
-### Fixed
-
--
+- Export to GeoPandas with quantities aggregated in time.
 
 ### Changed
 
 - Result reading/writing fundamentally uses TimeSeriesId now instead of QueryData
+- DataFrames previously including duplicates are now resolved by TimeSeriesId (especially for reach segments, the 'tag' level is used)
 - Following are now abstract base classes: ResultReader, QueryData, ResultLocation
 - GeoPandas conversion now includes extra columns matching some TimeSeriesId fields.
 
@@ -112,7 +121,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.5...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.6...HEAD
+[0.6]: https://github.com/DHI/mikeio1d/releases/tag/v0.6
 [0.5]: https://github.com/DHI/mikeio1d/releases/tag/v0.5
 [0.4.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.4.1
 [0.4]: https://github.com/DHI/mikeio1d/releases/tag/v0.4
