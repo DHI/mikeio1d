@@ -81,6 +81,10 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     def chainages(self) -> List[str]:
         return list(self.keys())
 
+    @property
+    def gridpoints(self) -> List[ResultGridPoint]:
+        return list(self.values())
+
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("name", self.reaches[0].Name)
