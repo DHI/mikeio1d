@@ -1,6 +1,7 @@
 from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
+from typing import Dict
 
 if TYPE_CHECKING:
     from ..geometry import ReachGeometry
@@ -13,7 +14,7 @@ from ..various import try_import_shapely
 from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
 
 
-class ResultReach(ResultLocation):
+class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     """
     Class for wrapping a list of ResultData reaches
     having the same reach name.
@@ -65,9 +66,6 @@ class ResultReach(ResultLocation):
             return getattr(self.reaches[0], name)
         else:
             object.__getattribute__(self, name)
-
-    def __getitem__(self, index):
-        return self.reaches[index]
 
     def _get_total_length(self):
         total_length = 0
@@ -186,6 +184,9 @@ class ResultReach(ResultLocation):
             chainage_string, self.chainage_label
         )
         setattr(self, result_gridpoint_attribute_string, result_gridpoint)
+
+        chainage_str = f"{gridpoint.Chainage:.3f}"
+        self[chainage_str] = result_gridpoint
 
     def set_gridpoint_data_items(self, reach):
         """

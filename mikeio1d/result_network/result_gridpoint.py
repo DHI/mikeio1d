@@ -35,7 +35,7 @@ class ResultGridPoint(ResultLocation):
         self.element_indices = []
 
     @property
-    def chainage(self):
+    def chainage(self) -> float:
         """Chainage of the grid point."""
         return self.gridpoint.Chainage
 
