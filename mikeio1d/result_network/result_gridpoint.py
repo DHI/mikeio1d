@@ -34,10 +34,11 @@ class ResultGridPoint(ResultLocation):
         self.structure_data_items = []
         self.element_indices = []
 
-    @property
-    def chainage(self) -> float:
-        """Chainage of the grid point."""
-        return self.gridpoint.Chainage
+        self.set_static_attributes()
+
+    def set_static_attributes(self):
+        """Set static attributes. These show up in the html repr."""
+        self.set_static_attribute("chainage", self.gridpoint.Chainage)
 
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGridPoint.
