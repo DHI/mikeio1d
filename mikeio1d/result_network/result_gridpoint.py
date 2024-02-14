@@ -38,7 +38,10 @@ class ResultGridPoint(ResultLocation):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
+        self.set_static_attribute("reach_name", self.reach.Name)
         self.set_static_attribute("chainage", self.gridpoint.Chainage)
+        self.set_static_attribute("xcoord", self.gridpoint.X)
+        self.set_static_attribute("ycoord", self.gridpoint.Y)
 
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGridPoint.
