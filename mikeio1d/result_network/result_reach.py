@@ -5,6 +5,7 @@ from typing import Dict
 
 if TYPE_CHECKING:
     from ..geometry import ReachGeometry
+    from typing import List
 
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
@@ -75,6 +76,10 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     def _get_total_gridpoints(self):
         return sum([len(gp_list) for gp_list in self.result_gridpoints])
+
+    @property
+    def chainages(self) -> List[str]:
+        return list(self.keys())
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
