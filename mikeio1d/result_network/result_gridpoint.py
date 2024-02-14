@@ -34,6 +34,11 @@ class ResultGridPoint(ResultLocation):
         self.structure_data_items = []
         self.element_indices = []
 
+    @property
+    def chainage(self):
+        """Chainage of the grid point."""
+        return self.gridpoint.Chainage
+
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGridPoint.
 
