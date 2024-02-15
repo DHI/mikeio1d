@@ -18,19 +18,71 @@ class CrossSection:
 
     @property
     def topo_id(self) -> str:
+        """Topo ID of the cross section."""
         return self._m1d_cross_section.TopoID
 
     @property
     def location_id(self) -> str:
+        """Location ID of the cross section."""
         return self._m1d_cross_section.Location.ID
 
     @property
     def chainage(self) -> float:
+        """Chainage of the cross section."""
         return self._m1d_cross_section.Location.Chainage
 
     @property
-    def bottom_elevation(self) -> float:
-        return self._m1d_cross_section.Location.Z
+    def bottom_level(self) -> float:
+        return self._m1d_cross_section.BottomLevel
+
+    @property
+    def height(self) -> float:
+        """Height of the cross section."""
+        return self._m1d_cross_section.Height
+
+    @property
+    def interpolated(self) -> bool:
+        """Is the cross section interpolated? (i.e. not measured)"""
+        return self._m1d_cross_section.Interpolated
+
+    @property
+    def is_open(self) -> bool:
+        """Is the cross section open? (i.e. not closed)"""
+        return self._m1d_cross_section.IsOpen
+
+    @property
+    def max_width(self) -> float:
+        """Maximum width of the cross section."""
+        return self._m1d_cross_section.MaximumWidth
+
+    @property
+    def min_water_depth(self) -> float:
+        """
+        Minimum water depth of the cross section.
+        If the water depth goes below this depth, it will be corrected to match this depth.
+
+        This can be negative, in case the cross section has a slot attached.
+        """
+        return self._m1d_cross_section.MinWaterDepth
+
+    @property
+    def resistance_factor_proportionality(self) -> float:
+        """
+        A proportionality factor that is multiplied with the resistance factor.
+
+        ResistanceFactorProportionality is used by the resistance factor boundaries to adjust the resistance factor during the simulation.
+        """
+        return self._m1d_cross_section.ResistanceFactorProportionality
+
+    @property
+    def zmax(self) -> float:
+        """Maximum elevation of the cross section."""
+        return self._m1d_cross_section.ZMax
+
+    @property
+    def zmin(self) -> float:
+        """Minimum elevation of the cross section."""
+        return self._m1d_cross_section.ZMin
 
 
 class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
