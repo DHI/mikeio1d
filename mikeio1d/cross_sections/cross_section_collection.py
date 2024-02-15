@@ -36,6 +36,29 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         else:
             return super().__getitem__(key)
 
+    def sel(
+        self, location_id: str = ..., chainage: str = ..., topo_id: str = ...
+    ) -> CrossSection | List[CrossSection]:
+        """
+        This method is used to select cross sections from the collection.
+
+        Parameters
+        ----------
+        location_id : str, optional
+            Location ID of the cross section.
+        chainage : str, optional
+            Chainage of the cross section, with three decimals.
+        topo_id : str, optional
+            Topo ID of the cross section.
+
+        Returns
+        -------
+        CrossSection or list of CrossSection
+            Providing all arguments will return a CrossSection.
+            Provinding partial arguments will always return a list, even if it only has one CrossSection.
+        """
+        return self[location_id, chainage, topo_id]
+
     def add_xsection(self, xsection: CrossSection):
         location_id = xsection.location_id
         chainage = f"{xsection.chainage:.3f}"
