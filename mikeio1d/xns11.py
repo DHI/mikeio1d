@@ -4,6 +4,9 @@ import functools
 import os.path
 import pandas as pd
 
+from .cross_sections import CrossSection
+from .cross_sections import CrossSectionCollection
+
 from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
 from DHI.Mike1D.Generic import Connection, Diagnostics, Location
 
@@ -86,6 +89,8 @@ class Xns11:
         self.__topoids = None
         # Load the file on initialization
         self._load_file()
+        self.xsections = CrossSectionCollection()
+        self._init_xsections()
 
     def __repr__(self):
         return "<mikeio1d.Xns11>"
@@ -113,6 +118,11 @@ class Xns11:
 
     def __exit__(self, *excinfo):
         self.close()
+
+    def _init_xsections(self):
+        """Initialize the cross sections."""
+        for xs in self.file:
+            self.xsections.add_xsection(CrossSection(xs))
 
     def info(self):
         """Prints information about the result file."""
