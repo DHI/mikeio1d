@@ -87,6 +87,9 @@ class Xns11:
         # Load the file on initialization
         self._load_file()
 
+    def __repr__(self):
+        return "<mikeio1d.Xns11>"
+
     def _load_file(self):
         """Load the file."""
         if not os.path.exists(self.file_path):
@@ -96,16 +99,49 @@ class Xns11:
         )
         self._closed = False
 
-    def close(self):
-        """Close the file handle."""
-        self.file.Finalize()
-        self._closed = True
+    def _get_info(self) -> str:
+        info = []
+        if self.file_path:
+            info.append(f"# Cross sections: {str(self.file.Count)}")
+            info.append(f"Interpolation type: {str(self.interpolation_type)}")
+
+        info = str.join("\n", info)
+        return info
 
     def __enter__(self):
         return self
 
     def __exit__(self, *excinfo):
         self.close()
+
+    def info(self):
+        """Prints information about the result file."""
+        info = self._get_info()
+        print(info)
+
+    def close(self):
+        """Close the file handle."""
+        self.file.Finalize()
+        self._closed = True
+
+    @property
+    def interpolation_type(self):
+        """
+        Defines how an interpolated cross section are interpolated.
+
+        Returns
+        -------
+        DHI.Mike1D.CrossSectionModule.XSInterpolationType
+
+            Possible values:
+            - ProcessedTopDown: 0
+                Interpolates the processed data. Raw data will not be available.
+            - Raw: 1
+                Interpolates the raw data and calculates processed data from the new raw data.
+            - Middling: 2
+                Interpolation happens during runtime by requesting values at neighbour cross sections and interpolate between those.
+        """
+        return self.file.XSInterpolationType
 
     @property
     def _topoids(self):
