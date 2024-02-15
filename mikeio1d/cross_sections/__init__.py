@@ -4,6 +4,11 @@ from typing import Dict
 from typing import Tuple
 from typing import List
 
+import pandas as pd
+
+import matplotlib.pyplot as plt
+from IPython.display import display
+
 LocationId = str
 Chainage = str
 TopoId = str
@@ -83,6 +88,61 @@ class CrossSection:
     def zmin(self) -> float:
         """Minimum elevation of the cross section."""
         return self._m1d_cross_section.ZMin
+
+    def read(self) -> pd.DataFrame:
+        """
+        Read the cross section to a pandas DataFrame.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            A DataFrame with columns 'x' and 'z'. Units in 'meters'.
+        """
+
+        data = {
+            "x": [],
+            "z": [],
+        }
+
+        for point in self._m1d_cross_section.BaseCrossSection.Points:
+            data["x"].append(point.X)
+            data["z"].append(point.Z)
+
+        return pd.DataFrame(data)
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Plot the cross section.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            The axes to plot to. If not provided, a new figure will be created.
+
+        Returns
+        -------
+        ax : matplotlib.axes.Axes
+            The axes that was plotted to.
+        """
+        is_existing_ax = ax is not None
+
+        if not is_existing_ax:
+            _, ax = plt.subplots()
+
+        df = self.read()
+
+        label = f"'{self.location_id}' @ {self.chainage}"
+        ax.plot(df["x"], df["z"], label=label, **kwargs)
+        ax.set_xlabel("x [meters]")
+        ax.set_ylabel("z [meters]")
+        ax.grid(True)
+        ax.set_title("Cross section")
+        ax.legend()
+
+        if is_existing_ax:
+            display(ax.figure)
+
+        return ax
 
 
 class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
