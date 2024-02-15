@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from typing import Dict
 from typing import Tuple
 from typing import List
 
+if TYPE_CHECKING:
+    import geopandas as gpd
+
 from .cross_section import CrossSection
+
+from ..various import try_import_geopandas
 
 LocationId = str
 Chainage = str
@@ -58,6 +65,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             Provinding partial arguments will always return a list, even if it only has one CrossSection.
         """
         return self[location_id, chainage, topo_id]
+
+    def to_geopandas(self) -> gpd.GeoDataFrame:
+        try_import_geopandas()
+        import geopandas as gpd
+
+        geometries = [xs.geometry.to_shapely() for xs in self.values()]
+        gdf = gpd.GeoDataFrame(geometry=geometries)
+        return gdf
 
     def add_xsection(self, xsection: CrossSection):
         location_id = xsection.location_id

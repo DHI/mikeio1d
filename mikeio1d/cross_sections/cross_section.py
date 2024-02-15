@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..geometry import CrossSectionGeometry
+
 import pandas as pd
 
 import matplotlib.pyplot as plt
 from IPython.display import display
+
+from ..various import try_import_shapely
 
 
 class CrossSection:
@@ -80,6 +87,14 @@ class CrossSection:
     def zmin(self) -> float:
         """Minimum elevation of the cross section."""
         return self._m1d_cross_section.ZMin
+
+    @property
+    def geometry(self) -> CrossSectionGeometry:
+        """The geometry of the cross section."""
+        try_import_shapely()
+        from ..geometry import CrossSectionGeometry
+
+        return CrossSectionGeometry(self._m1d_cross_section)
 
     def read(self) -> pd.DataFrame:
         """
