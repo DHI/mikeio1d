@@ -23,7 +23,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         super().__init__()
 
     def __repr__(self) -> str:
-        return "<CrossSectionCollection>"
+        return f"<CrossSectionCollection {len(self)}>"
 
     def __getitem__(
         self, key: Tuple[LocationId, Chainage, TopoId]
@@ -42,6 +42,18 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             ]
         else:
             return super().__getitem__(key)
+
+    @property
+    def location_ids(self) -> List[str]:
+        return list(set([k[0] for k in self.keys()]))
+
+    @property
+    def chainages(self) -> List[str]:
+        return list(set([k[1] for k in self.keys()]))
+
+    @property
+    def topo_ids(self) -> List[str]:
+        return list(set([k[2] for k in self.keys()]))
 
     def sel(
         self, location_id: str = ..., chainage: str = ..., topo_id: str = ...
