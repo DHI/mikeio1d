@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 import pandas as pd
 
 import matplotlib.pyplot as plt
-from IPython.display import display
 
 from ..various import try_import_shapely
 
@@ -131,9 +130,8 @@ class CrossSection:
         ax : matplotlib.axes.Axes
             The axes that was plotted to.
         """
-        is_existing_ax = ax is not None
 
-        if not is_existing_ax:
+        if ax is None:
             _, ax = plt.subplots()
 
         df = self.read()
@@ -145,8 +143,5 @@ class CrossSection:
         ax.grid(True)
         ax.set_title("Cross section")
         ax.legend()
-
-        if is_existing_ax:
-            display(ax.figure)
 
         return ax
