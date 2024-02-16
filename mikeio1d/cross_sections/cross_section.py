@@ -159,7 +159,7 @@ class CrossSection:
 
         return pd.DataFrame(data)
 
-    def plot(self, ax=None, **kwargs):
+    def plot(self, ax=None, with_markers: bool = True, with_marker_labels=True, **kwargs):
         """
         Plot the cross section.
 
@@ -167,6 +167,10 @@ class CrossSection:
         ----------
         ax : matplotlib.axes.Axes, optional
             The axes to plot to. If not provided, a new figure will be created.
+        with_markers : bool, optional
+            If True, markers will be plotted.
+        with_marker_labels : bool, optional
+            If True, marker labels will be plotted. Ignored if with_markers is False.
 
         Returns
         -------
@@ -180,11 +184,29 @@ class CrossSection:
         df = self.read()
 
         label = f"'{self.location_id}' @ {self.chainage}"
+
         ax.plot(df["x"], df["z"], label=label, **kwargs)
+
+        if with_markers:
+            mask = df.markers.ne("") & df.markers.notna()
+            df_markers = df[mask]
+            ax.scatter(df_markers.x, df_markers.z, color="grey", marker="o", zorder=-1)
+
+        if with_markers and with_marker_labels:
+            for marker, x, z in zip(df_markers.marker_labels, df_markers.x, df_markers.z):
+                ax.annotate(
+                    marker,
+                    (x, z),
+                    textcoords="offset points",
+                    xytext=(0, -5),
+                    ha="center",
+                    fontsize=6,
+                )
+
         ax.set_xlabel("x [meters]")
         ax.set_ylabel("z [meters]")
         ax.grid(True)
-        ax.set_title("Cross section")
         ax.legend()
+        ax.set_title("Cross section")
 
         return ax

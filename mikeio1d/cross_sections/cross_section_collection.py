@@ -85,6 +85,12 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         """
         return self[location_id, chainage, topo_id]
 
+    def plot(self, *args, **kwargs):
+        for xs in self.values():
+            ax = xs.plot(*args, **kwargs)
+            kwargs["ax"] = ax
+        return ax
+
     def to_dataframe(self) -> pd.DataFrame:
         location_ids = [k[0] for k in self.keys()]
         chainages = [k[1] for k in self.keys()]
