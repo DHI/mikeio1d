@@ -5,11 +5,48 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..geometry import CrossSectionGeometry
 
+from enum import Enum
+
 import pandas as pd
 
 import matplotlib.pyplot as plt
 
 from ..various import try_import_shapely
+
+
+class Marker(Enum):
+    LEFT_LEVEE_BANK = 1
+    LOWEST_POINT = 2
+    RIGHT_LEVEE_BANK = 3
+    LEFT_LOW_FLOW_BANK = 4
+    RIGHT_LOW_FLOW_BANK = 5
+
+    def __repr__(self) -> str:
+        return Marker.pretty(self)
+
+    @staticmethod
+    def is_default_marker(marker: int | Marker) -> bool:
+        return marker in Marker
+
+    @staticmethod
+    def is_user_marker(marker: int | Marker) -> bool:
+        MIN_USER_MARKER = 8
+        return marker >= MIN_USER_MARKER
+
+    @staticmethod
+    def pretty(marker: int | Marker) -> str:
+        if Marker.is_default_marker(marker):
+            marker = marker if isinstance(marker, Marker) else Marker(marker)
+            return marker.name.replace("_", " ").title() + f" ({marker.value})"
+        elif Marker.is_user_marker(marker):
+            return f"User Marker ({marker})"
+        else:
+            return f"Unknown Marker ({marker})"
+
+    @staticmethod
+    def from_pretty(marker: str) -> int:
+        marker = int(marker.split("(")[-1][:-1])
+        return marker
 
 
 class CrossSection:
@@ -106,11 +143,17 @@ class CrossSection:
         """
 
         data = {
+            "markers": [],
+            "marker_labels": [],
             "x": [],
             "z": [],
         }
 
-        for point in self._m1d_cross_section.BaseCrossSection.Points:
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        for i, point in enumerate(base_xs.Points):
+            markers = [m for m in base_xs.GetMarkersOfPoint(i)]
+            data["markers"].append(",".join(str(m) for m in markers))
+            data["marker_labels"].append(",".join(Marker.pretty(m) for m in markers))
             data["x"].append(point.X)
             data["z"].append(point.Z)
 
