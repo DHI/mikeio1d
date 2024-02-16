@@ -9,6 +9,8 @@ from typing import List
 if TYPE_CHECKING:
     import geopandas as gpd
 
+import pandas as pd
+
 from .cross_section import CrossSection
 
 from ..various import try_import_geopandas
@@ -82,6 +84,22 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             Provinding partial arguments will always return a list, even if it only has one CrossSection.
         """
         return self[location_id, chainage, topo_id]
+
+    def to_dataframe(self) -> pd.DataFrame:
+        location_ids = [k[0] for k in self.keys()]
+        chainages = [k[1] for k in self.keys()]
+        topo_ids = [k[2] for k in self.keys()]
+
+        df = pd.DataFrame(
+            {
+                "location_id": location_ids,
+                "chainage": chainages,
+                "topo_id": topo_ids,
+                "cross_section": list(self.values()),
+            }
+        )
+        df = df.set_index(["location_id", "chainage", "topo_id"])
+        return df
 
     def to_geopandas(self) -> gpd.GeoDataFrame:
         try_import_geopandas()
