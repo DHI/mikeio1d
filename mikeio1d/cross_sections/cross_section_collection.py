@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 import pandas as pd
 
 from .cross_section import CrossSection
+from .cross_section import Marker
 
 from ..various import try_import_geopandas
 
@@ -120,6 +121,37 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             "topo_id": df.topo_id,
             "geometry": geometries,
         }
+        gdf = gpd.GeoDataFrame(data=data)
+        return gdf
+
+    def to_geopandas_markers(self) -> gpd.GeoDataFrame:
+        try_import_geopandas()
+        import geopandas as gpd
+
+        data = {
+            "location_id": [],
+            "chainage": [],
+            "topo_id": [],
+            "marker": [],
+            "marker_label": [],
+            "geometry": [],
+        }
+
+        for xs in self.values():
+            base_xs = xs._m1d_cross_section.BaseCrossSection
+            for i, point in enumerate(base_xs.Points):
+                markers = [m for m in base_xs.GetMarkersOfPoint(i)]
+                if len(markers) == 0:
+                    continue
+                data["location_id"].append(xs.location_id)
+                data["chainage"].append(xs.chainage)
+                data["topo_id"].append(xs.topo_id)
+                data["marker"].append(",".join(str(m) for m in markers))
+                data["marker_label"].append(",".join(Marker.pretty(m) for m in markers))
+                data["geometry"].append(
+                    xs.geometry.to_shapely().interpolate(point.X / xs.max_width, normalized=True)
+                )
+
         gdf = gpd.GeoDataFrame(data=data)
         return gdf
 
