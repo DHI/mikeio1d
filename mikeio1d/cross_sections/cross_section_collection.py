@@ -105,15 +105,13 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         try_import_geopandas()
         import geopandas as gpd
 
-        location_ids = [k[0] for k in self.keys()]
-        chainages = [k[1] for k in self.keys()]
-        topo_ids = [k[2] for k in self.keys()]
+        df = self.to_dataframe().reset_index()
         geometries = [xs.geometry.to_shapely() for xs in self.values()]
 
         data = {
-            "location_id": location_ids,
-            "chainage": chainages,
-            "topo_id": topo_ids,
+            "location_id": df.location_id,
+            "chainage": df.chainage,
+            "topo_id": df.topo_id,
             "geometry": geometries,
         }
         gdf = gpd.GeoDataFrame(data=data)
