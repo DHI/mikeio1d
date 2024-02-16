@@ -19,15 +19,15 @@ TopoId = str
 
 
 class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def __repr__(self) -> str:
         return f"<CrossSectionCollection {len(self)}>"
 
     def __getitem__(
         self, key: Tuple[LocationId, Chainage, TopoId]
-    ) -> CrossSection | List[CrossSection]:
+    ) -> CrossSection | CrossSectionCollection:
         if isinstance(key, str):
             return self.__getitem__((key, ..., ...))
 
@@ -35,13 +35,18 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             return self.__getitem__((key[0], key[1], ...))
 
         if ... in key:
-            return [
-                v
-                for k, v in self.items()
-                if all(k_i == key_i or key_i is ... for k_i, key_i in zip(k, key))
-            ]
+            return self._slice_collection(key)
         else:
             return super().__getitem__(key)
+
+    def _slice_collection(self, key: Tuple[LocationId, Chainage, TopoId]) -> CrossSectionCollection:
+        return CrossSectionCollection(
+            {
+                k: v
+                for k, v in self.items()
+                if all(k_i == key_i or key_i is ... for k_i, key_i in zip(k, key))
+            }
+        )
 
     @property
     def location_ids(self) -> List[str]:
