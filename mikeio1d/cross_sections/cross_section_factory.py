@@ -7,8 +7,6 @@ if TYPE_CHECKING:
     import pandas as pd
 
 
-from .cross_section import CrossSection
-
 from DHI.Mike1D.Generic import ZLocation
 from DHI.Mike1D.Generic import RadiusType
 from DHI.Mike1D.Generic import ResistanceDistribution
@@ -32,7 +30,7 @@ class CrossSectionFactory:
     @staticmethod
     def create_open_from_xz_data(
         x: Iterable[float], z: Iterable[float], location_id: str, chainage: float, topo_id: str
-    ) -> CrossSection:
+    ):
         builder = M1DCrossSectionFactory()
 
         builder.BuildOpen("")
@@ -59,4 +57,4 @@ class CrossSectionFactory:
 
         CrossSectionFactory.validate(xs)
 
-        return CrossSection(xs)
+        return xs

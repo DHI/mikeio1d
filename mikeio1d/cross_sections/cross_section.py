@@ -3,7 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Iterable
     from ..geometry import CrossSectionGeometry
+
+    import numpy as np
 
 from enum import Enum
 
@@ -12,6 +15,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from ..various import try_import_shapely
+from .cross_section_factory import CrossSectionFactory
 
 
 class Marker(Enum):
@@ -55,6 +59,44 @@ class CrossSection:
             m1d_cross_section = m1d_cross_section.__implementation__
 
         self._m1d_cross_section = m1d_cross_section
+
+    @staticmethod
+    def create_from_xz(
+        xz_data: pd.DataFrame | np.ndarray | Iterable[Iterable[float, float]],
+        location_id: str,
+        chainage: float,
+        topo_id: str,
+    ) -> CrossSection:
+        """
+        Create an open cross section from xz data.
+
+        Parameters
+        ----------
+        xz_data : pandas.DataFrame | numpy.ndarray | iterable of x, z pairs
+            If a DataFrame, it must have columns 'x' and 'z' (lowercase)
+            If a numpy array, it must have shape (n, 2).
+            If an iterable, it must yield iterables of length 2.
+        location_id : str
+            Location ID of the cross section.
+        chainage : float
+            Chainage of the cross section.
+        topo_id : str
+            Topo ID of the cross section.
+
+        Returns
+        -------
+        cross_section : CrossSection
+        """
+        if isinstance(xz_data, pd.DataFrame):
+            x = xz_data["x"]
+            z = xz_data["z"]
+        else:
+            x, z = zip(*xz_data)
+
+        m1d_cross_section = CrossSectionFactory.create_open_from_xz_data(
+            x, z, location_id, chainage, topo_id
+        )
+        return CrossSection(m1d_cross_section)
 
     def __repr__(self) -> str:
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
