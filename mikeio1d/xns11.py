@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import List
+
 from collections import defaultdict, namedtuple
 import functools
 
@@ -28,7 +30,7 @@ class FileNotOpenedError(BaseXns11Error):
     """Accessing data from a file that is not opened."""
 
 
-def read(file_path, queries):
+def read(file_path: str | Path, queries: QueryData | List[QueryData]) -> pd.DataFrame:
     """Read the requested data from the xns11 file and
     return a Pandas DataFrame.
 
@@ -47,7 +49,7 @@ def read(file_path, queries):
         return xns11.read(queries)
 
 
-def open(file_path):
+def open(file_path: str | Path) -> Xns11:
     """Open a xns11 file as a Xns11 object that has convenient methods
     to extract specific data from the file. It is recommended to use it
     as a context manager.
@@ -67,6 +69,9 @@ def open(file_path):
     >>>     print(x11.topoid_names)
     ['topoid1', 'topoid2']
     """
+    if not os.path.exists(file_path):
+        raise FileExistsError(f"File {file_path} does not exist.")
+
     return Xns11(file_path)
 
 
