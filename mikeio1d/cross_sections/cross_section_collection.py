@@ -9,6 +9,8 @@ from typing import List
 if TYPE_CHECKING:
     import geopandas as gpd
 
+    from ..xns11 import Xns11
+
 import pandas as pd
 
 from .cross_section import CrossSection
@@ -24,6 +26,7 @@ TopoId = str
 class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.xns11: Xns11 | None = None
 
     def __repr__(self) -> str:
         return f"<CrossSectionCollection {len(self)}>"
@@ -160,3 +163,6 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         chainage = f"{xsection.chainage:.3f}"
         topo_id = xsection.topo_id
         self[location_id, chainage, topo_id] = xsection
+
+        if self.xns11:
+            self.xns11._cross_section_data.Add(xsection._m1d_cross_section)
