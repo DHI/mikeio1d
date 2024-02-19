@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List
 
 from collections import defaultdict, namedtuple
-import functools
+from warnings import warn
 
 import os.path
 from pathlib import Path
@@ -75,19 +75,6 @@ def open(file_path: str | Path) -> Xns11:
     return Xns11(file_path)
 
 
-def _not_closed(prop):
-    @functools.wraps(prop)
-    def wrapper(self, *args, **kwargs):
-        if self._closed:
-            raise FileNotOpenedError(
-                "The xns11 file should be opened first to access to its "
-                f"{prop.__name__} property."
-            )
-        return prop(self, *args, **kwargs)
-
-    return wrapper
-
-
 class Xns11:
     def __init__(self, file_path: str | Path = None):
         self.file_path: str | Path = file_path
@@ -101,7 +88,6 @@ class Xns11:
 
         # Load the file on initialization
         self._init_cross_section_data()
-        self._closed = True
 
         self.xsections = CrossSectionCollection()
         self._init_xsections()
@@ -116,7 +102,6 @@ class Xns11:
         self._cross_section_data = self._cross_section_data_factory.Open(
             Connection.Create(self.file_path), Diagnostics("Error loading file.")
         )
-        self._closed = False
 
     def _get_info(self) -> str:
         info = []
@@ -131,7 +116,11 @@ class Xns11:
         return self
 
     def __exit__(self, *excinfo):
-        self.close()
+        self.__del__()
+
+    def __del__(self):
+        self._cross_section_data.Finalize()
+        self._cross_section_data_factory.Finalize()
 
     def _init_cross_section_data(self):
         """Initialize the CrossSectionData object."""
@@ -169,8 +158,13 @@ class Xns11:
 
     def close(self):
         """Close the file handle."""
-        self._cross_section_data.Finalize()
-        self._closed = True
+        self.__del__()
+
+    @property
+    def file(self):
+        """Alias for CrossSectionData objected stored on the member '_cross_section_data'."""
+        warn("The 'file' property is deprecated. Use '_cross_section_data' instead.")
+        return self._cross_section_data
 
     @property
     def interpolation_type(self):
@@ -198,7 +192,6 @@ class Xns11:
         return list(self._cross_section_data.GetReachTopoIdEnumerable())
 
     @property
-    @_not_closed
     def topoid_names(self):
         """A list of the topo-id names"""
         if self._topoid_names:
@@ -212,7 +205,6 @@ class Xns11:
         return list(self._cross_section_data.GetReachTopoIdEnumerable())
 
     @property
-    @_not_closed
     def reach_names(self):
         """A list of the reach names"""
         if self._reach_names:
@@ -375,7 +367,6 @@ class Xns11:
 
         return dict(found_points)
 
-    @_not_closed
     def read(self, queries):
         """Read the requested data from the xns11 file and
         return a Pandas DataFrame.
