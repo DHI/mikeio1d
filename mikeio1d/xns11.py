@@ -136,6 +136,7 @@ class Xns11:
 
     def _init_xsections(self):
         """Initialize the cross sections."""
+        self.xsections.xns11 = self
         for xs in self._cross_section_data:
             self.xsections.add_xsection(CrossSection(xs))
 
