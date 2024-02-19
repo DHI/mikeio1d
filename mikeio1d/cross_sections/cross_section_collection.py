@@ -67,7 +67,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return list(set([k[2] for k in self.keys()]))
 
     def sel(
-        self, location_id: str = ..., chainage: str = ..., topo_id: str = ...
+        self, location_id: str = ..., chainage: str | float = ..., topo_id: str = ...
     ) -> CrossSection | List[CrossSection]:
         """
         This method is used to select cross sections from the collection.
@@ -76,8 +76,8 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         ----------
         location_id : str, optional
             Location ID of the cross section.
-        chainage : str, optional
-            Chainage of the cross section, with three decimals.
+        chainage : str | float, optional
+            Chainage of the cross section.
         topo_id : str, optional
             Topo ID of the cross section.
 
@@ -87,6 +87,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             Providing all arguments will return a CrossSection.
             Provinding partial arguments will always return a list, even if it only has one CrossSection.
         """
+        chainage = f"{float(chainage):.3f}"
         return self[location_id, chainage, topo_id]
 
     def plot(self, *args, **kwargs):

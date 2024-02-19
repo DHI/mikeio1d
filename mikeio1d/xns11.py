@@ -105,10 +105,8 @@ class Xns11:
 
     def _get_info(self) -> str:
         info = []
-        if self.file_path:
-            info.append(f"# Cross sections: {str(self._cross_section_data.Count)}")
-            info.append(f"Interpolation type: {str(self.interpolation_type)}")
-
+        info.append(f"# Cross sections: {str(self._cross_section_data.Count)}")
+        info.append(f"Interpolation type: {str(self.interpolation_type)}")
         info = str.join("\n", info)
         return info
 
