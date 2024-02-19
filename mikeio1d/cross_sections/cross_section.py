@@ -51,7 +51,10 @@ class Marker(Enum):
 
 class CrossSection:
     def __init__(self, m1d_cross_section):
-        self._m1d_cross_section = m1d_cross_section.__implementation__
+        if hasattr(m1d_cross_section, "__implementation__"):
+            m1d_cross_section = m1d_cross_section.__implementation__
+
+        self._m1d_cross_section = m1d_cross_section
 
     def __repr__(self) -> str:
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
