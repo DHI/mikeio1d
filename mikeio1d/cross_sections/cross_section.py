@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 from ..various import try_import_shapely
 from .cross_section_factory import CrossSectionFactory
 
+from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+
 
 class Marker(Enum):
     LEFT_LEVEE_BANK = 1
@@ -52,6 +54,10 @@ class Marker(Enum):
     def from_pretty(marker: str) -> int:
         marker = int(marker.split("(")[-1][:-1])
         return marker
+
+    @staticmethod
+    def list_from_string(s: str) -> List[Marker]:
+        return [Marker(int(m)) for m in s.split(",")]
 
 
 class CrossSection:
@@ -202,7 +208,8 @@ class CrossSection:
         """
         return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
 
-    def read_processed(self) -> pd.DataFrame:
+    @property
+    def processed(self) -> pd.DataFrame:
         """
         Read the processed cross section to a pandas DataFrame.
 
@@ -233,7 +240,8 @@ class CrossSection:
         df = pd.DataFrame(data)
         return df
 
-    def read(self) -> pd.DataFrame:
+    @property
+    def raw(self) -> pd.DataFrame:
         """
         Read the cross section to a pandas DataFrame.
 
@@ -262,6 +270,44 @@ class CrossSection:
 
         return pd.DataFrame(data)
 
+    @raw.setter
+    def raw(self, df: pd.DataFrame):
+        """
+        Set the raw cross section from a DataFrame.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A DataFrame with the same shape and column headers as the output of the raw property.
+        """
+        raw_current: pd.DataFrame = self.raw
+        for column_name in raw_current.columns:
+            if column_name not in df.columns:
+                raise ValueError(f"Column '{column_name}' is missing from the provided DataFrame.")
+
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        base_xs.Points.Clear()
+        for x, z, resistance in zip(df.x, df.z, df.resistance):
+            point = CrossSectionPoint(x, z)
+            point.DistributedResistance = resistance
+            base_xs.Points.Add(point)
+
+        for i, point in enumerate(base_xs.Points):
+            markers_str = df.markers.iloc[i]
+            if not markers_str:
+                continue
+
+            markers = Marker.list_from_string(markers_str)
+            for marker in markers:
+                if Marker.is_default_marker(marker):
+                    base_xs.SetMarkerAt(marker.value, i)
+                elif Marker.is_user_marker(marker):
+                    point.UserMarker = marker.value
+                else:
+                    raise ValueError(f"Unknown marker: '{marker}'")
+
+        base_xs.CalculateProcessedData()
+
     def plot(self, ax=None, with_markers: bool = True, with_marker_labels=True, **kwargs):
         """
         Plot the cross section.
@@ -284,7 +330,7 @@ class CrossSection:
         if ax is None:
             _, ax = plt.subplots()
 
-        df = self.read()
+        df = self.raw
 
         label = f"'{self.location_id}' @ {self.chainage}"
 
