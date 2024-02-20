@@ -177,6 +177,16 @@ class CrossSection:
 
         return CrossSectionGeometry(self._m1d_cross_section)
 
+    @property
+    def resistance_type(self) -> str:
+        """The type of resistance used in the cross section."""
+        return self._m1d_cross_section.ResistanceFormulation
+
+    @property
+    def resistance_distribution(self) -> str:
+        """The distribution of resistance used in the cross section."""
+        return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution
+
     def read(self) -> pd.DataFrame:
         """
         Read the cross section to a pandas DataFrame.
@@ -192,6 +202,7 @@ class CrossSection:
             "marker_labels": [],
             "x": [],
             "z": [],
+            "resistance": [],
         }
 
         base_xs = self._m1d_cross_section.BaseCrossSection
@@ -201,6 +212,7 @@ class CrossSection:
             data["marker_labels"].append(",".join(Marker.pretty(m) for m in markers))
             data["x"].append(point.X)
             data["z"].append(point.Z)
+            data["resistance"].append(point.DistributedResistance)
 
         return pd.DataFrame(data)
 
