@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Iterable
+    from typing import Tuple
     from ..geometry import CrossSectionGeometry
 
     import numpy as np
@@ -186,6 +187,51 @@ class CrossSection:
     def resistance_distribution(self) -> str:
         """The distribution of resistance used in the cross section."""
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution
+
+    def _calculate_conveyance_factor(
+        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
+    ) -> Tuple[float]:
+        """
+        Calculate the conveyance factor from resistance, flow area and radius.
+
+        Note that this is not the true conveyance factor since resistance could be relative. However,
+        this is the same calculation provided by MIKE+ cross section editor. Its main purpose is for checking
+        that conveyance values will be monotonically increasing. For more info, see
+        the MIKE+ documentation:
+        https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
+        """
+        return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
+
+    def read_processed(self) -> pd.DataFrame:
+        """
+        Read the processed cross section to a pandas DataFrame.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+        """
+
+        xs = self._m1d_cross_section
+        base_xs = xs.BaseCrossSection
+        levels = tuple(base_xs.ProcessedLevels)
+        flow_area = tuple(base_xs.ProcessedFlowAreas)
+        radius = tuple(base_xs.ProcessedRadii)
+        storage_width = tuple(base_xs.ProcessedStorageWidths)
+        additional_storage_area = tuple(base_xs.ProcessedAdditionalSurfaceAreas)
+        resistance = tuple(base_xs.ProcessedResistanceFactors)
+        conveyance_factor = self._calculate_conveyance_factor(resistance, flow_area, radius)
+        data = {
+            "level": levels,
+            "flow_area": flow_area,
+            "radius": radius,
+            "storage_width": storage_width,
+            "additional_storage_area": additional_storage_area,
+            "resistance": resistance,
+            "conveyance_factor": conveyance_factor,
+        }
+
+        df = pd.DataFrame(data)
+        return df
 
     def read(self) -> pd.DataFrame:
         """
