@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterable
     from typing import Tuple
+    from typing import List
     from ..geometry import CrossSectionGeometry
 
     import numpy as np
