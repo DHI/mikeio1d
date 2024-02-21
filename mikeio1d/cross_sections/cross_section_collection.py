@@ -40,7 +40,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         if len(key) == 2:
             return self.__getitem__((key[0], key[1], ...))
 
-        if ... in key:
+        if ... in key or slice(None) in key:
             return self._slice_collection(key)
         else:
             return super().__getitem__(key)
@@ -48,9 +48,12 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
     def _slice_collection(self, key: Tuple[LocationId, Chainage, TopoId]) -> CrossSectionCollection:
         return CrossSectionCollection(
             {
-                k: v
-                for k, v in self.items()
-                if all(k_i == key_i or key_i is ... for k_i, key_i in zip(k, key))
+                k: xs
+                for k, xs in self.items()
+                if all(
+                    k_i == key_i or key_i is ... or key_i == slice(None)
+                    for k_i, key_i in zip(k, key)
+                )
             }
         )
 
