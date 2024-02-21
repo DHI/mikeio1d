@@ -57,6 +57,12 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             }
         )
 
+    def __or__(self, other) -> CrossSectionCollection:
+        if isinstance(other, CrossSectionCollection):
+            return CrossSectionCollection({**self, **other})
+        else:
+            super().__or__(other)
+
     @property
     def location_ids(self) -> List[str]:
         return list(set([k[0] for k in self.keys()]))
