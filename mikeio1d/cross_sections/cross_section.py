@@ -243,6 +243,28 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
+    def processed_allow_recompute(self) -> bool:
+        """
+        Whether the processed data can be recomputed (e.g. if the raw data has changed).
+
+        Default is True.
+        """
+        return not self._m1d_cross_section.BaseCrossSection.ProcessedDataProtected
+
+    @processed_allow_recompute.setter
+    def processed_allow_recompute(self, value: bool):
+        self._m1d_cross_section.BaseCrossSection.ProcessedDataProtected = not value
+
+    def recompute_processed(self):
+        """
+        Recompute the processed data.
+
+        In most cases this is not necessary as it will be done automatically when the raw data changes.
+        If processed_allow_recompute is set to False, then this will do nothing.
+        """
+        self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
+
+    @property
     def processed(self) -> pd.DataFrame:
         """
         Read the processed cross section to a pandas DataFrame.
