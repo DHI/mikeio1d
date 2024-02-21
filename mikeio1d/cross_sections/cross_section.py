@@ -19,6 +19,7 @@ from ..various import try_import_shapely
 from .cross_section_factory import CrossSectionFactory
 
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.Generic import ProcessingOption
 
 
 class Marker(Enum):
@@ -207,6 +208,38 @@ class CrossSection:
         https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
         """
         return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
+
+    @property
+    def number_of_processing_levels(self) -> int:
+        """
+        The number of levels used in the processed data. Setting this will recalculate
+        processed data with equidistant levels based on the specified integer.
+        """
+        pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
+        return pls.NoOfLevels
+
+    @number_of_processing_levels.setter
+    def number_of_processing_levels(self, value: int):
+        pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
+        pls.Option = ProcessingOption.EquidistantLevels
+        pls.NoOfLevels = value
+        self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
+
+    @property
+    def processing_levels(self) -> Tuple[float]:
+        """
+        The levels used in the processed data. Setting this will recalculate the processed
+        data using only the specified levels. The minimum and maximum levels will be automatically
+        added if not already present.
+        """
+        return tuple(self._m1d_cross_section.BaseCrossSection.ProcessedLevels)
+
+    @processing_levels.setter
+    def processing_levels(self, levels: Iterable[float]):
+        pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
+        pls.Option = ProcessingOption.UserDefinedLevels
+        pls.UserDefLevels = tuple(levels)
+        self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
     def processed(self) -> pd.DataFrame:
