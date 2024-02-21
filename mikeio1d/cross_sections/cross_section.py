@@ -296,6 +296,30 @@ class CrossSection:
         df = pd.DataFrame(data)
         return df
 
+    @processed.setter
+    def processed(self, df: pd.DataFrame):
+        for column_name in [
+            "level",
+            "flow_area",
+            "radius",
+            "storage_width",
+            "additional_storage_area",
+            "resistance",
+        ]:
+            if column_name not in df.columns:
+                raise ValueError(f"Column '{column_name}' is missing from the provided DataFrame.")
+
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        base_xs.SetAllProcessedValues(
+            df.level.values,
+            df.storage_width.values,
+            df.flow_area.values,
+            df.radius.values,
+            df.resistance.values,
+            df.additional_storage_area.values,
+        )
+        self.processed_allow_recompute = False
+
     @property
     def raw(self) -> pd.DataFrame:
         """
