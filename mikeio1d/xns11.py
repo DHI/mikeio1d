@@ -138,6 +138,10 @@ class Xns11:
         info = self._get_info()
         print(info)
 
+    def add_xsection(self, cross_section: CrossSection):
+        """Add a cross section to the file."""
+        self.xsections.add_xsection(cross_section)
+
     def write(self, file_path: str | Path = None):
         """Write data to the file."""
         file_path = file_path if file_path else self.file_path
@@ -154,6 +158,9 @@ class Xns11:
             self._cross_section_data.Connection = Connection.Create(str(file_path))
 
         self._cross_section_data_factory.Save(self._cross_section_data)
+
+        if not self.file_path:
+            self.file_path = file_path
 
     def close(self):
         """Close the file handle."""
