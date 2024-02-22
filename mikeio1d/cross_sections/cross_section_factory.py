@@ -29,7 +29,12 @@ class CrossSectionFactory:
 
     @staticmethod
     def create_open_from_xz_data(
-        x: Iterable[float], z: Iterable[float], location_id: str, chainage: float, topo_id: str
+        x: Iterable[float],
+        z: Iterable[float],
+        location_id: str,
+        chainage: float,
+        topo_id: str,
+        default_markers: bool = True,
     ):
         builder = M1DCrossSectionFactory()
 
@@ -42,7 +47,8 @@ class CrossSectionFactory:
             points.Add(point)
         builder.SetRawPoints(points)
 
-        builder.SetDefaultMarkers()
+        if default_markers:
+            builder.SetDefaultMarkers()
         flow_resistance = FlowResistance()
         flow_resistance.ResistanceDistribution = ResistanceDistribution.Uniform
         flow_resistance.ResistanceValue = 1

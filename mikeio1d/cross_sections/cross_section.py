@@ -75,6 +75,7 @@ class CrossSection:
         location_id: str,
         chainage: float,
         topo_id: str,
+        default_markers: bool = True,
     ) -> CrossSection:
         """
         Create an open cross section from xz data.
@@ -103,7 +104,7 @@ class CrossSection:
             x, z = zip(*xz_data)
 
         m1d_cross_section = CrossSectionFactory.create_open_from_xz_data(
-            x, z, location_id, chainage, topo_id
+            x, z, location_id, chainage, topo_id, default_markers
         )
         return CrossSection(m1d_cross_section)
 
