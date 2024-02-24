@@ -4,12 +4,15 @@
 
 ### Added
 
-
 ### Fixed
-
 
 ### Changed
 
+## [0.6.1] - 2024-02-024
+
+### Fixed
+
+- Loading MIKE IO 1D together with MIKE+Py
 
 ## [0.6] - 2024-02-08
 
@@ -121,7 +124,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.6...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.6.1
 [0.6]: https://github.com/DHI/mikeio1d/releases/tag/v0.6
 [0.5]: https://github.com/DHI/mikeio1d/releases/tag/v0.5
 [0.4.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.4.1
