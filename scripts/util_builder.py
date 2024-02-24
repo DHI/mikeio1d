@@ -20,7 +20,7 @@ class UtilBuilder:
     build_dir_name = os.path.join("bin", "Release", "netstandard2.0")
 
     # Directory where libraries will be installed
-    bin_dir_name = os.path.join("mikeio1d", "bin")
+    bin_dir_name = os.path.join("mikeio1d", "bin", "DHI.Mike1D.MikeIO")
 
     # Utility libraries to build and install
     library_names = ["DHI.Mike1D.MikeIO"]
@@ -57,6 +57,7 @@ class UtilBuilder:
             print(f"    Copying file: {source_file_path_stripped}")
             _, file_name = os.path.split(source_file)
             destination_file = os.path.join(destination, file_name)
+            os.makedirs(destination, exist_ok=True)
             shutil.copy2(source_file, destination_file)
 
     def strip_source_file_path(self, file_path):
