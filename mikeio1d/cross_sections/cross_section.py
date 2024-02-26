@@ -21,6 +21,8 @@ from .cross_section_factory import CrossSectionFactory
 
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
 from DHI.Mike1D.Generic import ProcessingOption
+from DHI.Mike1D.Generic import ResistanceDistribution
+from DHI.Mike1D.Generic import ResistanceFormulation
 
 
 class Marker(Enum):
@@ -188,14 +190,84 @@ class CrossSection:
         return CrossSectionGeometry(self._m1d_cross_section)
 
     @property
-    def resistance_type(self) -> str:
-        """The type of resistance used in the cross section."""
-        return self._m1d_cross_section.ResistanceFormulation
+    def resistance_type(self):
+        """
+        Get the type of resistance used in the cross section.
+
+        Parameters
+        ----------
+        resistance_type: int
+            The type of resistance used in the cross section:
+
+            0 - Relative
+
+            1 - Manning's n
+
+            2 - Manning's M
+
+            3 - Chezy number
+
+            4 - Darcy-Weisbach
+
+            5 - Colebrook White
+
+            6 - Hazen Williams
+
+
+        Returns
+        -------
+        DHI.Mike1D.Generic.ResistanceFormulation
+            The type of resistance used in the cross section.
+        """
+        return self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation
+
+    @resistance_type.setter
+    def resistance_type(self, value: int):
+        self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation = ResistanceFormulation(
+            value
+        )
 
     @property
     def resistance_distribution(self) -> str:
-        """The distribution of resistance used in the cross section."""
+        """
+        Get the distribution of resistance used in the cross section.
+
+        Parameters
+        ----------
+        The resistance distribution is represented by an integer value:
+
+        0 - Uniform
+
+        1 - Zones
+
+        2 - Distributed
+
+        3 - Constant
+
+        4 - ExponentVarying
+
+
+        Returns
+        -------
+        str
+            The distribution of resistance used in the cross section.
+
+        Notes
+        -----
+        The resistance distribution is represented by an integer value:
+        0 - Uniform
+        1 - Zones
+        2 - Distributed
+        3 - Constant
+        4 - ExponentVarying
+        """
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution
+
+    @resistance_distribution.setter
+    def resistance_distribution(self, value: str):
+        self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution = (
+            ResistanceDistribution(value)
+        )
 
     def _calculate_conveyance_factor(
         self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
