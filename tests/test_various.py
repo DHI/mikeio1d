@@ -38,3 +38,15 @@ def test_network_attributes_allow_chinese_characters(test_file_path):
     assert res.nodes.美丽
     assert res.nodes.学生
     assert res.nodes.蛋糕
+
+
+def test_mikeio1d_and_mikepluspy_coexistence(test_file_path):
+    # This test cannot run on a GitHub pipeline, because currently there is no way
+    # to have MIKE+ installation on a virtual machine there.
+
+    import subprocess
+
+    test_folder_path = os.path.dirname(os.path.abspath(__file__))
+    script_path = os.path.join(test_folder_path, "call_mikepluspy_mikeio1d.py")
+    exit_code = subprocess.call(["python", script_path, test_file_path])
+    assert exit_code == 0
