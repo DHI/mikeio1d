@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from typing import List
     from ..geometry import CrossSectionGeometry
 
-    import numpy as np
+import numpy as np
 
 from enum import Enum
 
@@ -36,6 +36,9 @@ class Marker(Enum):
     def __repr__(self) -> str:
         return Marker.pretty(self)
 
+    def __int__(self) -> int:
+        return self.value
+
     @staticmethod
     def is_default_marker(marker: int | Marker) -> bool:
         return marker in Marker
@@ -61,8 +64,8 @@ class Marker(Enum):
         return marker
 
     @staticmethod
-    def list_from_string(s: str) -> List[Marker]:
-        return [Marker(int(m)) for m in s.split(",")]
+    def list_from_string(s: str) -> List[int]:
+        return [int(m) for m in s.split(",")]
 
 
 class CrossSection:
@@ -453,14 +456,22 @@ class CrossSection:
 
             markers = Marker.list_from_string(markers_str)
             for marker in markers:
-                if Marker.is_default_marker(marker):
-                    base_xs.SetMarkerAt(marker.value, i)
-                elif Marker.is_user_marker(marker):
-                    point.UserMarker = marker.value
-                else:
-                    raise ValueError(f"Unknown marker: '{marker}'")
+                self._update_marker(marker, i)
 
         base_xs.CalculateProcessedData()
+
+    def _update_marker(self, marker: int | Marker, point_index: int):
+        """
+        Update the marker of the specified point_index.
+        """
+        marker = int(marker)
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        if Marker.is_default_marker(marker):
+            base_xs.SetMarkerAt(marker, point_index)
+        elif Marker.is_user_marker(marker):
+            base_xs.Points[point_index].UserMarker = marker
+        else:
+            raise ValueError(f"Unknown marker: '{marker}'")
 
     @property
     def markers(self) -> pd.DataFrame:
@@ -489,7 +500,73 @@ class CrossSection:
             data["x"].append(point.X)
             data["z"].append(point.Z)
 
+        user_marker_points = (p for p in base_xs.Points if p.UserMarker > 0)
+        for point in user_marker_points:
+            data["marker"].append(point.UserMarker)
+            data["marker_label"].append(Marker.pretty(point.UserMarker))
+            data["x"].append(point.X)
+            data["z"].append(point.Z)
+
         return pd.DataFrame(data)
+
+    @markers.setter
+    def markers(self, df: pd.DataFrame):
+        df_current_markers = self.markers
+        for marker in df_current_markers.marker.values:
+            self.unset_marker(marker)
+        for _, row in df.iterrows():
+            marker, x, z = row.marker, row.x, row.z
+            self.set_marker(marker, x, z)
+
+    def set_marker(self, marker: int | Marker, x: float, z: float = 0):
+        """
+        Set a marker at the point nearest to the specified x, z coordinates.
+
+        Note: snapping to nearest point is 1000x more sensitive to 'x' than 'z'.
+
+        Parameters
+        ----------
+        marker : int | Marker
+            The marker to set.
+        x : float
+            The x coordinate of the point.
+        z : float (default: 0.0)
+            The z coordinate of the point.
+        """
+        point_index = self._find_nearest_point_index(x, z)
+        self._update_marker(marker, point_index)
+
+    def unset_marker(self, marker: int | Marker):
+        """
+        Removes the specified marker from the cross section.
+
+        Parameters
+        ----------
+        marker : int | Marker
+            The marker to remove.
+        """
+        marker = int(marker)
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        base_xs.SetMarkerAt(marker, -1)
+
+    def _find_nearest_point_index(self, x: float, z: float = 0) -> int:
+        """
+        Find the XSBaseRaw.points index of the nearest point for the given x, z coordinates.
+
+        Note: 'x' is weighted 1000 times more than 'z' to make the search more sensitive to x differences.
+
+        Returns
+        -------
+        index : int
+            The index of the nearest point.
+        """
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        points = base_xs.Points
+        points_coords = np.array(tuple((p.X, p.Z) for p in points))
+        weights = np.array([1000, 1])  # Higher weight for x difference
+        distances = np.linalg.norm((points_coords - (x, z)) * weights, axis=1)
+        nearest_index = np.argmin(distances)
+        return int(nearest_index)
 
     def plot(self, ax=None, with_markers: bool = True, with_marker_labels=True, **kwargs):
         """
