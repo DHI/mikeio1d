@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 from ..various import try_import_shapely
 from .cross_section_factory import CrossSectionFactory
 
+import System
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
 from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution
@@ -460,6 +461,35 @@ class CrossSection:
                     raise ValueError(f"Unknown marker: '{marker}'")
 
         base_xs.CalculateProcessedData()
+
+    @property
+    def markers(self) -> pd.DataFrame:
+        """
+        Get the markers of the cross section.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            A DataFrame with columns 'x', 'z', 'marker', and 'marker_label'.
+        """
+        base_xs = self._m1d_cross_section.BaseCrossSection
+        markers, marker_indices = base_xs.GetMarkerSequence()
+
+        data = {
+            "marker": [],
+            "marker_label": [],
+            "x": [],
+            "z": [],
+        }
+
+        for marker, point_index in zip(markers, marker_indices):
+            data["marker"].append(marker)
+            data["marker_label"].append(Marker.pretty(marker))
+            point = base_xs.Points[point_index]
+            data["x"].append(point.X)
+            data["z"].append(point.Z)
+
+        return pd.DataFrame(data)
 
     def plot(self, ax=None, with_markers: bool = True, with_marker_labels=True, **kwargs):
         """
