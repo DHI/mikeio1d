@@ -444,6 +444,13 @@ class CrossSection:
 
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.Points.Clear()
+
+        if df.resistance.nunique() == 1:
+            self.resistance_distribution == ResistanceDistribution.Uniform
+            base_xs.FlowResistance.ResistanceValue = float(df.resistance.iloc[0])
+        else:
+            self.resistance_distribution == ResistanceDistribution.Distributed
+
         for x, z, resistance in zip(df.x, df.z, df.resistance):
             point = CrossSectionPoint(x, z)
             point.DistributedResistance = resistance
