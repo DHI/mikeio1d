@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from warnings import warn
 
 if TYPE_CHECKING:
     from typing import Iterable
@@ -232,7 +233,7 @@ class CrossSection:
         )
 
     @property
-    def resistance_distribution(self) -> str:
+    def resistance_distribution(self):
         """
         Get the distribution of resistance used in the cross section.
 
@@ -268,7 +269,8 @@ class CrossSection:
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution
 
     @resistance_distribution.setter
-    def resistance_distribution(self, value: str):
+    def resistance_distribution(self, value: int):
+        value = int(value)
         self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution = (
             ResistanceDistribution(value)
         )
@@ -286,6 +288,44 @@ class CrossSection:
         https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
         """
         return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
+
+    def _warn_if_resistance_distribution_is_not_zones(self):
+        if self.resistance_distribution != ResistanceDistribution.Zones:
+            message = (
+                "You are accessing/setting zone resistances without the correct resistance distribution type. "
+                "Set the resistance distribution type to zones by setting '.resistance_distribution' to 1."
+            )
+            warn(message)
+
+    @property
+    def resistance_left_high_flow(self) -> float:
+        self._warn_if_resistance_distribution_is_not_zones()
+        return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLeftHighFlow
+
+    @resistance_left_high_flow.setter
+    def resistance_left_high_flow(self, value: float):
+        self._warn_if_resistance_distribution_is_not_zones()
+        self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLeftHighFlow = value
+
+    @property
+    def resistance_low_flow(self):
+        self._warn_if_resistance_distribution_is_not_zones()
+        return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLowFlow
+
+    @resistance_low_flow.setter
+    def resistance_low_flow(self, value: float):
+        self._warn_if_resistance_distribution_is_not_zones()
+        self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLowFlow = value
+
+    @property
+    def resistance_right_high_flow(self):
+        self._warn_if_resistance_distribution_is_not_zones()
+        return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow
+
+    @resistance_right_high_flow.setter
+    def resistance_right_low_flow(self, value: float):
+        self._warn_if_resistance_distribution_is_not_zones()
+        self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow = value
 
     @property
     def number_of_processing_levels(self) -> int:
@@ -408,6 +448,8 @@ class CrossSection:
             A DataFrame with columns 'x' and 'z'. Units in 'meters'.
         """
 
+        self.recompute_processed()
+
         data = {
             "markers": [],
             "marker_labels": [],
@@ -445,11 +487,13 @@ class CrossSection:
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.Points.Clear()
 
-        if df.resistance.nunique() == 1:
+        unique_resistances = df.resistance.nunique()
+        if unique_resistances == 1:
             self.resistance_distribution == ResistanceDistribution.Uniform
             base_xs.FlowResistance.ResistanceValue = float(df.resistance.iloc[0])
-        else:
-            self.resistance_distribution == ResistanceDistribution.Distributed
+
+        if unique_resistances > 3:
+            self.resistance_distribution = ResistanceDistribution.Distributed
 
         for x, z, resistance in zip(df.x, df.z, df.resistance):
             point = CrossSectionPoint(x, z)
@@ -465,7 +509,7 @@ class CrossSection:
             for marker in markers:
                 self._update_marker(marker, i)
 
-        base_xs.CalculateProcessedData()
+        self.recompute_processed()
 
     def _update_marker(self, marker: int | Marker, point_index: int):
         """
