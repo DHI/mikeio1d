@@ -224,20 +224,6 @@ class CrossSection:
             m1d_ResistanceDistribution(value)
         )
 
-    def _calculate_conveyance_factor(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float]:
-        """
-        Calculate the conveyance factor from resistance, flow area and radius.
-
-        Note that this is not the true conveyance factor since resistance could be relative. However,
-        this is the same calculation provided by MIKE+ cross section editor. Its main purpose is for checking
-        that conveyance values will be monotonically increasing. For more info, see
-        the MIKE+ documentation:
-        https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
-        """
-        return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
-
     def _warn_if_resistance_distribution_is_not_zones(self):
         if self.resistance_distribution != ResistanceDistribution.ZONES:
             message = (
@@ -283,7 +269,10 @@ class CrossSection:
         processed data with equidistant levels based on the specified integer.
         """
         pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
-        return pls.NoOfLevels
+        if pls.Option == ProcessingOption.EquidistantLevels:
+            return pls.NoOfLevels
+        else:
+            return len(self.processing_levels)
 
     @number_of_processing_levels.setter
     def number_of_processing_levels(self, value: int):
@@ -329,6 +318,20 @@ class CrossSection:
         If processed_allow_recompute is set to False, then this will do nothing.
         """
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
+
+    def _calculate_conveyance_factor(
+        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
+    ) -> Tuple[float]:
+        """
+        Calculate the conveyance factor from resistance, flow area and radius.
+
+        Note that this is not the true conveyance factor since resistance could be relative. However,
+        this is the same calculation provided by MIKE+ cross section editor. Its main purpose is for checking
+        that conveyance values will be monotonically increasing. For more info, see
+        the MIKE+ documentation:
+        https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
+        """
+        return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
 
     @property
     def processed(self) -> pd.DataFrame:

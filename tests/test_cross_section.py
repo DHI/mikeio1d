@@ -4,6 +4,7 @@ from typing import List
 from contextlib import nullcontext
 
 import numpy as np
+import pandas as pd
 
 from mikeio1d import Xns11
 
@@ -144,3 +145,70 @@ class TestCrossSectionCreation:
         cs_dummy.resistance_distribution = ResistanceDistribution.ZONES
         setattr(cs_dummy, zone, 2.0)
         assert getattr(cs_dummy, zone) == 2.0
+
+    def test_number_of_processing_levels_get(self, cs_dummy):
+        DEFAULT_PROCESSING_LEVELS = 20
+        assert cs_dummy.number_of_processing_levels == DEFAULT_PROCESSING_LEVELS
+
+        cs_dummy.processing_levels = cs_dummy.processing_levels[:10]
+        assert cs_dummy.number_of_processing_levels == len(cs_dummy.processing_levels)
+
+    def test_number_of_processing_levels_set(self, cs_dummy):
+        cs_dummy.number_of_processing_levels = 10
+        assert cs_dummy.number_of_processing_levels == 10
+
+        cs_dummy.processing_levels = cs_dummy.processing_levels[:5]
+        cs_dummy.number_of_processing_levels = 10
+        assert cs_dummy.number_of_processing_levels == 10
+
+    def test_processed_allow_recompute_get(self, cs_dummy):
+        DEFAULT_ALLOW_RECOMPUTE = True
+        assert cs_dummy.processed_allow_recompute is DEFAULT_ALLOW_RECOMPUTE
+
+    def test_processed_allow_recompute_set(self, cs_dummy):
+        cs_dummy.processed_allow_recompute = False
+        assert cs_dummy.processed_allow_recompute is False
+
+    def test_processed_allow_recompute_false_functionality(self, cs_dummy):
+        # TODO
+        return True
+
+    def test_calculate_conveyance_factor(self, cs_dummy):
+        df = cs_dummy.processed
+        resistance, flow_area, radius = df.resistance, df.flow_area, df.radius
+        conveyances = tuple(
+            r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius)
+        )
+        np.testing.assert_array_equal(conveyances, df.conveyance_factor)
+
+    def test_processed_get(self, cs_sample):
+        for cs in cs_sample:
+            df = cs.processed
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) == cs.number_of_processing_levels, cs
+            expected_columns = {
+                "level",
+                "flow_area",
+                "radius",
+                "storage_width",
+                "additional_storage_area",
+                "resistance",
+                "conveyance_factor",
+            }
+            set(df.columns) == expected_columns
+            base_xs = cs._m1d_cross_section.BaseCrossSection
+            expected_vs_actual = [
+                (np.array(base_xs.ProcessedLevels), df.level),
+                (np.array(base_xs.ProcessedFlowAreas), df.flow_area),
+                (np.array(base_xs.ProcessedRadii), df.radius),
+                (np.array(base_xs.ProcessedStorageWidths), df.storage_width),
+                (np.array(base_xs.ProcessedAdditionalSurfaceAreas), df.additional_storage_area),
+                (np.array(base_xs.ProcessedResistanceFactors), df.resistance),
+            ]
+            expected_conveyance = cs._calculate_conveyance_factor(
+                df.resistance, df.flow_area, df.radius
+            )
+            expected_vs_actual.append((expected_conveyance, df.conveyance_factor))
+
+            for expected, actual in expected_vs_actual:
+                np.testing.assert_array_equal(expected, actual)
