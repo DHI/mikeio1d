@@ -79,3 +79,45 @@ class ResistanceDistribution(IntEnum):
     Resistance is depth dependent with an exponential variation between top and bottom. 
     Processed resistance values are not used.
     """
+
+
+class RadiusType(IntEnum):
+    """
+    The type of hydraulic radius to use in the cross section.
+
+    This is a simple wrapper of DHI.Mike1D.Generic.RadiusType.
+    """
+
+    RESISTANCE_RADIUS = 0
+    """
+    Resistance radius.
+    """
+    HYDRAULIC_RADIUS_EFFECTIVE_AREA = 1
+    """
+    Hydraulic radius, effective area.
+    """
+    HYDRAULIC_RADIUS_TOTAL_AREA = 2
+    """
+    Hydraulic radius, total area.
+    """
+
+
+class ProcessLevelsMethod(IntEnum):
+    """
+    How to generate processing levels.
+
+    This is a simple wrapper of DHI.Mike1D.Generic.ProcessingOption
+    """
+
+    AUTOMATIC_LEVELS = 0
+    """
+    Use the built-in algorithm to find appropriate processed levels.
+    """
+    EQUIDISTANT_LEVELS = 1
+    """
+    Equidistant processed levels between a given min/max pair.
+    """
+    USER_DEFINED_LEVELS = 2
+    """
+    Processed levels are user-defined.
+    """
