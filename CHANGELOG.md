@@ -13,6 +13,7 @@
 ### Fixed
 
 - Loading MIKE IO 1D together with MIKE+Py
+- Fixed override_name parameter that was not working in ResultFrameAggregator
 
 ## [0.6] - 2024-02-08
 

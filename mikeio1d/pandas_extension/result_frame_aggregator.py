@@ -301,6 +301,14 @@ class ResultFrameAggregator:
                 continue
             quantity_index = quantity_index.droplevel(level)
 
+        if self._override_name is not None:
+            quantity_index = quantity_index.set_levels(
+                quantity_index.levels[quantity_index.names.index(self._agg_level_name)].map(
+                    lambda _: self._override_name
+                ),
+                level=self._agg_level_name,
+            )
+
         quantity_index = quantity_index.map("_".join)
 
         return quantity_index
