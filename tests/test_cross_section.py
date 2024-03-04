@@ -11,6 +11,8 @@ from mikeio1d import Xns11
 from mikeio1d.cross_sections import CrossSection
 from mikeio1d.cross_sections import ResistanceType
 from mikeio1d.cross_sections import ResistanceDistribution
+from mikeio1d.cross_sections import RadiusType
+from mikeio1d.cross_sections import ProcessLevelsMethod
 
 from tests import testdata
 
@@ -51,7 +53,11 @@ def cs_sample(xns_basic) -> List[CrossSection]:
     return x
 
 
-class TestCrossSectionCreation:
+class TestCrossSectionUnits:
+    """
+    Unit tests for the CrossSection class.
+    """
+
     def test_create_cross_section(self, xz_data):
         x, z = xz_data
         cs = CrossSection.from_xz(
@@ -146,6 +152,13 @@ class TestCrossSectionCreation:
         setattr(cs_dummy, zone, 2.0)
         assert getattr(cs_dummy, zone) == 2.0
 
+    def test_radius_type(self, cs_dummy):
+        assert cs_dummy.radius_type == RadiusType.RESISTANCE_RADIUS
+
+    def test_radius_type_set(self, cs_dummy):
+        cs_dummy.radius_type = RadiusType.HYDRAULIC_RADIUS_TOTAL_AREA
+        assert cs_dummy.radius_type == RadiusType.HYDRAULIC_RADIUS_TOTAL_AREA
+
     def test_number_of_processing_levels_get(self, cs_dummy):
         DEFAULT_PROCESSING_LEVELS = 20
         assert cs_dummy.number_of_processing_levels == DEFAULT_PROCESSING_LEVELS
@@ -161,6 +174,31 @@ class TestCrossSectionCreation:
         cs_dummy.number_of_processing_levels = 10
         assert cs_dummy.number_of_processing_levels == 10
 
+    def test_processing_levels_method_get(self, cs_dummy):
+        assert cs_dummy.processing_levels_method == ProcessLevelsMethod.AUTOMATIC_LEVELS
+
+    def test_processing_levels_method_set(self, cs_dummy):
+        automatic_levels = cs_dummy.processing_levels
+
+        cs_dummy.processing_levels_method = ProcessLevelsMethod.EQUIDISTANT_LEVELS
+        assert cs_dummy.processing_levels_method == ProcessLevelsMethod.EQUIDISTANT_LEVELS
+
+        equidistant_levels = cs_dummy.processing_levels
+        assert automatic_levels != equidistant_levels
+
+        cs_dummy.processing_levels_method = ProcessLevelsMethod.USER_DEFINED_LEVELS
+        assert cs_dummy.processing_levels_method == ProcessLevelsMethod.USER_DEFINED_LEVELS
+
+    def test_processing_levels_get(self, cs_dummy):
+        DEFAULT_PROCESSING_LEVELS = 20
+        assert len(cs_dummy.processing_levels) == DEFAULT_PROCESSING_LEVELS
+        assert min(cs_dummy.processing_levels) == cs_dummy.zmin
+        assert max(cs_dummy.processing_levels) == cs_dummy.zmax
+
+    def test_processing_levels_set(self, cs_dummy):
+        cs_dummy.processing_levels = [10, 15, 20]
+        assert len(cs_dummy.processing_levels) == 3
+
     def test_processed_allow_recompute_get(self, cs_dummy):
         DEFAULT_ALLOW_RECOMPUTE = True
         assert cs_dummy.processed_allow_recompute is DEFAULT_ALLOW_RECOMPUTE
@@ -168,10 +206,6 @@ class TestCrossSectionCreation:
     def test_processed_allow_recompute_set(self, cs_dummy):
         cs_dummy.processed_allow_recompute = False
         assert cs_dummy.processed_allow_recompute is False
-
-    def test_processed_allow_recompute_false_functionality(self, cs_dummy):
-        # TODO
-        return True
 
     def test_calculate_conveyance_factor(self, cs_dummy):
         df = cs_dummy.processed

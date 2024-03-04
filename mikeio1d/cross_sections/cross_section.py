@@ -15,8 +15,10 @@ import matplotlib.pyplot as plt
 
 from .cross_section_factory import CrossSectionFactory
 from .marker import Marker
+from .enums import RadiusType
 from .enums import ResistanceType
 from .enums import ResistanceDistribution
+from .enums import ProcessLevelsMethod
 
 from ..various import try_import_shapely
 
@@ -25,6 +27,8 @@ from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
 from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
+from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
+from DHI.Mike1D.Generic import ProcessingOption
 
 
 class CrossSection:
@@ -263,6 +267,33 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow = value
 
     @property
+    def radius_type(self) -> RadiusType:
+        """
+        The type of hydraulic radius used in the cross section.
+
+        Parameters
+        ----------
+        radius_type: int | RadiusType
+            The type of hydraulic radius used in the cross section:
+
+            0 - Resistance radius
+
+            1 - Hydraulic radius, effective area
+
+            2 - Hydraulic radius, total area
+
+        Returns
+        -------
+        RadiusType
+            The type of hydraulic radius used in the cross section.
+        """
+        return RadiusType(int(self._m1d_cross_section.BaseCrossSection.RadiusType))
+
+    @radius_type.setter
+    def radius_type(self, radius_type: int | RadiusType):
+        self._m1d_cross_section.BaseCrossSection.RadiusType = m1d_RadiusType(int(radius_type))
+
+    @property
     def number_of_processing_levels(self) -> int:
         """
         The number of levels used in the processed data. Setting this will recalculate
@@ -295,6 +326,34 @@ class CrossSection:
         pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
         pls.Option = ProcessingOption.UserDefinedLevels
         pls.UserDefLevels = tuple(levels)
+        self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
+
+    @property
+    def processing_levels_method(self) -> ProcessLevelsMethod:
+        """
+        The method used to generate processing levels.
+
+        Parameters
+        ----------
+        processing_level_method: int | ProcessLevelsMethod
+            0 - Automatic
+            1 - Equidistant
+            2 - User defined
+
+        Returns
+        -------
+        ProcessLevelsMethod
+            The method used to generate processing levels.
+        """
+        return ProcessLevelsMethod(
+            int(self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs.Option)
+        )
+
+    @processing_levels_method.setter
+    def processing_levels_method(self, processing_level_method: int | ProcessLevelsMethod):
+        self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs.Option = ProcessingOption(
+            int(processing_level_method)
+        )
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
