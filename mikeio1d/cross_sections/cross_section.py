@@ -15,14 +15,16 @@ import matplotlib.pyplot as plt
 
 from .cross_section_factory import CrossSectionFactory
 from .marker import Marker
+from .enums import ResistanceType
+from .enums import ResistanceDistribution
 
 from ..various import try_import_shapely
 
 import System
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
 from DHI.Mike1D.Generic import ProcessingOption
-from DHI.Mike1D.Generic import ResistanceDistribution
-from DHI.Mike1D.Generic import ResistanceFormulation
+from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
+from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
 
 
 class CrossSection:
@@ -121,15 +123,6 @@ class CrossSection:
         return self._m1d_cross_section.MinWaterDepth
 
     @property
-    def resistance_factor_proportionality(self) -> float:
-        """
-        A proportionality factor that is multiplied with the resistance factor.
-
-        ResistanceFactorProportionality is used by the resistance factor boundaries to adjust the resistance factor during the simulation.
-        """
-        return self._m1d_cross_section.ResistanceFactorProportionality
-
-    @property
     def zmax(self) -> float:
         """Maximum elevation of the cross section."""
         return self._m1d_cross_section.ZMax
@@ -148,7 +141,7 @@ class CrossSection:
         return CrossSectionGeometry(self._m1d_cross_section)
 
     @property
-    def resistance_type(self):
+    def resistance_type(self) -> ResistanceType:
         """
         Get the type of resistance used in the cross section.
 
@@ -174,19 +167,21 @@ class CrossSection:
 
         Returns
         -------
-        DHI.Mike1D.Generic.ResistanceFormulation
+        ResistanceType
             The type of resistance used in the cross section.
         """
-        return self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation
+        return ResistanceType(
+            int(self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation)
+        )
 
     @resistance_type.setter
-    def resistance_type(self, value: int):
-        self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation = ResistanceFormulation(
-            value
+    def resistance_type(self, value: int | ResistanceType):
+        self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation = (
+            m1d_ResistanceFormulation(value)
         )
 
     @property
-    def resistance_distribution(self):
+    def resistance_distribution(self) -> ResistanceDistribution:
         """
         Get the distribution of resistance used in the cross section.
 
@@ -207,7 +202,7 @@ class CrossSection:
 
         Returns
         -------
-        str
+        ResistanceDistribution
             The distribution of resistance used in the cross section.
 
         Notes
@@ -219,13 +214,14 @@ class CrossSection:
         3 - Constant
         4 - ExponentVarying
         """
-        return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution
+        return ResistanceDistribution(
+            int(self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution)
+        )
 
     @resistance_distribution.setter
-    def resistance_distribution(self, value: int):
-        value = int(value)
+    def resistance_distribution(self, value: int | ResistanceDistribution):
         self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution = (
-            ResistanceDistribution(value)
+            m1d_ResistanceDistribution(value)
         )
 
     def _calculate_conveyance_factor(
