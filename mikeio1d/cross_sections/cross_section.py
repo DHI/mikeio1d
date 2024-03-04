@@ -239,7 +239,7 @@ class CrossSection:
         return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
 
     def _warn_if_resistance_distribution_is_not_zones(self):
-        if self.resistance_distribution != ResistanceDistribution.Zones:
+        if self.resistance_distribution != ResistanceDistribution.ZONES:
             message = (
                 "You are accessing/setting zone resistances without the correct resistance distribution type. "
                 "Set the resistance distribution type to zones by setting '.resistance_distribution' to 1."
@@ -272,7 +272,7 @@ class CrossSection:
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow
 
     @resistance_right_high_flow.setter
-    def resistance_right_low_flow(self, value: float):
+    def resistance_right_high_flow(self, value: float):
         self._warn_if_resistance_distribution_is_not_zones()
         self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow = value
 
@@ -438,11 +438,11 @@ class CrossSection:
 
         unique_resistances = df.resistance.nunique()
         if unique_resistances == 1:
-            self.resistance_distribution == ResistanceDistribution.Uniform
+            self.resistance_distribution == ResistanceDistribution.UNIFORM
             base_xs.FlowResistance.ResistanceValue = float(df.resistance.iloc[0])
 
         if unique_resistances > 3:
-            self.resistance_distribution = ResistanceDistribution.Distributed
+            self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
 
         for x, z, resistance in zip(df.x, df.z, df.resistance):
             point = CrossSectionPoint(x, z)
