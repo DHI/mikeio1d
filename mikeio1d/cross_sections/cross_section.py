@@ -145,6 +145,20 @@ class CrossSection:
         return CrossSectionGeometry(self._m1d_cross_section)
 
     @property
+    def coords(self) -> Tuple[Tuple[float, float]]:
+        """
+        Get the coordinates of the cross section.
+
+        Returns
+        -------
+        list of tuples
+            List of (x, y) coordinates.
+        """
+        if self._m1d_cross_section.Coordinates is None:
+            return tuple()
+        return tuple((p.X, p.Y) for p in self._m1d_cross_section.Coordinates)
+
+    @property
     def resistance_type(self) -> ResistanceType:
         """
         Get the type of resistance used in the cross section.

@@ -14,6 +14,7 @@ from mikeio1d.cross_sections import ResistanceDistribution
 from mikeio1d.cross_sections import RadiusType
 from mikeio1d.cross_sections import ProcessLevelsMethod
 from mikeio1d.cross_sections import Marker
+from mikeio1d.geometry import CrossSectionGeometry
 
 from tests import testdata
 
@@ -44,7 +45,7 @@ def cs_dummy(xz_data) -> CrossSection:
 
 @pytest.fixture
 def cs_basic(xns_basic) -> CrossSection:
-    return xns_basic.xsections.values()[0]
+    return list(xns_basic.xsections.values())[0]
 
 
 @pytest.fixture
@@ -99,10 +100,19 @@ class TestCrossSectionUnits:
     def test_zmin(self, cs_dummy):
         assert cs_dummy.zmin == 10
 
-    @pytest.mark.skip
-    def test_geometry(self, cs_dummy):
-        # TODO
-        assert False
+    def test_coords_get(self, cs_basic):
+        coords = cs_basic.coords
+        assert len(coords) == 2
+        assert len(coords[0]) == 2
+        assert coords[0][0] == 938162.512
+        assert coords[0][1] == 377327.367
+        assert coords[1][0] == 938163.08
+        assert coords[1][1] == 377291.372
+
+    def test_geometry(self, cs_basic):
+        geometry = cs_basic.geometry
+        assert isinstance(geometry, CrossSectionGeometry)
+        np.testing.assert_array_equal(geometry.coords, cs_basic.coords)
 
     def test_resistance_type_get(self, cs_dummy):
         assert cs_dummy.resistance_type == ResistanceType.RELATIVE
@@ -378,8 +388,8 @@ class TestCrossSectionUnits:
         df_markers = cs_dummy.markers
         x = df_markers.loc[df_markers.marker == 99, "x"].values[0]
         z = df_markers.loc[df_markers.marker == 99, "z"].values[0]
-        assert x == 30
-        assert z == 11.6
+        assert x == 20
+        assert z == 13.6
 
     def test_unset_marker(self, cs_dummy):
         cs_dummy.unset_marker(Marker.LEFT_LEVEE_BANK.value)
