@@ -13,6 +13,7 @@ from mikeio1d.cross_sections import ResistanceType
 from mikeio1d.cross_sections import ResistanceDistribution
 from mikeio1d.cross_sections import RadiusType
 from mikeio1d.cross_sections import ProcessLevelsMethod
+from mikeio1d.cross_sections import Marker
 
 from tests import testdata
 
@@ -275,3 +276,64 @@ class TestCrossSectionUnits:
             np.testing.assert_array_equal(
                 cs_dummy.processed.conveyance_factor, df.conveyance_factor
             )
+
+    def test_raw_get(self, cs_dummy, xz_data):
+        x, z = xz_data
+        df = cs_dummy.raw
+        assert isinstance(df, pd.DataFrame)
+        expected_columns = {
+            "markers",
+            "marker_labels",
+            "x",
+            "z",
+            "resistance",
+        }
+        assert set(df.columns) == expected_columns
+        np.testing.assert_array_equal(df.x, x)
+        np.testing.assert_array_equal(df.z, z)
+        np.testing.assert_array_equal(df.resistance, np.ones_like(x))
+        empty_markers = np.array([""] * len(x))
+        empty_markers[0] = str(Marker.LEFT_LEVEE_BANK.value)
+        empty_markers[-1] = str(Marker.RIGHT_LEVEE_BANK.value)
+        empty_markers[df.z.idxmin()] = str(Marker.LOWEST_POINT.value)
+        np.testing.assert_array_equal(df.markers, empty_markers)
+        empty_marker_labels = np.array(
+            [Marker.pretty(int(m)) if m != "" else "" for m in empty_markers]
+        )
+        np.testing.assert_array_equal(df.marker_labels, empty_marker_labels)
+
+    def test_raw_set(self, cs_dummy):
+        df = cs_dummy.raw
+        df = df.iloc[3:-3].reset_index(drop=True)
+        cs_dummy.raw = df
+        pd.testing.assert_frame_equal(cs_dummy.raw, df)
+
+        df.iloc[0, df.columns.get_loc("markers")] = str(Marker.LEFT_LEVEE_BANK.value)
+        df.iloc[-1, df.columns.get_loc("markers")] = str(Marker.RIGHT_LEVEE_BANK.value)
+        cs_dummy.raw = df
+        # This raises an exception since labels are automatically filled in.
+        with pytest.raises(Exception):
+            pd.testing.assert_frame_equal(cs_dummy.raw, df)
+
+        # If we did include the labels, then no error.
+        df.marker_labels = df.markers.apply(lambda m: Marker.pretty(int(m)) if m != "" else "")
+        cs_dummy.raw = df
+        pd.testing.assert_frame_equal(cs_dummy.raw, df)
+
+        # Set user marker
+        df.iloc[0, df.columns.get_loc("markers")] += ",99"
+        markers = Marker.list_from_string(df.markers.iloc[0])
+        cs_dummy.raw = df
+        set_markers = Marker.list_from_string(cs_dummy.raw.markers.iloc[0])
+        assert set(set_markers) == set(markers)
+
+        # Raise error if duplicate markers found
+        with pytest.raises(ValueError):
+            df.iloc[0, df.columns.get_loc("markers")] += f",{int(Marker.LOWEST_POINT)}"
+            cs_dummy.raw = df
+
+        df.iloc[0, df.columns.get_loc("markers")] = ""
+        df.iloc[1, df.columns.get_loc("markers")] = str(Marker.LEFT_LEVEE_BANK.value)
+        cs_dummy.raw = df
+        assert cs_dummy.raw.markers.iloc[0] == ""
+        assert cs_dummy.raw.markers.iloc[1] == str(Marker.LEFT_LEVEE_BANK.value)
