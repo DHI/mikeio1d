@@ -511,6 +511,7 @@ class CrossSection:
             point.DistributedResistance = resistance
             base_xs.Points.Add(point)
 
+        markers_seen = set()
         for i, point in enumerate(base_xs.Points):
             markers_str = df.markers.iloc[i]
             if not markers_str:
@@ -518,6 +519,9 @@ class CrossSection:
 
             markers = Marker.list_from_string(markers_str)
             for marker in markers:
+                if marker in markers_seen:
+                    raise ValueError(f"Duplicate for marker '{marker}'")
+                markers_seen.add(marker)
                 self._update_marker(marker, i)
 
         self.recompute_processed()
