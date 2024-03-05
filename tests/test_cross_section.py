@@ -14,7 +14,6 @@ from mikeio1d.cross_sections import ResistanceDistribution
 from mikeio1d.cross_sections import RadiusType
 from mikeio1d.cross_sections import ProcessLevelsMethod
 from mikeio1d.cross_sections import Marker
-from mikeio1d.geometry import CrossSectionGeometry
 
 from tests import testdata
 
@@ -111,6 +110,8 @@ class TestCrossSectionUnits:
 
     def test_geometry(self, cs_basic):
         pytest.importorskip("shapely")
+        from mikeio1d.geometry import CrossSectionGeometry
+
         geometry = cs_basic.geometry
         assert isinstance(geometry, CrossSectionGeometry)
         np.testing.assert_array_equal(geometry.coords, cs_basic.coords)
