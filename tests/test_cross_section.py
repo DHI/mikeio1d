@@ -246,3 +246,32 @@ class TestCrossSectionUnits:
 
             for expected, actual in expected_vs_actual:
                 np.testing.assert_array_equal(expected, actual)
+
+    def test_processed_set(self, cs_dummy):
+        df = cs_dummy.processed
+        df = df.iloc[:5]
+        cs_dummy.processed = df
+        assert len(cs_dummy.processed) == 5
+        df.level = df.level + 1
+        cs_dummy.processed = df
+        np.testing.assert_array_equal(cs_dummy.processed.level, df.level)
+        df.storage_width = df.storage_width * 10
+        cs_dummy.processed = df
+        np.testing.assert_array_equal(cs_dummy.processed.storage_width, df.storage_width)
+        df.flow_area = df.flow_area * 10
+        cs_dummy.processed = df
+        np.testing.assert_array_equal(cs_dummy.processed.flow_area, df.flow_area)
+        df.radius = df.radius * 10
+        cs_dummy.processed = df
+        np.testing.assert_array_equal(cs_dummy.processed.radius, df.radius)
+        df.additional_storage_area = df.additional_storage_area + 100
+        cs_dummy.processed = df
+        np.testing.assert_array_equal(
+            cs_dummy.processed.additional_storage_area, df.additional_storage_area
+        )
+        df.conveyance_factor = df.conveyance_factor * 1000
+        cs_dummy.processed = df
+        with pytest.raises(AssertionError):
+            np.testing.assert_array_equal(
+                cs_dummy.processed.conveyance_factor, df.conveyance_factor
+            )
