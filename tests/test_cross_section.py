@@ -110,6 +110,7 @@ class TestCrossSectionUnits:
         assert coords[1][1] == 377291.372
 
     def test_geometry(self, cs_basic):
+        pytest.importorskip("shapely")
         geometry = cs_basic.geometry
         assert isinstance(geometry, CrossSectionGeometry)
         np.testing.assert_array_equal(geometry.coords, cs_basic.coords)
