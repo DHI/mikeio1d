@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import IntEnum
 
 from typing import List
 
 
-class Marker(Enum):
+class Marker(IntEnum):
     LEFT_LEVEE_BANK = 1
     LOWEST_POINT = 2
     RIGHT_LEVEE_BANK = 3
@@ -20,7 +20,8 @@ class Marker(Enum):
 
     @staticmethod
     def is_default_marker(marker: int | Marker) -> bool:
-        return marker in Marker
+        marker = int(marker)
+        return marker in (e.value for e in Marker)
 
     @staticmethod
     def is_user_marker(marker: int | Marker) -> bool:
