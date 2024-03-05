@@ -115,11 +115,7 @@ class Xns11:
         return self
 
     def __exit__(self, *excinfo):
-        self.__del__()
-
-    def __del__(self):
-        self._cross_section_data.Finalize()
-        self._cross_section_data_factory.Finalize()
+        pass
 
     def _init_cross_section_data(self):
         """Initialize the CrossSectionData object."""
