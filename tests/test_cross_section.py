@@ -372,3 +372,37 @@ class TestCrossSectionUnits:
         raw_markers = cs_dummy.raw[cs_dummy.raw.markers != ""]
         assert len(raw_markers) == 1
         assert raw_markers.iloc[0].markers == str(Marker.LOWEST_POINT.value)
+
+    def test_set_marker(self, cs_dummy):
+        cs_dummy.set_marker(99, x=25)
+        df_markers = cs_dummy.markers
+        x = df_markers.loc[df_markers.marker == 99, "x"].values[0]
+        z = df_markers.loc[df_markers.marker == 99, "z"].values[0]
+        assert x == 30
+        assert z == 11.6
+
+    def test_unset_marker(self, cs_dummy):
+        cs_dummy.unset_marker(Marker.LEFT_LEVEE_BANK.value)
+        df_markers = cs_dummy.markers
+        assert len(df_markers) == 2
+        assert Marker.LEFT_LEVEE_BANK.value not in df_markers.marker.values
+
+    @pytest.mark.parametrize(
+        "x,z,expected_index",
+        [
+            (0, None, 0),
+            (5, None, 0),
+            (5, 20, 0),
+            (5, 16.4, 1),
+            (20, 13.6, 2),
+            (20, None, 2),
+            (50, 10, 5),
+            (100, 20, 10),
+        ],
+    )
+    def test_find_nearest_point_index(self, cs_dummy, x, z, expected_index):
+        index = cs_dummy._find_nearest_point_index(x, z)
+        assert index == expected_index
+
+    def test_plot(self, cs_dummy):
+        cs_dummy.plot()

@@ -584,11 +584,11 @@ class CrossSection:
             marker, x, z = row.marker, row.x, row.z
             self.set_marker(marker, x, z)
 
-    def set_marker(self, marker: int | Marker, x: float, z: float = 0):
+    def set_marker(self, marker: int | Marker, x: float, z: float = None):
         """
         Set a marker at the point nearest to the specified x, z coordinates.
 
-        Note: snapping to nearest point is 1000x more sensitive to 'x' than 'z'.
+        Note: if z is not provided, the nearest point in the x direction will be found.
 
         Parameters
         ----------
@@ -596,7 +596,7 @@ class CrossSection:
             The marker to set.
         x : float
             The x coordinate of the point.
-        z : float (default: 0.0)
+        z : float (default: None)
             The z coordinate of the point.
         """
         point_index = self._find_nearest_point_index(x, z)
@@ -615,11 +615,11 @@ class CrossSection:
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.SetMarkerAt(marker, -1)
 
-    def _find_nearest_point_index(self, x: float, z: float = 0) -> int:
+    def _find_nearest_point_index(self, x: float, z: float = None) -> int:
         """
         Find the XSBaseRaw.points index of the nearest point for the given x, z coordinates.
 
-        Note: 'x' is weighted 1000 times more than 'z' to make the search more sensitive to x differences.
+        If z is not provided, the nearest point in the x direction will be found.
 
         Returns
         -------
@@ -629,8 +629,11 @@ class CrossSection:
         base_xs = self._m1d_cross_section.BaseCrossSection
         points = base_xs.Points
         points_coords = np.array(tuple((p.X, p.Z) for p in points))
-        weights = np.array([1000, 1])  # Higher weight for x difference
-        distances = np.linalg.norm((points_coords - (x, z)) * weights, axis=1)
+        if z is None:
+            distances = np.abs(points_coords[:, 0] - x)
+        else:
+            distances = np.linalg.norm(points_coords - (x, z), axis=1)
+
         nearest_index = np.argmin(distances)
         return int(nearest_index)
 
