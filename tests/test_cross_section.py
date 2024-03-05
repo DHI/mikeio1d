@@ -293,9 +293,9 @@ class TestCrossSectionUnits:
         np.testing.assert_array_equal(df.z, z)
         np.testing.assert_array_equal(df.resistance, np.ones_like(x))
         empty_markers = np.array([""] * len(x))
-        empty_markers[0] = str(Marker.LEFT_LEVEE_BANK.value)
-        empty_markers[-1] = str(Marker.RIGHT_LEVEE_BANK.value)
-        empty_markers[df.z.idxmin()] = str(Marker.LOWEST_POINT.value)
+        empty_markers[0] = str(int(Marker.LEFT_LEVEE_BANK))
+        empty_markers[-1] = str(int(Marker.RIGHT_LEVEE_BANK))
+        empty_markers[df.z.idxmin()] = str(int(Marker.LOWEST_POINT))
         np.testing.assert_array_equal(df.markers, empty_markers)
         empty_marker_labels = np.array(
             [Marker.pretty(int(m)) if m != "" else "" for m in empty_markers]
@@ -337,3 +337,38 @@ class TestCrossSectionUnits:
         cs_dummy.raw = df
         assert cs_dummy.raw.markers.iloc[0] == ""
         assert cs_dummy.raw.markers.iloc[1] == str(Marker.LEFT_LEVEE_BANK.value)
+
+    def test_markers_get(self, cs_dummy):
+        markers = cs_dummy.markers
+        assert isinstance(markers, pd.DataFrame)
+        expected_columns = {
+            "marker",
+            "marker_label",
+            "x",
+            "z",
+        }
+        assert set(markers.columns) == expected_columns
+        assert len(markers) == 3
+        assert {
+            Marker.LEFT_LEVEE_BANK.value,
+            Marker.LOWEST_POINT.value,
+            Marker.RIGHT_LEVEE_BANK.value,
+        } == set(markers.marker)
+
+        df: pd.DataFrame = cs_dummy.raw
+        df = df[df.markers != ""]
+        df = df[["markers", "marker_labels", "x", "z"]]
+        df = df.rename(columns={"markers": "marker", "marker_labels": "marker_label"})
+        df = df.explode("marker").reset_index(drop=True)
+        df.marker = df.marker.astype(int)
+        pd.testing.assert_frame_equal(markers, df), "Markers do not match raw data."
+
+    def test_markers_set(self, cs_dummy):
+        markers = cs_dummy.markers
+        markers = markers.iloc[[1]]
+        cs_dummy.markers = markers
+        assert len(cs_dummy.markers) == 1
+        assert cs_dummy.markers.iloc[0].marker == Marker.LOWEST_POINT.value
+        raw_markers = cs_dummy.raw[cs_dummy.raw.markers != ""]
+        assert len(raw_markers) == 1
+        assert raw_markers.iloc[0].markers == str(Marker.LOWEST_POINT.value)
