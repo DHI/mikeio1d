@@ -25,8 +25,29 @@ TopoId = str
 
 class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        if args and isinstance(args[0], list):
+            self._handle_args(*args)
+        else:
+            super().__init__(*args, **kwargs)
+
         self.xns11: Xns11 | None = None
+
+        self._validate()
+
+    def _handle_args(self, *args):
+        if not isinstance(args[0][0], CrossSection):
+            raise ValueError("Input must be a list of CrossSection objects")
+        for xs in args[0]:
+            self[xs.location_id, f"{xs.chainage:.3f}", xs.topo_id] = xs
+
+    def _validate(self):
+        for key, cross_section in self.items():
+            if key[0] != cross_section.location_id:
+                raise ValueError(f"Location ID mismatch: {key[0]} != {cross_section.location_id}")
+            if key[1] != f"{cross_section.chainage:.3f}":
+                raise ValueError(f"Chainage mismatch: {key[1]} != {cross_section.chainage:.3f}")
+            if key[2] != cross_section.topo_id:
+                raise ValueError(f"Topo ID mismatch: {key[2]} != {cross_section.topo_id}")
 
     def __repr__(self) -> str:
         return f"<CrossSectionCollection {len(self)}>"
