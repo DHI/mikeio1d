@@ -4,10 +4,15 @@ from typing import List
 
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 
+import pandas as pd
+
+from mikeio1d import Xns11
 from mikeio1d.cross_sections import CrossSection
 from mikeio1d.cross_sections import CrossSectionCollection
 
 from .test_cross_section import create_xz_data
+
+from tests import testdata
 
 
 @pytest.fixture()
@@ -27,24 +32,30 @@ def complete(shell, prompt) -> List[str]:
     return completions
 
 
-def create_dummy_cross_section(location_id, chainage, topo_id):
+def create_dummy_cross_section(location_id, chainage, topo_id) -> CrossSection:
     x, z = create_xz_data()
     return CrossSection.from_xz(x, z, location_id=location_id, chainage=chainage, topo_id=topo_id)
 
 
 @pytest.fixture
-def dummy_cross_section():
+def dummy_cross_section() -> CrossSection:
     return create_dummy_cross_section("loc1", 100, "topo1")
 
 
 @pytest.fixture
-def many_dummy_cross_sections():
+def many_dummy_cross_sections() -> List[CrossSection]:
     xs = []
     for i in range(0, 100, 10):
         xs.append(create_dummy_cross_section(f"loc{i}", i, "topo"))
     for i in range(0, 100, 10):
         xs.append(create_dummy_cross_section(f"loc{i}", i, "topo2"))
     return xs
+
+
+@pytest.fixture
+def many_real_cross_sections() -> List[CrossSection]:
+    xns = Xns11(testdata.mikep_xns11)
+    return list(xns.xsections.values())
 
 
 class TestCrossSectionCollectionUnits:
@@ -184,3 +195,87 @@ class TestCrossSectionCollectionUnits:
             "80.000",
             "90.000",
         }
+
+    def test_sel(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert len(csc.sel(location_id="loc0")) == 2
+        assert len(csc.sel(chainage="50.000")) == 2
+        assert len(csc.sel(topo_id="topo2")) == 10
+        assert len(csc.sel(location_id="loc0", topo_id="topo2")) == 1
+        assert len(csc.sel(chainage="50.000", topo_id="topo2")) == 1
+        assert len(csc.sel()) == 20
+
+    def test_plot(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections[:3])
+        csc.plot()
+
+    def test_to_dataframe(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        df = csc.to_dataframe()
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 20
+        expected_columns = {"cross_section"}
+        assert set(df.columns) == expected_columns
+        expected_index_levels = {"location_id", "chainage", "topo_id"}
+        assert set(df.index.names) == expected_index_levels
+        xs_expected = many_dummy_cross_sections[0]
+        xs = df.cross_section.iloc[0]
+        assert xs == xs_expected
+
+    def test_to_geopandas(self, many_real_cross_sections):
+        pytest.importorskip("geopandas")
+        import geopandas as gpd
+
+        csc = CrossSectionCollection(many_real_cross_sections)
+        csc = csc.sel(location_id="tributary")
+        gdf = csc.to_geopandas()
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert len(gdf) == len(csc)
+        expected_columns = {
+            "location_id",
+            "chainage",
+            "topo_id",
+            "geometry",
+        }
+        assert set(gdf.columns) == expected_columns
+        expected_geometry = list(csc.values())[0].geometry.to_shapely()
+        assert gdf.geometry.iloc[0] == expected_geometry
+        expected_geometry = list(csc.values())[-1].geometry.to_shapely()
+        assert gdf.geometry.iloc[-1] == expected_geometry
+
+    def test_to_geopandas_markers(self, many_real_cross_sections):
+        pytest.importorskip("geopandas")
+        import geopandas as gpd
+
+        csc = CrossSectionCollection(many_real_cross_sections)
+        csc = csc.sel(location_id="river")
+        gdf = csc.to_geopandas_markers()
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert len(gdf) == sum([len(cs.markers) for cs in csc.values()])
+        expected_columns = {
+            "location_id",
+            "chainage",
+            "topo_id",
+            "marker",
+            "marker_label",
+            "geometry",
+        }
+        assert set(gdf.columns) == expected_columns
+        expected_marker = list(csc.values())[0].markers
+        assert gdf.marker.iloc[0] == str(expected_marker.marker[0])
+        assert gdf.marker_label.iloc[0] == expected_marker.marker_label[0]
+
+    def test_add_xsection(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections[:10])
+        added_xs = many_dummy_cross_sections[10]
+        csc.add_xsection(added_xs)
+        assert len(csc) == 11
+        assert added_xs in csc.values()
+        assert (
+            csc.sel(
+                location_id=added_xs.location_id,
+                chainage=added_xs.chainage,
+                topo_id=added_xs.topo_id,
+            )
+            == added_xs
+        )

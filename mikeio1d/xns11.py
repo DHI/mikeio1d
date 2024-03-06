@@ -79,6 +79,8 @@ def open(file_path: str | Path) -> Xns11:
 class Xns11:
     def __init__(self, file_path: str | Path = None):
         self.file_path: str | Path = file_path
+        if file_path is not None and not os.path.exists(file_path):
+            raise FileExistsError(f"File '{file_path}' does not exist.")
         self._cross_section_data_factory = CrossSectionDataFactory()
         self._cross_section_data = None
 

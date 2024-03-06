@@ -127,7 +127,8 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             Providing all arguments will return a CrossSection.
             Provinding partial arguments will always return a list, even if it only has one CrossSection.
         """
-        chainage = f"{float(chainage):.3f}"
+        if isinstance(chainage, int) or isinstance(chainage, float):
+            chainage = f"{float(chainage):.3f}"
         return self[location_id, chainage, topo_id]
 
     def plot(self, *args, **kwargs):
