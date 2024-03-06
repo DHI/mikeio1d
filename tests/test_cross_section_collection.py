@@ -196,6 +196,10 @@ class TestCrossSectionCollectionUnits:
             "90.000",
         }
 
+    def test_topo_ids(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert csc.topo_ids == {"topo", "topo2"}
+
     def test_sel(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)
         assert len(csc.sel(location_id="loc0")) == 2
