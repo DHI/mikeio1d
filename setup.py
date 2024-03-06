@@ -48,7 +48,7 @@ setuptools.setup(
             "sphinx-copybutton",
             "myst-parser",
         ],
-        "test": ["pytest", "matplotlib", "pyarrow", "nbformat", "nbconvert"],
+        "test": ["pytest", "matplotlib", "pyarrow", "nbformat", "nbconvert", "ipython"],
         "all": ["matplotlib", "geopandas"],
     },
     options={

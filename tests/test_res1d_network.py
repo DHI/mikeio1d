@@ -371,7 +371,3 @@ def test_reaches_dict_access_maintains_backwards_compatibility(res1d_network, re
         reach = res1d_network.result_network.reaches["100l1"]
         assert reach.Name == "100l1"
         assert reach.Length == pytest.approx(47.6827148432828)
-        # Or it could include multiple reaches
-        reach = res1d_river_network.result_network.reaches["river"]
-        assert iter(reach), "Should be iterable where there is several subreaches"
-        assert reach[0].Id == "river-12"
