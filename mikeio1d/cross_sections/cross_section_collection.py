@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from typing import Dict
 from typing import Tuple
 from typing import List
+from typing import Set
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -85,16 +86,25 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             super().__or__(other)
 
     @property
-    def location_ids(self) -> List[str]:
-        return list(set([k[0] for k in self.keys()]))
+    def location_ids(self) -> Set[str]:
+        """
+        Unique location IDs in the collection.
+        """
+        return set([k[0] for k in self.keys()])
 
     @property
-    def chainages(self) -> List[str]:
-        return list(set([k[1] for k in self.keys()]))
+    def chainages(self) -> Set[str]:
+        """
+        Unique chainages in the collection (as string with 3 decimals).
+        """
+        return set([k[1] for k in self.keys()])
 
     @property
-    def topo_ids(self) -> List[str]:
-        return list(set([k[2] for k in self.keys()]))
+    def topo_ids(self) -> Set[str]:
+        """
+        Unique topo IDs in the collection.
+        """
+        return set([k[2] for k in self.keys()])
 
     def sel(
         self, location_id: str = ..., chainage: str | float = ..., topo_id: str = ...

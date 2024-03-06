@@ -133,15 +133,6 @@ class TestCrossSectionCollectionUnits:
                 "csc['loc0', '",
                 [
                     "0.000",
-                    "10.000",
-                    "20.000",
-                    "30.000",
-                    "40.000",
-                    "50.000",
-                    "60.000",
-                    "70.000",
-                    "80.000",
-                    "90.000",
                 ],
             ),
             (
@@ -157,3 +148,39 @@ class TestCrossSectionCollectionUnits:
         shell.push({"csc": CrossSectionCollection(cross_sections)})
         completions = complete(shell, prompt)
         assert completions == expected_completions
+
+    def test_joining_cross_section_collections(self, many_dummy_cross_sections):
+        csc1 = CrossSectionCollection(many_dummy_cross_sections[:10])
+        csc2 = CrossSectionCollection(many_dummy_cross_sections[10:])
+        csc = csc1 | csc2
+        assert len(csc) == 20
+
+    def test_location_ids(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert csc.location_ids == {
+            "loc0",
+            "loc10",
+            "loc20",
+            "loc30",
+            "loc40",
+            "loc50",
+            "loc60",
+            "loc70",
+            "loc80",
+            "loc90",
+        }
+
+    def test_chainages(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert csc.chainages == {
+            "0.000",
+            "10.000",
+            "20.000",
+            "30.000",
+            "40.000",
+            "50.000",
+            "60.000",
+            "70.000",
+            "80.000",
+            "90.000",
+        }
