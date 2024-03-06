@@ -372,7 +372,7 @@ class TestCrossSectionUnits:
         df = df[["markers", "marker_labels", "x", "z"]]
         df = df.rename(columns={"markers": "marker", "marker_labels": "marker_label"})
         df = df.explode("marker").reset_index(drop=True)
-        df.marker = df.marker.astype(int)
+        df.marker = df.marker.astype(np.int64)
         pd.testing.assert_frame_equal(markers, df), "Markers do not match raw data."
 
     def test_markers_set(self, cs_dummy):
