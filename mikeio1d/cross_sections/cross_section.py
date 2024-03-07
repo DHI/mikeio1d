@@ -32,6 +32,35 @@ from DHI.Mike1D.Generic import ProcessingOption
 
 
 class CrossSection:
+    """
+    A cross section in MIKE 1D, uniquely identified by a location ID, chainage, and topo ID.
+
+    Parameters
+    ----------
+    m1d_cross_section: ICrossSection
+        The MIKE 1D cross section object.
+
+    Attributes
+    ----------
+    location_id : str (required)
+        Location ID of the cross section.
+    chainage : float (required)
+        Chainage of the cross section.
+    topo_id : str (required)
+        Topo ID of the cross section.
+
+    Notes
+    -----
+    Support is currently limited to open cross sections with raw data.
+
+    Examples
+    --------
+    >>> from mikeio1d.cross_sections import CrossSection
+    >>> x = [0, 10, 20, 30, 40, 50]
+    >>> z = [0, 2, 3, 4, 3, 0]
+    >>> cs = CrossSection.from_xz(x, z, location_id="loc1", chainage=100, topo_id="topo1")
+    """
+
     def __init__(self, m1d_cross_section):
         if hasattr(m1d_cross_section, "__implementation__"):
             m1d_cross_section = m1d_cross_section.__implementation__
@@ -94,6 +123,7 @@ class CrossSection:
 
     @property
     def bottom_level(self) -> float:
+        """Bottom level of the cross section."""
         return self._m1d_cross_section.BottomLevel
 
     @property
@@ -151,8 +181,8 @@ class CrossSection:
 
         Returns
         -------
-        list of tuples
-            List of (x, y) coordinates.
+        coords : Tuple[Tuple[float, float]]
+            A tuple of (x, y) coordinates.
         """
         if self._m1d_cross_section.Coordinates is None:
             return tuple()
@@ -161,11 +191,11 @@ class CrossSection:
     @property
     def resistance_type(self) -> ResistanceType:
         """
-        Get the type of resistance used in the cross section.
+        The type of resistance used by the cross section.
 
         Parameters
         ----------
-        resistance_type: int
+        resistance_type: int | ResistanceType
             The type of resistance used in the cross section:
 
             0 - Relative
@@ -201,7 +231,7 @@ class CrossSection:
     @property
     def resistance_distribution(self) -> ResistanceDistribution:
         """
-        Get the distribution of resistance used in the cross section.
+        The distribution of resistance used in the cross section.
 
         Parameters
         ----------
@@ -222,15 +252,6 @@ class CrossSection:
         -------
         ResistanceDistribution
             The distribution of resistance used in the cross section.
-
-        Notes
-        -----
-        The resistance distribution is represented by an integer value:
-        0 - Uniform
-        1 - Zones
-        2 - Distributed
-        3 - Constant
-        4 - ExponentVarying
         """
         return ResistanceDistribution(
             int(self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution)
@@ -252,6 +273,22 @@ class CrossSection:
 
     @property
     def resistance_left_high_flow(self) -> float:
+        """
+        Resistance for the left high flow zone.
+
+        Parameters
+        ----------
+        resistance_left_high_flow: float
+            Resistance for the left high flow zone.
+
+        Notes
+        -----
+        This property is only relevant if the resistance distribution is set to zones.
+
+        Returns
+        -------
+        float
+        """
         self._warn_if_resistance_distribution_is_not_zones()
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLeftHighFlow
 
@@ -262,6 +299,22 @@ class CrossSection:
 
     @property
     def resistance_low_flow(self):
+        """
+        Resistance for the low flow zone.
+
+        Parameters
+        ----------
+        resistance_low_flow: float
+            Resistance for the low flow zone.
+
+        Notes
+        -----
+        This property is only relevant if the resistance distribution is set to zones.
+
+        Returns
+        -------
+        float
+        """
         self._warn_if_resistance_distribution_is_not_zones()
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLowFlow
 
@@ -272,6 +325,22 @@ class CrossSection:
 
     @property
     def resistance_right_high_flow(self):
+        """
+        Resistance for the right high flow zone.
+
+        Parameters
+        ----------
+        resistance_right_high_flow: float
+            Resistance for the right high flow zone.
+
+        Notes
+        -----
+        This property is only relevant if the resistance distribution is set to zones.
+
+        Returns
+        -------
+        float
+        """
         self._warn_if_resistance_distribution_is_not_zones()
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow
 
@@ -310,8 +379,11 @@ class CrossSection:
     @property
     def number_of_processing_levels(self) -> int:
         """
-        The number of levels used in the processed data. Setting this will recalculate
-        processed data with equidistant levels based on the specified integer.
+        The number of levels used in the processed data.
+
+        Notes
+        -----
+        Setting this will both recalculate processed data and change the processing_levels_method to automatic.
         """
         pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
         if pls.Option == ProcessingOption.EquidistantLevels:
@@ -322,16 +394,19 @@ class CrossSection:
     @number_of_processing_levels.setter
     def number_of_processing_levels(self, value: int):
         pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
-        pls.Option = ProcessingOption.EquidistantLevels
+        pls.Option = ProcessingOption.AutomaticLevels
         pls.NoOfLevels = value
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
     def processing_levels(self) -> Tuple[float]:
         """
-        The levels used in the processed data. Setting this will recalculate the processed
-        data using only the specified levels. The minimum and maximum levels will be automatically
-        added if not already present.
+        A tuple of the level elevations used in the processed data.
+
+        Notes
+        -----
+        Setting this will recalculate the processed data using only the specified levels.
+        The minimum and maximum levels will be automatically added if not already present.
         """
         return tuple(self._m1d_cross_section.BaseCrossSection.ProcessedLevels)
 
@@ -375,6 +450,8 @@ class CrossSection:
         """
         Whether the processed data can be recomputed (e.g. if the raw data has changed).
 
+        Setting this to False will freeze the processed data values in their current state.
+
         Default is True.
         """
         return not self._m1d_cross_section.BaseCrossSection.ProcessedDataProtected
@@ -409,13 +486,28 @@ class CrossSection:
     @property
     def processed(self) -> pd.DataFrame:
         """
-        Read the processed cross section to a pandas DataFrame.
+        The processed cross section data as a pandas DataFrame.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A DataFrame containing the processed cross sectiond data to be updated.
 
         Returns
         -------
         df : pandas.DataFrame
-        """
 
+        Examples
+        --------
+        >>> from mikeio1d.cross_sections import CrossSection
+        >>> cs = CrossSection.from_xz([0, 10, 20, 30, 40, 50], [0, 2, 3, 4, 3, 0], location_id="loc1", chainage=100, topo_id="topo1")
+        >>> df = cs.processed
+        # df DataFrame containing processed cross section data
+
+        >>> df.resistance = df.resistance * 2.0
+        >>> cs.processed = df
+        # The processed cross section has been updated with the new resistance values
+        """
         xs = self._m1d_cross_section
         base_xs = xs.BaseCrossSection
         levels = tuple(base_xs.ProcessedLevels)
@@ -465,12 +557,39 @@ class CrossSection:
     @property
     def raw(self) -> pd.DataFrame:
         """
-        Read the cross section to a pandas DataFrame.
+        The raw cross section data as a pandas DataFrame.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A DataFrame containing the raw cross section data to be updated.
 
         Returns
         -------
         df : pandas.DataFrame
-            A DataFrame with columns 'x' and 'z'. Units in 'meters'.
+            A DataFrame containing the raw cross section data.
+
+        Notes
+        -----
+        The 'marker' column is a comma-separated string of markers at each point.
+        The 'marker_labels' column is automatically generated from the 'marker' column
+        and does not need to be set when updating marker values.
+
+        Examples
+        --------
+        >>> from mikeio1d.cross_sections import CrossSection
+        >>> cs = CrossSection.from_xz([0, 10, 20, 30, 40, 50], [0, 2, 3, 4, 3, 0], location_id="loc1", chainage=100, topo_id="topo1")
+        >>> df = cs.raw
+        # df DataFrame containing raw cross section data
+
+        >>> df.z = df.z + 100
+        >>> cs.raw = df
+        # The raw cross section has been updated with the new z values
+
+        >>> df = cs.raw
+        >>> df.loc[0, "markers"] += ",99"
+        >>> cs.raw = df
+        # Adds a user-defined marker (99) to the first point
         """
 
         self.recompute_processed()
@@ -496,14 +615,6 @@ class CrossSection:
 
     @raw.setter
     def raw(self, df: pd.DataFrame):
-        """
-        Set the raw cross section from a DataFrame.
-
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            A DataFrame with the same shape and column headers as the output of the raw property.
-        """
         raw_current: pd.DataFrame = self.raw
         for column_name in raw_current.columns:
             if column_name not in df.columns:
@@ -556,12 +667,33 @@ class CrossSection:
     @property
     def markers(self) -> pd.DataFrame:
         """
-        Get the markers of the cross section.
+        The markers of the cross section as a pandas DataFrame.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A DataFrame containing the marker data to be updated.
+
+        Notes
+        -----
+        Updating markers is more easily done using the 'set_marker' and 'unset_marker' methods.
+        The 'marker_label' column is for convenience and does not need to be set.
 
         Returns
         -------
         df : pandas.DataFrame
             A DataFrame with columns 'x', 'z', 'marker', and 'marker_label'.
+
+        Examples
+        --------
+        >>> from mikeio1d.cross_sections import CrossSection
+        >>> cs = CrossSection.from_xz([0, 10, 20, 30, 40, 50], [0, 2, 3, 4, 3, 0], location_id="loc1", chainage=100, topo_id="topo1")
+        >>> df = cs.markers
+        # df DataFrame containing marker data
+
+        >>> df = df.head(1)
+        >>> cs.markers = df
+        # The markers of the cross section have been updated to only include the first marker.
         """
         base_xs = self._m1d_cross_section.BaseCrossSection
         markers, marker_indices = base_xs.GetMarkerSequence()
@@ -612,6 +744,15 @@ class CrossSection:
             The x coordinate of the point.
         z : float (default: None)
             The z coordinate of the point.
+
+        Examples
+        --------
+        >>> from mikeio1d.cross_sections import Marker
+        >>> cs.set_marker(Marker.LEFT_LEVEE_BANK, 10)
+        # The LEFT_LEVEE_BANK marker has been set at the point nearest to x=10.
+
+        >>> cs.set_marker(99, 10, 5)
+        # A user-defined marker (99) has been set at the point nearest to x=10, z=5.
         """
         point_index = self._find_nearest_point_index(x, z)
         self._update_marker(marker, point_index)
@@ -624,6 +765,14 @@ class CrossSection:
         ----------
         marker : int | Marker
             The marker to remove.
+
+        Examples
+        --------
+        >>> cs.unset_marker(99)
+        # The user-defined marker (99) has been removed from the cross section.
+
+        >>> cs.unset_marker(Marker.LEFT_LEVEE_BANK)
+        # The LEFT_LEVEE_BANK marker has been removed from the cross section.
         """
         marker = int(marker)
         base_xs = self._m1d_cross_section.BaseCrossSection
