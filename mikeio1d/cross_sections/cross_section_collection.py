@@ -25,6 +25,27 @@ TopoId = str
 
 
 class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
+    """
+    A collection of CrossSection objects.
+
+    The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.
+
+    Parameters
+    ----------
+    args : list of CrossSection, optional
+        A list of CrossSection objects.
+
+    Examples
+    --------
+    >>> from mikeio1d.cross_sections import CrossSectionCollection, CrossSection
+    >>> x = [0, 1, 2, 3, 4, 5]
+    >>> z = [0, 1, 2, 3, 4, 5]
+    >>> xs1 = CrossSection.from_xz(x, z, location_id="loc1", chainage=100, topo_id="topo1")
+    >>> xs2 = CrossSection.from_xz(x, z, location_id="loc2", chainage=200, topo_id="topo1")
+    >>> csc = CrossSectionCollection([xs1, xs2])
+    # csc is a collection of two cross sections
+    """
+
     def __init__(self, *args, **kwargs):
         if args and isinstance(args[0], list):
             self._handle_args(*args)
@@ -85,6 +106,18 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         else:
             super().__or__(other)
 
+    def add_xsection(self, xsection: CrossSection):
+        """
+        Add a cross section to the collection.
+        """
+        location_id = xsection.location_id
+        chainage = f"{xsection.chainage:.3f}"
+        topo_id = xsection.topo_id
+        self[location_id, chainage, topo_id] = xsection
+
+        if self.xns11:
+            self.xns11._cross_section_data.Add(xsection._m1d_cross_section)
+
     @property
     def location_ids(self) -> Set[str]:
         """
@@ -138,6 +171,9 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return ax
 
     def to_dataframe(self) -> pd.DataFrame:
+        """
+        Converts the collection to a DataFrame.
+        """
         location_ids = [k[0] for k in self.keys()]
         chainages = [k[1] for k in self.keys()]
         topo_ids = [k[2] for k in self.keys()]
@@ -154,6 +190,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return df
 
     def to_geopandas(self) -> gpd.GeoDataFrame:
+        """
+        Converts the collection to a GeoDataFrame.
+
+        Note
+        ----
+        This method requires the geopandas package to be installed.
+        Cross sections must have defined coordinates.
+        """
         try_import_geopandas()
         import geopandas as gpd
 
@@ -170,6 +214,9 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return gdf
 
     def to_geopandas_markers(self) -> gpd.GeoDataFrame:
+        """
+        Converts the collection to a GeoDataFrame of the markers as points.
+        """
         try_import_geopandas()
         import geopandas as gpd
 
@@ -199,12 +246,3 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
 
         gdf = gpd.GeoDataFrame(data=data)
         return gdf
-
-    def add_xsection(self, xsection: CrossSection):
-        location_id = xsection.location_id
-        chainage = f"{xsection.chainage:.3f}"
-        topo_id = xsection.topo_id
-        self[location_id, chainage, topo_id] = xsection
-
-        if self.xns11:
-            self.xns11._cross_section_data.Add(xsection._m1d_cross_section)
