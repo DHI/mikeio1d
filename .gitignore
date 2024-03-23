@@ -160,3 +160,4 @@ tests/testdata/w_right_discharge_in_structure.extract.txt
 tests/testdata/lts_event_statistics.merged.res1d
 tests/testdata/lts_monthly_statistics.merged.res1d
 tests/testdata/catchment_merge_c.res1d
+tests/testdata/network_cali.res1d
