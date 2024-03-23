@@ -12,6 +12,12 @@ def test_file_path():
     return os.path.join(test_folder_path, "testdata", "network_chinese.res1d")
 
 
+@pytest.fixture
+def test_file_path_res11():
+    test_folder_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(test_folder_path, "testdata", "network_cali.res11")
+
+
 def test_make_proper_variable_name():
     mpvn = make_proper_variable_name  # alias
     assert mpvn("a") == "a"
@@ -50,3 +56,17 @@ def test_mikeio1d_and_mikepluspy_coexistence(test_file_path):
     script_path = os.path.join(test_folder_path, "call_mikepluspy_mikeio1d.py")
     exit_code = subprocess.call(["python", script_path, test_file_path])
     assert exit_code == 0
+
+
+def test_res11_to_res1d_conversion(test_file_path_res11):
+    res11 = Res1D(test_file_path_res11)
+
+    test_file_path_res1d = test_file_path_res11.replace("res11", "res1d")
+    res11.save(test_file_path_res1d)
+
+    res1d = Res1D(test_file_path_res1d)
+
+    df_res11 = res11.read()
+    df_res1d = res1d.read()
+
+    assert df_res11.max().max() == df_res1d.max().max()

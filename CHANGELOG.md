@@ -8,12 +8,13 @@
 
 ### Changed
 
-## [0.6.1] - 2024-02-024
+## [0.6.1] - 2024-03-22
 
 ### Fixed
 
 - Loading MIKE IO 1D together with MIKE+Py
 - Fixed override_name parameter that was not working in ResultFrameAggregator
+- Fixed converting res11 to res1d
 
 ## [0.6] - 2024-02-08
 

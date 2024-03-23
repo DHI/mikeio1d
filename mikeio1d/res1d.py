@@ -50,6 +50,7 @@ from .quantities import TimeSeriesId
 from .pandas_extension import Mikeio1dAccessor  # noqa: F401
 
 from System import DateTime
+from DHI.Mike1D.Generic import Connection
 
 
 class Res1D:
@@ -396,8 +397,10 @@ class Res1D:
         file_path : str
             File path for the new res1d file.
         """
-        self.data.Connection.FilePath.Path = file_path
+        connection_original = self.data.Connection
+        self.data.Connection = Connection.Create(file_path)
         self.data.Save()
+        self.data.Connection = connection_original
 
     def extract(
         self,
