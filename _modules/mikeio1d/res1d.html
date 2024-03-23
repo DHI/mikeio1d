@@ -130,6 +130,7 @@
 <span class="kn">from</span> <span class="nn">.pandas_extension</span> <span class="kn">import</span> <span class="n">Mikeio1dAccessor</span>  <span class="c1"># noqa: F401</span>
 
 <span class="kn">from</span> <span class="nn">System</span> <span class="kn">import</span> <span class="n">DateTime</span>
+<span class="kn">from</span> <span class="nn">DHI.Mike1D.Generic</span> <span class="kn">import</span> <span class="n">Connection</span>
 
 
 <div class="viewcode-block" id="Res1D">
@@ -495,8 +496,10 @@
 <span class="sd">        file_path : str</span>
 <span class="sd">            File path for the new res1d file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Connection</span><span class="o">.</span><span class="n">FilePath</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">file_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Save</span><span class="p">()</span></div>
+        <span class="n">connection_original</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Connection</span> <span class="o">=</span> <span class="n">Connection</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Connection</span> <span class="o">=</span> <span class="n">connection_original</span></div>
 
 
 <div class="viewcode-block" id="Res1D.extract">
