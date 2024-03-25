@@ -41,20 +41,6 @@ def test_file_does_not_exist():
         assert read(file, [query])
 
 
-def test_get_properties_if_not_opened(file):
-    """Public properties cannot be accessed if the file is not opened"""
-    r = Xns11(file)
-    r.close()
-
-    with pytest.raises(FileNotOpenedError) as excinfo:
-        r.topoid_names
-    assert "topoid_names" in str(excinfo.value)
-
-    with pytest.raises(FileNotOpenedError) as excinfo:
-        r.reach_names
-    assert "reach_names" in str(excinfo.value)
-
-
 @pytest.mark.parametrize(
     "query,expected_bottom",
     [

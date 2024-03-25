@@ -39,6 +39,8 @@ class testdata:
     """An LTS monthly statistics file."""
     xsections_xns11: str = format_path("xsections.xns11")
     """A basic xsections file."""
+    mikep_xns11: str = format_path("mikep_cs_demo.xns11")
+    """A cross section file matching the MIKE+ example project for river control."""
     epanet_res: str = format_path("epanet.res")
     """A basic Epanet res file. Must have accompanying .inp file."""
     epanet_resx: str = format_path("epanet.resx")
