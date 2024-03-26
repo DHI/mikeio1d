@@ -390,7 +390,9 @@ def test_result_quantity_collection_methods(test_file):
     assert pytest.approx(max_value) == 100.247
 
     # Test the calling of methods
-    discharge_in_structure.plot()
+    ax = discharge_in_structure.plot()
+    discharge_in_structure.plot(ax=ax)
+
     discharge_in_structure.to_csv(
         file_path.replace("network_river.res1d", "discharge_in_structure.extract.csv")
     )
