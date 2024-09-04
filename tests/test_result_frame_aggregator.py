@@ -345,10 +345,10 @@ class TestResultFrameAggregator:
         df_agg = df_agg.groupby("name").agg("max")  # test for entire reach (not segments)
 
         assert list(df_agg.columns.values) == [
+            "max_WaterLevel",
+            "max_ManningResistanceNumber",
             "max_Discharge",
             "max_FlowVelocity",
-            "max_ManningResistanceNumber",
-            "max_WaterLevel",
         ]
 
         assert list(df_agg.index) == [
@@ -366,13 +366,13 @@ class TestResultFrameAggregator:
         # cheap expected value check
         df_agg_std = df_agg.std()
         assert list(df_agg_std.index) == [
+            "max_WaterLevel",
+            "max_ManningResistanceNumber",
             "max_Discharge",
             "max_FlowVelocity",
-            "max_ManningResistanceNumber",
-            "max_WaterLevel",
         ]
         assert list(df_agg_std.values) == pytest.approx(
-            [32.83624888, 1.28741954, 3.25905542, 0.4820685]
+            [0.4820685, 3.25905542, 32.83624888, 1.28741954]
         )
 
     @pytest.mark.parametrize("column_mode", ["all", "compact"])
@@ -382,8 +382,8 @@ class TestResultFrameAggregator:
         df_agg = rfa.aggregate(df_reaches)
 
         assert list(df_agg.columns.values) == [
+            "max_WaterLevel",
+            "max_ManningResistanceNumber",
             "max_Discharge",
             "max_FlowVelocity",
-            "max_ManningResistanceNumber",
-            "max_WaterLevel",
         ]
