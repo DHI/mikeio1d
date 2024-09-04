@@ -167,13 +167,11 @@ class Xns11:
     @staticmethod
     def from_cross_section_collection(xsections: CrossSectionCollection) -> Xns11:
         """Create a Xns11 object from a CrossSectionCollection."""
-        tmp_file_path = str(Path(tempfile.mktemp(suffix=".xns11")))
-        xns = Xns11(tmp_file_path)
-        for xs in xsections.values():
-            xns._cross_section_data.Add(xs._m1d_cross_section)
-        xns.write(tmp_file_path)
-        xns = Xns11(tmp_file_path)
-        xns.file_path = None
+        xns = Xns11()
+        for key in xsections:
+            xs = xsections[key]
+            xns.add_xsection(xs)
+
         return xns
 
     @property
