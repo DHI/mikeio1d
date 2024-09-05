@@ -6,6 +6,8 @@ if TYPE_CHECKING:
     from typing import List
     from typing import Optional
 
+import warnings
+
 from enum import Enum
 from abc import ABC
 from abc import abstractmethod
@@ -283,7 +285,11 @@ class ResultReader(ABC):
                 simulation_start + datetime.timedelta(seconds=s)
                 for s in seconds_since_simulation_started
             ]
-            df.iloc[:, i] = datetime_since_simulation_started
+
+            # Suppress casting warning for now with hope that it will be fixed by pandas in the future.
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=FutureWarning)
+                df.iloc[:, i] = datetime_since_simulation_started
 
     def _is_lts_event_time_column(
         self,

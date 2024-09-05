@@ -342,7 +342,7 @@ class ResultFrameAggregator:
         for level in self._quantity_levels:
             if level not in df.columns.names:
                 continue
-            df = df.stack(level)
+            df = df.stack(level, future_stack=True)
 
         df = df.T
 

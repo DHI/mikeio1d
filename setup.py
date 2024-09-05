@@ -30,9 +30,10 @@ setuptools.setup(
     install_requires=[
         "pythonnet>=3.0.0",
         "numpy",
-        "pandas",
+        "pandas>=2.1.0",
         'mikecore; platform_system=="Linux"',
     ],
+    python_requires=">=3.9",
     extras_require={
         "dev": [
             "pytest",
@@ -71,7 +72,6 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
