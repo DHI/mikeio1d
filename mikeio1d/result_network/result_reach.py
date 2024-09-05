@@ -90,9 +90,7 @@ class ResultReach(ResultLocation):
         try:
             self.set_static_attribute("length", self._get_total_length())
         except Exception as _:
-            warnings.warn(
-                "Length attribute not included. For SWMM and EPANET results this is not implemented."
-            )
+            pass
 
     def add_res1d_reach(self, reach):
         """
