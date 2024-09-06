@@ -146,6 +146,9 @@ mikeio1d/bin/**/*.ubg
 mikeio1d/bin/**/*.xml
 mikeio1d/bin/**/*so.5
 
+# mikeio1d/util/bin folder
+mikeio1d/bin/DHI.Mike1D.MikeIO/**/*
+
 # Specific files
 tests/testdata/network_river.mod.res1d
 tests/testdata/network_river.extract.csv
