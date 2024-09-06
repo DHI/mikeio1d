@@ -6,7 +6,10 @@ from pandas.testing import assert_frame_equal
 
 
 def test_access_available_derived_quantities(res1d_network):
-    assert len(res1d_network.derived_quantities) > 0
+    dq = res1d_network.derived_quantities
+    assert len(dq) > 0
+    assert None not in dq
+    assert isinstance(dq[0], str)
     assert "NodeFlooding" in res1d_network.derived_quantities
 
 
@@ -17,7 +20,7 @@ def test_available_derived_quantities_by_locations(res1d_network):
 
 def test_available_derived_quantities_by_single_location(res1d_network):
     assert "NodeFlooding" in res1d_network.nodes["1"].derived_quantities
-    assert "NodeFlooding" not in res1d_network.reaches["r_100l1"].derived_quantities
+    assert "NodeFlooding" not in res1d_network.reaches["100l1"].derived_quantities
 
 
 def test_read_derived_quantities_locations(res1d_network):
