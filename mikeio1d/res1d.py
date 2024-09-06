@@ -308,7 +308,13 @@ class Res1D:
     @property
     def derived_quantities(self) -> List[str]:
         """Derived quantities available for res1d file."""
-        return list(derived_quantity_manager.derived_quantities.keys())
+        dq = [
+            *self.nodes.derived_quantities,
+            *self.reaches.derived_quantities,
+            *self.catchments.derived_quantities,
+            *self.structures.derived_quantities,
+        ]
+        return list(set(dq))
 
     @property
     def query(self):
