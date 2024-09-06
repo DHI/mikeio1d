@@ -306,6 +306,11 @@ class Res1D:
         return self.result_reader.quantities
 
     @property
+    def derived_quantities(self) -> List[str]:
+        """Derived quantities available for res1d file."""
+        return list(derived_quantity_manager.derived_quantities.keys())
+
+    @property
     def query(self):
         """
         .NET object ResultDataQuery to use for querying the loaded res1d data.

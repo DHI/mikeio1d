@@ -92,6 +92,17 @@ class ResultLocations(Dict[str, ResultLocation]):
         return {k: getattr(self, k) for k in self.result_quantity_map}
 
     @property
+    def derived_quantities(self) -> List[str]:
+        """A list of available derived quantities."""
+        dq = [
+            *self.nodes.derived_quantities,
+            *self.reaches.derived_quantities,
+            *self.catchments.derived_quantities,
+            *self.structures.derived_quantities,
+        ]
+        return list(set(dq))
+
+    @property
     def names(self) -> List[str]:
         """A list of location names (e.g. MUIDs)."""
         return list(self.keys())

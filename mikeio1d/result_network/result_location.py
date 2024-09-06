@@ -107,6 +107,11 @@ class ResultLocation(ABC):
         """A list of available quantities."""
         return list(self.result_quantity_map.keys())
 
+    @property
+    def derived_quantities(self) -> List[str]:
+        """A list of available derived quantities."""
+        return list(self.result_quantity_derived_map.keys())
+
     def set_static_attribute(self, key, value):
         """Add static attribute. This shows up in the html repr"""
         self._static_attributes.append(key)
