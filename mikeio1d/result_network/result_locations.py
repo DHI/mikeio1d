@@ -94,13 +94,7 @@ class ResultLocations(Dict[str, ResultLocation]):
     @property
     def derived_quantities(self) -> List[str]:
         """A list of available derived quantities."""
-        dq = [
-            *self.nodes.derived_quantities,
-            *self.reaches.derived_quantities,
-            *self.catchments.derived_quantities,
-            *self.structures.derived_quantities,
-        ]
-        return list(set(dq))
+        return list(self.result_quantity_derived_map.keys())
 
     @property
     def names(self) -> List[str]:
