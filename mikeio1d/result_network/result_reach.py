@@ -68,6 +68,11 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         else:
             object.__getattribute__(self, name)
 
+    def __getitem__(self, key: str | int) -> ResultGridPoint:
+        if isinstance(key, int):
+            return self.gridpoints[key]
+        return super().__getitem__(key)
+
     def _get_total_length(self):
         total_length = 0
         for reach in self.reaches:
