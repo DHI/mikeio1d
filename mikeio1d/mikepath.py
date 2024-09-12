@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 import pythonnet
 
@@ -25,6 +26,8 @@ class MikePath:
 
     mikeio1d_bin_path = os.path.join(os.path.dirname(__file__), "bin")
 
+    mikeio1d_bin_extra_path = os.path.join(os.path.dirname(__file__), "bin/DHI.Mike1D.MikeIO")
+
     mike_install_path = os.environ.get("MIKE_INSTALL_PATH", None)
 
     skip_bin_x64 = os.environ.get("MIKE_SKIP_BIN_X64", None)
@@ -49,7 +52,10 @@ class MikePath:
         syspath: list of str
             List of strings defining PATH variable.
         """
+        MikePath.update_mike_bin_to_mikepluspy_bin_if_used()
+
         syspath.append(MikePath.mike_bin_path)
+        syspath.append(MikePath.mikeio1d_bin_extra_path)
 
         if MikePath.is_linux:
             MikePath.setup_mike_installation_linux()
@@ -58,9 +64,25 @@ class MikePath:
             MikePath.setup_mike_installation_custom(syspath)
 
     @staticmethod
-    def setup_mike_installation_custom(syspath):
-        syspath.append(MikePath.mikeio1d_bin_path)
+    def update_mike_bin_to_mikepluspy_bin_if_used():
+        """
+        Updates the path for MIKE assemblies to the ones used by MIKE+Py package.
+        This requires that the MIKE+Py package was already loaded.
+        """
+        mikepluspy = sys.modules.get("mikeplus")
+        if mikepluspy == None:
+            return
 
+        import mikeplus
+
+        mikeplus_bin_path = str(mikeplus.MikeImport.ActiveProduct().InstallRoot)
+        mikeplus_bin_path = os.path.join(mikeplus_bin_path, MikePath.bin_x64)
+
+        MikePath.mikeio1d_bin_path = mikeplus_bin_path
+        MikePath.mike_bin_path = mikeplus_bin_path
+
+    @staticmethod
+    def setup_mike_installation_custom(syspath):
         # Some of the MIKE libraries will need to be resolved by DHI.Mike.Install,
         # so set it up here.
         import clr

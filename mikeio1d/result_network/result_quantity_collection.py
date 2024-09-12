@@ -63,13 +63,15 @@ class ResultQuantityCollection(ResultQuantity):
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
         return self.res1d.read(timeseries_ids, column_mode=column_mode)
 
-    def plot(self):
+    def plot(self, **kwargs):
         """Plot the time series data."""
         if len(self.result_quantities) <= 0:
             return
 
+        # Taking the first data item is enough, because all of them have
+        # the same quantity and for plotting.
         self.data_item = self.result_quantities[0].data_item
-        ResultQuantity.plot(self)
+        return ResultQuantity.plot(self, **kwargs)
 
     def get_query(self):
         """Get queries corresponding to ResultQuantityCollection."""
