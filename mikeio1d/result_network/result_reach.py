@@ -102,6 +102,12 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
         self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
         self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
+        self.set_static_attribute(
+            "start_node", self.res1d.data.Nodes[self.reaches[0].StartNodeIndex].Id
+        )
+        self.set_static_attribute(
+            "end_node", self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
+        )
 
     def try_set_static_attribute_length(self):
         try:
