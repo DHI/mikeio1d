@@ -306,5 +306,42 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             reach.StartNodeIndex
         ].__implementation__.GroundLevel
         end_ground_level = self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__.GroundLevel
+
+        if start_ground_level is None or end_ground_level is None:
+            return np.nan
+
         ground_slope = (end_ground_level - start_ground_level) / (end_chainage - start_chainage)
         return start_ground_level + ground_slope * (chainage - start_chainage)
+
+    def interpolate_reach_critical_level(self, chainage: float) -> float:
+        """
+        Interpolates the critical level at a given chainage by linear interpolation
+        from the bounding node critical levels.
+
+        Parameters
+        ----------
+        chainage: float
+            Chainage for which to interpolate the critical level.
+
+        Returns
+        -------
+        float
+            Interpolated critical level.
+        """
+        reach = self._get_reach_for_chainage(chainage)
+        start_chainage = reach.LocationSpan.StartChainage
+        end_chainage = reach.LocationSpan.EndChainage
+        start_critical_level = getattr(
+            self.res1d.data.Nodes[reach.StartNodeIndex].__implementation__, "CriticalLevel", None
+        )
+        end_critical_level = getattr(
+            self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__, "CriticalLevel", None
+        )
+
+        if start_critical_level is None or end_critical_level is None:
+            return np.nan
+
+        critical_slope = (end_critical_level - start_critical_level) / (
+            end_chainage - start_chainage
+        )
+        return start_critical_level + critical_slope * (chainage - start_chainage)
