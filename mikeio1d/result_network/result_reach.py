@@ -7,13 +7,19 @@ if TYPE_CHECKING:
     from ..geometry import ReachGeometry
     from typing import List
 
+import numpy as np
+
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
 from ..various import try_import_shapely
 from ..quantities import TimeSeriesIdGroup
+from ..dotnet import pythonnet_implementation as impl
 
 from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
+from DHI.Mike1D.ResultDataAccess import Res1DCircularCrossSection
+from DHI.Mike1D.ResultDataAccess import Res1DEggshapedCrossSection
+from DHI.Mike1D.ResultDataAccess import Res1DRectangularCrossSection
 
 
 class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
@@ -87,6 +93,33 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     def _get_total_gridpoints(self):
         return sum([len(gp_list) for gp_list in self.result_gridpoints])
 
+    def _get_height(self) -> float:
+        first_gridpoint = impl(self.gridpoints[0].gridpoint)
+        cs = impl(first_gridpoint.CrossSection)
+
+        if isinstance(cs, Res1DCircularCrossSection):
+            return cs.Diameter
+        elif isinstance(cs, Res1DEggshapedCrossSection):
+            return cs.Diameter
+        elif isinstance(cs, Res1DRectangularCrossSection):
+            return cs.Height
+        elif hasattr(cs, "Height"):
+            return cs.Height
+        else:
+            return np.nan
+
+    def _get_reach_for_chainage(self, chainage: float):
+        """
+        Returns the relevant .NET Res1DReach for the specified chainage.
+        """
+        for reach in self.reaches:
+            start_chainage = reach.LocationSpan.StartChainage
+            end_chainage = reach.LocationSpan.EndChainage
+            if chainage >= start_chainage and chainage <= end_chainage:
+                return reach
+
+        raise ValueError(f"Invalid chainage of {chainage} for reach {self.name}")
+
     @property
     def chainages(self) -> List[str]:
         return list(self.keys())
@@ -108,6 +141,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_static_attribute(
             "end_node", self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
         )
+        self.set_static_attribute("height", self._get_height())
 
     def try_set_static_attribute_length(self):
         try:
@@ -249,3 +283,28 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         from ..geometry import ReachGeometry
 
         return ReachGeometry.from_m1d_reaches(self.reaches)
+
+    def interpolate_reach_ground_level(self, chainage: float) -> float:
+        """
+        Interpolates the ground level at a given chainage by linear interpolation
+        from the bounding node ground levels.
+
+        Parameters
+        ----------
+        chainage: float
+            Chainage for which to interpolate the ground level.
+
+        Returns
+        -------
+        float
+            Interpolated ground level.
+        """
+        reach = self._get_reach_for_chainage(chainage)
+        start_chainage = reach.LocationSpan.StartChainage
+        end_chainage = reach.LocationSpan.EndChainage
+        start_ground_level = self.res1d.data.Nodes[
+            reach.StartNodeIndex
+        ].__implementation__.GroundLevel
+        end_ground_level = self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__.GroundLevel
+        ground_slope = (end_ground_level - start_ground_level) / (end_chainage - start_chainage)
+        return start_ground_level + ground_slope * (chainage - start_chainage)
