@@ -42,6 +42,7 @@ class ResultGridPoint(ResultLocation):
         self.set_static_attribute("chainage", self.gridpoint.Chainage)
         self.set_static_attribute("xcoord", self.gridpoint.X)
         self.set_static_attribute("ycoord", self.gridpoint.Y)
+        self.set_static_attribute("bottom_level", self.gridpoint.Z)
 
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGridPoint.
