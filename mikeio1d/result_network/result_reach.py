@@ -95,7 +95,11 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     def _get_height(self) -> float:
         first_gridpoint = impl(self.gridpoints[0].gridpoint)
-        cs = impl(first_gridpoint.CrossSection)
+
+        if hasattr(first_gridpoint, "CrossSection"):
+            cs = impl(first_gridpoint.CrossSection)
+        else:
+            cs = None
 
         if isinstance(cs, Res1DCircularCrossSection):
             return cs.Diameter
@@ -120,6 +124,18 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
         raise ValueError(f"Invalid chainage of {chainage} for reach {self.name}")
 
+    def _get_start_node(self):
+        """
+        Returns the start node of the reach.
+        """
+        return self.res1d.data.Nodes[self.reaches[0].StartNodeIndex]
+
+    def _get_end_node(self):
+        """
+        Returns the end node of the reach.
+        """
+        return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex]
+
     @property
     def chainages(self) -> List[str]:
         return list(self.keys())
@@ -135,12 +151,10 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
         self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
         self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
-        self.set_static_attribute(
-            "start_node", self.res1d.data.Nodes[self.reaches[0].StartNodeIndex].Id
-        )
-        self.set_static_attribute(
-            "end_node", self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
-        )
+        # For resx files, the start and end node indices are not available
+        if not self.res1d.file_path.endswith(".resx"):
+            self.set_static_attribute("start_node", self._get_start_node())
+            self.set_static_attribute("end_node", self._get_end_node())
         self.set_static_attribute("height", self._get_height())
 
     def try_set_static_attribute_length(self):
