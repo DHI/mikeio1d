@@ -20,6 +20,8 @@ from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
 from DHI.Mike1D.ResultDataAccess import Res1DCircularCrossSection
 from DHI.Mike1D.ResultDataAccess import Res1DEggshapedCrossSection
 from DHI.Mike1D.ResultDataAccess import Res1DRectangularCrossSection
+from DHI.Mike1D.Generic import Quantity
+from DHI.Mike1D.Generic import PredefinedQuantity
 
 
 class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
@@ -136,6 +138,29 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """
         return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex]
 
+    def _get_full_flow_discharge(self) -> float:
+        """
+        Returns the full flow discharge of the reach.
+        """
+
+        ffd_quantity_type = Quantity.Create(PredefinedQuantity.FullReachDischarge)
+
+        ffd_network_data = None
+        for nd in self.res1d.data.NetworkDatas:
+            if Quantity.ComparerDescription().Equals(nd.Quantity, ffd_quantity_type):
+                ffd_network_data = nd
+                break
+
+        if ffd_network_data is None:
+            return np.nan
+
+        ffd_reach_data = ffd_network_data.GetReachData(self.reaches[0].Name)
+
+        if ffd_reach_data is None:
+            return np.nan
+
+        return ffd_reach_data.GlobalValue
+
     @property
     def chainages(self) -> List[str]:
         return list(self.keys())
@@ -156,6 +181,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             self.set_static_attribute("start_node", self._get_start_node())
             self.set_static_attribute("end_node", self._get_end_node())
         self.set_static_attribute("height", self._get_height())
+        self.set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
 
     def try_set_static_attribute_length(self):
         try:
