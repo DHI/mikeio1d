@@ -56,6 +56,7 @@ class TestSpecificDerivedQuantities:
         set_multiindex_level_values(df_node_flooding_expected, "quantity", "NodeFlooding")
         set_multiindex_level_values(df_node_flooding_expected, "derived", True)
         df_node_flooding_expected.m1d.compact()
+        df_node_flooding_expected = df_node_flooding_expected.droplevel("derived", axis=1)
 
         # Read derived values
         df_node_flooding = node.NodeFlooding.read()
@@ -71,6 +72,7 @@ class TestSpecificDerivedQuantities:
         set_multiindex_level_values(df_node_depth_expected, "quantity", "NodeWaterDepth")
         set_multiindex_level_values(df_node_depth_expected, "derived", True)
         df_node_depth_expected.m1d.compact()
+        df_node_depth_expected = df_node_depth_expected.droplevel("derived", axis=1)
 
         # Read derived values
         df_node_depth = node.NodeWaterDepth.read()
