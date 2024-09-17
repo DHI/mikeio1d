@@ -17,6 +17,8 @@ if TYPE_CHECKING:
     from ..quantities import TimeSeriesIdGroup
     from ..quantities import DerivedQuantity
 
+import pandas as pd
+
 from .result_location import ResultLocation
 from .result_quantity import ResultQuantity
 
@@ -106,7 +108,9 @@ class ResultLocations(Dict[str, ResultLocation]):
         """A list of location objects (e.g. <ResultNode>)."""
         return list(self.values())
 
-    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def read(
+        self, column_mode: Optional[str | ColumnMode] = None, derived: bool = False
+    ) -> pd.DataFrame:
         """
         Read the time series data for all quantities at these locations into a DataFrame.
 
@@ -117,10 +121,20 @@ class ResultLocations(Dict[str, ResultLocation]):
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
+
+        derived: bool, default False
+            Include derived quantities.
         """
         result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
         timesries_ids = [q.timeseries_id for q in result_quantities]
         df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
+
+        if derived:
+            df_derived = []
+            for dq in self.result_quantity_derived_map.values():
+                df_derived.append(dq.read(column_mode=column_mode))
+            df = pd.concat([df, *df_derived], axis=1)
+
         return df
 
     def set_quantity_collections(self):
