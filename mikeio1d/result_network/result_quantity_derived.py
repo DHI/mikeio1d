@@ -53,7 +53,8 @@ class ResultQuantityDerived:
         """
 
         df_source = self._create_source_dataframe()
-        return self.derived_quantity.generate(df_source)
+        df_derived = self.derived_quantity.generate(df_source)
+        return df_derived.droplevel("derived", axis=1)
 
     def plot(self, **kwargs):
         """Plot the time series data."""
