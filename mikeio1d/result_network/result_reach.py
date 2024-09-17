@@ -130,13 +130,13 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """
         Returns the start node of the reach.
         """
-        return self.res1d.data.Nodes[self.reaches[0].StartNodeIndex]
+        return self.res1d.data.Nodes[self.reaches[0].StartNodeIndex].Id
 
     def _get_end_node(self):
         """
         Returns the end node of the reach.
         """
-        return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex]
+        return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
 
     def _get_full_flow_discharge(self) -> float:
         """
@@ -371,12 +371,24 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         reach = self._get_reach_for_chainage(chainage)
         start_chainage = reach.LocationSpan.StartChainage
         end_chainage = reach.LocationSpan.EndChainage
-        start_critical_level = getattr(
-            self.res1d.data.Nodes[reach.StartNodeIndex].__implementation__, "CriticalLevel", None
-        )
-        end_critical_level = getattr(
-            self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__, "CriticalLevel", None
-        )
+        start_node = self.res1d.data.Nodes[reach.StartNodeIndex].__implementation__
+        end_node = self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__
+        start_critical_level = getattr(start_node, "CriticalLevel", None)
+        end_critical_level = getattr(end_node, "CriticalLevel", None)
+
+        if (
+            start_critical_level is None
+            or np.isnan(start_critical_level)
+            or np.isinf(start_critical_level)
+        ):
+            start_critical_level = getattr(start_node, "GroundLevel", None)
+
+        if (
+            end_critical_level is None
+            or np.isnan(end_critical_level)
+            or np.isinf(end_critical_level)
+        ):
+            end_critical_level = getattr(end_node, "GroundLevel", None)
 
         if start_critical_level is None or end_critical_level is None:
             return np.nan
@@ -384,4 +396,5 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         critical_slope = (end_critical_level - start_critical_level) / (
             end_chainage - start_chainage
         )
+
         return start_critical_level + critical_slope * (chainage - start_chainage)
