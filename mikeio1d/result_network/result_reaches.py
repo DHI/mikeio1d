@@ -91,7 +91,7 @@ class ResultReaches(ResultLocations):
         agg: str | Callable = None,
         agg_kwargs: Dict[str : str | Callable] = {},
         segmented: bool = True,
-        derived: bool = False,
+        include_derived: bool = False,
     ) -> GeoDataFrame:
         """
         Convert reaches to a geopandas.GeoDataFrame object.
@@ -114,7 +114,7 @@ class ResultReaches(ResultLocations):
         segmented : bool, (default=True)
             True - one LineString per IRes1DReach object.
             False - one LineString per reach name.
-        derived : bool, default False
+        include_derived : bool, default False
             Include derived quantities.
 
         Returns
@@ -145,7 +145,7 @@ class ResultReaches(ResultLocations):
 
         rfa = ResultFrameAggregator(agg, **agg_kwargs)
 
-        df_quantities = self.read(column_mode="compact", derived=derived)
+        df_quantities = self.read(column_mode="compact", include_derived=include_derived)
         df_quantities = rfa.aggregate(df_quantities)
 
         if segmented:

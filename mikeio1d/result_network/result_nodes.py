@@ -69,7 +69,7 @@ class ResultNodes(ResultLocations):
         self,
         agg: str | Callable = None,
         agg_kwargs: Dict[str : str | Callable] = {},
-        derived: bool = False,
+        include_derived: bool = False,
     ) -> GeoDataFrame:
         """
         Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.
@@ -89,7 +89,7 @@ class ResultNodes(ResultLocations):
 
         agg_kwargs : dict, default {}
             Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
-        derived: bool, default False
+        include_derived: bool, default False
             Include derived quantities.
 
         Returns
@@ -115,7 +115,7 @@ class ResultNodes(ResultLocations):
 
         rfa = ResultFrameAggregator(agg, **agg_kwargs)
 
-        df_quantities = self.read(column_mode="compact", derived=derived)
+        df_quantities = self.read(column_mode="compact", include_derived=include_derived)
         df_quantities = rfa.aggregate(df_quantities)
 
         gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
