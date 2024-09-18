@@ -3,6 +3,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
+from matplotlib.axes import Axes
 from pandas.testing import assert_frame_equal
 
 from mikeio1d import Res1D
@@ -140,6 +141,16 @@ def test_example_custom_derived_quantity(res1d_network):
         df_reaches_expected, "quantity", "WaterLevelPlusOne"
     )
     assert_frame_equal(df_reaches, df_reaches_expected)
+
+
+def test_result_derived_quantity_plots(res1d_network):
+    ax = res1d_network.nodes["1"].NodeFlooding.plot()
+    assert isinstance(ax, Axes)
+    assert ax.get_ylabel() == "NodeFlooding"
+
+    ax = res1d_network.nodes.NodeFlooding.plot()
+    assert isinstance(ax, Axes)
+    assert ax.get_ylabel() == "NodeFlooding"
 
 
 class TestSpecificDerivedQuantities:
