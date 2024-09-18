@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from typing import Dict
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
 
