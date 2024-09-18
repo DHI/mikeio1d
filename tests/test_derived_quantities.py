@@ -203,6 +203,27 @@ def test_custom_derived_quantity_example(res1d_network):
     assert_frame_equal(df_reaches, df_reaches_expected)
 
 
+def test_derived_quantity_manager_unregister(res1d_network):
+    from mikeio1d.quantities.derived.derived_quantity_example import ExampleDerivedQuantity
+    from mikeio1d.res1d import derived_quantity_manager as dqm
+
+    dqm.register(ExampleDerivedQuantity)
+    res1d_network = Res1D(res1d_network.file_path)
+
+    assert "WaterLevelPlusOne" in res1d_network.derived_quantities
+
+    with pytest.raises(ValueError):
+        dqm.register(ExampleDerivedQuantity)
+
+    dqm.unregister(ExampleDerivedQuantity._NAME)
+    res1d_network = Res1D(res1d_network.file_path)
+    assert "WaterLevelPlusOne" not in res1d_network.derived_quantities
+
+    dqm.register(ExampleDerivedQuantity)
+    res1d_network = Res1D(res1d_network.file_path)
+    assert "WaterLevelPlusOne" in res1d_network.derived_quantities
+
+
 def test_result_derived_quantity_plots(res1d_network):
     ax = res1d_network.nodes["1"].NodeFlooding.plot()
     assert isinstance(ax, Axes)
