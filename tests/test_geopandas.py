@@ -140,3 +140,39 @@ def test_geopandas_nodes_converter(res1d_network):
     sample_row = gdf.iloc[2]
     name, geometry = sample_row["name"], sample_row["geometry"]
     assert res1d_network.nodes[name].geometry.to_shapely() == geometry
+
+
+def test_geopandas_nodes_with_max_agg(res1d_network):
+    """Test that nodes.to_geopandas() returns a GeoDataFrame with quantities."""
+    gdf = res1d_network.nodes.to_geopandas("max")
+    assert isinstance(gdf, GeoDataFrame)
+    assert "max_WaterLevel" in gdf.columns
+
+
+def test_geopandas_nodes_with_include_derived(res1d_network):
+    """Test that nodes.to_geopandas() returns a GeoDataFrame with derived quantities."""
+    gdf = res1d_network.nodes.to_geopandas("max", include_derived=True)
+    assert isinstance(gdf, GeoDataFrame)
+    assert "max_NodeWaterDepth" in gdf.columns
+
+
+def test_geopandas_reaches_with_max_agg(res1d_network):
+    """Test that reaches.to_geopandas() returns a GeoDataFrame with quantities."""
+    gdf = res1d_network.reaches.to_geopandas("max")
+    assert isinstance(gdf, GeoDataFrame)
+    assert "max_Discharge" in gdf.columns
+    assert "max_WaterLevel" in gdf.columns
+
+
+def test_geopandas_Reaches_with_include_derived(res1d_network):
+    """Test that reaches.to_geopandas() returns a GeoDataFrame with derived quantities."""
+    gdf = res1d_network.reaches.to_geopandas("max", include_derived=True)
+    assert isinstance(gdf, GeoDataFrame)
+    assert "max_ReachWaterDepth" in gdf.columns
+    assert "max_ReachFilling" in gdf.columns
+
+
+def test_geopandas_catchments_with_max_agg(res1d_catchments):
+    gdf = res1d_catchments.catchments.to_geopandas("max")
+    assert isinstance(gdf, GeoDataFrame)
+    assert "max_TotalRunOff" in gdf.columns
