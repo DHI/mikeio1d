@@ -109,7 +109,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         return list(self.values())
 
     def read(
-        self, column_mode: Optional[str | ColumnMode] = None, derived: bool = False
+        self, column_mode: Optional[str | ColumnMode] = None, include_derived: bool = False
     ) -> pd.DataFrame:
         """
         Read the time series data for all quantities at these locations into a DataFrame.
@@ -122,14 +122,17 @@ class ResultLocations(Dict[str, ResultLocation]):
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
 
-        derived: bool, default False
+        include_derived: bool, default False
             Include derived quantities.
         """
         result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
         timesries_ids = [q.timeseries_id for q in result_quantities]
+
+        if include_derived:
+            column_mode = "compact"
         df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
 
-        if derived:
+        if include_derived:
             df_derived = []
             for dq in self.result_quantity_derived_map.values():
                 df_derived.append(dq.read(column_mode=column_mode))
