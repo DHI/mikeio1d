@@ -77,6 +77,22 @@ def test_available_Derived_quantities_by_single_location_reach(
     assert reach_derived_quantity_id not in res1d_network.nodes["1"].derived_quantities
 
 
+def test_read_all_with_derived_quantities_nodes(res1d_network, node_derived_quantity_id):
+    df = res1d_network.nodes.read(include_derived=True)
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) > 0
+    quantities = set(df.columns.get_level_values("quantity"))
+    assert node_derived_quantity_id in quantities
+
+
+def test_read_all_with_derived_quantities_reaches(res1d_network, reach_derived_quantity_id):
+    df = res1d_network.reaches.read(include_derived=True)
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) > 0
+    quantities = set(df.columns.get_level_values("quantity"))
+    assert reach_derived_quantity_id in quantities
+
+
 def test_read_derived_quantities_locations_nodes(res1d_network, node_derived_quantity_id):
     derived_result_quantity = getattr(res1d_network.nodes, node_derived_quantity_id)
     df = derived_result_quantity.read()
