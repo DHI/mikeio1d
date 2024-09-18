@@ -98,39 +98,6 @@ class DerivedQuantity(ABC):
         df_derived = df_derived.m1d.compact()
         return df_derived
 
-    @staticmethod
-    def add_derived_quantities_to_df(
-        df: pd.DataFrame, derived_quantities: List[DerivedQuantity]
-    ) -> pd.DataFrame:
-        """
-        Adds the derived quantity to the DataFrame.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            DataFrame with the source quantities.
-        derived_quantity : List[DerivedQuantity] | None
-            List of derived quantities to add to the DataFrame.
-
-        Returns
-        -------
-        pd.DataFrame
-            DataFrame with the derived quantity added.
-        """
-        if derived_quantities is None or len(derived_quantities) == 0:
-            return df
-
-        derived_quantity_dfs = []
-
-        for derived_quantity in derived_quantities:
-            derived_quantity._validate_source_dataframe(df)
-            df_source = derived_quantity._filter_source_dataframe(df)
-            df_derived = derived_quantity.derive(df_source)
-            derived_quantity_dfs.append(df_derived)
-
-        df_updated = pd.concat([df, *derived_quantity_dfs], axis=1)
-        return df_updated
-
     def create_source_dataframe_for_location(self, result_location: ResultLocation) -> pd.DataFrame:
         """
         Generates a DataFrame with the source quantities required to calculate the derived quantity.
@@ -232,51 +199,3 @@ class DerivedQuantity(ABC):
         result_quantities = result_location.result_quantity_map[self.source_quantity]
         tsids = [q.timeseries_id for q in result_quantities]
         return tsids
-
-    def _get_source_timeseries_ids(self) -> List[TimeSeriesId]:
-        """
-        Generates a list of all TimeSeriesId for the source quantity that apply to the derived quantity.
-        """
-        tsids = []
-        for group in self.groups:
-            result_locations = self._get_result_locations_for_group(group)
-            tsids.extend(self._get_source_timeseries_ids_for_locations(result_locations))
-        return tsids
-
-    def _get_result_locations_for_group(self, group: TimeSeriesIdGroup) -> ResultLocations:
-        """
-        Fetch the respective ResultLocations object based on 'group'.
-        """
-        if group == TimeSeriesIdGroup.CATCHMENT:
-            return self.res1d.catchments
-        elif group == TimeSeriesIdGroup.REACH:
-            return self.res1d.reaches
-        elif group == TimeSeriesIdGroup.NODE:
-            return self.res1d.nodes
-        elif group == TimeSeriesIdGroup.STRUCTURE:
-            return self.res1d.structures
-        elif group == TimeSeriesIdGroup.GLOBAL:
-            return self.res1d.global_data
-        else:
-            raise ValueError(f"Unknown group: {group}")
-
-    def _filter_source_dataframe(self, df_source: pd.DataFrame) -> pd.DataFrame:
-        """
-        Filters the source DataFrame to only include relevant groups and quantities.
-        """
-        stringified_groups = "'" + "', '".join(self.groups) + "'"
-        df_source = df_source.m1d.query(f"group in [{stringified_groups}]")
-        df_source = df_source.m1d.query(f"quantity == '{self.source_quantity}'")
-        return df_source
-
-    def _validate_source_dataframe(self, df_source: pd.DataFrame) -> None:
-        """
-        Validates the source DataFrame.
-        """
-        if not isinstance(df_source.columns, pd.MultiIndex):
-            raise ValueError("Expected a MultiIndex dataframe (try .read(column_mode='compact'))")
-
-        required_levels = ("group", "quantity")
-        for level in required_levels:
-            if level not in df_source.columns.names:
-                raise ValueError(f"Column MultiIndex must have a level named '{level}'.")
