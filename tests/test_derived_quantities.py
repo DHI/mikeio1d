@@ -207,6 +207,8 @@ def test_derived_quantity_manager_unregister(res1d_network):
     from mikeio1d.quantities.derived.derived_quantity_example import ExampleDerivedQuantity
     from mikeio1d.res1d import derived_quantity_manager as dqm
 
+    dqm.unregister(ExampleDerivedQuantity._NAME)
+
     dqm.register(ExampleDerivedQuantity)
     res1d_network = Res1D(res1d_network.file_path)
 
