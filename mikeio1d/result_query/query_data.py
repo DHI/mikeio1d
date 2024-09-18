@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
 
 from abc import ABC
@@ -71,8 +71,7 @@ class QueryData(ABC):
         return self._name
 
     @abstractmethod
-    def _update_query(self, res1d: Res1D):
-        ...
+    def _update_query(self, res1d: Res1D): ...
 
     def _check_invalid_quantity(self, res1d: Res1D):
         if self._quantity not in res1d.quantities:
