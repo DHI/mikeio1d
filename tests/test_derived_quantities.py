@@ -7,6 +7,8 @@ from matplotlib.axes import Axes
 from pandas.testing import assert_frame_equal
 
 from mikeio1d import Res1D
+from mikeio1d.quantities import DerivedQuantity
+from mikeio1d.quantities import TimeSeriesIdGroup
 
 NODE_DERIVED_QUANTITIES = [
     "NodeFlooding",
@@ -117,7 +119,65 @@ def set_multiindex_level_values(df, level, value):
     return df
 
 
-def test_example_custom_derived_quantity(res1d_network):
+def test_custom_derived_quantity_invalid_name(res1d_network):
+    with pytest.raises(ValueError):
+
+        class CustomDerivedQuantity(DerivedQuantity):
+            _NAME = 1
+            _GROUPS = {TimeSeriesIdGroup.NODE}
+            _SOURCE_QUANTITY = "WaterLevel"
+
+            def derive(self, df_source, locations):
+                return df_source
+
+        CustomDerivedQuantity(res1d_network)
+
+
+def test_custom_derived_quantity_invalid_group(res1d_network):
+    with pytest.raises(ValueError):
+
+        class CustomDerivedQuantity(DerivedQuantity):
+            _NAME = "CustomDerivedQuantity"
+            _GROUPS = TimeSeriesIdGroup.NODE
+            _SOURCE_QUANTITY = "WaterLevel"
+
+            def derive(self, df_source, locations):
+                return df_source
+
+        CustomDerivedQuantity(res1d_network)
+
+
+def test_custom_derived_quantity_invalid_source(res1d_network):
+    with pytest.raises(ValueError):
+
+        class CustomDerivedQuantity(DerivedQuantity):
+            _NAME = "CustomDerivedQuantity"
+            _GROUPS = {TimeSeriesIdGroup.NODE}
+            _SOURCE_QUANTITY = 2
+
+            def derive(self, df_source, locations):
+                return df_source
+
+        CustomDerivedQuantity(res1d_network)
+
+
+def test_custom_derived_quantity_basic(res1d_network):
+    class CustomDerivedQuantity(DerivedQuantity):
+        _NAME = "WaterLevel"
+        _GROUPS = {TimeSeriesIdGroup.NODE}
+        _SOURCE_QUANTITY = "WaterLevel"
+
+        def derive(self, df_source, locations):
+            return df_source
+
+    df = CustomDerivedQuantity(res1d_network).generate(
+        res1d_network.nodes.WaterLevel.read(column_mode="timeseries")
+    )
+    df.columns = df.columns.droplevel("derived")
+    assert_frame_equal(df, res1d_network.nodes.WaterLevel.read(column_mode="compact"))
+
+
+def test_custom_derived_quantity_example(res1d_network):
     from mikeio1d.quantities.derived.derived_quantity_example import ExampleDerivedQuantity
     from mikeio1d.res1d import derived_quantity_manager as dqm
 
