@@ -50,6 +50,7 @@ setuptools.setup(
             "myst-parser",
         ],
         "test": ["pytest", "matplotlib", "pyarrow", "nbformat", "nbconvert", "ipython"],
+        "test": ["pytest", "matplotlib", "pyarrow", "nbformat", "nbconvert", "ipykernel"],
         "all": ["matplotlib", "geopandas"],
     },
     options={
