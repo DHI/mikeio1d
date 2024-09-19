@@ -44,23 +44,12 @@ For MIKE IO 1D to work .NET runtime environment (version 3.1 and above) is neede
 ```
 For more Res1D examples see this [notebook](https://nbviewer.jupyter.org/github/DHI/mikeio1d/blob/main/notebooks/Res1D.ipynb)
 
-### Read Xns11 file Return Pandas DataFrame
+### Read Xns11 file and plot a cross section
 ```python
->>>  import matplotlib.pyplot as plt
->>>  from mikeio1d import xns11
->>>  # Query the geometry of chainage 58.68 of topoid1 at reach1
->>>  q1 = xns11.QueryData('topoid1', 'reach1', 58.68)
->>>  # Query the geometry of all chainages of topoid1 at reach2
->>>  q2 = xns11.QueryData('topoid1', 'reach2')
->>>  # Query the geometry of all chainages of topoid2
->>>  q3 = xns11.QueryData('topoid2')
->>>  # Combine the queries in a list
->>>  queries = [q1, q2, q3]
->>>  # The returned geometry object is a pandas DataFrame
->>>  geometry = xns11.read('xsections.xns11', queries)
->>>  # Plot geometry of chainage 58.68 of topoid1 at reach1
->>>  plt.plot(geometry['x topoid1 reach1 58.68'],geometry['z topoid1 reach1 58.68'])
->>>  plt.xlabel('Horizontal [meter]')
->>>  plt.ylabel('Elevation [meter]')
+>>>  from mikeio1d import Xns11
+
+# Plot section with location id 'basin_right', chainage '238.800', and topo id '1'.
+>>>  xns = Xns11("mikep_cs_demo.xns11")
+>>>  xns.xsections.['basin_right', '238.800', '1'].plot()
 ```
 ![Geometry](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/xns11_geometry.png)
