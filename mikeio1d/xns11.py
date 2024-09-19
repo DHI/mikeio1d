@@ -93,6 +93,21 @@ class Xns11:
         self._init_cross_section_data()
 
         self.xsections = CrossSectionCollection()
+        """
+        A collection of CrossSection objects.
+
+        The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.
+
+        Examples
+        --------
+        >>> location_id, chainage, topo_id = 'location', '200.000', 'topo'
+
+        #### Get a specific cross section
+        >>> xns.xsections[location_id, chainage, topo_id]
+
+        #### Get all cross sections for a particular location and topo.
+        >>> xns.xsection[location_id, ..., topo_id]
+        """
         self._init_xsections()
 
     def __repr__(self):
