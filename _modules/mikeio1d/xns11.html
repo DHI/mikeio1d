@@ -176,6 +176,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_cross_section_data</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">xsections</span> <span class="o">=</span> <span class="n">CrossSectionCollection</span><span class="p">()</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A collection of CrossSection objects.</span>
+
+<span class="sd">        The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; location_id, chainage, topo_id = &#39;location&#39;, &#39;200.000&#39;, &#39;topo&#39;</span>
+
+<span class="sd">        #### Get a specific cross section</span>
+<span class="sd">        &gt;&gt;&gt; xns.xsections[location_id, chainage, topo_id]</span>
+
+<span class="sd">        #### Get all cross sections for a particular location and topo.</span>
+<span class="sd">        &gt;&gt;&gt; xns.xsection[location_id, ..., topo_id]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_xsections</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
