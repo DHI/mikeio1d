@@ -8,6 +8,26 @@
 
 ### Changed
 
+## [0.7.0] - 2024-09-19
+
+### Added
+
+- New API for reading and writing xns11 files (see new notebook examples).
+- Access to both raw and processed data in xns11 files.
+- Export xns11 sections and markers to GeoPandas.
+- Gridpoint indexing from ResultReach by either chainage or number.
+- Extra gridpoint static attributes: chainage, reach name, and x/y coordinates.
+
+### Fixed
+
+- Various warning fixes related to new Pandas and GeoPandas versions.
+
+### Changed
+
+- Removed support for Python 3.8 (to be compatible with Pandas >= 2.1).
+- Iterating over IRes1DReach objects must now be done via ResultReach.reaches.
+
+
 ## [0.6.1] - 2024-03-23
 
 ### Fixed
@@ -127,7 +147,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.6.1...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.7.0
 [0.6.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.6.1
 [0.6]: https://github.com/DHI/mikeio1d/releases/tag/v0.6
 [0.5]: https://github.com/DHI/mikeio1d/releases/tag/v0.5
