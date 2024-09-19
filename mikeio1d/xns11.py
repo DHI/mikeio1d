@@ -1,10 +1,21 @@
+from __future__ import annotations
+
+from typing import List
+
 from collections import defaultdict, namedtuple
-import functools
+from warnings import warn
 
 import os.path
+from pathlib import Path
+import tempfile
+
 import pandas as pd
 
+from .cross_sections import CrossSection
+from .cross_sections import CrossSectionCollection
+
 from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
+from DHI.Mike1D.CrossSectionModule import CrossSectionData
 from DHI.Mike1D.Generic import Connection, Diagnostics, Location
 
 
@@ -20,7 +31,7 @@ class FileNotOpenedError(BaseXns11Error):
     """Accessing data from a file that is not opened."""
 
 
-def read(file_path, queries):
+def read(file_path: str | Path, queries: QueryData | List[QueryData]) -> pd.DataFrame:
     """Read the requested data from the xns11 file and
     return a Pandas DataFrame.
 
@@ -39,7 +50,7 @@ def read(file_path, queries):
         return xns11.read(queries)
 
 
-def open(file_path):
+def open(file_path: str | Path) -> Xns11:
     """Open a xns11 file as a Xns11 object that has convenient methods
     to extract specific data from the file. It is recommended to use it
     as a context manager.
@@ -59,62 +70,142 @@ def open(file_path):
     >>>     print(x11.topoid_names)
     ['topoid1', 'topoid2']
     """
+    if not os.path.exists(file_path):
+        raise FileExistsError(f"File {file_path} does not exist.")
+
     return Xns11(file_path)
 
 
-def _not_closed(prop):
-    @functools.wraps(prop)
-    def wrapper(self, *args, **kwargs):
-        if self._closed:
-            raise FileNotOpenedError(
-                "The xns11 file should be opened first to access to its "
-                f"{prop.__name__} property."
-            )
-        return prop(self, *args, **kwargs)
-
-    return wrapper
-
-
 class Xns11:
-    def __init__(self, file_path=None):
-        self.file_path = file_path
-        self.file = None
-        self._closed = True
+    def __init__(self, file_path: str | Path = None):
+        self.file_path: str | Path = file_path
+        if file_path is not None and not os.path.exists(file_path):
+            raise FileExistsError(f"File '{file_path}' does not exist.")
+        self._cross_section_data_factory = CrossSectionDataFactory()
+        self._cross_section_data = None
+
         self._reach_names = None
         self.__reaches = None
         self._topoid_names = None
         self.__topoids = None
+
         # Load the file on initialization
-        self._load_file()
+        self._init_cross_section_data()
+
+        self.xsections = CrossSectionCollection()
+        self._init_xsections()
+
+    def __repr__(self):
+        return "<mikeio1d.Xns11>"
 
     def _load_file(self):
         """Load the file."""
         if not os.path.exists(self.file_path):
             raise FileExistsError(f"File {self.file_path} does not exist.")
-        self.file = CrossSectionDataFactory().Open(
+        self._cross_section_data = self._cross_section_data_factory.Open(
             Connection.Create(self.file_path), Diagnostics("Error loading file.")
         )
-        self._closed = False
 
-    def close(self):
-        """Close the file handle."""
-        self.file.Finalize()
-        self._closed = True
+    def _get_info(self) -> str:
+        info = []
+        info.append(f"# Cross sections: {str(len(self.xsections))}")
+        info.append(f"Interpolation type: {str(self.interpolation_type)}")
+        info = str.join("\n", info)
+        return info
 
     def __enter__(self):
         return self
 
     def __exit__(self, *excinfo):
-        self.close()
+        pass
+
+    def _init_cross_section_data(self):
+        """Initialize the CrossSectionData object."""
+        if self.file_path and os.path.exists(self.file_path):
+            return self._load_file()
+        self._cross_section_data = CrossSectionData()
+
+    def _init_xsections(self):
+        """Initialize the cross sections."""
+        self.xsections.xns11 = self
+        for xs in self._cross_section_data:
+            self.xsections.add_xsection(CrossSection(xs))
+
+    def info(self):
+        """Prints information about the result file."""
+        info = self._get_info()
+        print(info)
+
+    def add_xsection(self, cross_section: CrossSection):
+        """Add a cross section to the file."""
+        self.xsections.add_xsection(cross_section)
+
+    def write(self, file_path: str | Path = None):
+        """Write data to the file."""
+        file_path = file_path if file_path else self.file_path
+
+        if not file_path:
+            raise ValueError("A file path must be provided.")
+
+        file_path = Path(file_path)
+        if not file_path.suffix == ".xns11":
+            raise ValueError("The file extension must be .xns11.")
+
+        current_con_path = Path(self._cross_section_data.Connection.FilePath.Path)
+        if not file_path.exists() or not current_con_path.resolve().samefile(file_path.resolve()):
+            self._cross_section_data.Connection = Connection.Create(str(file_path))
+
+        self._cross_section_data_factory.Save(self._cross_section_data)
+
+        if not self.file_path:
+            self.file_path = file_path
+
+    def close(self):
+        """Close the file handle."""
+        self.__del__()
+
+    @staticmethod
+    def from_cross_section_collection(xsections: CrossSectionCollection) -> Xns11:
+        """Create a Xns11 object from a CrossSectionCollection."""
+        xns = Xns11()
+        for key in xsections:
+            xs = xsections[key]
+            xns.add_xsection(xs)
+
+        return xns
+
+    @property
+    def file(self):
+        """Alias for CrossSectionData objected stored on the member '_cross_section_data'."""
+        warn("The 'file' property is deprecated. Use '_cross_section_data' instead.")
+        return self._cross_section_data
+
+    @property
+    def interpolation_type(self):
+        """
+        Defines how an interpolated cross section are interpolated.
+
+        Returns
+        -------
+        DHI.Mike1D.CrossSectionModule.XSInterpolationType
+
+            Possible values:
+            - ProcessedTopDown: 0
+                Interpolates the processed data. Raw data will not be available.
+            - Raw: 1
+                Interpolates the raw data and calculates processed data from the new raw data.
+            - Middling: 2
+                Interpolation happens during runtime by requesting values at neighbour cross sections and interpolate between those.
+        """
+        return self._cross_section_data.XSInterpolationType
 
     @property
     def _topoids(self):
         if self.__topoids:
             return self.__topoids
-        return list(self.file.GetReachTopoIdEnumerable())
+        return list(self._cross_section_data.GetReachTopoIdEnumerable())
 
     @property
-    @_not_closed
     def topoid_names(self):
         """A list of the topo-id names"""
         if self._topoid_names:
@@ -125,10 +216,9 @@ class Xns11:
     def _reaches(self):
         if self.__reaches:
             return self.__reaches
-        return list(self.file.GetReachTopoIdEnumerable())
+        return list(self._cross_section_data.GetReachTopoIdEnumerable())
 
     @property
-    @_not_closed
     def reach_names(self):
         """A list of the reach names"""
         if self._reach_names:
@@ -156,7 +246,7 @@ class Xns11:
             location = Location()
             location.ID = reach.value
             location.Chainage = chainage.value
-            geometry = self.file.FindClosestCrossSection(
+            geometry = self._cross_section_data.FindClosestCrossSection(
                 location, topoid.value
             ).BaseCrossSection.Points
             x, z = [], []
@@ -291,7 +381,6 @@ class Xns11:
 
         return dict(found_points)
 
-    @_not_closed
     def read(self, queries):
         """Read the requested data from the xns11 file and
         return a Pandas DataFrame.
