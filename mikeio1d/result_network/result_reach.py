@@ -1,9 +1,11 @@
 from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
+from typing import Dict
 
 if TYPE_CHECKING:
     from ..geometry import ReachGeometry
+    from typing import List
 
 from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
@@ -13,7 +15,7 @@ from ..various import try_import_shapely
 from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
 
 
-class ResultReach(ResultLocation):
+class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     """
     Class for wrapping a list of ResultData reaches
     having the same reach name.
@@ -66,8 +68,10 @@ class ResultReach(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
-    def __getitem__(self, index):
-        return self.reaches[index]
+    def __getitem__(self, key: str | int) -> ResultGridPoint:
+        if isinstance(key, int):
+            return self.gridpoints[key]
+        return super().__getitem__(key)
 
     def _get_total_length(self):
         total_length = 0
@@ -77,6 +81,14 @@ class ResultReach(ResultLocation):
 
     def _get_total_gridpoints(self):
         return sum([len(gp_list) for gp_list in self.result_gridpoints])
+
+    @property
+    def chainages(self) -> List[str]:
+        return list(self.keys())
+
+    @property
+    def gridpoints(self) -> List[ResultGridPoint]:
+        return list(self.values())
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
@@ -184,6 +196,9 @@ class ResultReach(ResultLocation):
             chainage_string, self.chainage_label
         )
         setattr(self, result_gridpoint_attribute_string, result_gridpoint)
+
+        chainage_str = f"{gridpoint.Chainage:.3f}"
+        self[chainage_str] = result_gridpoint
 
     def set_gridpoint_data_items(self, reach):
         """
