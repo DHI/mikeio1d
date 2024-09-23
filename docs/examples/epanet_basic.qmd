@@ -1,0 +1,67 @@
+---
+title: EPANET - basic
+description: Extract EPANET results for a water distribution system to a pandas DataFrame.
+jupyter: python3
+---
+
+## Overview 
+
+::: callout-tip
+MIKE IO 1D treats EPANET (.res/.resx) and Res1D results in the same way, so you may also refer to Res1D examples.
+:::
+
+```{python}	
+from mikeio1d import Res1D
+```
+
+::: callout-caution
+Reading '.res' files requires the accompanying '.inp' file having the same name.
+:::
+
+```{python}	
+res = Res1D("../data/epanet.res")
+res.info()
+```
+
+## Plot network
+```{python}
+res.network.to_geopandas().plot()
+```
+
+## Explore network
+
+```{python}
+res.reaches
+```
+
+```{python}
+res.nodes
+```
+
+## Extract results to a DataFrame
+
+```{python}
+df = res.read()
+df.head()
+```
+
+```{python}
+df = res.reaches.Flow.read()
+df.head()
+```
+
+## Plot results
+
+```{python}
+res.reaches['110'].Flow.plot()
+```
+
+```{python}
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(2)
+res.reaches['110'].Flow.plot(ax=ax[0])
+res.reaches['110'].Velocity.plot(ax=ax[1])
+
+plt.tight_layout()
+```

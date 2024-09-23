@@ -1,0 +1,17 @@
+---
+title: Examples
+listing:
+  type: table
+  fields: ['title', 'description']
+  categories: true
+---
+
+::: {.callout-tip title="Example data" collapse="true"}
+
+If you want to try one of the examples you need to first download some data files.
+
+The files are stored on GitHub in the [MIKE IO 1D repo](https://github.com/DHI/mikeio1d).
+
+The easiest way is to the download the repo as a [zip file](https://github.com/DHI/mikeio1d/archive/main.zip) and extract the files you need.
+
+In the zip file you find the files in `tests/testdata/` folder.

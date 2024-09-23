@@ -1,0 +1,32 @@
+---
+title: Network
+---
+A fundamental concept of MIKE IO 1D is the structure of a Network. Understanding its basic components is essential for working with the library.
+
+## Overview
+Networks consist of several elements: reaches, grid points, nodes, and catchments.
+
+::: {layout-ncol=2 layout-valign="center" layout-align="center"}
+![](../images/docs/NetworkExample){width=45%}
+
+![](../images/docs/NetworkCatchments.svg){width=45%}
+:::
+
+## Reaches
+Reaches have many synonyms within different domain applications. In collection systems they are often called links or pipes. In river models they are called branches, streams, canals or channels. In graph and network theory they are called links or edges. Reaches contains several 'grid points' along their path, and are bounded by nodes.
+
+## Grid Points
+Grid points are the computational points along a reach. A flow model has different types of grid points:
+
+* H grid point: contains water level and an associated cross section.
+* Q grid point: contains discharge or flow velocity.
+* Structure grid point: calculates discharge over a structure depending on the water levels on each side of the structure.
+
+## Nodes
+Nodes are connected together by reaches. Nodes can represent different entities: manholes, basins, outlets, and junction nodes. They may or may not have a volume.
+
+## Catchments
+Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.
+
+## Additional resources
+- [MIKE 1D API](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)

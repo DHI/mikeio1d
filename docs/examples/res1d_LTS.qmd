@@ -1,0 +1,68 @@
+---
+title: Res1D - long term statistics (LTS)
+description: Read and plot LTS results. 
+jupyter: python3
+---
+```{python}
+from mikeio1d import Res1D
+```	
+
+## Event statistics
+
+```{python}
+res = Res1D("../data/lts_event_statistics.res1d")
+res.info()
+```	
+
+```{python}
+df = res.read()
+df.head()
+```	
+
+```{python}
+df[['WaterLevelMaximum:B4.1200', 'WaterLevelMaximumTime:B4.1200']]
+```	
+
+```{python}
+quantities = [c for c in df.columns if 'Discharge' in c and 'B4.1200l1:26.666' in c]
+df[quantities]
+```	
+
+```{python}
+df[
+    [
+        "WaterLevelMaximum:B4.1200",
+        "WaterLevelMaximum:B4.1200l1:0",
+        "WaterLevelMaximum:B4.1200l1:479.999",
+        "WaterLevelMaximum:B4.1485",
+    ]
+].plot()
+```
+
+## Chronological statistics
+
+```{python}
+res = Res1D("../data/lts_monthly_statistics.res1d")
+df = res.read()
+df.head()
+```
+
+```{python}
+quantities = [c for c in df.columns if 'Discharge' in c and 'B4.1200l1:26.666' in c]
+df[quantities].head()
+```	
+
+```{python}
+print(quantities[0])
+df[quantities[0]].plot()
+```	
+
+```{python}
+print(quantities[1])
+df[quantities[1]].plot()
+```	
+
+```{python}
+print(quantities[2])
+df[quantities[2]].plot()
+```	
