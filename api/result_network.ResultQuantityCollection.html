@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>find_a_place_for_me – MIKE IO 1D</title>
+<title>result_network.resultquantitycollection – MIKE IO 1D</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,44 +20,10 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -100,9 +66,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -163,7 +126,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">What types of files can I read?</h1>
+          <h1 class="quarto-secondary-nav-title"></h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -298,620 +261,223 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#basics-of-the-network-structure" id="toc-basics-of-the-network-structure" class="nav-link active" data-scroll-target="#basics-of-the-network-structure">Basics of the network structure</a></li>
-  <li><a href="#reading-and-plotting-data" id="toc-reading-and-plotting-data" class="nav-link" data-scroll-target="#reading-and-plotting-data">Reading and plotting data</a>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection" id="toc-mikeio1d.result_network.ResultQuantityCollection" class="nav-link active" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection">result_network.ResultQuantityCollection</a>
   <ul class="collapse">
-  <li><a href="#read-everything" id="toc-read-everything" class="nav-link" data-scroll-target="#read-everything">Read everything</a></li>
-  <li><a href="#read-a-specific-result" id="toc-read-a-specific-result" class="nav-link" data-scroll-target="#read-a-specific-result">Read a specific result</a></li>
-  <li><a href="#read-a-group-of-results" id="toc-read-a-group-of-results" class="nav-link" data-scroll-target="#read-a-group-of-results">Read a group of results</a></li>
-  <li><a href="#combine-various-results-into-one-dataframe" id="toc-combine-various-results-into-one-dataframe" class="nav-link" data-scroll-target="#combine-various-results-into-one-dataframe">Combine various results into one dataframe</a></li>
-  <li><a href="#use-plot-instead-of-read" id="toc-use-plot-instead-of-read" class="nav-link" data-scroll-target="#use-plot-instead-of-read">Use plot() instead of read()</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.add" id="toc-mikeio1d.result_network.ResultQuantityCollection.add" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.add">add</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry" id="toc-mikeio1d.result_network.ResultQuantityCollection.get_data_entry" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry">get_data_entry</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net" id="toc-mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net">get_data_entry_net</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.get_query" id="toc-mikeio1d.result_network.ResultQuantityCollection.get_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.get_query">get_query</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.plot" id="toc-mikeio1d.result_network.ResultQuantityCollection.plot" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.plot">plot</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.read" id="toc-mikeio1d.result_network.ResultQuantityCollection.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.to_csv" id="toc-mikeio1d.result_network.ResultQuantityCollection.to_csv" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.to_csv">to_csv</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dataframe" id="toc-mikeio1d.result_network.ResultQuantityCollection.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.to_dataframe">to_dataframe</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dfs0" id="toc-mikeio1d.result_network.ResultQuantityCollection.to_dfs0" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.to_dfs0">to_dfs0</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.to_txt" id="toc-mikeio1d.result_network.ResultQuantityCollection.to_txt" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.to_txt">to_txt</a></li>
   </ul></li>
-  <li><a href="#inspect-network-elements" id="toc-inspect-network-elements" class="nav-link" data-scroll-target="#inspect-network-elements">Inspect network elements</a>
-  <ul class="collapse">
-  <li><a href="#descriptive-html-representations" id="toc-descriptive-html-representations" class="nav-link" data-scroll-target="#descriptive-html-representations">Descriptive html representations</a></li>
-  <li><a href="#descriptive-string-representations" id="toc-descriptive-string-representations" class="nav-link" data-scroll-target="#descriptive-string-representations">Descriptive string representations</a></li>
-  <li><a href="#accessing-static-data" id="toc-accessing-static-data" class="nav-link" data-scroll-target="#accessing-static-data">Accessing static data</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/find_a_place_for_me.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title d-none d-lg-block">What types of files can I read?</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p>Any result file related to MIKE collection system, water distribution, and river modelling. Specific file extensions supported include:</p>
-<ul>
-<li>MIKE 1D network and catchment .res1d files</li>
-<li>MIKE 1D Long Term Statistics .res1d files</li>
-<li>MOUSE legacy .PRF and .CRF files</li>
-<li>EPANET .res and .resx files generated by MIKE+</li>
-<li>SWMM .out files</li>
-</ul>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>EPANET, SWMM, and MOUSE result files are read the same way as res1d files. No special syntax or alternative API is required.</p>
-</div>
-</div>
-<p>Additionally, support is available for cross section data stored in .xns11 files.</p>
-<section id="basics-of-the-network-structure" class="level2">
-<h2 class="anchored" data-anchor-id="basics-of-the-network-structure">Basics of the network structure</h2>
-<p>Working with MIKE IO 1D requires a conceptual understanding of the network structure. All result data lives somewhere on the network. There’s four main elements of every network:</p>
-<ul>
-<li>Nodes</li>
-<li>Reaches (also consisting of grid points)</li>
-<li>Catchments</li>
-<li>Global data</li>
-</ul>
-<p>When you first open a result file, you’ll see how many of these elements types exist in the file.</p>
-<div id="112639af" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Start time: 1994-08-07 16:35:00
-End time: 1994-08-07 18:35:00
-# Timesteps: 110
-# Catchments: 0
-# Nodes: 119
-# Reaches: 118
-# Globals: 0
-0 - WaterLevel &lt;m&gt;
-1 - Discharge &lt;m^3/s&gt;</code></pre>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The network structure is generic and applies to different domains (e.g.&nbsp;collection systems, water distribution, rivers). Here’s a few examples of result types mapped onto this structure.</p>
-</div>
-</div>
-<pre class="{list-table}"><code>:widths: 15 30
-:header-rows: 1
-
-*   - Network Element
-    - Result Type
-*   - Nodes
-    -
-        - Various water levels (e.g. manhole, basin, outlet, junction)
-        - Pump discarge in structure
-*   - Reaches
-    -
-        - Various link discharges (e.g. pipes, pumps, weirs)
-        - Water level at various chainages along a river reach
-*   - Catchments
-    -
-        - Catchment discharge
-        - Total Runoff
-*   - Global data
-    -
-        - Water balance
-        - User defined variable types</code></pre>
-</section>
-<section id="reading-and-plotting-data" class="level2">
-<h2 class="anchored" data-anchor-id="reading-and-plotting-data">Reading and plotting data</h2>
-<p>There’s various ways to read data into dataframes and make plots.</p>
-<section id="read-everything" class="level3">
-<h3 class="anchored" data-anchor-id="read-everything">Read everything</h3>
-<div id="ad67f410" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<section id="mikeio1d.result_network.ResultQuantityCollection" class="level1">
+<h1>result_network.ResultQuantityCollection</h1>
+<p><code>result_network.ResultQuantityCollection(self, result_quantities, res1d)</code></p>
+<p>Class for dealing with a collection ResultQuantity objects.</p>
+<p>ResultQuantityCollection objects are the attributes assigned to a network type like nodes, catchments, etc. For example, res1d.nodes.WaterLevel They have the ability to add queries.</p>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 7%">
+<col style="width: 60%">
+<col style="width: 11%">
+</colgroup>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:1</th>
-<th data-quarto-table-cell-role="th">WaterLevel:2</th>
-<th data-quarto-table-cell-role="th">WaterLevel:3</th>
-<th data-quarto-table-cell-role="th">WaterLevel:4</th>
-<th data-quarto-table-cell-role="th">WaterLevel:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:6</th>
-<th data-quarto-table-cell-role="th">WaterLevel:7</th>
-<th data-quarto-table-cell-role="th">WaterLevel:8</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9</th>
-<th data-quarto-table-cell-role="th">WaterLevel:10</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">Discharge:99l1:22.2508</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:10</th>
-<th data-quarto-table-cell-role="th">Discharge:9l1:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:1</th>
-<th data-quarto-table-cell-role="th">Discharge:Weir:119w1:0.5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:82.4281</th>
-<th data-quarto-table-cell-role="th">Discharge:Pump:115p1:41.214</th>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625000</td>
-<td>193.675003</td>
-<td>193.764999</td>
-<td>193.774994</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.774994</td>
-<td>193.764999</td>
-<td>0.000031</td>
-<td>193.550003</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.304993</td>
-<td>195.005005</td>
-<td>0.0</td>
+<td><code>result_quantities</code></td>
+<td></td>
+<td>A list of ResultQuantity objects having the same quantity id.</td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.052994</td>
-<td>195.821701</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625320</td>
-<td>193.675110</td>
-<td>193.765060</td>
-<td>193.775116</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775070</td>
-<td>193.765060</td>
-<td>0.000031</td>
-<td>193.550003</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.306061</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.052994</td>
-<td>195.821640</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625671</td>
-<td>193.675369</td>
-<td>193.765106</td>
-<td>193.775513</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775391</td>
-<td>193.765106</td>
-<td>0.000033</td>
-<td>193.550034</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.307144</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626236</td>
-<td>193.675751</td>
-<td>193.765228</td>
-<td>193.776077</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775894</td>
-<td>193.765228</td>
-<td>0.000037</td>
-<td>193.550079</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.308884</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626556</td>
-<td>193.675949</td>
-<td>193.765335</td>
-<td>193.776352</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.776154</td>
-<td>193.765335</td>
-<td>0.000039</td>
-<td>193.550095</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.309860</td>
-<td>195.005005</td>
-<td>0.0</td>
+<td><code>res1d</code></td>
+<td>Res1D</td>
+<td>Res1D object the quantity belongs to.</td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
-
-<p>5 rows × 495 columns</p>
-</div>
-</div>
-</div>
 </section>
-<section id="read-a-specific-result" class="level3">
-<h3 class="anchored" data-anchor-id="read-a-specific-result">Read a specific result</h3>
-<div id="be175ebc" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<section id="attributes" class="level2">
+<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:101</th>
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.931503</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.name">name</a></td>
+<td>Name of the quantity id assosciated with collection.</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.931595</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.931625</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.931656</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.931656</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.timeseries_id">timeseries_id</a></td>
+<td>TimeSeriesId corresponding to ResultQuantity.</td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
 </section>
-<section id="read-a-group-of-results" class="level3">
-<h3 class="anchored" data-anchor-id="read-a-group-of-results">Read a group of results</h3>
-<div id="3e53c48e" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes.WaterLevel.read()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:1</th>
-<th data-quarto-table-cell-role="th">WaterLevel:2</th>
-<th data-quarto-table-cell-role="th">WaterLevel:3</th>
-<th data-quarto-table-cell-role="th">WaterLevel:4</th>
-<th data-quarto-table-cell-role="th">WaterLevel:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:6</th>
-<th data-quarto-table-cell-role="th">WaterLevel:7</th>
-<th data-quarto-table-cell-role="th">WaterLevel:8</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9</th>
-<th data-quarto-table-cell-role="th">WaterLevel:10</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">WaterLevel:46</th>
-<th data-quarto-table-cell-role="th">WaterLevel:55</th>
-<th data-quarto-table-cell-role="th">WaterLevel:58</th>
-<th data-quarto-table-cell-role="th">WaterLevel:116</th>
-<th data-quarto-table-cell-role="th">WaterLevel:117</th>
-<th data-quarto-table-cell-role="th">WaterLevel:118</th>
-<th data-quarto-table-cell-role="th">WaterLevel:115</th>
-<th data-quarto-table-cell-role="th">WaterLevel:119</th>
-<th data-quarto-table-cell-role="th">WaterLevel:120</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir Outlet:119w1</th>
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625000</td>
-<td>193.675003</td>
-<td>193.764999</td>
-<td>193.774994</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.074997</td>
-<td>195.005005</td>
-<td>193.554993</td>
-<td>193.550003</td>
-<td>193.585007</td>
-<td>193.585007</td>
-<td>193.304993</td>
-<td>193.550003</td>
-<td>193.550003</td>
-<td>193.779999</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.add">add</a></td>
+<td>Add queries to ResultNetwork.queries from a list of result quantities.</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.052994</td>
-<td>195.821701</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625320</td>
-<td>193.675110</td>
-<td>193.765060</td>
-<td>193.775116</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.074997</td>
-<td>195.005005</td>
-<td>193.555023</td>
-<td>193.550064</td>
-<td>193.585831</td>
-<td>193.586807</td>
-<td>193.306061</td>
-<td>193.550003</td>
-<td>193.550003</td>
-<td>188.479996</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry">get_data_entry</a></td>
+<td>Get DataEntry corresponding to ResultQuantity.</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.052994</td>
-<td>195.821640</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625671</td>
-<td>193.675369</td>
-<td>193.765106</td>
-<td>193.775513</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.074997</td>
-<td>195.005005</td>
-<td>193.555084</td>
-<td>193.550110</td>
-<td>193.586426</td>
-<td>193.588196</td>
-<td>193.307144</td>
-<td>193.550034</td>
-<td>193.550003</td>
-<td>188.479996</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net">get_data_entry_net</a></td>
+<td>Get DataEntryNet corresponding to ResultQuantity.</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626236</td>
-<td>193.675751</td>
-<td>193.765228</td>
-<td>193.776077</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.074997</td>
-<td>195.005005</td>
-<td>193.555191</td>
-<td>193.550156</td>
-<td>193.586960</td>
-<td>193.589706</td>
-<td>193.308884</td>
-<td>193.550079</td>
-<td>193.550003</td>
-<td>188.479996</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.get_query">get_query</a></td>
+<td>Get queries corresponding to ResultQuantityCollection.</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626556</td>
-<td>193.675949</td>
-<td>193.765335</td>
-<td>193.776352</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.074997</td>
-<td>195.005005</td>
-<td>193.555267</td>
-<td>193.550171</td>
-<td>193.587112</td>
-<td>193.590317</td>
-<td>193.309860</td>
-<td>193.550095</td>
-<td>193.550003</td>
-<td>188.479996</td>
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.plot">plot</a></td>
+<td>Plot the time series data.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.read">read</a></td>
+<td>Read the time series data into a data frame.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_csv">to_csv</a></td>
+<td>Extract time series data into a csv file.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dataframe">to_dataframe</a></td>
+<td>Get a time series as a data frame.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dfs0">to_dfs0</a></td>
+<td>Extract time series data into a dfs0 file.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_txt">to_txt</a></td>
+<td>Extract time series data into a txt file.</td>
 </tr>
 </tbody>
 </table>
-
-<p>5 rows × 119 columns</p>
-</div>
-</div>
-</div>
+<section id="mikeio1d.result_network.ResultQuantityCollection.add" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.add">add</h3>
+<p><code>result_network.ResultQuantityCollection.add()</code></p>
+<p>Add queries to ResultNetwork.queries from a list of result quantities.</p>
 </section>
-<section id="combine-various-results-into-one-dataframe" class="level3">
-<h3 class="anchored" data-anchor-id="combine-various-results-into-one-dataframe">Combine various results into one dataframe</h3>
-<div id="8bec9a81" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.add()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>].Discharge.add()</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<section id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry">get_data_entry</h3>
+<p><code>result_network.ResultQuantityCollection.get_data_entry()</code></p>
+<p>Get DataEntry corresponding to ResultQuantity.</p>
+</section>
+<section id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net">get_data_entry_net</h3>
+<p><code>result_network.ResultQuantityCollection.get_data_entry_net()</code></p>
+<p>Get DataEntryNet corresponding to ResultQuantity.</p>
+</section>
+<section id="mikeio1d.result_network.ResultQuantityCollection.get_query" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_query">get_query</h3>
+<p><code>result_network.ResultQuantityCollection.get_query()</code></p>
+<p>Get queries corresponding to ResultQuantityCollection.</p>
+</section>
+<section id="mikeio1d.result_network.ResultQuantityCollection.plot" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.plot">plot</h3>
+<p><code>result_network.ResultQuantityCollection.plot(**kwargs)</code></p>
+<p>Plot the time series data.</p>
+</section>
+<section id="mikeio1d.result_network.ResultQuantityCollection.read" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.read">read</h3>
+<p><code>result_network.ResultQuantityCollection.read(column_mode=None)</code></p>
+<p>Read the time series data into a data frame.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 7%">
+<col style="width: 85%">
+<col style="width: 2%">
+</colgroup>
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:101</th>
-<th data-quarto-table-cell-role="th">Discharge:100l1:23.8414</th>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.931503</td>
-<td>0.000006</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.931595</td>
-<td>0.000006</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.931625</td>
-<td>0.000006</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.931656</td>
-<td>0.000006</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.931656</td>
-<td>0.000006</td>
+<td><code>column_mode</code></td>
+<td>str | ColumnMode(optional)</td>
+<td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects ‘str’ - column index of str representations of QueryData objects</td>
+<td><code>None</code></td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
-</section>
-<section id="use-plot-instead-of-read" class="level3">
-<h3 class="anchored" data-anchor-id="use-plot-instead-of-read">Use plot() instead of read()</h3>
-<div id="1ca16054" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="find_a_place_for_me_files/figure-html/cell-7-output-1.png" width="606" height="414" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="callout-hint">
-<p>Think of add() as in ‘add this to some collection of results I eventually want to read to a dataframe’.</p>
-</div>
-<div class="callout-add">
-<p>The add() workflow may change to something more intuitive. Join the discussion on GitHub to share your opinion :)’.</p>
-</div>
 </section>
 </section>
-<section id="inspect-network-elements" class="level2">
-<h2 class="anchored" data-anchor-id="inspect-network-elements">Inspect network elements</h2>
-<p>You can easily see what static and dynamic data is associated with a network element within a jupyter notebook.</p>
-<section id="descriptive-html-representations" class="level3">
-<h3 class="anchored" data-anchor-id="descriptive-html-representations">Descriptive html representations</h3>
-<div id="7243d3a6" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> res.nodes[<span class="st">'101'</span>]</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>node</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
-&lt;Manhole: 101&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (8)</summary><ul><li>id: 101</li><li>type: Manhole</li><li>xcoord: -687859.5004882812</li><li>ycoord: -1056308.700012207</li><li>ground_level: 196.67999267578125</li><li>bottom_level: 195.92999267578125</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>WaterLevel</li></ul></details>
-</div>
-</div>
+<section id="mikeio1d.result_network.ResultQuantityCollection.to_csv" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_csv">to_csv</h3>
+<p><code>result_network.ResultQuantityCollection.to_csv(file_path, time_step_skipping_number=1)</code></p>
+<p>Extract time series data into a csv file.</p>
 </section>
-<section id="descriptive-string-representations" class="level3">
-<h3 class="anchored" data-anchor-id="descriptive-string-representations">Descriptive string representations</h3>
-<div id="85db9419" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> res.nodes[<span class="st">'101'</span>]</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">str</span>(node)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
-<pre><code>'&lt;Manhole: 101&gt;'</code></pre>
-</div>
-</div>
+<section id="mikeio1d.result_network.ResultQuantityCollection.to_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_dataframe">to_dataframe</h3>
+<p><code>result_network.ResultQuantityCollection.to_dataframe()</code></p>
+<p>Get a time series as a data frame.</p>
 </section>
-<section id="accessing-static-data" class="level3">
-<h3 class="anchored" data-anchor-id="accessing-static-data">Accessing static data</h3>
-<div id="39a91c9f" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> res.nodes[<span class="st">'101'</span>]</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>node.<span class="bu">id</span>, node.<span class="bu">type</span>, node.ground_level</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>('101', 'Manhole', 196.67999267578125)</code></pre>
-</div>
-</div>
+<section id="mikeio1d.result_network.ResultQuantityCollection.to_dfs0" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_dfs0">to_dfs0</h3>
+<p><code>result_network.ResultQuantityCollection.to_dfs0(file_path, time_step_skipping_number=1)</code></p>
+<p>Extract time series data into a dfs0 file.</p>
+</section>
+<section id="mikeio1d.result_network.ResultQuantityCollection.to_txt" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_txt">to_txt</h3>
+<p><code>result_network.ResultQuantityCollection.to_txt(file_path, time_step_skipping_number=1)</code></p>
+<p>Extract time series data into a txt file.</p>
 
 
+</section>
 </section>
 </section>
 
@@ -1344,7 +910,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/find_a_place_for_me.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+</div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
