@@ -41,6 +41,8 @@ setuptools.setup(
             "matplotlib",
             "jupyterlab",
             "geopandas",
+            "folium",
+            "mapclassify",
         ],
         "docs": [
             "quarto-cli",
