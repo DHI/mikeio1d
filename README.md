@@ -1,14 +1,15 @@
 ![logo](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png)
 # MIKE IO 1D: Read MIKE 1D in python
 
-Read res1d and xns11 files.
+Read, manipulate, and analyze res1d, res, resx, out, and xns11 files.
 
 For other MIKE files (Dfs0, Dfs1, Dfs2, Dfsu,...) use the related package [MIKE IO](https://github.com/DHI/mikeio)
 
 ## Requirements
-* Windows operating system (Support for Linux is experimental)
-* Python x64 3.9, 3.10, 3.11 or 3.12 
-* [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) (already installed if you have MIKE)
+* Windows, Linux (experimental)
+* Python x64 3.9 - 3.12 
+* (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) (already installed if you have MIKE)
+* (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
 
 ## Installation
 
@@ -16,33 +17,33 @@ From PyPI:
 
 `pip install mikeio1d`
 
+Linux users will need to install .NET runtime. For Ubuntu, you can install .NET runtime as follows:
+
+`sudo apt install dotnet-runtime-7.0`
+
 Or development version:
 
 `pip install https://github.com/DHI/mikeio1d/archive/main.zip`
 
+If you're on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:
 
-For MIKE IO 1D to work .NET runtime environment (version 3.1 and above) is needed. On Linux operating systems this is not available per default. For example, on Ubuntu distribution to get .NET 7.0 runtime call:
+`sudo apt install dotnet-sdk-7.0`
 
-`sudo apt install dotnet-runtime-7.0`
+## Documentation
 
-## Where can I get help?
+Check out the [official documentation for MIKE IO 1D](https://dhi.github.io/mikeio1d/).
 
-* New ideas and feature requests - [GitHub Discussions](http://github.com/DHI/mikeio1d/discussions) 
-* Bugs - [GitHub Issues](http://github.com/DHI/mikeio1d/issues) 
-* General help, FAQ - [Stackoverflow with the tag `mikeio`](https://stackoverflow.com/questions/tagged/mikeio1d)
+## Getting started
 
-
-## Examples
-
-### Read Res1D file Return Pandas DataFrame
+### Read network results into a DataFrame
 ```python
->>>  from mikeio1d.res1d import Res1D, QueryDataReach
->>>  df = Res1D(filename).read()
+>>>  from mikeio1d import Res1D
+>>>  res = Res1D('my_results.res1d')
+>>>  df = res.read()
 
->>>  query = QueryDataReach("WaterLevel", "104l1", 34.4131)
->>>  df = res1d.read(query)
+>>>  df_reach = res.reaches['my_reach'].Discharge.read()
+>>>  df_node  = res.nodes['my_node'].WaterLevel.read()
 ```
-For more Res1D examples see this [notebook](https://nbviewer.jupyter.org/github/DHI/mikeio1d/blob/main/notebooks/Res1D.ipynb)
 
 ### Read Xns11 file and plot a cross section
 ```python
@@ -53,3 +54,11 @@ For more Res1D examples see this [notebook](https://nbviewer.jupyter.org/github/
 >>>  xns.xsections.['basin_right', '238.800', '1'].plot()
 ```
 ![Geometry](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/xns11_geometry.png)
+
+Continue learning with [additional examples](https://dhi.github.io/mikeio1d/examples/res1d_basic.html).
+
+## Where can I get help?
+
+* Reference - [Documentation](https://dhi.github.io/mikeio1d/)
+* New ideas and feature requests - [GitHub Discussions](http://github.com/DHI/mikeio1d/discussions) 
+* Bugs - [GitHub Issues](http://github.com/DHI/mikeio1d/issues) 
