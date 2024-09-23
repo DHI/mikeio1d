@@ -77,6 +77,38 @@ def open(file_path: str | Path) -> Xns11:
 
 
 class Xns11:
+    """
+    A class to read and write xns11 files.
+
+    Parameters
+    ----------
+    file_path: str or Path, optional
+        full path and file name to the xns11 file.
+
+    Examples
+    --------
+    ```python
+    # Open an existing file
+    >>> xns = Xns11("file.xns11")
+
+    # Overview of the cross sections
+    >>> xns.xsections.to_dataframe()
+
+    # Read a specific cross section
+    >>> xs = xns.xsections.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
+
+    # Plot a cross section
+    >>> xs.plot()
+
+    # Access cross section raw data
+    >>> xs.raw_data
+
+    # Access cross section processed data
+    >>> xs.processed_data
+    ```
+
+    """
+
     def __init__(self, file_path: str | Path = None):
         self.file_path: str | Path = file_path
         if file_path is not None and not os.path.exists(file_path):

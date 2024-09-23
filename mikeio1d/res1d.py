@@ -84,7 +84,7 @@ class Res1D:
         (and optionally chainage) in the data frame label.
     put_chainage_in_col_name : bool
         Flag specifying to add chainage into data frame column label.
-    clear_queries_after_reading : bool
+    clear_queue_after_reading : bool
         Flag specifying to clear active queries after reading/processing them.
 
     Examples
@@ -168,10 +168,9 @@ class Res1D:
 
     # region Private methods
 
-    def info(self):
+    def info(self) -> str:
         """Prints information about the result file."""
-        info = self._get_info()
-        print(info)
+        print(self._get_info())
 
     def _get_timeseries_ids_to_read(
         self, queries: List[QueryData] | List[TimeSeriesId]
@@ -505,3 +504,12 @@ class Res1D:
             file_name = entry.file_path if isinstance(entry, Res1D) else entry
             file_names_new.append(file_name)
         return file_names_new
+
+    __all__ = [
+        "Res1D",
+        "ResultNodes",
+        "ResultReaches",
+        "ResultCatchments",
+        "ResultStructures",
+        "ResultGlobalDatas",
+    ]

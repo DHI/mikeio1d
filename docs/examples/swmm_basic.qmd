@@ -1,0 +1,69 @@
+---
+title: SWMM - basic
+description: Extract SWMM results for a collection system to a pandas DataFrame.
+jupyter: python3
+---
+
+## Overview 
+
+::: callout-tip
+MIKE IO 1D treats SWMM and Res1D results in the same way, so you may also refer to Res1D examples.
+:::
+
+```{python}	
+from mikeio1d import Res1D
+```
+
+```{python}	
+res = Res1D("../data/swmm.out")
+res.info()
+```
+
+## Plot network
+```{python}
+ax = res.reaches.to_geopandas().plot()
+res.nodes.to_geopandas().plot(ax=ax)
+res.catchments.to_geopandas().plot(ax=ax, alpha=0.5)
+```
+
+## Explore network
+
+```{python}
+res.reaches
+```
+
+```{python}
+res.nodes
+```
+
+```{python}
+res.catchments
+```
+
+## Extract results to a DataFrame
+
+```{python}
+df = res.read()
+df.head()
+```
+
+```{python}
+df = res.reaches['1'].SWMM_LINK_FLOW.read()
+df.head()
+```
+
+## Plot results
+
+```{python}
+res.reaches['1'].SWMM_LINK_FLOW.plot()
+```
+
+```{python}
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(2)
+res.reaches['1'].SWMM_LINK_FLOW.plot(ax=ax[0])
+res.catchments['2'].SWMM_SUBCATCH_RUNOFF.plot(ax=ax[1])
+
+plt.tight_layout()
+```

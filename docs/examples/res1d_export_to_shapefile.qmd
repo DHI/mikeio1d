@@ -1,0 +1,71 @@
+---
+title: Res1D - export to shapefile
+description: Export res1d results to shapefiles. 
+jupyter: python3
+---
+## Export to GeoDataFrame
+```	{python}
+from mikeio1d import Res1D
+```
+
+```	{python}
+res = Res1D("../data/network.res1d")
+gdf = res.network.to_geopandas()
+gdf.plot()
+```
+```	{python}
+res = Res1D("../data/network.res1d")
+gdf = res.network.to_geopandas()
+gdf.head()
+```
+
+## Plotting results
+```	{python}
+df_reaches = res.reaches.to_geopandas(agg='max')
+df_reaches.plot(column='max_Discharge', cmap="RdYlGn_r", legend=True)
+```
+```	{python}
+df_nodes = res.nodes.to_geopandas(agg='max')
+ax = df_reaches.plot(color="gray", zorder=-1)
+df_nodes.plot(ax=ax, column='max_WaterLevel', legend=True)
+```
+
+```	{python}
+res = Res1D("../data/catchments.res1d")
+df_catchments = res.catchments.to_geopandas('max')
+df_catchments.plot(column='max_TotalRunOff', cmap='Blues', legend=True, alpha=0.75)
+```
+
+## Interactive maps
+```	{python}
+map = df_reaches.explore(column="max_Discharge", legend=True, tiles="cartodb positron", tooltip=["name", "max_Discharge"], popup=True)
+map
+```
+
+```	{python}
+# save a distributable html map
+map.save("results.html")
+```
+
+## Export to shapefile
+```	{python}
+for df in [df_reaches, df_nodes, df_catchments]:
+    df.columns = [col[:10] for col in df.columns]
+
+df_reaches.to_file("reaches.shp")
+df_nodes.to_file("nodes.shp")
+df_catchments.to_file("catchments.shp")
+```
+
+::: {.hidden}
+```	{python .hidden}
+from pathlib import Path
+
+files_to_delete = []
+for p in ("results.html", "reaches*", "nodes*", "catchments*"):
+    files_to_delete = [*files_to_delete, *Path.glob(Path.cwd(), p)]
+
+for f in files_to_delete:
+    f.unlink()
+```	
+:::
