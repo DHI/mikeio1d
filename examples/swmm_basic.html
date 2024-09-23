@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Extract SWMM results for a collection system to a pandas DataFrame.">
 
-<title>MIKE IO 1D</title>
+<title>SWMM - basic – MIKE IO 1D</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,22 +58,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../examples/epanet_basic.html" rel="next">
+<link href="../examples/res1d_LTS.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -114,8 +117,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png" alt="" class="navbar-logo">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -125,15 +128,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./examples/index.html"> 
+    <a class="nav-link active" href="../examples/index.html" aria-current="page"> 
 <span class="menu-text">Examples</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./api/index.html"> 
+    <a class="nav-link" href="../api/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
 </ul>
@@ -163,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title"></h1>
+          <h1 class="quarto-secondary-nav-title">SWMM - basic</h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -184,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -193,37 +196,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/network.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/network.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/res1d.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/res1d.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/locations.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/locations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Locations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/quantities.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/quantities.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Quantities</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/xns11.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/xns11.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Xns11</span></a>
   </div>
 </li>
@@ -231,7 +234,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./examples/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../examples/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Examples</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -240,37 +243,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/res1d_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D - basic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/res1d_export_to_shapefile.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_export_to_shapefile.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D - export to shapefile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/res1d_LTS.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_LTS.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D - long term statistics (LTS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/swmm_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/swmm_basic.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">SWMM - basic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/epanet_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/epanet_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EPANET - basic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/xns11_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/xns11_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Xns11 - basic</span></a>
   </div>
 </li>
@@ -278,13 +281,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./design.html" class="sidebar-item-text sidebar-link">
+  <a href="../design.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Design philosophy</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./api/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../api/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">API Reference</span></a>
   </div>
 </li>
@@ -298,81 +301,175 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mike-io-1d-inputoutput-of-mike-1d-files-in-python" id="toc-mike-io-1d-inputoutput-of-mike-1d-files-in-python" class="nav-link active" data-scroll-target="#mike-io-1d-inputoutput-of-mike-1d-files-in-python">MIKE IO 1D: input/output of MIKE 1D files in Python</a>
-  <ul class="collapse">
-  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
-  <li><a href="#where-can-i-get-help" id="toc-where-can-i-get-help" class="nav-link" data-scroll-target="#where-can-i-get-help">Where can I get help?</a></li>
-  </ul></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#plot-network" id="toc-plot-network" class="nav-link" data-scroll-target="#plot-network">Plot network</a></li>
+  <li><a href="#explore-network" id="toc-explore-network" class="nav-link" data-scroll-target="#explore-network">Explore network</a></li>
+  <li><a href="#extract-results-to-a-dataframe" id="toc-extract-results-to-a-dataframe" class="nav-link" data-scroll-target="#extract-results-to-a-dataframe">Extract results to a DataFrame</a></li>
+  <li><a href="#plot-results" id="toc-plot-results" class="nav-link" data-scroll-target="#plot-results">Plot results</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/examples/swmm_basic.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">SWMM - basic</h1>
+</div>
+
+<div>
+  <div class="description">
+    Extract SWMM results for a collection system to a pandas DataFrame.
+  </div>
+</div>
 
 
+<div class="quarto-title-meta">
 
-<p><img src="images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png" class="img-fluid"></p>
-<section id="mike-io-1d-inputoutput-of-mike-1d-files-in-python" class="level1">
-<h1>MIKE IO 1D: input/output of MIKE 1D files in Python</h1>
-<p><img src="https://img.shields.io/pypi/pyversions/mikeio1d.svg" class="img-fluid" alt="Python version"> <a href="https://badge.fury.io/py/mikeio1d"><img src="https://badge.fury.io/py/mikeio1d.svg" class="img-fluid" alt="PyPI version"></a></p>
-<p>Read, manipulate, and analyze res1d, res, resx, out, and xns11 files.</p>
-<p>For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files), refer to <a href="https://github.com/DHI/mikeio">MIKE IO</a></p>
-<div class="callout callout-style-default callout-warning callout-titled">
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Warning
+Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>MIKE IO 1D is under development and could be subject to changes.</p>
+<p>MIKE IO 1D treats SWMM and Res1D results in the same way, so you may also refer to Res1D examples.</p>
 </div>
 </div>
-<section id="requirements" class="level2">
-<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
-<ul>
-<li>Windows, Linux (experimental)</li>
-<li>Python x64 3.9 - 3.12</li>
-<li>(Windows) <a href="https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads%3E">VC++ redistributables</a> (already installed if you have MIKE)</li>
-<li>(Linux) <a href="https://learn.microsoft.com/en-us/dotnet/core/install/linux">.NET Runtime</a> (not installed by default)</li>
-</ul>
+<div id="a80c8fde" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="76f46354" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/swmm.out"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start time: 1998-01-01 01:00:00.001000
+End time: 1998-01-02 12:00:00.001000
+# Timesteps: 36
+# Catchments: 8
+# Nodes: 14
+# Reaches: 13
+# Globals: 15
+0 - SWMM_NODE_DEPTH &lt;ft&gt;
+1 - SWMM_NODE_HEAD &lt;ft&gt;
+2 - SWMM_NODE_VOLUME &lt;ft^3&gt;
+3 - SWMM_NODE_LATFLOW &lt;ft^3/s&gt;
+4 - SWMM_NODE_INFLOW &lt;ft^3/s&gt;
+5 - SWMM_NODE_OVERFLOW &lt;ft^3/s&gt;
+6 - SWMM_NODE_QUAL &lt;mu-g/l&gt;
+7 - SWMM_LINK_FLOW &lt;ft^3/s&gt;
+8 - SWMM_LINK_DEPTH &lt;ft&gt;
+9 - SWMM_LINK_VELOCITY &lt;ft/s&gt;
+10 - SWMM_LINK_Froude_Number &lt;()&gt;
+11 - SWMM_LINK_CAPACITY &lt;()&gt;
+12 - SWMM_LINK_QUAL &lt;mu-g/l&gt;
+13 - SWMM_SUBCATCH_RAINFALL &lt;in/h&gt;
+14 - SWMM_SUBCATCH_SNOWDEPTH &lt;in&gt;
+15 - SWMM_SUBCATCH_EVAP &lt;in&gt;
+16 - SWMM_SUBCATCH_INFIL &lt;in/h&gt;
+17 - SWMM_SUBCATCH_RUNOFF &lt;ft^3/s&gt;
+18 - SWMM_SUBCATCH_GW_FLOW &lt;ft^3/s&gt;
+19 - SWMM_SUBCATCH_GW_ELEV &lt;ft&gt;
+20 - SWMM_SUBCATCH_SOIL_MOIST &lt;()&gt;
+21 - SWMM_SUBCATCH_WASHOFF &lt;mu-g/l&gt;
+22 - SWMM_SYS_TEMPERATURE &lt;deg F&gt;
+23 - SWMM_SYS_RAINFALL &lt;in/h&gt;
+24 - SWMM_SYS_SNOWDEPTH &lt;in&gt;
+25 - SWMM_SYS_INFIL &lt;in/h&gt;
+26 - SWMM_SYS_RUNOFF &lt;ft^3/s&gt;
+27 - SWMM_SYS_DWFLOW &lt;ft^3/s&gt;
+28 - SWMM_SYS_GWFLOW &lt;ft^3/s&gt;
+29 - SWMM_SYS_INFLOW &lt;ft^3/s&gt;
+30 - SWMM_SYS_EXFLOW &lt;ft^3/s&gt;
+31 - SWMM_SYS_FLOODING &lt;ft^3/s&gt;
+32 - SWMM_SYS_OUTFLOW &lt;ft^3/s&gt;
+33 - SWMM_SYS_STORAGE &lt;ft^3&gt;
+34 - SWMM_SYS_EVAP &lt;-&gt;
+35 - SWMM_SYS_PET &lt;-&gt;</code></pre>
+</div>
+</div>
 </section>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install mikeio1d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Using MIKE IO 1D with Linux?">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Using MIKE IO 1D with Linux?
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>Linux users will need to install .NET runtime. If you’re on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install dotnet-runtime-7.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install dotnet-sdk-7.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="plot-network" class="level2">
+<h2 class="anchored" data-anchor-id="plot-network">Plot network</h2>
+<div id="93869116" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> res.reaches.to_geopandas().plot()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>res.nodes.to_geopandas().plot(ax<span class="op">=</span>ax)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>res.catchments.to_geopandas().plot(ax<span class="op">=</span>ax, alpha<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="swmm_basic_files/figure-html/cell-4-output-1.png" width="417" height="411" class="figure-img"></p>
+</figure>
 </div>
 </div>
 </div>
 </section>
-<section id="getting-started" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
-<div id="d466b5b4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"data/network.res1d"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
+<section id="explore-network" class="level2">
+<h2 class="anchored" data-anchor-id="explore-network">Explore network</h2>
+<div id="41d95700" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+&lt;ResultReaches&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Names (13)</summary><ul><li>1</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>10</li><li>11</li><li>12</li><li>13</li><li>14</li><li>15</li><li>16</li></ul></details><details><summary>Quantities (6)</summary><ul><li>SWMM_LINK_FLOW</li><li>SWMM_LINK_DEPTH</li><li>SWMM_LINK_VELOCITY</li><li>SWMM_LINK_Froude_Number</li><li>SWMM_LINK_CAPACITY</li><li>SWMM_LINK_QUAL</li></ul></details>
+</div>
+</div>
+<div id="5c7e640e" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+&lt;ResultNodes&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Names (14)</summary><ul><li>9</li><li>10</li><li>13</li><li>14</li><li>15</li><li>16</li><li>17</li><li>19</li><li>20</li><li>21</li><li>22</li><li>23</li><li>24</li><li>18</li></ul></details><details><summary>Quantities (7)</summary><ul><li>SWMM_NODE_DEPTH</li><li>SWMM_NODE_HEAD</li><li>SWMM_NODE_VOLUME</li><li>SWMM_NODE_LATFLOW</li><li>SWMM_NODE_INFLOW</li><li>SWMM_NODE_OVERFLOW</li><li>SWMM_NODE_QUAL</li></ul></details>
+</div>
+</div>
+<div id="ca119fe1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+&lt;ResultCatchments&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Names (8)</summary><ul><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li></ul></details><details><summary>Quantities (9)</summary><ul><li>SWMM_SUBCATCH_RAINFALL</li><li>SWMM_SUBCATCH_SNOWDEPTH</li><li>SWMM_SUBCATCH_EVAP</li><li>SWMM_SUBCATCH_INFIL</li><li>SWMM_SUBCATCH_RUNOFF</li><li>SWMM_SUBCATCH_GW_FLOW</li><li>SWMM_SUBCATCH_GW_ELEV</li><li>SWMM_SUBCATCH_SOIL_MOIST</li><li>SWMM_SUBCATCH_WASHOFF</li></ul></details>
+</div>
+</div>
+</section>
+<section id="extract-results-to-a-dataframe" class="level2">
+<h2 class="anchored" data-anchor-id="extract-results-to-a-dataframe">Extract results to a DataFrame</h2>
+<div id="431a068f" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
 <div>
 
 
@@ -380,168 +477,229 @@ Using MIKE IO 1D with Linux?
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:1</th>
-<th data-quarto-table-cell-role="th">WaterLevel:2</th>
-<th data-quarto-table-cell-role="th">WaterLevel:3</th>
-<th data-quarto-table-cell-role="th">WaterLevel:4</th>
-<th data-quarto-table-cell-role="th">WaterLevel:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:6</th>
-<th data-quarto-table-cell-role="th">WaterLevel:7</th>
-<th data-quarto-table-cell-role="th">WaterLevel:8</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9</th>
-<th data-quarto-table-cell-role="th">WaterLevel:10</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_DEPTH:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_HEAD:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_VOLUME:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_LATFLOW:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_INFLOW:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_OVERFLOW:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_QUAL:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_QUAL:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_DEPTH:10</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_HEAD:10</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">Discharge:99l1:22.2508</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:10</th>
-<th data-quarto-table-cell-role="th">Discharge:9l1:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:1</th>
-<th data-quarto-table-cell-role="th">Discharge:Weir:119w1:0.5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:82.4281</th>
-<th data-quarto-table-cell-role="th">Discharge:Pump:115p1:41.214</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_DWFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_GWFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_INFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_EXFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_INFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_FLOODING</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_OUTFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_STORAGE</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_EVAP</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_PET</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625000</td>
-<td>193.675003</td>
-<td>193.764999</td>
-<td>193.774994</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.774994</td>
-<td>193.764999</td>
-<td>0.000031</td>
-<td>193.550003</td>
-<td>188.479996</td>
+<td data-quarto-table-cell-role="th">1998-01-01 01:00:00.001</td>
+<td>0.000000</td>
+<td>1000.000000</td>
 <td>0.0</td>
-<td>193.304993</td>
-<td>195.005005</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>995.000000</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.052994</td>
-<td>195.821701</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625320</td>
-<td>193.675110</td>
-<td>193.765060</td>
-<td>193.775116</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775070</td>
-<td>193.765060</td>
-<td>0.000031</td>
-<td>193.550003</td>
-<td>188.479996</td>
+<td data-quarto-table-cell-role="th">1998-01-01 02:00:00.001</td>
+<td>0.288774</td>
+<td>1000.288757</td>
 <td>0.0</td>
-<td>193.306061</td>
-<td>195.005005</td>
+<td>1.239633</td>
+<td>1.239633</td>
+<td>0.0</td>
+<td>15.720075</td>
+<td>3.144015</td>
+<td>0.520309</td>
+<td>995.520325</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>6.216826</td>
+<td>0.000000</td>
+<td>6.128909</td>
+<td>1656.397217</td>
+<td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.052994</td>
-<td>195.821640</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625671</td>
-<td>193.675369</td>
-<td>193.765106</td>
-<td>193.775513</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775391</td>
-<td>193.765106</td>
-<td>0.000033</td>
-<td>193.550034</td>
-<td>188.479996</td>
+<td data-quarto-table-cell-role="th">1998-01-01 03:00:00.001</td>
+<td>0.418453</td>
+<td>1000.418457</td>
 <td>0.0</td>
-<td>193.307144</td>
-<td>195.005005</td>
+<td>2.595429</td>
+<td>2.595429</td>
+<td>0.0</td>
+<td>15.389509</td>
+<td>3.077902</td>
+<td>3.000000</td>
+<td>998.000000</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>13.030855</td>
+<td>0.521967</td>
+<td>12.470544</td>
+<td>2796.561035</td>
+<td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626236</td>
-<td>193.675751</td>
-<td>193.765228</td>
-<td>193.776077</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775894</td>
-<td>193.765228</td>
-<td>0.000037</td>
-<td>193.550079</td>
-<td>188.479996</td>
+<td data-quarto-table-cell-role="th">1998-01-01 04:00:00.001</td>
+<td>0.567633</td>
+<td>1000.567627</td>
 <td>0.0</td>
-<td>193.308884</td>
-<td>195.005005</td>
+<td>4.645479</td>
+<td>4.645479</td>
+<td>0.0</td>
+<td>14.810841</td>
+<td>2.962168</td>
+<td>3.000000</td>
+<td>998.000000</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>24.252975</td>
+<td>4.511855</td>
+<td>19.521162</td>
+<td>3780.683594</td>
+<td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626556</td>
-<td>193.675949</td>
-<td>193.765335</td>
-<td>193.776352</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.776154</td>
-<td>193.765335</td>
-<td>0.000039</td>
-<td>193.550095</td>
-<td>188.479996</td>
+<td data-quarto-table-cell-role="th">1998-01-01 05:00:00.001</td>
+<td>0.425047</td>
+<td>1000.425049</td>
 <td>0.0</td>
-<td>193.309860</td>
-<td>195.005005</td>
+<td>2.675368</td>
+<td>2.675368</td>
+<td>0.0</td>
+<td>14.338782</td>
+<td>2.867756</td>
+<td>3.000000</td>
+<td>998.000000</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>14.172027</td>
+<td>0.555154</td>
+<td>13.623661</td>
+<td>2913.430420</td>
+<td>0.0</td>
 <td>0.0</td>
 </tr>
 </tbody>
 </table>
 
-<p>5 rows × 495 columns</p>
+<p>5 rows × 298 columns</p>
 </div>
 </div>
 </div>
-<p>Read more in the <a href="./user-guide/getting-started.html">getting started guide</a>.</p>
-</section>
-<section id="where-can-i-get-help" class="level2">
-<h2 class="anchored" data-anchor-id="where-can-i-get-help">Where can I get help?</h2>
-<ul>
-<li>New ideas and feature requests - <a href="https://github.com/DHI/mikeio1d/discussions">GitHub Discussions</a></li>
-<li>Bugs - <a href="https://github.com/DHI/mikeio1d/issues">GitHub Issues</a></li>
-</ul>
+<div id="63563d6a" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.read()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
 
 
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">SWMM_LINK_FLOW:1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01 01:00:00.001</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1998-01-01 02:00:00.001</td>
+<td>1.235769</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01 03:00:00.001</td>
+<td>2.593548</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1998-01-01 04:00:00.001</td>
+<td>4.638623</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01 05:00:00.001</td>
+<td>2.675184</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
+<section id="plot-results" class="level2">
+<h2 class="anchored" data-anchor-id="plot-results">Plot results</h2>
+<div id="e73df832" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="swmm_basic_files/figure-html/cell-10-output-1.png" width="588" height="414" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="097d0b36" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.plot(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>res.catchments[<span class="st">'2'</span>].SWMM_SUBCATCH_RUNOFF.plot(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="swmm_basic_files/figure-html/cell-11-output-1.png" width="661" height="470" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -965,6 +1123,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../examples/res1d_LTS.html" class="pagination-link" aria-label="Res1D - long term statistics (LTS)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Res1D - long term statistics (LTS)</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../examples/epanet_basic.html" class="pagination-link" aria-label="EPANET - basic">
+        <span class="nav-page-text">EPANET - basic</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -973,7 +1143,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/examples/swmm_basic.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>

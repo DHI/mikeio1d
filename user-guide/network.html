@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>MIKE IO 1D</title>
+<title>Network – MIKE IO 1D</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,59 +20,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../user-guide/res1d.html" rel="next">
+<link href="../user-guide/getting-started.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -100,9 +68,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -114,8 +79,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png" alt="" class="navbar-logo">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -125,15 +90,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./examples/index.html"> 
+    <a class="nav-link active" href="../examples/index.html" aria-current="page"> 
 <span class="menu-text">Examples</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./api/index.html"> 
+    <a class="nav-link" href="../api/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
 </ul>
@@ -163,7 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title"></h1>
+          <h1 class="quarto-secondary-nav-title">Network</h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -184,7 +149,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -193,37 +158,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/network.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/network.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/res1d.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/res1d.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/locations.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/locations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Locations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/quantities.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/quantities.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Quantities</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./user-guide/xns11.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/xns11.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Xns11</span></a>
   </div>
 </li>
@@ -231,7 +196,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./examples/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../examples/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Examples</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -240,37 +205,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/res1d_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D - basic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/res1d_export_to_shapefile.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_export_to_shapefile.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D - export to shapefile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/res1d_LTS.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_LTS.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Res1D - long term statistics (LTS)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/swmm_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/swmm_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">SWMM - basic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/epanet_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/epanet_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EPANET - basic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples/xns11_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/xns11_basic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Xns11 - basic</span></a>
   </div>
 </li>
@@ -278,13 +243,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./design.html" class="sidebar-item-text sidebar-link">
+  <a href="../design.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Design philosophy</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./api/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../api/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">API Reference</span></a>
   </div>
 </li>
@@ -298,250 +263,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mike-io-1d-inputoutput-of-mike-1d-files-in-python" id="toc-mike-io-1d-inputoutput-of-mike-1d-files-in-python" class="nav-link active" data-scroll-target="#mike-io-1d-inputoutput-of-mike-1d-files-in-python">MIKE IO 1D: input/output of MIKE 1D files in Python</a>
-  <ul class="collapse">
-  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
-  <li><a href="#where-can-i-get-help" id="toc-where-can-i-get-help" class="nav-link" data-scroll-target="#where-can-i-get-help">Where can I get help?</a></li>
-  </ul></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#reaches" id="toc-reaches" class="nav-link" data-scroll-target="#reaches">Reaches</a></li>
+  <li><a href="#grid-points" id="toc-grid-points" class="nav-link" data-scroll-target="#grid-points">Grid Points</a></li>
+  <li><a href="#nodes" id="toc-nodes" class="nav-link" data-scroll-target="#nodes">Nodes</a></li>
+  <li><a href="#catchments" id="toc-catchments" class="nav-link" data-scroll-target="#catchments">Catchments</a></li>
+  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional resources</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/network.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Network</h1>
+</div>
 
 
 
-<p><img src="images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png" class="img-fluid"></p>
-<section id="mike-io-1d-inputoutput-of-mike-1d-files-in-python" class="level1">
-<h1>MIKE IO 1D: input/output of MIKE 1D files in Python</h1>
-<p><img src="https://img.shields.io/pypi/pyversions/mikeio1d.svg" class="img-fluid" alt="Python version"> <a href="https://badge.fury.io/py/mikeio1d"><img src="https://badge.fury.io/py/mikeio1d.svg" class="img-fluid" alt="PyPI version"></a></p>
-<p>Read, manipulate, and analyze res1d, res, resx, out, and xns11 files.</p>
-<p>For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files), refer to <a href="https://github.com/DHI/mikeio">MIKE IO</a></p>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>MIKE IO 1D is under development and could be subject to changes.</p>
-</div>
-</div>
-<section id="requirements" class="level2">
-<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
-<ul>
-<li>Windows, Linux (experimental)</li>
-<li>Python x64 3.9 - 3.12</li>
-<li>(Windows) <a href="https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads%3E">VC++ redistributables</a> (already installed if you have MIKE)</li>
-<li>(Linux) <a href="https://learn.microsoft.com/en-us/dotnet/core/install/linux">.NET Runtime</a> (not installed by default)</li>
-</ul>
-</section>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install mikeio1d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Using MIKE IO 1D with Linux?">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Using MIKE IO 1D with Linux?
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>Linux users will need to install .NET runtime. If you’re on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install dotnet-runtime-7.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install dotnet-sdk-7.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</section>
-<section id="getting-started" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
-<div id="d466b5b4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"data/network.res1d"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A fundamental concept of MIKE IO 1D is the structure of a Network. Understanding its basic components is essential for working with the library.</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Networks consist of several elements: reaches, grid points, nodes, and catchments.</p>
 <div>
 
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:1</th>
-<th data-quarto-table-cell-role="th">WaterLevel:2</th>
-<th data-quarto-table-cell-role="th">WaterLevel:3</th>
-<th data-quarto-table-cell-role="th">WaterLevel:4</th>
-<th data-quarto-table-cell-role="th">WaterLevel:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:6</th>
-<th data-quarto-table-cell-role="th">WaterLevel:7</th>
-<th data-quarto-table-cell-role="th">WaterLevel:8</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9</th>
-<th data-quarto-table-cell-role="th">WaterLevel:10</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">Discharge:99l1:22.2508</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:10</th>
-<th data-quarto-table-cell-role="th">Discharge:9l1:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:1</th>
-<th data-quarto-table-cell-role="th">Discharge:Weir:119w1:0.5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:82.4281</th>
-<th data-quarto-table-cell-role="th">Discharge:Pump:115p1:41.214</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625000</td>
-<td>193.675003</td>
-<td>193.764999</td>
-<td>193.774994</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.774994</td>
-<td>193.764999</td>
-<td>0.000031</td>
-<td>193.550003</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.304993</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.052994</td>
-<td>195.821701</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625320</td>
-<td>193.675110</td>
-<td>193.765060</td>
-<td>193.775116</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775070</td>
-<td>193.765060</td>
-<td>0.000031</td>
-<td>193.550003</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.306061</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.052994</td>
-<td>195.821640</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625671</td>
-<td>193.675369</td>
-<td>193.765106</td>
-<td>193.775513</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775391</td>
-<td>193.765106</td>
-<td>0.000033</td>
-<td>193.550034</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.307144</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626236</td>
-<td>193.675751</td>
-<td>193.765228</td>
-<td>193.776077</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.775894</td>
-<td>193.765228</td>
-<td>0.000037</td>
-<td>193.550079</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.308884</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626556</td>
-<td>193.675949</td>
-<td>193.765335</td>
-<td>193.776352</td>
-<td>193.804993</td>
-<td>...</td>
-<td>0.000002</td>
-<td>193.776154</td>
-<td>193.765335</td>
-<td>0.000039</td>
-<td>193.550095</td>
-<td>188.479996</td>
-<td>0.0</td>
-<td>193.309860</td>
-<td>195.005005</td>
-<td>0.0</td>
-</tr>
-</tbody>
-</table>
-
-<p>5 rows × 495 columns</p>
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2" data-layout-align="center">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="../images/docs/NetworkExample.png" class="img-fluid"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="../images/docs/NetworkCatchments.svg" class="img-fluid"></p>
 </div>
 </div>
 </div>
-<p>Read more in the <a href="./user-guide/getting-started.html">getting started guide</a>.</p>
 </section>
-<section id="where-can-i-get-help" class="level2">
-<h2 class="anchored" data-anchor-id="where-can-i-get-help">Where can I get help?</h2>
+<section id="reaches" class="level2">
+<h2 class="anchored" data-anchor-id="reaches">Reaches</h2>
+<p>Reaches have many synonyms within different domain applications. In collection systems they are often called links or pipes. In river models they are called branches, streams, canals or channels. In graph and network theory they are called links or edges. Reaches contains several ‘grid points’ along their path, and are bounded by nodes.</p>
+</section>
+<section id="grid-points" class="level2">
+<h2 class="anchored" data-anchor-id="grid-points">Grid Points</h2>
+<p>Grid points are the computational points along a reach. A flow model has different types of grid points:</p>
 <ul>
-<li>New ideas and feature requests - <a href="https://github.com/DHI/mikeio1d/discussions">GitHub Discussions</a></li>
-<li>Bugs - <a href="https://github.com/DHI/mikeio1d/issues">GitHub Issues</a></li>
+<li>H grid point: contains water level and an associated cross section.</li>
+<li>Q grid point: contains discharge or flow velocity.</li>
+<li>Structure grid point: calculates discharge over a structure depending on the water levels on each side of the structure.</li>
+</ul>
+</section>
+<section id="nodes" class="level2">
+<h2 class="anchored" data-anchor-id="nodes">Nodes</h2>
+<p>Nodes are connected together by reaches. Nodes can represent different entities: manholes, basins, outlets, and junction nodes. They may or may not have a volume.</p>
+</section>
+<section id="catchments" class="level2">
+<h2 class="anchored" data-anchor-id="catchments">Catchments</h2>
+<p>Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.</p>
+</section>
+<section id="additional-resources" class="level2">
+<h2 class="anchored" data-anchor-id="additional-resources">Additional resources</h2>
+<ul>
+<li><a href="https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/">MIKE 1D API</a></li>
 </ul>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -965,6 +763,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../user-guide/getting-started.html" class="pagination-link" aria-label="User Guide">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">User Guide</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../user-guide/res1d.html" class="pagination-link" aria-label="Res1D">
+        <span class="nav-page-text">Res1D</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -973,7 +783,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/network.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
