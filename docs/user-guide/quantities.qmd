@@ -1,0 +1,79 @@
+---
+title: Quantities
+---
+::: {.hidden}
+```{python}
+from mikeio1d import Res1D
+res = Res1D('../data/network.res1d')
+res_catchments = Res1D('../data/catchments.res1d')
+```
+:::
+
+Quantities are the actual model results, which can be read into a pandas DataFrame or plotted directly.
+
+## Data structures
+
+Two main quantity structures exist: quantities and quantity collections.
+
+### Quantity
+A quantity is a single quantity at a specific location. Quantities are accessed from a location object.
+
+```{python}
+res.nodes['101'].WaterLevel # single quantity (i.e. water level) at a single location (i.e. node 101)
+```
+
+### Quantity Collection
+A quantity collection is a single quantity at multiple locations. Quantity collections are accessed from a location collection.
+```{python}
+res.nodes.WaterLevel # single quantity (i.e. water level) at multiple locations (i.e. all nodes)
+```
+
+## Reading data
+Quantities and quantity collections can be read into a pandas DataFrame with their `read` method.
+```{python}
+df = res.nodes['101'].WaterLevel.read()
+df.head()
+```
+
+```{python}
+df = res.nodes.WaterLevel.read()
+df.head()
+```
+
+## Plotting data
+Quantities and quantity collections can be plotted directly with their `plot` method.
+```{python}
+res.nodes['101'].WaterLevel.plot()
+```
+
+```{python}
+res.nodes.WaterLevel.plot(legend=False)
+```
+
+## Dynamic selections 
+Quantities or quantity collections can be conveniently combined into a single DataFrame with the 'add' method.
+```{python}
+res.nodes['101'].WaterLevel.add()
+res.nodes['100'].WaterLevel.add()
+df = res.read()
+df.head()
+```
+
+```{python}
+res.nodes.WaterLevel.add()
+res.reaches.WaterLevel.add()
+df = res.read()
+df.head()
+```
+
+::: callout-note
+The name 'add' indicates the quantity is added to a list of quantities to be read. The 'read' method reads all quantities in the list.
+:::
+
+## Examples
+
+- [Res1D Basics](../examples/res1d_basic.qmd)
+
+::: callout-tip
+There are also several notebook examples available on our [GitHub repository]()https://github.com/DHI/mikeio1d/tree/main/notebooks.
+:::

@@ -1,0 +1,117 @@
+---
+title: Res1D - basic
+description: Extract res1d results for a collection system or river to a pandas DataFrame.
+jupyter: python3
+---
+
+```{python}
+from mikeio1d import Res1D
+```
+
+## Res1D
+
+```{python}
+# Check contents
+res = Res1D("../data/network.res1d")
+res.info()
+```
+
+```{python}
+# Extract results to a pandas DataFrame
+df = res.read()
+df.head()
+```
+
+### Reaches
+
+```{python}
+# See info related to nodes
+res.reaches
+```
+
+```{python}
+# Get reach water levels
+df_reaches = res.reaches.WaterLevel.read()
+df_reaches.head()
+```
+
+```{python}
+# Plot water levels for a specific reach
+res.reaches['100l1'].WaterLevel.plot()
+```
+
+```{python}
+# See info related to a specific reach
+res.reaches['100l1']
+```
+
+### Grid points
+
+```{python}
+# See grid point info for a reach by chainage
+res.reaches['100l1']['47.683']
+```
+
+```{python}
+# Alternatively, index grid points by index number (e.g. '0' for first, '-1' for last, etc.).
+res.reaches['100l1'][-1]
+```
+
+```{python}
+# Plot water level at a gridpoint
+res.reaches['100l1'][0].WaterLevel.plot()
+```
+
+### Nodes
+
+```{python}
+# See info related to nodes
+res.nodes
+```
+
+```{python}
+# Get node water levels
+df_nodes = res.nodes.WaterLevel.read()
+df_nodes.head()
+```
+
+```{python}
+# Plot water level of specific node
+res.nodes['1'].WaterLevel.plot()
+```
+
+```{python}
+# See info related to a specific node
+res.nodes['1']
+```
+
+### Catchments
+```{python}
+# See info related to catchments
+res = Res1D("../data/catchments.res1d")
+res.catchments
+```
+
+```{python}
+# Extract runoff to a pandas DataFrame
+df = res.catchments.TotalRunOff.read()
+df.head()
+```
+
+
+```{python}
+# Plot runoff for a specific catchment
+df = res.catchments['20_2_2'].TotalRunOff.plot()
+```
+
+## Dynamic selections
+```{python}
+# Dynamically select results to extract into a pandas DataFrame.
+res = Res1D("../data/network.res1d")
+
+res.reaches['100l1'].Discharge.add()
+res.reaches['101l1'].Discharge.add()
+res.nodes['1'].WaterLevel.add()
+df = res.read()
+df.head()
+```

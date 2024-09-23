@@ -1,0 +1,174 @@
+---
+title: Xns11 - basic
+description: Extract cross sections to a pandas DataFrame and plot them.
+jupyter: python3
+---
+
+## Overview
+```{python}
+from mikeio1d import Xns11
+xns = Xns11("../data/mikep_cs_demo.xns11")
+xns.xsections
+```
+
+```{python}
+xns.xsections.to_dataframe().head()
+```
+
+## Plotting
+
+```{python}
+xns.xsections['basin_left1','122.042','1'].plot()
+```
+
+## Extracting data
+
+```{python}
+xns.xsections['basin_left1','122.042','1'].raw.head()
+```
+```{python}
+xns.xsections['basin_left1','122.042','1'].markers
+```
+
+```{python}
+xns.xsections['basin_left1','122.042','1'].processed.head()
+```
+
+## Selecting cross sections
+
+```{python}
+xns.xsections['basin_left1','122.042','1']
+```
+
+```{python}
+xns.xsections.sel(location_id='basin_left1', chainage=122.042, topo_id='1')
+```
+
+```{python}
+# Use ':' or '...' as a wildcard
+xns.xsections['basin_left1', :, '1'].to_dataframe()
+```
+
+```{python}
+# Similar to above, but using the 'sel' method.
+xns.xsections.sel(location_id='basin_left1').to_dataframe()
+```
+
+
+```{python}
+# Combine multiple cross sections into one plot.
+cross_sections = xns.xsections['basin_left1','481.451', ...] | xns.xsections['basin_left1','166.107', ...]
+cross_sections.plot()
+```
+
+## Creating cross sections
+
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+from mikeio1d.xns11 import CrossSection
+```
+
+```{python}
+n_points = 11
+x = np.linspace(0, 100, n_points)
+z = 10**-3 * (x-50)**2
+plt.plot(x, z)
+```
+
+```{python}
+location_id = "my_reach"
+chainage = 100.0
+topo_id = "my_topo"
+
+xs = CrossSection.from_xz(x, z, location_id, chainage, topo_id)
+xs.plot()
+```
+
+## Writing Xns11 files
+```{python}
+xns_custom = Xns11()
+xns_custom.add_xsection(xs)
+xns_custom.write("my_custom.xns11")
+xns_custom.xsections.to_dataframe()
+```
+```{python}
+# Subset an existing Xns11 file
+subset = xns.xsections.sel(location_id='basin_left1')
+xns_subset = Xns11.from_cross_section_collection(subset)
+xns_subset.write("my_subset.xns11")
+xns_subset.xsections.to_dataframe()
+```
+
+::: {.hidden}
+```{python .hidden}
+# Clean up
+import os
+os.remove("my_custom.xns11")
+os.remove("my_subset.xns11")
+```
+:::
+
+## Modifying cross sections
+
+```{python}
+xs = xns.xsections['basin_left1','122.042','1']
+raw_copy = xs.raw.copy()
+raw_copy.head()
+```
+```{python}
+raw_copy['z'] = raw_copy['z'] + 1000
+raw_copy.head()
+```
+
+```{python}
+xs.raw = raw_copy
+xs.plot()
+```
+
+```{python}
+from mikeio1d.cross_sections import Marker
+
+xs.set_marker(Marker.LEFT_LOW_FLOW_BANK, x=70)
+xs.set_marker(Marker.RIGHT_LOW_FLOW_BANK, x=74)
+xs.markers
+```
+
+```{python}	
+xs.plot(with_marker_labels=False)
+```
+
+```{python}
+# Write the modified cross section back to the Xns11 file.
+xns.write()
+```
+
+## GeoPandas
+
+```{python}
+gdf = xns.xsections.to_geopandas()
+gdf.plot()
+```
+
+```{python}
+gdf = xns.xsections.to_geopandas()
+gdf.plot(column='topo_id', legend=True, legend_kwds={'title': 'Topo'})
+```
+
+```{python}
+# Plot all of the markers.
+xns.xsections.to_geopandas_markers().plot("marker_label", legend=True)
+```
+
+```{python}
+# Plot markers on top of cross sections.
+
+gdf1 = xns.xsections.to_geopandas()
+gdf2 = xns.xsections.to_geopandas_markers()
+
+ax = gdf1.plot()
+
+gdf2.plot(ax=ax, column="marker_label", markersize=10, zorder=10, legend=True)
+```

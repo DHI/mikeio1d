@@ -42,3 +42,5 @@ clr.AddReference("DHI.Mike1D.MikeIO")
 
 from .res1d import Res1D
 from .xns11 import Xns11
+
+__all__ = ["Res1D", "Xns11"]

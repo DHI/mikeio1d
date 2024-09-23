@@ -1,0 +1,138 @@
+---
+title: Locations
+---
+
+Locations are where model results exist in the [Network](network.qmd). The main location types are nodes, reaches, gridpoints, and catchments. 
+
+::: {.hidden}
+```{python}
+from mikeio1d import Res1D
+res = Res1D('../data/network.res1d')
+res_catchments = Res1D('../data/catchments.res1d')
+```
+:::
+
+## Data structures
+There are two main data structures for locations: location collections and single locations.
+
+### Location collections
+Access location collections from a [Res1D](res1d.qmd) object. Each collection shows available quantities and location IDs.
+
+```{python}	
+res.nodes
+```
+
+```{python}	
+res.reaches
+```
+
+```{python}
+res_catchments.catchments
+```
+
+::: callout-note
+Gridpoints only exist as single locations on a reach, and have no collection.
+:::
+
+### Single locations
+Access a single location by indexing its respective collection with its unique ID. Each location shows available quantities and static properties.
+
+```{python}	
+res.nodes['1']
+```
+
+```{python}
+res.reaches['100l1']
+```
+
+```{python}
+# gridpoint on reach 100l1 at chainage 23.841
+res.reaches['100l1']['23.841']
+```
+
+::: callout-tip
+Gridpoints can also be indexed by number instead of chainage. For example:
+```{python}
+#| output: false
+res.reaches['100l1'][0]  # first gridpoint
+res.reaches['100l1'][-1] # last gridpoint
+```
+:::
+
+```{python}
+res_catchments.catchments['100_16_16']
+```
+
+## Quantities
+
+[Quantities](quantities.qmd) are the actual model results. Each single location or location collection has associated quantities.
+
+```{python}
+res.nodes.WaterLevel
+```
+```{python}
+res.nodes['1'].WaterLevel
+```
+
+::: {.callout-tip collapse="true" title="Can't find a which location a quantity belongs to?"}
+The [Network](network.qmd) structure is generic and applies across different domains (e.g. collection systems, water distribution, rivers). Sometimes this can be challenging to find a particular result. Here are some examples of result types mapped onto this structure.
+
+| Location  | Example quantities |
+|-----------|--------------------|
+|Nodes      | Water level (e.g. manhole, basin, outlet, junction) |
+|           | Pump discharge in structure |
+|Reaches    | Discharge (e.g. pipes, pumps, weirs) |
+|           | Water level (e.g. at specific chainges) |
+|Catchments | Catchment discharge |
+|           | Total runoff |
+|Global     | Water balance |
+|           | User defined variable types |
+:::
+
+Refer to the [Quantities](quantities.qmd) page for more information on how to read and plot the returned quantities.
+
+## Static attributes
+Each location has a set of static attributes.
+
+```{python}
+res.nodes['1']._static_attributes
+```
+
+```{python}
+res.nodes['1'].ground_level
+```
+
+
+## Reading data
+All result data for a single location or location collection can be read into a pandas DataFrame.
+```{python}
+df = res.reaches['100l1'].read()
+df.head()
+```
+```{python}
+df = res.reaches.read()
+df.head()
+```
+
+## GeoDataFrames
+
+Locations collections can be extracted into a GeoDataFrame, both with and without quantities.
+
+```{python}
+gdf = res.reaches.to_geopandas()
+gdf.plot()
+```
+
+```{python}
+gdf = res.reaches.to_geopandas(agg='max')
+gdf.plot(column='max_Discharge', linewidth=3, cmap='RdYlGn_r', legend=True)
+```
+
+## Examples
+
+- [Res1D Basics](../examples/res1d_basic.qmd)
+- [Res1D Export to shapefile](../examples/res1d_export_to_shapefile.qmd)
+
+::: callout-tip
+There are also several notebook examples available on our [GitHub repository]()https://github.com/DHI/mikeio1d/tree/main/notebooks.
+:::

@@ -1,0 +1,128 @@
+project:
+  type: website
+
+execute: 
+  warning: false
+
+website:
+  title: "MIKE IO 1D"
+  page-footer: "© 2024 DHI Group"
+  repo-url: https://github.com/DHI/mikeio1d
+  repo-actions: [edit]
+  repo-subdir: docs
+  page-navigation: true
+  bread-crumbs: false # I can\'t get this to work properly, disabled for now
+  
+  navbar:
+    title: false
+    logo: images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png
+    tools:
+    - icon: github
+      menu:
+      - text: Source Code
+        url:  https://github.com/DHI/mikeio1d
+      - text: Report a Bug
+        url:  https://github.com/DHI/mikeio1d/issues
+    left:
+      - href: index.qmd
+        text: Home
+      - href: examples/index.qmd
+        text: Examples
+      - href: api/index.qmd
+        text: API Reference
+    
+  sidebar:
+    style: docked
+    search: true
+    contents: 
+      - section: "User Guide"
+        href: user-guide/getting-started.qmd
+        contents:
+          - text: Getting Started
+            href: user-guide/getting-started.qmd
+          - text: Network
+            href: user-guide/network.qmd
+          - text: Res1D
+            href: user-guide/res1d.qmd
+          - text: Locations
+            href: user-guide/locations.qmd
+          - text: Quantities
+            href: user-guide/quantities.qmd
+          - text: Xns11
+            href: user-guide/xns11.qmd
+      - section: Examples
+        href: examples/index.qmd
+        contents:
+          - examples/res1d_basic.qmd
+          - examples/res1d_export_to_shapefile.qmd
+          - examples/res1d_LTS.qmd
+          - examples/swmm_basic.qmd
+          - examples/epanet_basic.qmd
+          - examples/xns11_basic.qmd
+      - text: Design philosophy
+        href: design.qmd
+      - text: API Reference
+        href: api/index.qmd 
+
+          
+        
+
+      
+filters:
+  - interlinks
+interlinks:
+  sources:
+      numpy: 
+        url: https://numpy.org/doc/stable/
+      xarray: 
+        url: https://xarray.pydata.org/en/stable/
+      pandas: 
+        url: https://pandas.pydata.org/docs/
+      scipy: 
+        url: https://docs.scipy.org/doc/scipy/
+
+quartodoc:
+  style: pkgdown
+  title: API Reference
+  dir: api
+  package: mikeio1d
+  options:
+    include_inherited: true
+    include_imports: true
+  renderer:
+    style: markdown
+    display_name: relative
+
+  sections:
+  - title: Main
+    desc: ''
+    contents:
+    - name: Res1D
+    - name: Xns11
+  - title: Locations
+    desc: ''
+    contents:
+    - name: result_network.ResultNode
+    - name: result_network.ResultNodes
+    - name: result_network.ResultReach
+    - name: result_network.ResultReaches
+    - name: result_network.ResultGridPoint
+    - name: result_network.ResultCatchment
+    - name: result_network.ResultCatchments
+    - name: result_network.ResultGlobalData
+    - name: result_network.ResultGlobalDatas
+  - title: Quantities
+    desc: ''
+    contents:
+    - name: result_network.ResultQuantity
+    - name: result_network.ResultQuantityCollection
+  - title: Cross sections
+    desc: ''
+    contents:
+    - name: cross_sections.CrossSection
+    - name: cross_sections.CrossSectionCollection
+    
+format:
+  html:
+    theme: cosmo
+    toc: true
