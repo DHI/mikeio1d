@@ -1,3 +1,5 @@
+import pytest
+
 import pandas as pd
 import platform
 import clr
@@ -60,3 +62,33 @@ def test_dotnet_add_seconds_ticks():
         assert time_with_seconds_added.Ticks == ticks_with_seconds_added_windows
     elif platform_system == "Linux":
         assert time_with_seconds_added.Ticks == ticks_with_seconds_added_linux
+
+
+@pytest.mark.parametrize(
+    "ticks",
+    [
+        633979018199999999,
+        633979018199999990,
+        633979018199999900,
+        633979018199999000,
+    ],
+)
+def test_dotnet_round_to_milliseconds_for_large_milliseconds(ticks):
+    """
+    Test that rounding to milliseconds works for large millisecond values (e.g. where microseconds is rounded to 10^6)
+    """
+    time = System.DateTime(ticks)
+    microseconds = time.Ticks % 10**7 // 10
+    microseconds_rounded = round(microseconds, -3)
+
+    assert microseconds_rounded == 10**6
+
+    time_unrounded = from_dotnet_datetime(time, round_to_milliseconds=False)
+
+    assert time_unrounded.microsecond == microseconds
+
+    time_rounded = from_dotnet_datetime(time, round_to_milliseconds=True)
+
+    assert time_rounded.microsecond == 0
+    expected_rounded_time = time_unrounded.replace(microsecond=0) + pd.Timedelta("1s")
+    assert time_rounded == expected_rounded_time
