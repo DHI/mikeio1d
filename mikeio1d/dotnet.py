@@ -51,6 +51,9 @@ def from_dotnet_datetime(x, round_to_milliseconds=True):
     # Round to milliseconds if requested
     if round_to_milliseconds:
         microseconds_rounded = round(time.microsecond, -3)
+        if microseconds_rounded == 10**6:
+            time += datetime.timedelta(seconds=1)
+            microseconds_rounded = 0
         time = time.replace(microsecond=microseconds_rounded)
 
     return time
