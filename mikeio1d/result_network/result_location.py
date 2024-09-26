@@ -61,11 +61,15 @@ class ResultLocation(ABC):
         attributes = {k: getattr(self, k) for k in self._static_attributes}
         total_attributes = len(attributes)
         total_quantities = len(self.quantities)
+        pretty_quantities = [
+            ResultQuantity.prettify_quantity(self.result_quantity_map[qid][0])
+            for qid in self.result_quantity_map
+        ]
         repr = build_html_repr_from_sections(
             self.__repr__(),
             [
                 (f"Attributes ({total_attributes})", attributes),
-                (f"Quantities ({total_quantities})", self.quantities),
+                (f"Quantities ({total_quantities})", pretty_quantities),
             ],
         )
         return repr

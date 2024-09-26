@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from ..result_reader_writer.result_reader import ColumnMode
 
 from .result_location import ResultLocation
+from .result_quantity import ResultQuantity
 
 from ..dotnet import pythonnet_implementation as impl
 from .result_quantity_collection import ResultQuantityCollection
@@ -59,11 +60,15 @@ class ResultLocations(Dict[str, ResultLocation]):
     def _repr_html_(self) -> str:
         total_names = len(self)
         total_quantities = len(self.quantities)
+        pretty_quantities = [
+            ResultQuantity.prettify_quantity(self.result_quantity_map[qid][0])
+            for qid in self.result_quantity_map
+        ]
         repr = build_html_repr_from_sections(
             self.__repr__(),
             [
                 (f"Names ({total_names})", self.names),
-                (f"Quantities ({total_quantities})", list(self.quantities.keys())),
+                (f"Quantities ({total_quantities})", pretty_quantities),
             ],
         )
         return repr
