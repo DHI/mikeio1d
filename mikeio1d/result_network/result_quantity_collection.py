@@ -32,7 +32,8 @@ class ResultQuantityCollection(ResultQuantity):
         self.res1d = res1d
 
     def __repr__(self) -> str:
-        return f"<QuantityCollection ({len(self.result_quantities)}): {self.name}>"
+        pretty_quantity = ResultQuantity.prettify_quantity(self.result_quantities[0])
+        return f"<QuantityCollection ({len(self.result_quantities)}): {pretty_quantity}>"
 
     @property
     def name(self) -> str:

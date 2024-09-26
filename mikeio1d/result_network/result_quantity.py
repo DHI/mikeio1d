@@ -15,6 +15,7 @@ from ..quantities import TimeSeriesId
 from ..result_query import QueryDataCreator
 
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
+from DHI.Mike1D.Generic import IQuantity
 
 
 class ResultQuantity:
@@ -63,7 +64,36 @@ class ResultQuantity:
         self._name = data_item.Quantity.Id
 
     def __repr__(self) -> str:
-        return f"<Quantity: {self.name}>"
+        return f"<Quantity: {ResultQuantity.prettify_quantity(self.name)}>"
+
+    @staticmethod
+    def prettify_quantity(quantity: ResultQuantity | IQuantity, latex_format=False) -> str:
+        """
+        Get a pretty string representation of a ResultQuantity's type and unit.
+
+        Parameters
+        ----------
+        quantity: ResultQuantity | IQuantity
+            ResultQuantity object or DHI.Mike1D.Generic.IQuantity object.
+        latex_format: bool, optional
+            If True, the unit abbreviation will use LaTeX-formatted text.
+        Returns
+        -------
+        str
+            A string representation of the quantity type and unit.
+        """
+        if isinstance(quantity, ResultQuantity):
+            m1d_quantity = quantity.data_item.Quantity
+        elif isinstance(quantity, IQuantity):
+            m1d_quantity = quantity
+        else:
+            raise ValueError("quantity must be a ResultQuantity or IQuantity object.")
+
+        description = m1d_quantity.Description
+        unit_abbreviation = m1d_quantity.EumQuantity.UnitAbbreviation
+        if latex_format:
+            unit_abbreviation = f"$\\mathrm{{{unit_abbreviation}}}$"
+        return f"{description} ({unit_abbreviation})"
 
     @property
     def name(self) -> str:
@@ -91,11 +121,8 @@ class ResultQuantity:
         """Plot the time series data."""
         df = self.read()
         ax = df.plot(**kwargs)
-        quantity = self.data_item.Quantity
         ax.set_xlabel("Time")
-        ax.set_ylabel(
-            f"{quantity.Description} [$\\mathrm{{{quantity.EumQuantity.UnitAbbreviation}}}$]"
-        )
+        ax.set_ylabel(ResultQuantity.prettify_quantity(self, latex_format=True))
         return ax
 
     def to_dataframe(self):

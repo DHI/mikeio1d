@@ -28,6 +28,7 @@ from .dotnet import to_numpy
 from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
+from .result_network import ResultQuantity
 from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
@@ -161,7 +162,7 @@ class Res1D:
 
             info.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
             for i, quantity in enumerate(self.data.Quantities):
-                info.append(f"{i} - {quantity.Id} <{quantity.EumQuantity.UnitAbbreviation}>")
+                info.append(f"{i} - {ResultQuantity.prettify_quantity(quantity)}")
 
         info = str.join("\n", info)
         return info
