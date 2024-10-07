@@ -47,7 +47,7 @@ from .various import NAME_DELIMITER
 from .various import make_list_if_not_iterable
 
 from .quantities import TimeSeriesId
-from .quantities import derived_quantity_manager  # noqa: F401
+from .quantities import DerivedQuantityManager  # noqa: F401
 
 from .pandas_extension import Mikeio1dAccessor  # noqa: F401
 
@@ -112,6 +112,8 @@ class Res1D:
         put_chainage_in_col_name=True,
         clear_queue_after_reading=True,
         result_reader_type=ResultReaderType.COPIER,
+        derived_quantity_manager=None,
+
     ):
         self.result_reader = ResultReaderCreator.create(
             result_reader_type,
@@ -125,6 +127,7 @@ class Res1D:
             col_name_delimiter,
             put_chainage_in_col_name,
         )
+        self.derived_quantity_manager = derived_quantity_manager or DerivedQuantityManager.create_default_manager()
 
         self._start_time = None
         self._end_time = None

@@ -21,7 +21,6 @@ from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 from ..quantities import TimeSeriesId
 from ..quantities import DerivedQuantity
-from ..quantities import derived_quantity_manager
 
 
 class ResultLocation(ABC):
@@ -146,6 +145,7 @@ class ResultLocation(ABC):
     def set_derived_quantities(self):
         """Sets all derived quantity attributes."""
         derived_quantities = []
+        derived_quantity_manager = self.res1d.derived_quantity_manager
         for source_quantity in self.result_quantity_map:
             dq = derived_quantity_manager.get_quantity_where(
                 self.res1d, source_quantity, self.group
