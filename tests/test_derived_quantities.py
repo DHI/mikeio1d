@@ -195,10 +195,9 @@ def test_custom_derived_quantity_basic(res1d_network):
 
 def test_custom_derived_quantity_example(res1d_network):
     from mikeio1d.quantities.derived.derived_quantity_example import ExampleDerivedQuantity
-    from mikeio1d.res1d import derived_quantity_manager as dqm
 
-    dqm.register(ExampleDerivedQuantity)
     res1d_network = Res1D(res1d_network.file_path)
+    res1d_network.derived_quantity_manager.register(ExampleDerivedQuantity)
 
     assert "WaterLevelPlusOne" in res1d_network.derived_quantities
     assert "WaterLevelPlusOne" in res1d_network.nodes.derived_quantities
@@ -221,8 +220,8 @@ def test_custom_derived_quantity_example(res1d_network):
 
 def test_derived_quantity_manager_unregister(res1d_network):
     from mikeio1d.quantities.derived.derived_quantity_example import ExampleDerivedQuantity
-    from mikeio1d.res1d import derived_quantity_manager as dqm
 
+    dqm = res1d_network.derived_quantity_manager
     dqm.unregister(ExampleDerivedQuantity._NAME)
 
     dqm.register(ExampleDerivedQuantity)
