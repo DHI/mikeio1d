@@ -29,16 +29,26 @@ class DerivedQuantity(ABC):
 
     def __init__(self, res1d: Res1D):
         self._res1d = res1d
+        self._validate()
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}>"
+    
+    def _validate(self) -> bool:
+        """
+        Validates the derived quantity.
+
+        Returns
+        -------
+        bool
+            True if the derived quantity is valid, False otherwise.
+        """
         if not isinstance(self._NAME, str):
             raise ValueError("DerivedQuantity must have str value for '_NAME'.")
         if not isinstance(self._GROUPS, set):
             raise ValueError("DerivedQuantity must have set value for '_GROUPS'.")
         if not isinstance(self._SOURCE_QUANTITY, str):
             raise ValueError("DerivedQuantity must have str value for '_SOURCE_QUANTITY'.")
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}>"
 
     @property
     def res1d(self) -> Res1D:
