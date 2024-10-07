@@ -15,7 +15,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from .result_quantity import ResultQuantity
     from ..result_reader_writer.result_reader import ColumnMode
     from ..quantities import TimeSeriesIdGroup
-    from ..quantities import DerivedQuantity
 
 import pandas as pd
 
@@ -27,6 +26,7 @@ from .result_quantity_collection import ResultQuantityCollection
 from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 from .result_quantity_derived_collection import ResultQuantityDerivedCollection
+from ..quantities import DerivedQuantity
 
 
 class ResultLocations(Dict[str, ResultLocation]):
@@ -108,7 +108,9 @@ class ResultLocations(Dict[str, ResultLocation]):
         return list(self.values())
 
     def read(
-        self, column_mode: Optional[str | ColumnMode] = None, include_derived: bool = False
+        self,
+        column_mode: Optional[str | ColumnMode] = None,
+        include_derived: bool = False,
     ) -> pd.DataFrame:
         """
         Read the time series data for all quantities at these locations into a DataFrame.
@@ -124,7 +126,9 @@ class ResultLocations(Dict[str, ResultLocation]):
         include_derived: bool, default False
             Include derived quantities.
         """
-        result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
+        result_quantities = [
+            q for qlist in self.result_quantity_map.values() for q in qlist
+        ]
         timesries_ids = [q.timeseries_id for q in result_quantities]
 
         if include_derived:
@@ -143,24 +147,61 @@ class ResultLocations(Dict[str, ResultLocation]):
         """Sets all quantity collection attributes."""
         for quantity_id in self.result_quantity_map:
             result_quantities = self.result_quantity_map[quantity_id]
-            result_quantity_collection = ResultQuantityCollection(result_quantities, self.res1d)
+            result_quantity_collection = ResultQuantityCollection(
+                result_quantities, self.res1d
+            )
             result_quantity_attribute_string = make_proper_variable_name(
                 quantity_id, self.quantity_label
             )
             setattr(self, result_quantity_attribute_string, result_quantity_collection)
 
-    def set_derived_quantities(self):
-        """Sets all derived quantity attributes."""
-        derived_quantities = []
-        derived_quantity_manager = self.res1d.derived_quantity_manager
-        for source_quantity in self.result_quantity_map:
-            dq = derived_quantity_manager.get_quantity_where(
-                self.res1d, source_quantity, self.group
-            )
-            derived_quantities.extend(dq)
+    def _can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
+        """
+        Check if a derived quantity can be added to the result locations."""
+        if self.group not in derived_quantity.groups:
+            return False
+        elif derived_quantity.source_quantity not in self.result_quantity_map:
+            return False
+        return True
 
-        for derived_quantity in derived_quantities:
+    def add_derived_quantity(self, derived_quantity: DerivedQuantity):
+        """
+        Add a derived quantity to the result network.
+
+        Parameters
+        ----------
+        derived_quantity : DerivedQuantity
+            Derived quantity to be added to the result network.
+        """
+        if self._can_add_derived_quantity(derived_quantity):
             self.set_quantity_derived(derived_quantity)
+
+        for location in self.values():
+            location.add_derived_quantity(derived_quantity)
+
+    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+        """
+        Remove a derived quantity from the result network.
+
+        Parameters
+        ----------
+        derived_quantity : DerivedQuantity or str
+            Derived quantity to be removed from the result network. Either a DerivedQuantity object or its name.
+        """
+        # remove from self.result_quantity_derived_map
+        if isinstance(derived_quantity, DerivedQuantity):
+            derived_quantity = derived_quantity.name
+
+        self.result_quantity_derived_map.pop(derived_quantity, None)
+
+        result_quantity_attribute_string = make_proper_variable_name(
+            derived_quantity, self.quantity_label
+        )
+        if hasattr(self, result_quantity_attribute_string):
+            delattr(self, result_quantity_attribute_string)
+
+        for location in self.values():
+            location.remove_derived_quantity(derived_quantity)
 
     def set_quantity_derived(self, derived_quantity: DerivedQuantity):
         """Sets a single derived quantity attribute on the obj."""
@@ -169,7 +210,9 @@ class ResultLocations(Dict[str, ResultLocation]):
         )
         quantity_id = result_quantity_derived.name
 
-        self.result_quantity_derived_map[result_quantity_derived.name] = result_quantity_derived
+        self.result_quantity_derived_map[result_quantity_derived.name] = (
+            result_quantity_derived
+        )
 
         result_quantity_attribute_string = make_proper_variable_name(
             quantity_id, self.quantity_label

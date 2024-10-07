@@ -22,13 +22,15 @@ class ReachQQManning(DerivedQuantity):
     _SOURCE_QUANTITY = "Discharge"
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
-        dtype = df_source.dtypes[0]
-        full_flow_discharges = np.fromiter(self.get_full_flow_discharges(locations), dtype=dtype)
+        dtype = df_source.dtypes.iloc[0]
+        full_flow_discharges = np.fromiter(
+            self.get_full_flow_discharges(locations), dtype=dtype
+        )
         df_derived = df_source / full_flow_discharges
         return df_derived
-    
+
     def get_full_flow_discharge(self, gridpoint: ResultGridPoint):
         return gridpoint.result_reach.full_flow_discharge
-    
+
     def get_full_flow_discharges(self, gridpoints: List[ResultGridPoint]):
         yield from (self.get_full_flow_discharge(location) for location in gridpoints)

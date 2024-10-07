@@ -28,7 +28,6 @@ class ResultNode(ResultLocation):
         self._group = TimeSeriesIdGroup.NODE
         self._node = node
         self.set_quantities()
-        self.set_derived_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:
@@ -82,10 +81,14 @@ class ResultNode(ResultLocation):
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add node result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, self.result_quantity_map
+        )
 
         nodes_result_quantity_map = self.res1d.result_network.nodes.result_quantity_map
-        self.add_to_result_quantity_map(quantity_id, result_quantity, nodes_result_quantity_map)
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, nodes_result_quantity_map
+        )
 
         self.add_to_network_result_quantity_map(result_quantity)
 
