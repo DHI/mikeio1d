@@ -342,10 +342,10 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         reach = self._get_reach_for_chainage(chainage)
         start_chainage = reach.LocationSpan.StartChainage
         end_chainage = reach.LocationSpan.EndChainage
-        start_ground_level = self.res1d.data.Nodes[
-            reach.StartNodeIndex
-        ].__implementation__.GroundLevel
-        end_ground_level = self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__.GroundLevel
+        start_node = impl(self.res1d.data.Nodes[reach.StartNodeIndex])
+        end_node = impl(self.res1d.data.Nodes[reach.EndNodeIndex])
+        start_ground_level = start_node.GroundLevel
+        end_ground_level = end_node.GroundLevel
 
         if start_ground_level is None or end_ground_level is None:
             return np.nan
@@ -371,8 +371,8 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         reach = self._get_reach_for_chainage(chainage)
         start_chainage = reach.LocationSpan.StartChainage
         end_chainage = reach.LocationSpan.EndChainage
-        start_node = self.res1d.data.Nodes[reach.StartNodeIndex].__implementation__
-        end_node = self.res1d.data.Nodes[reach.EndNodeIndex].__implementation__
+        start_node = impl(self.res1d.data.Nodes[reach.StartNodeIndex])
+        end_node = impl(self.res1d.data.Nodes[reach.EndNodeIndex])
         start_critical_level = getattr(start_node, "CriticalLevel", None)
         end_critical_level = getattr(end_node, "CriticalLevel", None)
 
