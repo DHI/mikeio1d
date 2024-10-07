@@ -22,12 +22,14 @@ class NodeWaterDepth(DerivedQuantity):
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
 
-        bottom_levels = np.array(
-            tuple(self.get_bottom_level(location) for location in locations), dtype=np.float32
-        )
+        dtype = df_source.dtypes[0]
+        bottom_levels = np.fromiter(self.get_bottom_levels(locations), dtype=dtype)
         df_derived = df_source - bottom_levels
 
         return df_derived
 
     def get_bottom_level(self, location: ResultLocation):
         return getattr(location, "bottom_level", np.nan)
+    
+    def get_bottom_levels(self, locations: List[ResultLocation]):
+        yield from (self.get_bottom_level(location) for location in locations)
