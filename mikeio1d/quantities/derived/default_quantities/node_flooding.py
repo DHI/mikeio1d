@@ -22,12 +22,14 @@ class NodeFlooding(DerivedQuantity):
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
 
-        ground_level = np.array(
-            tuple(self.get_ground_level(location) for location in locations), dtype=np.float32
-        )
-        df_derived = df_source - ground_level
+        dtype = df_source.dtypes[0]
+        ground_levels = np.fromiter(self.get_ground_levels(locations), dtype=dtype)
+        df_derived = df_source - ground_levels
 
         return df_derived
 
     def get_ground_level(self, location: ResultLocation):
         return getattr(location, "ground_level", np.nan)
+    
+    def get_ground_levels(self, locations: List[ResultLocation]):
+        yield from (self.get_ground_level(location) for location in locations)

@@ -8,6 +8,9 @@ if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
+    from mikeio1d.result_network import ResultGridPoint
+
+import numpy as np
 
 from ..derived_quantity import DerivedQuantity
 from ...timeseries_id import TimeSeriesIdGroup
@@ -19,6 +22,13 @@ class ReachWaterDepth(DerivedQuantity):
     _SOURCE_QUANTITY = "WaterLevel"
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
-        bottom_levels = tuple(gridpoint.bottom_level for gridpoint in locations)
+        dtype = df_source.dtypes[0]
+        bottom_levels = np.fromiter(self.get_bottom_levels(locations), dtype=dtype)
         df_derived = df_source - bottom_levels
         return df_derived
+    
+    def get_bottom_level(self, gridpoint: ResultGridPoint):
+        return gridpoint.bottom_level
+    
+    def get_bottom_levels(self, gridpoints: List[ResultGridPoint]):
+        yield from (self.get_bottom_level(location) for location in gridpoints)
