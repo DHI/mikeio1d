@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..geometry import NodePoint
 
 from warnings import warn
@@ -10,6 +10,7 @@ from warnings import warn
 from ..query import QueryDataNode
 from .result_location import ResultLocation
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultNode(ResultLocation):
@@ -24,6 +25,7 @@ class ResultNode(ResultLocation):
 
     def __init__(self, node, res1d):
         ResultLocation.__init__(self, node.DataItems, res1d)
+        self._group = TimeSeriesIdGroup.NODE
         self._node = node
         self.set_quantities()
         self.set_static_attributes()
@@ -79,10 +81,14 @@ class ResultNode(ResultLocation):
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add node result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, self.result_quantity_map
+        )
 
         nodes_result_quantity_map = self.res1d.result_network.nodes.result_quantity_map
-        self.add_to_result_quantity_map(quantity_id, result_quantity, nodes_result_quantity_map)
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, nodes_result_quantity_map
+        )
 
         self.add_to_network_result_quantity_map(result_quantity)
 

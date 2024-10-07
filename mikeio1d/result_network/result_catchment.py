@@ -2,12 +2,13 @@ from __future__ import annotations
 from warnings import warn
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from ..geometry import CatchmentGeometry
 
 from ..query import QueryDataCatchment
 from .result_location import ResultLocation
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultCatchment(ResultLocation):
@@ -24,6 +25,7 @@ class ResultCatchment(ResultLocation):
 
     def __init__(self, catchment, res1d):
         ResultLocation.__init__(self, catchment.DataItems, res1d)
+        self._group = TimeSeriesIdGroup.CATCHMENT
         self._catchment = catchment
         self.set_quantities()
         self.set_static_attributes()
@@ -70,10 +72,16 @@ class ResultCatchment(ResultLocation):
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add catchment result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, self.result_quantity_map
+        )
 
-        catchment_result_quantity_map = self.res1d.result_network.catchments.result_quantity_map
-        self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
+        catchment_result_quantity_map = (
+            self.res1d.result_network.catchments.result_quantity_map
+        )
+        self.add_to_result_quantity_map(
+            quantity_id, result_quantity, catchment_result_quantity_map
+        )
 
         self.add_to_network_result_quantity_map(result_quantity)
 

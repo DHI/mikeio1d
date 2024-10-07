@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict
     from typing import Callable
     from geopandas import GeoDataFrame
@@ -12,6 +12,7 @@ from .result_locations import ResultLocations
 from .result_node import ResultNode
 from .various import make_proper_variable_name
 from ..pandas_extension import ResultFrameAggregator
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultNodes(ResultLocations):
@@ -35,6 +36,7 @@ class ResultNodes(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
+        self._group = TimeSeriesIdGroup.NODE
         self.node_label = "n_"
 
         res1d.result_network.nodes = self
@@ -53,7 +55,9 @@ class ResultNodes(ResultLocations):
             node = impl(node)
             result_node = ResultNode(node, self.res1d)
             self.set_res1d_node_to_dict(result_node)
-            result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
+            result_node_attribute_string = make_proper_variable_name(
+                node.ID, self.node_label
+            )
             setattr(self, result_node_attribute_string, result_node)
 
     def set_res1d_node_to_dict(self, result_node):
@@ -66,6 +70,7 @@ class ResultNodes(ResultLocations):
         self,
         agg: str | Callable = None,
         agg_kwargs: Dict[str : str | Callable] = {},
+        include_derived: bool = False,
     ) -> GeoDataFrame:
         """
         Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.
@@ -85,6 +90,8 @@ class ResultNodes(ResultLocations):
 
         agg_kwargs : dict, default {}
             Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
+        include_derived: bool, default False
+            Include derived quantities.
 
         Returns
         -------
@@ -109,7 +116,9 @@ class ResultNodes(ResultLocations):
 
         rfa = ResultFrameAggregator(agg, **agg_kwargs)
 
-        df_quantities = self.read(column_mode="compact")
+        df_quantities = self.read(
+            column_mode="compact", include_derived=include_derived
+        )
         df_quantities = rfa.aggregate(df_quantities)
 
         gdf = gdf.merge(df_quantities, left_on="name", right_index=True)

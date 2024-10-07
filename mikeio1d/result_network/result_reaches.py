@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Callable
     from typing import Dict
     from geopandas import GeoDataFrame
@@ -12,6 +12,7 @@ from .result_reach import ResultReach
 from .various import make_proper_variable_name
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
+from ..quantities import TimeSeriesIdGroup
 
 
 class ResultReaches(ResultLocations):
@@ -41,6 +42,7 @@ class ResultReaches(ResultLocations):
 
     def __init__(self, res1d):
         ResultLocations.__init__(self, res1d)
+        self._group = TimeSeriesIdGroup.REACH
         self.reach_label = "r_"
         self.result_reach_map = {}
 
@@ -56,7 +58,9 @@ class ResultReaches(ResultLocations):
         for reach in self.data.Reaches:
             reach = impl(reach)
             result_reach = self.get_or_create_result_reach(reach)
-            result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
+            result_reach_attribute_string = make_proper_variable_name(
+                reach.Name, self.reach_label
+            )
             setattr(self, result_reach_attribute_string, result_reach)
 
     def set_quantity_collections(self):
@@ -88,6 +92,7 @@ class ResultReaches(ResultLocations):
         agg: str | Callable = None,
         agg_kwargs: Dict[str : str | Callable] = {},
         segmented: bool = True,
+        include_derived: bool = False,
     ) -> GeoDataFrame:
         """
         Convert reaches to a geopandas.GeoDataFrame object.
@@ -110,6 +115,8 @@ class ResultReaches(ResultLocations):
         segmented : bool, (default=True)
             True - one LineString per IRes1DReach object.
             False - one LineString per reach name.
+        include_derived : bool, default False
+            Include derived quantities.
 
         Returns
         -------
@@ -139,13 +146,17 @@ class ResultReaches(ResultLocations):
 
         rfa = ResultFrameAggregator(agg, **agg_kwargs)
 
-        df_quantities = self.read(column_mode="compact")
+        df_quantities = self.read(
+            column_mode="compact", include_derived=include_derived
+        )
         df_quantities = rfa.aggregate(df_quantities)
 
         if segmented:
             gdf = gdf.merge(df_quantities, left_on=["name", "tag"], right_index=True)
         else:
-            df_quantities = df_quantities.groupby("name").agg(rfa.get_agg_function("time"))
+            df_quantities = df_quantities.groupby("name").agg(
+                rfa.get_agg_function("time")
+            )
             gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
 
         return gdf
