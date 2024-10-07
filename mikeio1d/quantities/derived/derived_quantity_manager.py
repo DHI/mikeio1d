@@ -14,6 +14,7 @@ DerivedQuantityName = str
 
 
 class DerivedQuantityManager:
+    """The derived quantity manager. Use this to register and unregister derived quantities."""
     _instance = None
 
     def __new__(cls):
@@ -49,10 +50,10 @@ class DerivedQuantityManager:
             for q in self._derived_quantities.values()
             if q._SOURCE_QUANTITY == source_quantity and group in q._GROUPS
         ]
-
-
-derived_quantity_manager = DerivedQuantityManager()
-"""The derived quantity manager. Use this to register and unregister derived quantities."""
-
-for dq in default_derived_quantities:
-    derived_quantity_manager.register(dq)
+    
+    @staticmethod
+    def create_default_manager():
+        derived_quantity_manager = DerivedQuantityManager()
+        for dq in default_derived_quantities:
+            derived_quantity_manager.register(dq)
+        return derived_quantity_manager
