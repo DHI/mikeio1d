@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
+    from typing import Type
 
     from datetime import datetime
 
@@ -47,7 +48,8 @@ from .various import NAME_DELIMITER
 from .various import make_list_if_not_iterable
 
 from .quantities import TimeSeriesId
-from .quantities import DerivedQuantityManager  # noqa: F401
+from .quantities import get_default_derived_quantity_classes
+from .quantities import DerivedQuantity
 
 from .pandas_extension import Mikeio1dAccessor  # noqa: F401
 
@@ -112,8 +114,7 @@ class Res1D:
         put_chainage_in_col_name=True,
         clear_queue_after_reading=True,
         result_reader_type=ResultReaderType.COPIER,
-        derived_quantity_manager=None,
-
+        derived_quantities=None,
     ):
         self.result_reader = ResultReaderCreator.create(
             result_reader_type,
@@ -127,7 +128,6 @@ class Res1D:
             col_name_delimiter,
             put_chainage_in_col_name,
         )
-        self.derived_quantity_manager = derived_quantity_manager or DerivedQuantityManager.create_default_manager()
 
         self._start_time = None
         self._end_time = None
@@ -151,6 +151,8 @@ class Res1D:
         self.global_data = self.result_network.global_data
         """Global data of the result file."""
 
+        self._derived_quantities = self._init_derived_quantities(derived_quantities)
+
     def __repr__(self):
         return "<mikeio1d.Res1D>"
 
@@ -171,7 +173,45 @@ class Res1D:
         info = str.join("\n", info)
         return info
 
+    def _init_derived_quantities(
+        self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
+    ) -> List[DerivedQuantity]:
+        if derived_quantity_classes is None:
+            derived_quantity_classes = get_default_derived_quantity_classes()
+
+        for dq in derived_quantity_classes:
+            self.add_derived_quantity(dq)
+
     # region Private methods
+
+    def derived_quantities(self):
+        """Returns a list of derived quantities."""
+        return self._derived_quantities
+
+    def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
+        """Adds a derived quantity to the Res1D object, propogating changes to the network.
+
+        Parameters
+        ----------
+        derived_quantity : Type[DerivedQuantity]
+            Derived quantity to be added
+        """
+        derived_quantity = derived_quantity(self)
+        self.network.add_derived_quantity(derived_quantity)
+
+    def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
+        """Removes a derived quantity from the Res1D object, propogating changes to the network.
+
+        Parameters
+        ----------
+        derived_quantity : DerivedQuantity | str
+            Derived quantity to be removed. Either DerivedQuantity class or its name.
+        """
+        if isinstance(derived_quantity, type) and issubclass(
+            derived_quantity, DerivedQuantity
+        ):
+            derived_quantity = derived_quantity._NAME
+        self.network.remove_derived_quantity(derived_quantity)
 
     def info(self) -> str:
         """Prints information about the result file."""
@@ -210,7 +250,9 @@ class Res1D:
 
     def read(
         self,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: Optional[
+            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
+        ] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
         """
@@ -372,7 +414,9 @@ class Res1D:
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
         if self.result_reader.is_lts_result_file():
-            raise NotImplementedError("The method is not implemented for LTS event statistics.")
+            raise NotImplementedError(
+                "The method is not implemented for LTS event statistics."
+            )
 
         time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
         return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
@@ -420,7 +464,9 @@ class Res1D:
     def extract(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: Optional[
+            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
+        ] = None,
         time_step_skipping_number=1,
         ext=None,
     ):
@@ -460,29 +506,41 @@ class Res1D:
     def to_csv(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: Optional[
+            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
+        ] = None,
         time_step_skipping_number=1,
     ):
         """Extract to csv file."""
-        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
+        self.extract(
+            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV
+        )
 
     def to_dfs0(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: Optional[
+            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
+        ] = None,
         time_step_skipping_number=1,
     ):
         """Extract to dfs0 file."""
-        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
+        self.extract(
+            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0
+        )
 
     def to_txt(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: Optional[
+            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
+        ] = None,
         time_step_skipping_number=1,
     ):
         """Extract to txt file."""
-        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
+        self.extract(
+            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT
+        )
 
     @staticmethod
     def merge(file_names: List[str] | List[Res1D], merged_file_name: str):

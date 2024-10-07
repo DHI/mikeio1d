@@ -1,4 +1,4 @@
 from .derived_quantity import DerivedQuantity
-from .derived_quantity_manager import DerivedQuantityManager
+from .default_quantities import get_default_derived_quantity_classes
 
-__all__ = ["DerivedQuantity", "DerivedQuantityManager"]
+__all__ = ["DerivedQuantity", "get_default_derived_quantity_classes"]
