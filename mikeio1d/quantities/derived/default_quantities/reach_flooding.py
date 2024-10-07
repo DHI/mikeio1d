@@ -22,13 +22,13 @@ class ReachFlooding(DerivedQuantity):
     _SOURCE_QUANTITY = "WaterLevel"
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
-        dtype = df_source.dtypes[0]
+        dtype = df_source.dtypes.iloc[0]
         ground_levels = np.fromiter(self.get_ground_levels(locations), dtype=dtype)
         df_derived = df_source - ground_levels
         return df_derived
-    
+
     def get_ground_level(self, gridpoint: ResultGridPoint):
         return gridpoint.result_reach.interpolate_reach_ground_level(gridpoint.chainage)
-    
+
     def get_ground_levels(self, gridpoints: List[ResultGridPoint]):
         yield from (self.get_ground_level(location) for location in gridpoints)

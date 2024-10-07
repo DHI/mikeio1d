@@ -91,7 +91,9 @@ class ResultLocation(ABC):
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
         """
-        result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
+        result_quantities = [
+            q for qlist in self.result_quantity_map.values() for q in qlist
+        ]
         timesries_ids = [q.timeseries_id for q in result_quantities]
         df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
         return df
@@ -129,7 +131,9 @@ class ResultLocation(ABC):
     def set_quantity(self, obj, data_item, element_index=0):
         """Sets a single quantity attribute on the obj."""
         m1d_dataset = self.get_m1d_dataset(data_item)
-        result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
+        result_quantity = ResultQuantity(
+            obj, data_item, self.res1d, m1d_dataset, element_index
+        )
         self.res1d.result_network.add_result_quantity_to_map(result_quantity)
 
         quantity = data_item.Quantity
@@ -142,25 +146,42 @@ class ResultLocation(ABC):
 
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
 
-    def set_derived_quantities(self):
-        """Sets all derived quantity attributes."""
-        derived_quantities = []
-        derived_quantity_manager = self.res1d.derived_quantity_manager
-        for source_quantity in self.result_quantity_map:
-            dq = derived_quantity_manager.get_quantity_where(
-                self.res1d, source_quantity, self.group
-            )
-            derived_quantities.extend(dq)
+    def _can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
+        """
+        Check if a derived quantity can be added to the result locations."""
+        if self.group not in derived_quantity.groups:
+            return False
+        elif derived_quantity.source_quantity not in self.quantities:
+            return False
+        return True
 
-        for derived_quantity in derived_quantities:
+    def add_derived_quantity(self, derived_quantity: DerivedQuantity):
+        """Add a derived quantity to the result location."""
+        if self._can_add_derived_quantity(derived_quantity):
             self.set_quantity_derived(derived_quantity)
+
+    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+        if isinstance(derived_quantity, DerivedQuantity):
+            derived_quantity = derived_quantity.name
+
+        self.result_quantity_derived_map.pop(derived_quantity, None)
+
+        result_quantity_attribute_string = make_proper_variable_name(
+            derived_quantity, self.quantity_label
+        )
+        if hasattr(self, result_quantity_attribute_string):
+            delattr(self, result_quantity_attribute_string)
 
     def set_quantity_derived(self, derived_quantity: DerivedQuantity):
         """Sets a single derived quantity attribute on the obj."""
-        result_quantity_derived = ResultQuantityDerived(derived_quantity, self, self.res1d)
+        result_quantity_derived = ResultQuantityDerived(
+            derived_quantity, self, self.res1d
+        )
         quantity_id = result_quantity_derived.name
 
-        self.result_quantity_derived_map[result_quantity_derived.name] = result_quantity_derived
+        self.result_quantity_derived_map[result_quantity_derived.name] = (
+            result_quantity_derived
+        )
 
         result_quantity_attribute_string = make_proper_variable_name(
             quantity_id, self.quantity_label
@@ -184,7 +205,9 @@ class ResultLocation(ABC):
         ...
 
     @abstractclassmethod
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ):
         """
         Base method for adding to result quantity maps, which is a dictionary
         from quantity id to a list of result quantities corresponding to that
@@ -222,7 +245,9 @@ class ResultLocation(ABC):
         else:
             result_quantity_map[quantity_id] = [result_quantity]
 
-    def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
+    def add_to_network_result_quantity_map(
+        self, result_quantity: ResultQuantity
+    ) -> TimeSeriesId:
         """
         Add a ResultQuantity to map of all possible ResultQuantities.
 

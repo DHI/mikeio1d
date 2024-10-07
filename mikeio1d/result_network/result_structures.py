@@ -34,7 +34,6 @@ class ResultStructures(ResultLocations):
         res1d.result_network.structures = self
         self.set_structures()
         self.set_quantity_collections()
-        self.set_derived_quantities()
 
     def set_structures(self):
         """
@@ -65,7 +64,11 @@ class ResultStructures(ResultLocations):
         is_data_item_for_single_grid_point = len(list(data_item.IndexList)) == 1
         has_three_grid_points = len(list(reach.GridPoints)) == 3
 
-        if reach.IsStructureReach and has_three_grid_points and is_data_item_for_single_grid_point:
+        if (
+            reach.IsStructureReach
+            and has_three_grid_points
+            and is_data_item_for_single_grid_point
+        ):
             return True
 
         return False
