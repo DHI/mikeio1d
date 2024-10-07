@@ -22,13 +22,13 @@ class ReachWaterDepth(DerivedQuantity):
     _SOURCE_QUANTITY = "WaterLevel"
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
-        dtype = df_source.dtypes[0]
+        dtype = df_source.dtypes.iloc[0]
         bottom_levels = np.fromiter(self.get_bottom_levels(locations), dtype=dtype)
         df_derived = df_source - bottom_levels
         return df_derived
-    
+
     def get_bottom_level(self, gridpoint: ResultGridPoint):
         return gridpoint.bottom_level
-    
+
     def get_bottom_levels(self, gridpoints: List[ResultGridPoint]):
         yield from (self.get_bottom_level(location) for location in gridpoints)

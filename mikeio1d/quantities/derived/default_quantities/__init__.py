@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
+    from typing import Type
 
 import pkgutil
 import inspect
@@ -12,7 +13,7 @@ import importlib
 from ..derived_quantity import DerivedQuantity
 
 
-def get_all_derived_quantity_classes() -> List[type(DerivedQuantity)]:
+def get_default_derived_quantity_classes() -> List[Type[DerivedQuantity]]:
     """
     Helper function to get a list of all derived quantity classes in this package.
     """
@@ -27,7 +28,3 @@ def get_all_derived_quantity_classes() -> List[type(DerivedQuantity)]:
             ):
                 derived_quantity_classes.append(obj)
     return derived_quantity_classes
-
-
-default_derived_quantities = get_all_derived_quantity_classes()
-"""A list of all default derived quantities."""

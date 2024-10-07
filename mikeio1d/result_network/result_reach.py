@@ -65,7 +65,6 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         for reach in reaches:
             self.add_res1d_reach(reach)
 
-        self.set_derived_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:
@@ -173,15 +172,21 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("name", self.reaches[0].Name)
         self.try_set_static_attribute_length()
-        self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
-        self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
+        self.set_static_attribute(
+            "start_chainage", self.reaches[0].LocationSpan.StartChainage
+        )
+        self.set_static_attribute(
+            "end_chainage", self.reaches[-1].LocationSpan.EndChainage
+        )
         self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
         # For resx files, the start and end node indices are not available
         if not self.res1d.file_path.endswith(".resx"):
             self.set_static_attribute("start_node", self._get_start_node())
             self.set_static_attribute("end_node", self._get_end_node())
         self.set_static_attribute("height", self._get_height())
-        self.set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
+        self.set_static_attribute(
+            "full_flow_discharge", self._get_full_flow_discharge()
+        )
 
     def try_set_static_attribute_length(self):
         try:
@@ -229,7 +234,8 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             if m1d_reach.DataItems.Contains(m1d_dataitem):
                 return m1d_reach
         raise Exception(
-            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ", m1d_dataitem
+            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
+            m1d_dataitem,
         )
 
     def set_gridpoints(self, reach):
@@ -272,7 +278,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """
         current_reach_result_gridpoints = self.current_reach_result_gridpoints
 
-        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d)
+        result_gridpoint = ResultGridPoint(
+            reach, gridpoint, reach.DataItems, self, self.res1d
+        )
         current_reach_result_gridpoints.append(result_gridpoint)
 
         chainage_string = f"{gridpoint.Chainage:g}"
@@ -296,7 +304,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """
         for data_item in reach.DataItems:
             # For SWMM and EPANET results IndexList is None.
-            index_list = [0] if data_item.IndexList is None else list(data_item.IndexList)
+            index_list = (
+                [0] if data_item.IndexList is None else list(data_item.IndexList)
+            )
             element_count = len(index_list)
             for element_index in range(element_count):
                 gridpoint_index = index_list[element_index]
@@ -307,7 +317,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
                     result_gridpoint.add_structure_data_item(data_item)
 
     def get_query(self, data_item):
-        raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
+        raise NotImplementedError(
+            "get_query not implemented for ResultReach. Use ResultGridPoint."
+        )
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         raise NotImplementedError(
@@ -350,7 +362,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         if start_ground_level is None or end_ground_level is None:
             return np.nan
 
-        ground_slope = (end_ground_level - start_ground_level) / (end_chainage - start_chainage)
+        ground_slope = (end_ground_level - start_ground_level) / (
+            end_chainage - start_chainage
+        )
         return start_ground_level + ground_slope * (chainage - start_chainage)
 
     def interpolate_reach_critical_level(self, chainage: float) -> float:

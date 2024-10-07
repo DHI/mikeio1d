@@ -18,6 +18,7 @@ from .result_global_datas import ResultGlobalDatas
 from .result_structures import ResultStructures
 from .result_quantity import ResultQuantity
 from ..quantities import TimeSeriesId
+from ..quantities import DerivedQuantity
 
 
 class ResultNetwork:
@@ -81,7 +82,9 @@ class ResultNetwork:
         self.res1d.result_network = self
         self.set_result_locations()
 
-    def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
+    def add_result_quantity_to_map(
+        self, result_quantity: ResultQuantity
+    ) -> TimeSeriesId:
         """
         Add a ResultQuantity to map of all possible ResultQuantities.
 
@@ -123,6 +126,34 @@ class ResultNetwork:
         """
         if timeseries_id not in self.queue:
             self.queue.append(timeseries_id)
+
+    def add_derived_quantity(self, derived_quantity: ResultQuantity):
+        """
+        Add a derived quantity to the result network.
+
+        Parameters
+        ----------
+        derived_quantity : Type[ResultQuantity]
+            Derived quantity to be added to the result network.
+        """
+        self.nodes.add_derived_quantity(derived_quantity)
+        self.reaches.add_derived_quantity(derived_quantity)
+        self.catchments.add_derived_quantity(derived_quantity)
+        self.structures.add_derived_quantity(derived_quantity)
+
+    def remove_derived_quantity(self, derived_quantity: ResultQuantity | str):
+        """
+        Remove a derived quantity from the result network.
+
+        Parameters
+        ----------
+        derived_quantity : ResultQuantity or str
+            Derived quantity to be removed from the result network. Either a ResultQuantity object or its name.
+        """
+        self.nodes.remove_derived_quantity(derived_quantity)
+        self.reaches.remove_derived_quantity(derived_quantity)
+        self.catchments.remove_derived_quantity(derived_quantity)
+        self.structures.remove_derived_quantity(derived_quantity)
 
     def to_geopandas(self) -> GeoDataFrame:
         """

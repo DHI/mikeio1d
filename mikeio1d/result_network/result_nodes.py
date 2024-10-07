@@ -42,7 +42,6 @@ class ResultNodes(ResultLocations):
         res1d.result_network.nodes = self
         self.set_nodes()
         self.set_quantity_collections()
-        self.set_derived_quantities()
 
         self._node_ids = None
         self._geometries = None
@@ -56,7 +55,9 @@ class ResultNodes(ResultLocations):
             node = impl(node)
             result_node = ResultNode(node, self.res1d)
             self.set_res1d_node_to_dict(result_node)
-            result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
+            result_node_attribute_string = make_proper_variable_name(
+                node.ID, self.node_label
+            )
             setattr(self, result_node_attribute_string, result_node)
 
     def set_res1d_node_to_dict(self, result_node):
@@ -115,7 +116,9 @@ class ResultNodes(ResultLocations):
 
         rfa = ResultFrameAggregator(agg, **agg_kwargs)
 
-        df_quantities = self.read(column_mode="compact", include_derived=include_derived)
+        df_quantities = self.read(
+            column_mode="compact", include_derived=include_derived
+        )
         df_quantities = rfa.aggregate(df_quantities)
 
         gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
