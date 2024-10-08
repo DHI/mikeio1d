@@ -50,14 +50,14 @@ def test_info(test_file):
     res1d_info = res1d._get_info()
     res1d_info_ref = (
         "Start time: 1994-08-07 16:35:00\n"
-        + "End time: 1994-08-07 18:35:00\n"
-        + "# Timesteps: 110\n"
-        + "# Catchments: 0\n"
-        + "# Nodes: 119\n"
-        + "# Reaches: 118\n"
-        + "# Globals: 0\n"
-        + "0 - WaterLevel <m>\n"
-        + "1 - Discharge <m^3/s>"
+        "End time: 1994-08-07 18:35:00\n"
+        "# Timesteps: 110\n"
+        "# Catchments: 0\n"
+        "# Nodes: 119\n"
+        "# Reaches: 118\n"
+        "# Globals: 0\n"
+        "0 - Water level (m)\n"
+        "1 - Discharge (m^3/s)"
     )
     assert res1d_info == res1d_info_ref
 
