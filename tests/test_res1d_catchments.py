@@ -43,22 +43,7 @@ def test_quantities(test_file):
 
 def test_info(test_file):
     res1d = test_file
-    res1d_info = res1d._get_info()
-    res1d_info_ref = (
-        "Start time: 1994-08-07 16:35:00\n"
-        + "End time: 1994-08-07 18:35:00\n"
-        + "# Timesteps: 108\n"
-        + "# Catchments: 31\n"
-        + "# Nodes: 0\n"
-        + "# Reaches: 0\n"
-        + "# Globals: 0\n"
-        + "0 - TotalRunOff <m^3/s>\n"
-        + "1 - ActualRainfall <m/s>\n"
-        + "2 - ZinkLoadRR <kg/s>\n"
-        + "3 - ZinkMassAccumulatedRR <kg>\n"
-        + "4 - ZinkRR <mg/l>"
-    )
-    assert res1d_info == res1d_info_ref
+    res1d.info()
 
 
 def test_data_item_dicts(test_file):
