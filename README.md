@@ -14,7 +14,7 @@ Most users of MIKE IO 1D will also find [MIKE+Py](https://github.com/DHI/mikeplu
 
 ## Requirements
 * Windows, Linux (experimental)
-* Python x64 3.9 - 3.12 
+* Python x64 3.9 - 3.13
 * (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) (already installed if you have MIKE)
 * (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
 
