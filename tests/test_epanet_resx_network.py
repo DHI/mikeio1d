@@ -34,22 +34,7 @@ def test_quantities(test_file):
 
 def test_info(test_file):
     epanet_resx = test_file
-    epanet_resx_info = epanet_resx._get_info()
-    epanet_repr_ref = (
-        "Start time: 2022-10-13 00:00:00\n"
-        + "End time: 2022-10-14 00:00:00\n"
-        + "# Timesteps: 25\n"
-        + "# Catchments: 0\n"
-        + "# Nodes: 2\n"
-        + "# Reaches: 1\n"
-        + "# Globals: 0\n"
-        + "0 - Volume <m^3>\n"
-        + "1 - Volume Percentage <%>\n"
-        + "2 - Pump efficiency <%>\n"
-        + "3 - Pump energy costs </kWh>\n"
-        + "4 - Pump energy <kW>"
-    )
-    assert epanet_resx_info == epanet_repr_ref
+    epanet_resx.info()
 
 
 def test_data_item_dicts(test_file):

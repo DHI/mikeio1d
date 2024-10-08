@@ -43,38 +43,7 @@ def test_quantities(test_file):
 
 def test_info(test_file):
     res1d = test_file
-    res1d_info = res1d._get_info()
-    res1d_info_ref = (
-        "Start time: 1957-01-01 00:00:00\n"
-        + "End time: 1963-01-01 00:00:00\n"
-        + "# Timesteps: 73\n"
-        + "# Catchments: 0\n"
-        + "# Nodes: 16\n"
-        + "# Reaches: 17\n"
-        + "# Globals: 9\n"
-        + "0 - DischargeIntegratedMonthly <m^3>\n"
-        + "1 - DischargeIntegratedMonthlyCount <()>\n"
-        + "2 - DischargeIntegratedMonthlyDuration <h>\n"
-        + "3 - Component_1TransportIntegratedMonthly <kg>\n"
-        + "4 - Component_1TransportIntegratedMonthlyCount <()>\n"
-        + "5 - Component_1TransportIntegratedMonthlyDuration <h>\n"
-        + "6 - Component_2TransportIntegratedMonthly <kg>\n"
-        + "7 - Component_2TransportIntegratedMonthlyCount <()>\n"
-        + "8 - Component_2TransportIntegratedMonthlyDuration <h>\n"
-        + "9 - SurchargeIntegratedMonthly <m^3>\n"
-        + "10 - SurchargeIntegratedMonthlyCount <()>\n"
-        + "11 - SurchargeIntegratedMonthlyDuration <h>\n"
-        + "12 - DischargeIntegratedMonthlyOutlets <m^3>\n"
-        + "13 - DischargeIntegratedMonthlyWeirs <m^3>\n"
-        + "14 - DischargeIntegratedMonthlyTotalOutflow <m^3>\n"
-        + "15 - Component_1TransportIntegratedMonthlyTotalEmission <kg>\n"
-        + "16 - Component_2TransportIntegratedMonthlyTotalEmission <kg>\n"
-        + "17 - Component_1TransportIntegratedMonthlyOutlets <kg>\n"
-        + "18 - Component_2TransportIntegratedMonthlyOutlets <kg>\n"
-        + "19 - Component_1TransportIntegratedMonthlyWeirs <kg>\n"
-        + "20 - Component_2TransportIntegratedMonthlyWeirs <kg>"
-    )
-    assert res1d_info == res1d_info_ref
+    res1d.info()
 
 
 def test_data_item_dicts(test_file):

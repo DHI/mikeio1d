@@ -112,3 +112,8 @@ def many_catchments(res1d_catchments):
 @pytest.fixture
 def structure(res1d_network):
     return res1d_network.result_network.structures["119w1"]
+
+
+@pytest.fixture
+def result_quantity(node):
+    return node.WaterLevel

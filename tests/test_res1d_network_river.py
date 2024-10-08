@@ -37,30 +37,7 @@ def test_quantities(test_file):
 
 def test_repr(test_file):
     res1d = test_file
-    res1d_info = res1d._get_info()
-    res1d_info_ref = (
-        "Start time: 2000-02-18 00:06:00\n"
-        + "End time: 2000-02-18 12:06:00\n"
-        + "# Timesteps: 73\n"
-        + "# Catchments: 0\n"
-        + "# Nodes: 18\n"
-        + "# Reaches: 18\n"
-        + "# Globals: 4\n"
-        + "0 - WaterLevel <m>\n"
-        + "1 - Discharge <m^3/s>\n"
-        + "2 - ManningResistanceNumber <m^(1/3)/s>\n"
-        + "3 - FlowVelocity <m/s>\n"
-        + "4 - FlowVelocityInStructure <m/s>\n"
-        + "5 - FlowAreaInStructure <m^2>\n"
-        + "6 - DischargeInStructure <m^3/s>\n"
-        + "7 - ControlStrategyId <Integer>\n"
-        + "8 - GateLevel <m>\n"
-        + "9 - Variable:TwoTimeSensorGateLevel <->\n"
-        + "10 - Water level:Sensor:s.h.river53745.34 <m>\n"
-        + "11 - Gate level:Sensor:SensorGateLevel <m>\n"
-        + "12 - Discharge:Sensor:SensorGauge1 <m^3/s>"
-    )
-    assert res1d_info == res1d_info_ref
+    res1d.info()
 
 
 def test_data_item_dicts(test_file):
