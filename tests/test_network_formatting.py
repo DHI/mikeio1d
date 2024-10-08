@@ -1,5 +1,11 @@
 """
-Tests for the formatting of the result network objects."""
+Tests for the formatting of the result network objects.
+"""
+
+import pytest
+
+from mikeio1d.result_network import ResultQuantity
+from DHI.Mike1D.Generic import IQuantity
 
 
 def test_location_str_repr_header_line(node, reach, catchment, structure):
@@ -46,7 +52,7 @@ def test_single_node_html_repr(node):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>WaterLevel</li></ul></details>"""
+    <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details>"""
     assert html_repr == expected_html_repr
 
 
@@ -60,7 +66,7 @@ def test_single_catchment_html_repr(catchment):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (3)</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities (5)</summary><ul><li>TotalRunOff</li><li>ActualRainfall</li><li>ZinkLoadRR</li><li>ZinkMassAccumulatedRR</li><li>ZinkRR</li></ul></details>"""
+    <details><summary>Attributes (3)</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details>"""
     assert html_repr == expected_html_repr
 
 
@@ -74,7 +80,7 @@ def test_single_reach_html_repr(river_reach):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (5)</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 94</li></ul></details><details><summary>Quantities (4)</summary><ul><li>WaterLevel</li><li>ManningResistanceNumber</li><li>Discharge</li><li>FlowVelocity</li></ul></details>"""
+    <details><summary>Attributes (5)</summary><ul><li>name: river</li><li>length: 2024.2276598819008</li><li>start_chainage: 53100.0</li><li>end_chainage: 55124.2276598819</li><li>n_gridpoints: 94</li></ul></details><details><summary>Quantities (4)</summary><ul><li>Water level (m)</li><li>Manning Resistance Number (m^(1/3)/s)</li><li>Discharge (m^3/s)</li><li>Flow velocity (m/s)</li></ul></details>"""
     assert html_repr == expected_html_repr
 
 
@@ -88,5 +94,22 @@ def test_single_structure_html_repr(structure):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (3)</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge</li></ul></details>"""
+    <details><summary>Attributes (3)</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge (m^3/s)</li></ul></details>"""
     assert html_repr == expected_html_repr
+
+
+@pytest.mark.parametrize(
+    "latex_format, expected_str",
+    [
+        (None, "Water level (m)"),
+        (False, "Water level (m)"),
+        (True, "Water level ($\\mathrm{m}$)"),
+    ],
+)
+def test_pretty_quantity_formatting(result_quantity, latex_format, expected_str):
+    assert isinstance(result_quantity, ResultQuantity)
+    m1d_quantity = result_quantity.data_item.Quantity
+    assert isinstance(m1d_quantity, IQuantity)
+
+    assert ResultQuantity.prettify_quantity(result_quantity, latex_format) == expected_str
+    assert ResultQuantity.prettify_quantity(m1d_quantity, latex_format) == expected_str

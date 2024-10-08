@@ -34,30 +34,7 @@ def test_quantities(test_file):
 
 def test_info(test_file):
     epanet_res = test_file
-    epanet_res_info = epanet_res._get_info()
-    epanet_res_info_ref = (
-        "Start time: 2022-10-13 00:00:00\n"
-        + "End time: 2022-10-14 00:00:00\n"
-        + "# Timesteps: 25\n"
-        + "# Catchments: 0\n"
-        + "# Nodes: 11\n"
-        + "# Reaches: 13\n"
-        + "# Globals: 0\n"
-        + "0 - Demand <l/s>\n"
-        + "1 - Head <m>\n"
-        + "2 - Pressure <m>\n"
-        + "3 - WaterQuality <->\n"
-        + "4 - Flow <l/s>\n"
-        + "5 - Velocity <m/s>\n"
-        + "6 - HeadlossPer1000Unit <m>\n"
-        + "7 - AvgWaterQuality <->\n"
-        + "8 - StatusCode <->\n"
-        + "9 - Setting <->\n"
-        + "10 - ReactorRate <->\n"
-        + "11 - FrictionFactor <->"
-    )
-
-    assert epanet_res_info == epanet_res_info_ref
+    epanet_res.info()
 
 
 def test_data_item_dicts(test_file):

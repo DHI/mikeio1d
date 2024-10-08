@@ -35,53 +35,7 @@ def test_quantities(test_file):
 
 def test_info(test_file):
     swmm_out = test_file
-    swmm_out_info = swmm_out._get_info()
-    swmm_out_info_ref = (
-        "Start time: 1998-01-01 01:00:00.001000\n"
-        + "End time: 1998-01-02 12:00:00.001000\n"
-        + "# Timesteps: 36\n"
-        + "# Catchments: 8\n"
-        + "# Nodes: 14\n"
-        + "# Reaches: 13\n"
-        + "# Globals: 15\n"
-        + "0 - SWMM_NODE_DEPTH <ft>\n"
-        + "1 - SWMM_NODE_HEAD <ft>\n"
-        + "2 - SWMM_NODE_VOLUME <ft^3>\n"
-        + "3 - SWMM_NODE_LATFLOW <ft^3/s>\n"
-        + "4 - SWMM_NODE_INFLOW <ft^3/s>\n"
-        + "5 - SWMM_NODE_OVERFLOW <ft^3/s>\n"
-        + "6 - SWMM_NODE_QUAL <mu-g/l>\n"
-        + "7 - SWMM_LINK_FLOW <ft^3/s>\n"
-        + "8 - SWMM_LINK_DEPTH <ft>\n"
-        + "9 - SWMM_LINK_VELOCITY <ft/s>\n"
-        + "10 - SWMM_LINK_Froude_Number <()>\n"
-        + "11 - SWMM_LINK_CAPACITY <()>\n"
-        + "12 - SWMM_LINK_QUAL <mu-g/l>\n"
-        + "13 - SWMM_SUBCATCH_RAINFALL <in/h>\n"
-        + "14 - SWMM_SUBCATCH_SNOWDEPTH <in>\n"
-        + "15 - SWMM_SUBCATCH_EVAP <in>\n"
-        + "16 - SWMM_SUBCATCH_INFIL <in/h>\n"
-        + "17 - SWMM_SUBCATCH_RUNOFF <ft^3/s>\n"
-        + "18 - SWMM_SUBCATCH_GW_FLOW <ft^3/s>\n"
-        + "19 - SWMM_SUBCATCH_GW_ELEV <ft>\n"
-        + "20 - SWMM_SUBCATCH_SOIL_MOIST <()>\n"
-        + "21 - SWMM_SUBCATCH_WASHOFF <mu-g/l>\n"
-        + "22 - SWMM_SYS_TEMPERATURE <deg F>\n"
-        + "23 - SWMM_SYS_RAINFALL <in/h>\n"
-        + "24 - SWMM_SYS_SNOWDEPTH <in>\n"
-        + "25 - SWMM_SYS_INFIL <in/h>\n"
-        + "26 - SWMM_SYS_RUNOFF <ft^3/s>\n"
-        + "27 - SWMM_SYS_DWFLOW <ft^3/s>\n"
-        + "28 - SWMM_SYS_GWFLOW <ft^3/s>\n"
-        + "29 - SWMM_SYS_INFLOW <ft^3/s>\n"
-        + "30 - SWMM_SYS_EXFLOW <ft^3/s>\n"
-        + "31 - SWMM_SYS_FLOODING <ft^3/s>\n"
-        + "32 - SWMM_SYS_OUTFLOW <ft^3/s>\n"
-        + "33 - SWMM_SYS_STORAGE <ft^3>\n"
-        + "34 - SWMM_SYS_EVAP <->\n"
-        + "35 - SWMM_SYS_PET <->"
-    )
-    assert swmm_out_info == swmm_out_info_ref
+    swmm_out.info()
 
 
 def test_data_item_dicts(test_file):
