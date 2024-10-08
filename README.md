@@ -7,7 +7,7 @@ For other MIKE files (Dfs0, Dfs1, Dfs2, Dfsu,...) use the related package [MIKE 
 
 ## Requirements
 * Windows, Linux (experimental)
-* Python x64 3.9 - 3.12 
+* Python x64 3.9 - 3.13
 * (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) (already installed if you have MIKE)
 * (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
 
