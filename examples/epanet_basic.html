@@ -351,7 +351,7 @@ Tip
 <p>MIKE IO 1D treats EPANET (.res/.resx) and Res1D results in the same way, so you may also refer to Res1D examples.</p>
 </div>
 </div>
-<div id="154d2462" class="cell" data-execution_count="1">
+<div id="0b019bbd" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-caution callout-titled">
@@ -367,7 +367,7 @@ Caution
 <p>Reading ‘.res’ files requires the accompanying ‘.inp’ file having the same name.</p>
 </div>
 </div>
-<div id="60936eeb" class="cell" data-execution_count="2">
+<div id="fb6c9849" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/epanet.res"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -378,24 +378,24 @@ End time: 2022-10-14 00:00:00
 # Nodes: 11
 # Reaches: 13
 # Globals: 0
-0 - Demand &lt;l/s&gt;
-1 - Head &lt;m&gt;
-2 - Pressure &lt;m&gt;
-3 - WaterQuality &lt;-&gt;
-4 - Flow &lt;l/s&gt;
-5 - Velocity &lt;m/s&gt;
-6 - HeadlossPer1000Unit &lt;m&gt;
-7 - AvgWaterQuality &lt;-&gt;
-8 - StatusCode &lt;-&gt;
-9 - Setting &lt;-&gt;
-10 - ReactorRate &lt;-&gt;
-11 - FrictionFactor &lt;-&gt;</code></pre>
+0 - Water Demand (l/s)
+1 - Head (m)
+2 - Pressure (m)
+3 - Water Quality (-)
+4 - Flow (l/s)
+5 - Velocity (m/s)
+6 - Headloss Per 1000Unit (m)
+7 - Average Water Quality (-)
+8 - Status Code (-)
+9 - Setting (-)
+10 - Reactor Rate (-)
+11 - Friction Factor (-)</code></pre>
 </div>
 </div>
 </section>
 <section id="plot-network" class="level2">
 <h2 class="anchored" data-anchor-id="plot-network">Plot network</h2>
-<div id="ee45baf9" class="cell" data-execution_count="3">
+<div id="a67c8e03" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res.network.to_geopandas().plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -408,7 +408,7 @@ End time: 2022-10-14 00:00:00
 </section>
 <section id="explore-network" class="level2">
 <h2 class="anchored" data-anchor-id="explore-network">Explore network</h2>
-<div id="2b076be4" class="cell" data-execution_count="4">
+<div id="24b1ed53" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 &lt;ResultReaches&gt;
@@ -419,10 +419,10 @@ End time: 2022-10-14 00:00:00
             padding-left: 2em;
         }
     </style>
-    <details><summary>Names (13)</summary><ul><li>10</li><li>11</li><li>110</li><li>111</li><li>112</li><li>113</li><li>12</li><li>121</li><li>122</li><li>21</li><li>22</li><li>31</li><li>9</li></ul></details><details><summary>Quantities (8)</summary><ul><li>Flow</li><li>Velocity</li><li>HeadlossPer1000Unit</li><li>AvgWaterQuality</li><li>StatusCode</li><li>Setting</li><li>ReactorRate</li><li>FrictionFactor</li></ul></details>
+    <details><summary>Names (13)</summary><ul><li>10</li><li>11</li><li>110</li><li>111</li><li>112</li><li>113</li><li>12</li><li>121</li><li>122</li><li>21</li><li>22</li><li>31</li><li>9</li></ul></details><details><summary>Quantities (8)</summary><ul><li>Flow (l/s)</li><li>Velocity (m/s)</li><li>Headloss Per 1000Unit (m)</li><li>Average Water Quality (-)</li><li>Status Code (-)</li><li>Setting (-)</li><li>Reactor Rate (-)</li><li>Friction Factor (-)</li></ul></details>
 </div>
 </div>
-<div id="b117d2d6" class="cell" data-execution_count="5">
+<div id="aa146f0b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 &lt;ResultNodes&gt;
@@ -433,13 +433,13 @@ End time: 2022-10-14 00:00:00
             padding-left: 2em;
         }
     </style>
-    <details><summary>Names (11)</summary><ul><li>10</li><li>11</li><li>12</li><li>13</li><li>21</li><li>22</li><li>23</li><li>31</li><li>32</li><li>9</li><li>2</li></ul></details><details><summary>Quantities (4)</summary><ul><li>Demand</li><li>Head</li><li>Pressure</li><li>WaterQuality</li></ul></details>
+    <details><summary>Names (11)</summary><ul><li>10</li><li>11</li><li>12</li><li>13</li><li>21</li><li>22</li><li>23</li><li>31</li><li>32</li><li>9</li><li>2</li></ul></details><details><summary>Quantities (4)</summary><ul><li>Water Demand (l/s)</li><li>Head (m)</li><li>Pressure (m)</li><li>Water Quality (-)</li></ul></details>
 </div>
 </div>
 </section>
 <section id="extract-results-to-a-dataframe" class="level2">
 <h2 class="anchored" data-anchor-id="extract-results-to-a-dataframe">Extract results to a DataFrame</h2>
-<div id="83df6ec6" class="cell" data-execution_count="6">
+<div id="3d467279" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -601,7 +601,7 @@ End time: 2022-10-14 00:00:00
 </div>
 </div>
 </div>
-<div id="36102f9f" class="cell" data-execution_count="7">
+<div id="4cf21c30" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches.Flow.read()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -717,7 +717,7 @@ End time: 2022-10-14 00:00:00
 </section>
 <section id="plot-results" class="level2">
 <h2 class="anchored" data-anchor-id="plot-results">Plot results</h2>
-<div id="71844cce" class="cell" data-execution_count="8">
+<div id="7dbf3057" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'110'</span>].Flow.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -727,7 +727,7 @@ End time: 2022-10-14 00:00:00
 </div>
 </div>
 </div>
-<div id="562f9225" class="cell" data-execution_count="9">
+<div id="ea12fc8a" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>)</span>

@@ -335,7 +335,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="hidden">
-<div id="52da7551" class="cell" data-execution_count="1">
+<div id="b94b730e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res_catchments <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -348,20 +348,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="quantity" class="level3">
 <h3 class="anchored" data-anchor-id="quantity">Quantity</h3>
 <p>A quantity is a single quantity at a specific location. Quantities are accessed from a location object.</p>
-<div id="4e6d4adf" class="cell" data-execution_count="2">
+<div id="e0532341" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel <span class="co"># single quantity (i.e. water level) at a single location (i.e. node 101)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>&lt;Quantity: WaterLevel&gt;</code></pre>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/IPython/core/formatters.py:711</span>, in <span class="ansi-cyan-fg">PlainTextFormatter.__call__</span><span class="ansi-blue-fg">(self, obj)</span>
+<span class="ansi-green-fg ansi-bold">    704</span> stream <span style="color:rgb(98,98,98)">=</span> StringIO()
+<span class="ansi-green-fg ansi-bold">    705</span> printer <span style="color:rgb(98,98,98)">=</span> pretty<span style="color:rgb(98,98,98)">.</span>RepresentationPrinter(stream, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>verbose,
+<span class="ansi-green-fg ansi-bold">    706</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>max_width, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>newline,
+<span class="ansi-green-fg ansi-bold">    707</span>     max_seq_length<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>max_seq_length,
+<span class="ansi-green-fg ansi-bold">    708</span>     singleton_pprinters<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>singleton_printers,
+<span class="ansi-green-fg ansi-bold">    709</span>     type_pprinters<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>type_printers,
+<span class="ansi-green-fg ansi-bold">    710</span>     deferred_pprinters<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>deferred_printers)
+<span class="ansi-green-fg">--&gt; 711</span> <span class="ansi-yellow-bg">printer</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">pretty</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    712</span> printer<span style="color:rgb(98,98,98)">.</span>flush()
+<span class="ansi-green-fg ansi-bold">    713</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> stream<span style="color:rgb(98,98,98)">.</span>getvalue()
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/IPython/lib/pretty.py:419</span>, in <span class="ansi-cyan-fg">RepresentationPrinter.pretty</span><span class="ansi-blue-fg">(self, obj)</span>
+<span class="ansi-green-fg ansi-bold">    408</span>                         <span style="font-weight:bold;color:rgb(0,135,0)">return</span> meth(obj, <span style="color:rgb(0,135,0)">self</span>, cycle)
+<span class="ansi-green-fg ansi-bold">    409</span>                 <span style="font-weight:bold;color:rgb(0,135,0)">if</span> (
+<span class="ansi-green-fg ansi-bold">    410</span>                     <span style="color:rgb(0,135,0)">cls</span> <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">object</span>
+<span class="ansi-green-fg ansi-bold">    411</span>                     <span style="font-style:italic;color:rgb(95,135,135)"># check if cls defines __repr__</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">    417</span>                     <span style="font-weight:bold;color:rgb(175,0,255)">and</span> <span style="color:rgb(0,135,0)">callable</span>(_safe_getattr(<span style="color:rgb(0,135,0)">cls</span>, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">__repr__</span><span style="color:rgb(175,0,0)">"</span>, <span style="font-weight:bold;color:rgb(0,135,0)">None</span>))
+<span class="ansi-green-fg ansi-bold">    418</span>                 ):
+<span class="ansi-green-fg">--&gt; 419</span>                     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">_repr_pprint</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">cycle</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    421</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> _default_pprint(obj, <span style="color:rgb(0,135,0)">self</span>, cycle)
+<span class="ansi-green-fg ansi-bold">    422</span> <span style="font-weight:bold;color:rgb(0,135,0)">finally</span>:
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/IPython/lib/pretty.py:787</span>, in <span class="ansi-cyan-fg">_repr_pprint</span><span class="ansi-blue-fg">(obj, p, cycle)</span>
+<span class="ansi-green-fg ansi-bold">    785</span> <span style="font-style:italic;color:rgb(175,0,0)">"""A pprint that just redirects to the normal repr function."""</span>
+<span class="ansi-green-fg ansi-bold">    786</span> <span style="font-style:italic;color:rgb(95,135,135)"># Find newlines and replace them with p.break_()</span>
+<span class="ansi-green-fg">--&gt; 787</span> output <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">repr</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    788</span> lines <span style="color:rgb(98,98,98)">=</span> output<span style="color:rgb(98,98,98)">.</span>splitlines()
+<span class="ansi-green-fg ansi-bold">    789</span> <span style="font-weight:bold;color:rgb(0,135,0)">with</span> p<span style="color:rgb(98,98,98)">.</span>group():
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/mikeio1d/result_network/result_quantity.py:67</span>, in <span class="ansi-cyan-fg">ResultQuantity.__repr__</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">     66</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">__repr__</span>(<span style="color:rgb(0,135,0)">self</span>) <span style="color:rgb(98,98,98)">-</span><span style="color:rgb(98,98,98)">&gt;</span> <span style="color:rgb(0,135,0)">str</span>:
+<span class="ansi-green-fg">---&gt; 67</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">&lt;Quantity: </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span><span class="ansi-yellow-bg">ResultQuantity</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">prettify_quantity</span><span class="ansi-yellow-bg">(</span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">name</span><span class="ansi-yellow-bg">)</span><span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">&gt;</span><span style="color:rgb(175,0,0)">"</span>
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.12.7/x64/lib/python3.12/site-packages/mikeio1d/result_network/result_quantity.py:90</span>, in <span class="ansi-cyan-fg">ResultQuantity.prettify_quantity</span><span class="ansi-blue-fg">(quantity, latex_format)</span>
+<span class="ansi-green-fg ansi-bold">     88</span>     m1d_quantity <span style="color:rgb(98,98,98)">=</span> quantity
+<span class="ansi-green-fg ansi-bold">     89</span> <span style="font-weight:bold;color:rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">---&gt; 90</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">ValueError</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">quantity must be a ResultQuantity or IQuantity object.</span><span style="color:rgb(175,0,0)">"</span>)
+<span class="ansi-green-fg ansi-bold">     92</span> description <span style="color:rgb(98,98,98)">=</span> m1d_quantity<span style="color:rgb(98,98,98)">.</span>Description
+<span class="ansi-green-fg ansi-bold">     93</span> unit_abbreviation <span style="color:rgb(98,98,98)">=</span> m1d_quantity<span style="color:rgb(98,98,98)">.</span>EumQuantity<span style="color:rgb(98,98,98)">.</span>UnitAbbreviation
+
+<span class="ansi-red-fg">ValueError</span>: quantity must be a ResultQuantity or IQuantity object.</pre>
+</div>
 </div>
 </div>
 </section>
 <section id="quantity-collection" class="level3">
 <h3 class="anchored" data-anchor-id="quantity-collection">Quantity Collection</h3>
 <p>A quantity collection is a single quantity at multiple locations. Quantity collections are accessed from a location collection.</p>
-<div id="6614ef9b" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel <span class="co"># single quantity (i.e. water level) at multiple locations (i.e. all nodes)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b89946a7" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel <span class="co"># single quantity (i.e. water level) at multiple locations (i.e. all nodes)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>&lt;QuantityCollection (119): WaterLevel&gt;</code></pre>
+<pre><code>&lt;QuantityCollection (119): Water level (m)&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -369,9 +415,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="reading-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-data">Reading data</h2>
 <p>Quantities and quantity collections can be read into a pandas DataFrame with their <code>read</code> method.</p>
-<div id="2026b192" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="5d766262" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
@@ -410,9 +456,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="4ad07b40" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes.WaterLevel.read()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="06d26181" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes.WaterLevel.read()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 
@@ -576,18 +622,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="plotting-data" class="level2">
 <h2 class="anchored" data-anchor-id="plotting-data">Plotting data</h2>
 <p>Quantities and quantity collections can be plotted directly with their <code>plot</code> method.</p>
-<div id="f3b9a580" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="475ddde1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="quantities_files/figure-html/cell-7-output-1.png" width="606" height="414" class="figure-img"></p>
+<p><img src="quantities_files/figure-html/cell-7-output-1.png" width="607" height="414" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="9b916b51" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.plot(legend<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="0aeb8de2" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.plot(legend<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -600,11 +646,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="dynamic-selections" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-selections">Dynamic selections</h2>
 <p>Quantities or quantity collections can be conveniently combined into a single DataFrame with the ‘add’ method.</p>
-<div id="34a1e371" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.add()</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'100'</span>].WaterLevel.add()</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="1c6168d3" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.add()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'100'</span>].WaterLevel.add()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div>
 
@@ -649,11 +695,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="4320ecd3" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.add()</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res.reaches.WaterLevel.add()</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c1dcd86e" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.add()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res.reaches.WaterLevel.add()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div>
 

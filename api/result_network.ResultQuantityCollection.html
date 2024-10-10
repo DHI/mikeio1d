@@ -272,6 +272,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net" id="toc-mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net">get_data_entry_net</a></li>
   <li><a href="#mikeio1d.result_network.ResultQuantityCollection.get_query" id="toc-mikeio1d.result_network.ResultQuantityCollection.get_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.get_query">get_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultQuantityCollection.plot" id="toc-mikeio1d.result_network.ResultQuantityCollection.plot" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.plot">plot</a></li>
+  <li><a href="#mikeio1d.result_network.ResultQuantityCollection.prettify_quantity" id="toc-mikeio1d.result_network.ResultQuantityCollection.prettify_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.prettify_quantity">prettify_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultQuantityCollection.read" id="toc-mikeio1d.result_network.ResultQuantityCollection.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.read">read</a></li>
   <li><a href="#mikeio1d.result_network.ResultQuantityCollection.to_csv" id="toc-mikeio1d.result_network.ResultQuantityCollection.to_csv" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.to_csv">to_csv</a></li>
   <li><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dataframe" id="toc-mikeio1d.result_network.ResultQuantityCollection.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultQuantityCollection.to_dataframe">to_dataframe</a></li>
@@ -378,22 +379,26 @@ ul.task-list li input[type="checkbox"] {
 <td>Plot the time series data.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.result_network.ResultQuantityCollection.prettify_quantity">prettify_quantity</a></td>
+<td>Get a pretty string representation of a ResultQuantity’s type and unit.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultQuantityCollection.read">read</a></td>
 <td>Read the time series data into a data frame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_csv">to_csv</a></td>
 <td>Extract time series data into a csv file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dataframe">to_dataframe</a></td>
 <td>Get a time series as a data frame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_dfs0">to_dfs0</a></td>
 <td>Extract time series data into a dfs0 file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultQuantityCollection.to_txt">to_txt</a></td>
 <td>Extract time series data into a txt file.</td>
 </tr>
@@ -424,12 +429,67 @@ ul.task-list li input[type="checkbox"] {
 <p><code>result_network.ResultQuantityCollection.plot(**kwargs)</code></p>
 <p>Plot the time series data.</p>
 </section>
+<section id="mikeio1d.result_network.ResultQuantityCollection.prettify_quantity" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.prettify_quantity">prettify_quantity</h3>
+<p><code>result_network.ResultQuantityCollection.prettify_quantity(quantity, latex_format=False)</code></p>
+<p>Get a pretty string representation of a ResultQuantity’s type and unit.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 24%">
+<col style="width: 52%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>quantity</code></td>
+<td>ResultQuantity | IQuantity</td>
+<td>ResultQuantity object or DHI.Mike1D.Generic.IQuantity object.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>latex_format</code></td>
+<td></td>
+<td>If True, the unit abbreviation will use LaTeX-formatted text.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>str</td>
+<td>A string representation of the quantity type and unit.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.read">read</h3>
 <p><code>result_network.ResultQuantityCollection.read(column_mode=None)</code></p>
 <p>Read the time series data into a data frame.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
