@@ -267,17 +267,21 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#mikeio1d.result_network.ResultReach.add_derived_quantity" id="toc-mikeio1d.result_network.ResultReach.add_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_derived_quantity">add_derived_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.add_query" id="toc-mikeio1d.result_network.ResultReach.add_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_query">add_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.add_res1d_reach" id="toc-mikeio1d.result_network.ResultReach.add_res1d_reach" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_res1d_reach">add_res1d_reach</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map" id="toc-mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map">add_to_network_result_quantity_map</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.add_to_result_quantity_map" id="toc-mikeio1d.result_network.ResultReach.add_to_result_quantity_map" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_to_result_quantity_map">add_to_result_quantity_map</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.get_m1d_dataset" id="toc-mikeio1d.result_network.ResultReach.get_m1d_dataset" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.get_m1d_dataset">get_m1d_dataset</a></li>
+  <li><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_critical_level" id="toc-mikeio1d.result_network.ResultReach.interpolate_reach_critical_level" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.interpolate_reach_critical_level">interpolate_reach_critical_level</a></li>
+  <li><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_ground_level" id="toc-mikeio1d.result_network.ResultReach.interpolate_reach_ground_level" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.interpolate_reach_ground_level">interpolate_reach_ground_level</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.read" id="toc-mikeio1d.result_network.ResultReach.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.read">read</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_gridpoint" id="toc-mikeio1d.result_network.ResultReach.set_gridpoint" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_gridpoint">set_gridpoint</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_gridpoint_data_items" id="toc-mikeio1d.result_network.ResultReach.set_gridpoint_data_items" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_gridpoint_data_items">set_gridpoint_data_items</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_gridpoints" id="toc-mikeio1d.result_network.ResultReach.set_gridpoints" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_gridpoints">set_gridpoints</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_quantities" id="toc-mikeio1d.result_network.ResultReach.set_quantities" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_quantities">set_quantities</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_quantity" id="toc-mikeio1d.result_network.ResultReach.set_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_quantity">set_quantity</a></li>
+  <li><a href="#mikeio1d.result_network.ResultReach.set_quantity_derived" id="toc-mikeio1d.result_network.ResultReach.set_quantity_derived" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_quantity_derived">set_quantity_derived</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_static_attribute" id="toc-mikeio1d.result_network.ResultReach.set_static_attribute" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_static_attribute">set_static_attribute</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.set_static_attributes" id="toc-mikeio1d.result_network.ResultReach.set_static_attributes" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.set_static_attributes">set_static_attributes</a></li>
   </ul></li>
@@ -378,48 +382,64 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultReach.add_derived_quantity">add_derived_quantity</a></td>
+<td>Add a derived quantity to the result location.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.add_query">add_query</a></td>
 <td>Base method for adding a query to ResultNetwork.queries list.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.add_res1d_reach">add_res1d_reach</a></td>
 <td>Add a IRes1DReach to ResultReach.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map">add_to_network_result_quantity_map</a></td>
 <td>Add a ResultQuantity to map of all possible ResultQuantities.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.add_to_result_quantity_map">add_to_result_quantity_map</a></td>
 <td>Method for adding to a given result quantity map.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.get_m1d_dataset">get_m1d_dataset</a></td>
 <td>Get IRes1DDataSet object associated with ResultReach.</td>
 </tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_critical_level">interpolate_reach_critical_level</a></td>
+<td>Interpolates the critical level at a given chainage by linear interpolation</td>
+</tr>
 <tr class="even">
+<td><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_ground_level">interpolate_reach_ground_level</a></td>
+<td>Interpolates the ground level at a given chainage by linear interpolation</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.read">read</a></td>
 <td>Read the time series data for all quantities at this location into a DataFrame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_gridpoint">set_gridpoint</a></td>
 <td>Assign chainage attribute to a current ResultReach object</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.set_gridpoint_data_items">set_gridpoint_data_items</a></td>
 <td>Assign data items to ResultGridPoint object belonging to current ResultReach</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_gridpoints">set_gridpoints</a></td>
 <td>Assign chainage attributes to a current ResultReach object</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.set_quantities">set_quantities</a></td>
 <td>Sets all quantity attributes.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_quantity">set_quantity</a></td>
 <td>Sets a single quantity attribute on the obj.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultReach.set_quantity_derived">set_quantity_derived</a></td>
+<td>Sets a single derived quantity attribute on the obj.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_static_attribute">set_static_attribute</a></td>
@@ -431,6 +451,11 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+<section id="mikeio1d.result_network.ResultReach.add_derived_quantity" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.add_derived_quantity">add_derived_quantity</h3>
+<p><code>result_network.ResultReach.add_derived_quantity(derived_quantity)</code></p>
+<p>Add a derived quantity to the result location.</p>
+</section>
 <section id="mikeio1d.result_network.ResultReach.add_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.add_query">add_query</h3>
 <p><code>result_network.ResultReach.add_query(data_item)</code></p>
@@ -605,12 +630,110 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="mikeio1d.result_network.ResultReach.interpolate_reach_critical_level" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.interpolate_reach_critical_level">interpolate_reach_critical_level</h3>
+<p><code>result_network.ResultReach.interpolate_reach_critical_level(chainage)</code></p>
+<p>Interpolates the critical level at a given chainage by linear interpolation from the bounding node critical levels.</p>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 9%">
+<col style="width: 63%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>chainage</code></td>
+<td>float</td>
+<td>Chainage for which to interpolate the critical level.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4">
+<h4 class="anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>float</td>
+<td>Interpolated critical level.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultReach.interpolate_reach_ground_level" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.interpolate_reach_ground_level">interpolate_reach_ground_level</h3>
+<p><code>result_network.ResultReach.interpolate_reach_ground_level(chainage)</code></p>
+<p>Interpolates the ground level at a given chainage by linear interpolation from the bounding node ground levels.</p>
+<section id="parameters-6" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-6">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 9%">
+<col style="width: 62%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>chainage</code></td>
+<td>float</td>
+<td>Chainage for which to interpolate the ground level.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level4">
+<h4 class="anchored" data-anchor-id="returns-3">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>float</td>
+<td>Interpolated ground level.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="mikeio1d.result_network.ResultReach.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.read">read</h3>
 <p><code>result_network.ResultReach.read(column_mode=None)</code></p>
 <p>Read the time series data for all quantities at this location into a DataFrame.</p>
-<section id="parameters-5" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<section id="parameters-7" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
@@ -641,8 +764,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_gridpoint">set_gridpoint</h3>
 <p><code>result_network.ResultReach.set_gridpoint(reach, gridpoint)</code></p>
 <p>Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.</p>
-<section id="parameters-6" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-6">Parameters</h4>
+<section id="parameters-8" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-8">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 19%">
@@ -679,8 +802,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_gridpoint_data_items">set_gridpoint_data_items</h3>
 <p><code>result_network.ResultReach.set_gridpoint_data_items(reach)</code></p>
 <p>Assign data items to ResultGridPoint object belonging to current ResultReach from IRes1DReach data items.</p>
-<section id="parameters-7" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>
+<section id="parameters-9" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-9">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -705,8 +828,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_gridpoints">set_gridpoints</h3>
 <p><code>result_network.ResultReach.set_gridpoints(reach)</code></p>
 <p>Assign chainage attributes to a current ResultReach object from a data provided by IRes1DReach.</p>
-<section id="parameters-8" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-8">Parameters</h4>
+<section id="parameters-10" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-10">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -736,6 +859,11 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_quantity">set_quantity</h3>
 <p><code>result_network.ResultReach.set_quantity(obj, data_item, element_index=0)</code></p>
 <p>Sets a single quantity attribute on the obj.</p>
+</section>
+<section id="mikeio1d.result_network.ResultReach.set_quantity_derived" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_quantity_derived">set_quantity_derived</h3>
+<p><code>result_network.ResultReach.set_quantity_derived(derived_quantity)</code></p>
+<p>Sets a single derived quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultReach.set_static_attribute" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_static_attribute">set_static_attribute</h3>

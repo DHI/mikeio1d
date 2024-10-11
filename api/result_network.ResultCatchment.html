@@ -267,6 +267,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#mikeio1d.result_network.ResultCatchment.add_derived_quantity" id="toc-mikeio1d.result_network.ResultCatchment.add_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.add_derived_quantity">add_derived_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.add_query" id="toc-mikeio1d.result_network.ResultCatchment.add_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.add_query">add_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.add_to_network_result_quantity_map" id="toc-mikeio1d.result_network.ResultCatchment.add_to_network_result_quantity_map" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.add_to_network_result_quantity_map">add_to_network_result_quantity_map</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.add_to_result_quantity_map" id="toc-mikeio1d.result_network.ResultCatchment.add_to_result_quantity_map" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.add_to_result_quantity_map">add_to_result_quantity_map</a></li>
@@ -276,6 +277,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#mikeio1d.result_network.ResultCatchment.read" id="toc-mikeio1d.result_network.ResultCatchment.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.read">read</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.set_quantities" id="toc-mikeio1d.result_network.ResultCatchment.set_quantities" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.set_quantities">set_quantities</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.set_quantity" id="toc-mikeio1d.result_network.ResultCatchment.set_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.set_quantity">set_quantity</a></li>
+  <li><a href="#mikeio1d.result_network.ResultCatchment.set_quantity_derived" id="toc-mikeio1d.result_network.ResultCatchment.set_quantity_derived" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.set_quantity_derived">set_quantity_derived</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.set_static_attribute" id="toc-mikeio1d.result_network.ResultCatchment.set_static_attribute" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.set_static_attribute">set_static_attribute</a></li>
   <li><a href="#mikeio1d.result_network.ResultCatchment.set_static_attributes" id="toc-mikeio1d.result_network.ResultCatchment.set_static_attributes" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultCatchment.set_static_attributes">set_static_attributes</a></li>
   </ul></li>
@@ -337,8 +339,16 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultCatchment.derived_quantities">derived_quantities</a></td>
+<td>A list of available derived quantities.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.geometry">geometry</a></td>
 <td>A geometric representation of the catchment. Requires shapely.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultCatchment.group">group</a></td>
+<td>The TimeSeriesIdGroup assosciated with this location.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.quantities">quantities</a></td>
@@ -358,40 +368,48 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultCatchment.add_derived_quantity">add_derived_quantity</a></td>
+<td>Add a derived quantity to the result location.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.add_query">add_query</a></td>
 <td>Base method for adding a query to ResultNetwork.queries list.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchment.add_to_network_result_quantity_map">add_to_network_result_quantity_map</a></td>
 <td>Add a ResultQuantity to map of all possible ResultQuantities.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.add_to_result_quantity_map">add_to_result_quantity_map</a></td>
 <td>Method for adding to a given result quantity map.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchment.add_to_result_quantity_maps">add_to_result_quantity_maps</a></td>
 <td>Add catchment result quantity to result quantity maps.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.get_m1d_dataset">get_m1d_dataset</a></td>
 <td>Get IRes1DDataSet object associated with ResultCatchment.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchment.get_query">get_query</a></td>
 <td>Get a QueryDataCatchment for given data item.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.read">read</a></td>
 <td>Read the time series data for all quantities at this location into a DataFrame.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchment.set_quantities">set_quantities</a></td>
 <td>Sets all quantity attributes.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.set_quantity">set_quantity</a></td>
 <td>Sets a single quantity attribute on the obj.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultCatchment.set_quantity_derived">set_quantity_derived</a></td>
+<td>Sets a single derived quantity attribute on the obj.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchment.set_static_attribute">set_static_attribute</a></td>
@@ -403,6 +421,11 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+<section id="mikeio1d.result_network.ResultCatchment.add_derived_quantity" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchment.add_derived_quantity">add_derived_quantity</h3>
+<p><code>result_network.ResultCatchment.add_derived_quantity(derived_quantity)</code></p>
+<p>Add a derived quantity to the result location.</p>
+</section>
 <section id="mikeio1d.result_network.ResultCatchment.add_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchment.add_query">add_query</h3>
 <p><code>result_network.ResultCatchment.add_query(data_item)</code></p>
@@ -599,6 +622,11 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchment.set_quantity">set_quantity</h3>
 <p><code>result_network.ResultCatchment.set_quantity(obj, data_item, element_index=0)</code></p>
 <p>Sets a single quantity attribute on the obj.</p>
+</section>
+<section id="mikeio1d.result_network.ResultCatchment.set_quantity_derived" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchment.set_quantity_derived">set_quantity_derived</h3>
+<p><code>result_network.ResultCatchment.set_quantity_derived(derived_quantity)</code></p>
+<p>Sets a single derived quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultCatchment.set_static_attribute" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchment.set_static_attribute">set_static_attribute</h3>

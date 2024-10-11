@@ -267,9 +267,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#mikeio1d.result_network.ResultGlobalDatas.add_derived_quantity" id="toc-mikeio1d.result_network.ResultGlobalDatas.add_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.add_derived_quantity">add_derived_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultGlobalDatas.read" id="toc-mikeio1d.result_network.ResultGlobalDatas.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultGlobalDatas.remove_derived_quantity" id="toc-mikeio1d.result_network.ResultGlobalDatas.remove_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.remove_derived_quantity">remove_derived_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultGlobalDatas.set_global_data" id="toc-mikeio1d.result_network.ResultGlobalDatas.set_global_data" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.set_global_data">set_global_data</a></li>
   <li><a href="#mikeio1d.result_network.ResultGlobalDatas.set_quantity_collections" id="toc-mikeio1d.result_network.ResultGlobalDatas.set_quantity_collections" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.set_quantity_collections">set_quantity_collections</a></li>
+  <li><a href="#mikeio1d.result_network.ResultGlobalDatas.set_quantity_derived" id="toc-mikeio1d.result_network.ResultGlobalDatas.set_quantity_derived" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.set_quantity_derived">set_quantity_derived</a></li>
   <li><a href="#mikeio1d.result_network.ResultGlobalDatas.set_res1d_global_data_to_dict" id="toc-mikeio1d.result_network.ResultGlobalDatas.set_res1d_global_data_to_dict" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.set_res1d_global_data_to_dict">set_res1d_global_data_to_dict</a></li>
   <li><a href="#mikeio1d.result_network.ResultGlobalDatas.set_res1d_object_to_dict" id="toc-mikeio1d.result_network.ResultGlobalDatas.set_res1d_object_to_dict" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGlobalDatas.set_res1d_object_to_dict">set_res1d_object_to_dict</a></li>
   </ul></li>
@@ -350,8 +353,16 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultGlobalDatas.add_derived_quantity">add_derived_quantity</a></td>
+<td>Add a derived quantity to the result network.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultGlobalDatas.read">read</a></td>
 <td>Read the time series data for all quantities at these locations into a DataFrame.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultGlobalDatas.remove_derived_quantity">remove_derived_quantity</a></td>
+<td>Remove a derived quantity from the result network.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultGlobalDatas.set_global_data">set_global_data</a></td>
@@ -362,26 +373,62 @@ ul.task-list li input[type="checkbox"] {
 <td>Sets all quantity collection attributes.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.result_network.ResultGlobalDatas.set_quantity_derived">set_quantity_derived</a></td>
+<td>Sets a single derived quantity attribute on the obj.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultGlobalDatas.set_res1d_global_data_to_dict">set_res1d_global_data_to_dict</a></td>
 <td>Create a dict entry from data item quantity ID to IDatItem object.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultGlobalDatas.set_res1d_object_to_dict">set_res1d_object_to_dict</a></td>
 <td>Create a dict entry from a key name to an object</td>
 </tr>
 </tbody>
 </table>
-<section id="mikeio1d.result_network.ResultGlobalDatas.read" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.read">read</h3>
-<p><code>result_network.ResultGlobalDatas.read(column_mode=None)</code></p>
-<p>Read the time series data for all quantities at these locations into a DataFrame.</p>
+<section id="mikeio1d.result_network.ResultGlobalDatas.add_derived_quantity" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.add_derived_quantity">add_derived_quantity</h3>
+<p><code>result_network.ResultGlobalDatas.add_derived_quantity(derived_quantity)</code></p>
+<p>Add a derived quantity to the result network.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 4%">
+<col style="width: 19%">
+<col style="width: 16%">
+<col style="width: 51%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>derived_quantity</code></td>
+<td>DerivedQuantity</td>
+<td>Derived quantity to be added to the result network.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultGlobalDatas.read" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.read">read</h3>
+<p><code>result_network.ResultGlobalDatas.read(column_mode=None, include_derived=False)</code></p>
+<p>Read the time series data for all quantities at these locations into a DataFrame.</p>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
 <col style="width: 9%">
-<col style="width: 81%">
+<col style="width: 80%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -399,6 +446,44 @@ ul.task-list li input[type="checkbox"] {
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
 <td><code>None</code></td>
 </tr>
+<tr class="even">
+<td><code>include_derived</code></td>
+<td>bool</td>
+<td>Include derived quantities.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultGlobalDatas.remove_derived_quantity" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.remove_derived_quantity">remove_derived_quantity</h3>
+<p><code>result_network.ResultGlobalDatas.remove_derived_quantity(derived_quantity)</code></p>
+<p>Remove a derived quantity from the result network.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 64%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>derived_quantity</code></td>
+<td>DerivedQuantity or str</td>
+<td>Derived quantity to be removed from the result network. Either a DerivedQuantity object or its name.</td>
+<td><em>required</em></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -412,6 +497,11 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.set_quantity_collections">set_quantity_collections</h3>
 <p><code>result_network.ResultGlobalDatas.set_quantity_collections()</code></p>
 <p>Sets all quantity collection attributes.</p>
+</section>
+<section id="mikeio1d.result_network.ResultGlobalDatas.set_quantity_derived" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.set_quantity_derived">set_quantity_derived</h3>
+<p><code>result_network.ResultGlobalDatas.set_quantity_derived(derived_quantity)</code></p>
+<p>Sets a single derived quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultGlobalDatas.set_res1d_global_data_to_dict" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.set_res1d_global_data_to_dict">set_res1d_global_data_to_dict</h3>

@@ -360,7 +360,7 @@ Note
 <section id="opening-files" class="level2">
 <h2 class="anchored" data-anchor-id="opening-files">Opening files</h2>
 <p>Network files can be opened by providing the path to a Res1D object.</p>
-<div id="858af78c" class="cell" data-execution_count="1">
+<div id="518df621" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -372,7 +372,7 @@ Note
 <section id="exploring-contents" class="level2">
 <h2 class="anchored" data-anchor-id="exploring-contents">Exploring contents</h2>
 <p>An overview of the file contents can be obtained by calling the <code>info</code> method.</p>
-<div id="68c2b000" class="cell" data-execution_count="2">
+<div id="c13dc4c1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Start time: 1994-08-07 16:35:00
@@ -387,14 +387,14 @@ End time: 1994-08-07 18:35:00
 </div>
 </div>
 <p>The quantity IDs are accessible via the <code>quantities</code> attribute.</p>
-<div id="875d5ee4" class="cell" data-execution_count="3">
+<div id="fcab5a50" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.quantities</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>['WaterLevel', 'Discharge']</code></pre>
 </div>
 </div>
 <p>Res1D results share a common time index, which can be accessed via the <code>time_index</code> attribute.</p>
-<div id="27d96aa3" class="cell" data-execution_count="4">
+<div id="31d66771" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.time_index</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>DatetimeIndex([       '1994-08-07 16:35:00', '1994-08-07 16:36:01.870000',
@@ -415,7 +415,7 @@ End time: 1994-08-07 18:35:00
 <section id="reading-all-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-all-data">Reading all data</h2>
 <p>All data can be read into a pandas DataFrame by calling the <code>read</code> method.</p>
-<div id="af5bfc93" class="cell" data-execution_count="5">
+<div id="03de01bb" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -581,7 +581,7 @@ End time: 1994-08-07 18:35:00
 <section id="accessing-locations" class="level2">
 <h2 class="anchored" data-anchor-id="accessing-locations">Accessing locations</h2>
 <p><a href="../user-guide/locations.html">Locations</a> are where model results exist in the network. The main location types are nodes, reaches, and catchments. Each of these location types are accessible via the Res1D object.</p>
-<div id="2ab87df8" class="cell" data-execution_count="6">
+<div id="76f5926e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 &lt;ResultReaches&gt;
@@ -595,7 +595,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Names (118)</summary><ul><li>100l1</li><li>101l1</li><li>102l1</li><li>103l1</li><li>104l1</li><li>105l1</li><li>106l1</li><li>107l1</li><li>108l1</li><li>109l1</li><li>10l1</li><li>110l1</li><li>111l1</li><li>112l1</li><li>113l1</li><li>114l1</li><li>116l1</li><li>117l1</li><li>118l1</li><li>119l1</li><li>11l1</li><li>12l1</li><li>13l1</li><li>14l1</li><li>15l1</li><li>16l1</li><li>17l1</li><li>1l1</li><li>20l1</li><li>21l1</li><li>22l1</li><li>23l1</li><li>24l1</li><li>25l1</li><li>26l1</li><li>27l1</li><li>28l1</li><li>29l1</li><li>2l1</li><li>30l1</li><li>31l1</li><li>32l1</li><li>33l1</li><li>34l1</li><li>35l1</li><li>36l1</li><li>37l1</li><li>38l1</li><li>39l1</li><li>3l1</li><li>40l1</li><li>41l1</li><li>42l1</li><li>43l1</li><li>44l1</li><li>45l1</li><li>46l1</li><li>47l1</li><li>48l1</li><li>49l1</li><li>4l1</li><li>50l1</li><li>51l1</li><li>52l1</li><li>53l1</li><li>54l1</li><li>55l1</li><li>56l1</li><li>57l1</li><li>58l1</li><li>59l1</li><li>5l1</li><li>60l1</li><li>61l1</li><li>62l1</li><li>63l1</li><li>64l1</li><li>65l1</li><li>66l1</li><li>67l1</li><li>68l1</li><li>69l1</li><li>6l1</li><li>70l1</li><li>71l1</li><li>72l1</li><li>73l1</li><li>74l1</li><li>75l1</li><li>76l1</li><li>77l1</li><li>78l1</li><li>79l1</li><li>7l1</li><li>80l1</li><li>81l1</li><li>82l1</li><li>83l1</li><li>84l1</li><li>85l1</li><li>86l1</li><li>87l1</li><li>88l1</li><li>89l1</li><li>8l1</li><li>90l1</li><li>91l1</li><li>92l1</li><li>93l1</li><li>94l1</li><li>95l1</li><li>96l1</li><li>97l1</li><li>98l1</li><li>99l1</li><li>9l1</li><li>Weir:119w1</li><li>Pump:115p1</li></ul></details><details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details>
 </div>
 </div>
-<div id="3e8939c3" class="cell" data-execution_count="7">
+<div id="23714d8e" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 &lt;ResultNodes&gt;
@@ -609,7 +609,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Names (119)</summary><ul><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>10</li><li>11</li><li>13</li><li>14</li><li>15</li><li>17</li><li>20</li><li>21</li><li>22</li><li>23</li><li>24</li><li>25</li><li>26</li><li>27</li><li>28</li><li>29</li><li>30</li><li>31</li><li>32</li><li>33</li><li>34</li><li>35</li><li>36</li><li>37</li><li>38</li><li>39</li><li>40</li><li>41</li><li>42</li><li>43</li><li>44</li><li>45</li><li>47</li><li>48</li><li>49</li><li>50</li><li>51</li><li>52</li><li>53</li><li>54</li><li>56</li><li>57</li><li>59</li><li>60</li><li>61</li><li>62</li><li>63</li><li>64</li><li>65</li><li>66</li><li>67</li><li>68</li><li>69</li><li>70</li><li>71</li><li>72</li><li>73</li><li>74</li><li>75</li><li>76</li><li>77</li><li>78</li><li>79</li><li>80</li><li>81</li><li>82</li><li>83</li><li>84</li><li>85</li><li>86</li><li>87</li><li>88</li><li>89</li><li>90</li><li>91</li><li>92</li><li>93</li><li>94</li><li>95</li><li>96</li><li>97</li><li>98</li><li>99</li><li>100</li><li>101</li><li>102</li><li>103</li><li>104</li><li>105</li><li>106</li><li>107</li><li>108</li><li>109</li><li>110</li><li>111</li><li>112</li><li>113</li><li>114</li><li>12</li><li>16</li><li>46</li><li>55</li><li>58</li><li>116</li><li>117</li><li>118</li><li>115</li><li>119</li><li>120</li><li>Weir Outlet:119w1</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details>
 </div>
 </div>
-<div id="28994443" class="cell" data-execution_count="8">
+<div id="7dc834e5" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res_cat <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>res_cat.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -628,7 +628,7 @@ End time: 1994-08-07 18:35:00
 <section id="modifying-data" class="level2">
 <h2 class="anchored" data-anchor-id="modifying-data">Modifying data</h2>
 <p>Limited functionality is provided for modifying result data. A common use case for this is hotstart files. Modifying static network data is not supported.</p>
-<div id="78114558" class="cell" data-execution_count="9">
+<div id="9262c284" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 1m to the water level of the node with ID '1'.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read(column_mode<span class="op">=</span><span class="st">'timeseries'</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>df_modified <span class="op">=</span> df.copy()</span>
@@ -637,7 +637,7 @@ End time: 1994-08-07 18:35:00
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>res.modify(df_modified, file_path<span class="op">=</span><span class="st">'modified.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="hidden">
-<div id="bdc7479b" class="cell" data-execution_count="10">
+<div id="de6eb17d" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>os.remove(<span class="st">'modified.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
