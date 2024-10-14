@@ -8,6 +8,12 @@
 
 ### Changed
 
+### [0.8.1] - 2024-10-14
+
+### Fixed
+
+- Wheel and source builds did not include all necessary binary dependencies.
+
 ## [0.8.0] - 2024-10-14
 
 ### Added
