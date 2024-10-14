@@ -1,8 +1,5 @@
 import sys
-<<<<<<< Updated upstream
-=======
 import sysconfig
->>>>>>> Stashed changes
 import os
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -13,9 +10,6 @@ from install_dependencies import main
 
 class BuildHook(BuildHookInterface):
     def initialize(self, version, build_data):
-<<<<<<< Updated upstream
-        main()
-=======
         main()
         self.update_build_data(build_data)
 
@@ -45,4 +39,3 @@ class BuildHook(BuildHookInterface):
         else:
             raise Exception(f"Unsupported platform: {platform}")
         
->>>>>>> Stashed changes
