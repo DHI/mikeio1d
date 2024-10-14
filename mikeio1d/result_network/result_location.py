@@ -66,6 +66,7 @@ class ResultLocation(ABC):
         attributes = {k: getattr(self, k) for k in self._static_attributes}
         total_attributes = len(attributes)
         total_quantities = len(self.quantities)
+        total_derived_quantities = len(self.derived_quantities)
         pretty_quantities = [
             ResultQuantity.prettify_quantity(self.result_quantity_map[qid][0])
             for qid in self.result_quantity_map
@@ -75,6 +76,7 @@ class ResultLocation(ABC):
             [
                 (f"Attributes ({total_attributes})", attributes),
                 (f"Quantities ({total_quantities})", pretty_quantities),
+                (f"Derived Quantities ({total_derived_quantities})", self.derived_quantities),
             ],
         )
         return repr

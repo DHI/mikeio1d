@@ -92,7 +92,7 @@ def test_single_structure_html_repr(structure):
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (3)</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge (m^3/s)</li></ul></details>"""
+    <details><summary>Attributes (3)</summary><ul><li>id: 119w1</li><li>type: Weir</li><li>chainage: 0.5</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>"""
     assert html_repr == expected_html_repr
 
 

@@ -69,6 +69,7 @@ class ResultLocations(Dict[str, ResultLocation]):
     def _repr_html_(self) -> str:
         total_names = len(self)
         total_quantities = len(self.quantities)
+        total_derived_quantities = len(self.derived_quantities)
         pretty_quantities = [
             ResultQuantity.prettify_quantity(self.result_quantity_map[qid][0])
             for qid in self.result_quantity_map
@@ -78,6 +79,7 @@ class ResultLocations(Dict[str, ResultLocation]):
             [
                 (f"Names ({total_names})", self.names),
                 (f"Quantities ({total_quantities})", pretty_quantities),
+                (f"Derived Quantities ({total_derived_quantities})", self.derived_quantities),
             ],
         )
         return repr
