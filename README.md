@@ -19,7 +19,7 @@ From PyPI:
 
 Linux users will need to install .NET runtime. For Ubuntu, you can install .NET runtime as follows:
 
-`sudo apt install dotnet-runtime-7.0`
+`sudo apt install dotnet-runtime-8.0`
 
 Or development version:
 
@@ -27,7 +27,7 @@ Or development version:
 
 If you're on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:
 
-`sudo apt install dotnet-sdk-7.0`
+`sudo apt install dotnet-sdk-8.0`
 
 ## Documentation
 
