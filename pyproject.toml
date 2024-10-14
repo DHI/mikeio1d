@@ -10,17 +10,12 @@ post-install = "scripts/install_dependencies.py" # for editable installs
 
 [tool.hatch.build.targets.sdist]
 exclude = ["notebooks", "tests", "images"]
-artifacts = [
-    "*.so",
-    "*.dll",
-]
 
- [tool.hatch.build.targets.wheel]
- artifacts = [
-    "*.so",
-    "*.dll"
-]
+[tool.hatch.build.targets.sdist.force-include]
+"mikeio1d/bin" = "mikeio1d/bin"
 
+[tool.hatch.build.targets.wheel.force-include]
+"mikeio1d/bin" = "mikeio1d/bin"
 
 [project]
 name = "mikeio1d"
