@@ -26,7 +26,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="mikeio1d",
-    version="0.7.0",
+    version="0.8.0",
     install_requires=[
         "pythonnet>=3.0.0",
         "numpy",
