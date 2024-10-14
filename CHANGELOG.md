@@ -8,6 +8,24 @@
 
 ### Changed
 
+## [0.8.0] - 2024-10-14
+
+### Added
+
+- Derived quantity concept introduced with an API the same as regular quantities.
+- Nine default derived quantities (e.g. 'Node Flooding', 'Reach Filling', etc.).
+- Ability to extend MIKE IO 1D with custom derived quantities.
+- Quantity units are now more consistently visible in object representations.
+
+### Fixed
+
+- Fixed bug where rounding to milliseconds sometimes failed.
+
+### Changed
+
+- Updated documentation and README examples.
+
+
 ## [0.7.0] - 2024-09-19
 
 ### Added
@@ -147,7 +165,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.8.0
 [0.7.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.7.0
 [0.6.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.6.1
 [0.6]: https://github.com/DHI/mikeio1d/releases/tag/v0.6
