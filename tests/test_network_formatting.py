@@ -111,3 +111,6 @@ def test_pretty_quantity_formatting(result_quantity, latex_format, expected_str)
 
     assert ResultQuantity.prettify_quantity(result_quantity, latex_format) == expected_str
     assert ResultQuantity.prettify_quantity(m1d_quantity, latex_format) == expected_str
+
+def test_result_quantity_formatting(result_quantity):
+    assert result_quantity.__repr__() == "<Quantity: Water level (m)>"
