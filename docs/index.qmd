@@ -29,11 +29,11 @@ pip install mikeio1d
 Linux users will need to install .NET runtime. If you're on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:
 
 ```bash      
-sudo apt install dotnet-runtime-7.0
+sudo apt install dotnet-runtime-8.0
 ```
 
 ``` bash     
-sudo apt install dotnet-sdk-7.0
+sudo apt install dotnet-sdk-8.0
 ```
 :::
 
