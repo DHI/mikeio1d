@@ -64,7 +64,7 @@ class ResultQuantity:
         self._name = data_item.Quantity.Id
 
     def __repr__(self) -> str:
-        return f"<Quantity: {ResultQuantity.prettify_quantity(self.name)}>"
+        return f"<Quantity: {ResultQuantity.prettify_quantity(self)}>"
 
     @staticmethod
     def prettify_quantity(quantity: ResultQuantity | IQuantity, latex_format=False) -> str:
@@ -87,7 +87,7 @@ class ResultQuantity:
         elif isinstance(quantity, IQuantity):
             m1d_quantity = quantity
         else:
-            raise ValueError("quantity must be a ResultQuantity or IQuantity object.")
+            raise ValueError(f"quantity must be a ResultQuantity or IQuantity object. Got {type(quantity)}.")
 
         description = m1d_quantity.Description
         unit_abbreviation = m1d_quantity.EumQuantity.UnitAbbreviation
