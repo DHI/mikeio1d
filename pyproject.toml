@@ -19,7 +19,7 @@ exclude = ["notebooks", "tests", "images"]
 
 [project]
 name = "mikeio1d"
-version = "0.8.1"
+version = "0.8.2"
 description = "A package that uses the DHI MIKE1D .NET libraries to read res1d and xns11 files."
 readme = "README.md"
 requires-python = ">=3.9"

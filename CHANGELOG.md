@@ -8,6 +8,12 @@
 
 ### Changed
 
+### [0.8.2] - 2024-10-14
+
+### Fixed
+
+- Derived quantities were missing from object html representations.
+
 ### [0.8.1] - 2024-10-14
 
 ### Fixed
