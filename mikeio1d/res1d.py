@@ -83,6 +83,8 @@ class Res1D:
         Filter list of node ID strings, which will be included when loading the result file.
     catchments : list of str
         Filter list of catchment ID strings, which will be included when loading the result file.
+    time: slice | tuple[str] | list[str] | None
+        Start and end time of the data to read. Using None will read all data.
     col_name_delimiter : str
         String to delimit the quantity ID with location ID
         (and optionally chainage) in the data frame label.
@@ -98,7 +100,8 @@ class Res1D:
 
     >>> nodes = ['node1', 'node2']
     >>> reaches = ['reach1', 'reach2']
-    >>> res1d = Res1D('MyRes1D.res1d', nodes=nodes, reaches=reaches)
+    >>> times = slice('2020-01-01', '2020-01-02')
+    >>> res1d = Res1D('MyRes1D.res1d', nodes=nodes, reaches=reaches, time=times)
     >>> res1d.read()
     """
 
