@@ -237,6 +237,24 @@ def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
         df = res1d.read(column_mode=ColumnMode.ALL)
         helpers.assert_shared_columns_equal(df_full, df)
 
+@pytest.mark.parametrize("time, expected_len, expected_start, expected_end", [
+    (None, 110, "1994-08-07 16:35:00.000", "1994-08-07 18:35:00.000"),
+    (slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+    (("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+    (slice(None, "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+    ((None, "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+    (slice("1994-08-07 18:32:07.967000", None), 3, "1994-08-07 18:32:07.967000", "1994-08-07 18:35:00.000"),
+    (("1994-08-07 18:32:07.967000", None), 3, "1994-08-07 18:32:07.967000", "1994-08-07 18:35:00.000"),
+])
+def test_res1d_filter_time(test_file_path, time, expected_len, expected_start, expected_end):
+    expected_start = pd.Timestamp(expected_start)
+    expected_end = pd.Timestamp(expected_end)
+
+    res1d = Res1D(test_file_path, time=time)
+
+    assert res1d.data.NumberOfTimeSteps == expected_len
+    assert res1d.time_index[0] == expected_start
+    assert res1d.time_index[-1] == expected_end
 
 def test_node_attributes(test_file):
     res1d = test_file
