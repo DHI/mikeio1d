@@ -110,6 +110,7 @@ class Res1D:
         reaches=None,
         nodes=None,
         catchments=None,
+        time=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
         clear_queue_after_reading=True,
@@ -127,6 +128,7 @@ class Res1D:
             catchments,
             col_name_delimiter,
             put_chainage_in_col_name,
+            time=time,
         )
 
         self._start_time = None
