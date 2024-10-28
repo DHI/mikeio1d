@@ -157,9 +157,6 @@ class Res1D:
             time=time,
         )
 
-        self._start_time = None
-        self._end_time = None
-
         self.result_network = ResultNetwork(self)
         self.network = self.result_network
         self.result_writer = ResultWriter(self)
@@ -360,17 +357,11 @@ class Res1D:
     @property
     def start_time(self) -> datetime:
         """Start time of the result file."""
-        if self._start_time is not None:
-            return self._start_time
-
         return from_dotnet_datetime(self.data.StartTime)
 
     @property
     def end_time(self) -> datetime:
         """End time of the result file."""
-        if self._end_time is not None:
-            return self._end_time
-
         return from_dotnet_datetime(self.data.EndTime)
 
     @property
