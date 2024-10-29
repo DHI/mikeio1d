@@ -199,22 +199,17 @@ class Res1D:
     def read(
         self,
         queries: Optional[
-            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
+            list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData
         ] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
         """
-        Read loaded .res1d file data based on queries.
-        Currently the supported query classes are
-
-        * :class:`query.QueryDataNode`
-        * :class:`query.QueryDataReach`
-        * :class:`query.QueryDataCatchment`
+        Reads result data into a pandas DataFrame.
 
         Parameters
         ----------
-        queries: A single query or a list of queries.
-            Default is None = reads all data.
+        queries: list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData
+            For internal use by mikeio1d. If None, reads all data.
         column_mode : str | ColumnMode (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
@@ -226,16 +221,16 @@ class Res1D:
         -------
         pd.DataFrame
 
+        Notes
+        -------
+        The `queries` parameter is intended for internal use by mikeio1d. It mainly exists for historical
+        reasons and is not recommended for general use. The preferred way to query data is via the fluent API,
+        e.g. `res.nodes['node1'].WaterLevel.read()`.
+
         Examples
         --------
-        An example of reading res1d file with queries:
-
-        >>> res1d = Res1D('MyRes1D.res1d')
-        >>> queries = [
-                QueryDataNode('WaterLevel', 'node1'),
-                QueryDataReach('Discharge', 'reach1', 50.0)
-            ]
-        >>> res1d.read(queries)
+        >>> res = Res1D('results.res1d')
+        >>> res1d.read()
         """
 
         timeseries_ids = self._get_timeseries_ids_to_read(queries)
@@ -253,20 +248,7 @@ class Res1D:
     def _get_timeseries_ids_to_read(
         self, queries: List[QueryData] | List[TimeSeriesId]
     ) -> List[TimeSeriesId]:
-        """Find out which list of TimeSeriesId objects should be used for reading.
-
-        If user supplies queries, then convert them to TimeSeriesId. Otherwise use the
-        current queue of TimeSeriesId objects.
-
-        Parameters
-        ----------
-        queries : List[QueryData] | List[TimeSeriesId]
-            List of queries or time series ids supplied in read() method.
-
-        Returns
-        -------
-        List of TimeSeriesId objects.
-        """
+        """Find out which list of TimeSeriesId objects should be used for reading."""
         queries = make_list_if_not_iterable(queries)
 
         if queries is None or len(queries) == 0:
