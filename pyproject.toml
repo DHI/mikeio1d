@@ -82,7 +82,7 @@ all = [
 
 [tool.ruff]
 line-length = 100
-ignore = [
+lint.ignore = [
     "E402", # ignore for now
     "F401", # ignore for now
 ]
