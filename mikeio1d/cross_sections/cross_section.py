@@ -28,7 +28,6 @@ from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
 from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
-from DHI.Mike1D.Generic import ProcessingOption
 
 
 class CrossSection:
