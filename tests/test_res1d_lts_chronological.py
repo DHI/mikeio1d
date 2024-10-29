@@ -157,14 +157,14 @@ def test_res1d_filter(test_file_path, helpers):
     nodes = ["B4.1320", "A0.0327"]
     reaches = ["B4.1491l1"]
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
-    res1d.result_reader.column_mode = ColumnMode.ALL
+    res1d.reader.column_mode = ColumnMode.ALL
 
     df_b4_14 = res1d.read(QueryDataReach("DischargeIntegratedMonthly", "B4.1491l1", 144))
     df_b4_13 = res1d.read(QueryDataNode("SurchargeIntegratedMonthly", "B4.1320"))
     df_a0 = res1d.read(QueryDataNode("DischargeIntegratedMonthly", "A0.0327"))
 
     res1d_full = Res1D(test_file_path)
-    res1d_full.result_reader.column_mode = ColumnMode.ALL
+    res1d_full.reader.column_mode = ColumnMode.ALL
     df_full = res1d_full.read()
 
     helpers.assert_shared_columns_equal(df_full, df_b4_14)

@@ -142,7 +142,7 @@ class Res1D:
 
         # endregion deprecation
 
-        self.result_reader = ResultReaderCreator.create(
+        self.reader = ResultReaderCreator.create(
             result_reader_type,
             self,
             file_path,
@@ -157,7 +157,7 @@ class Res1D:
         )
 
         self._network = ResultNetwork(self)
-        self.result_writer = ResultWriter(self)
+        self.writer = ResultWriter(self)
 
         self.clear_queue_after_reading = clear_queue_after_reading
 
@@ -305,7 +305,7 @@ class Res1D:
         if len(timeseries_ids) == 0:
             return self.read_all(column_mode=column_mode)
 
-        df = self.result_reader.read(timeseries_ids, column_mode=column_mode)
+        df = self.reader.read(timeseries_ids, column_mode=column_mode)
 
         if self.clear_queue_after_reading:
             self.clear_queue()
@@ -328,7 +328,7 @@ class Res1D:
         -------
         pd.DataFrame
         """
-        return self.result_reader.read_all(column_mode=column_mode)
+        return self.reader.read_all(column_mode=column_mode)
 
     def clear_queue(self):
         """Clear the current active list of queries."""
@@ -373,7 +373,7 @@ class Res1D:
     @property
     def time_index(self) -> pd.DatetimeIndex:
         """pandas.DatetimeIndex of the time index."""
-        return self.result_reader.time_index
+        return self.reader.time_index
 
     @property
     def start_time(self) -> datetime:
@@ -388,7 +388,7 @@ class Res1D:
     @property
     def quantities(self) -> List[str]:
         """Quantities in res1d file."""
-        return self.result_reader.quantities
+        return self.reader.quantities
 
     @property
     def derived_quantities(self) -> List[str]:
@@ -409,7 +409,7 @@ class Res1D:
         More information about ResultDataQuery class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
         """
-        return self.result_reader.query
+        return self.reader.query
 
     @property
     def searcher(self):
@@ -419,12 +419,12 @@ class Res1D:
         More information about ResultDataSearcher class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
         """
-        return self.result_reader.searcher
+        return self.reader.searcher
 
     @property
     def file_path(self):
         """File path of the result file."""
-        return self.result_reader.file_path
+        return self.reader.file_path
 
     @property
     def data(self):
@@ -434,7 +434,7 @@ class Res1D:
         More information about ResultData class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm
         """
-        return self.result_reader.data
+        return self.reader.data
 
     @property
     def projection_string(self):
@@ -453,7 +453,7 @@ class Res1D:
         return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
-        if self.result_reader.is_lts_result_file():
+        if self.reader.is_lts_result_file():
             raise NotImplementedError(
                 "The method is not implemented for LTS event statistics."
             )
@@ -483,7 +483,7 @@ class Res1D:
         file_path : str
             File path for the new res1d file. Optional.
         """
-        self.result_writer.modify(data_frame)
+        self.writer.modify(data_frame)
         if file_path is not None:
             self.save(file_path)
 

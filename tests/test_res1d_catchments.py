@@ -161,7 +161,7 @@ def test_catchment_attributes(test_file):
     catchments.c_22_8_8.TotalRunOff.add()
     df = res1d.read()
 
-    column_mode = res1d.result_reader.column_mode
+    column_mode = res1d.reader.column_mode
     if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
         actual_max = round(df.T.query("quantity=='TotalRunOff' and name=='20_2_2'").T.max(), 3)
     elif column_mode == ColumnMode.STRING:

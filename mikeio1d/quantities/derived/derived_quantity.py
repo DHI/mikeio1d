@@ -123,7 +123,7 @@ class DerivedQuantity(ABC):
             DataFrame with the source quantities for the specified ResultLocation.
         """
         tsids = self._get_source_timeseries_ids_for_location(result_location)
-        df_source = self.res1d.result_reader.read(tsids, column_mode="compact")
+        df_source = self.res1d.reader.read(tsids, column_mode="compact")
         return df_source
 
     def create_source_dataframe_for_locations(
@@ -143,7 +143,7 @@ class DerivedQuantity(ABC):
             DataFrame with the source quantities for the specified ResultLocations.
         """
         tsids = self._get_source_timeseries_ids_for_locations(result_locations)
-        df_source = self.res1d.result_reader.read(tsids, column_mode="compact")
+        df_source = self.res1d.reader.read(tsids, column_mode="compact")
         return df_source
 
     def get_result_locations_from_source_dataframe(

@@ -77,7 +77,7 @@ def test_structure_attributes(test_file):
 
     df = res1d.read()
 
-    column_mode = res1d.result_reader.column_mode
+    column_mode = res1d.reader.column_mode
 
     if column_mode in (ColumnMode.ALL, ColumnMode.COMPACT):
         actual_max = round(
@@ -221,7 +221,7 @@ def test_all_structures_attributes(test_file):
 )
 def test_res1d_modification(test_file, column_mode, expected_exception):
     res1d = test_file
-    res1d.result_reader.column_mode = column_mode
+    res1d.reader.column_mode = column_mode
 
     # Test the reading of all the data into data frame
     df = res1d.read()
@@ -264,7 +264,7 @@ def test_res1d_modification(test_file, column_mode, expected_exception):
 )
 def test_res1d_modification_filtered(test_file, column_mode, expected_exception):
     res1d = test_file
-    res1d.result_reader.column_mode = column_mode
+    res1d.reader.column_mode = column_mode
 
     # Test the reading of all the data into data frame
     df = res1d.read()

@@ -135,7 +135,7 @@ class ResultLocations(Dict[str, ResultLocation]):
 
         if include_derived:
             column_mode = "compact"
-        df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
+        df = self.res1d.reader.read(timesries_ids, column_mode=column_mode)
 
         if include_derived:
             df_derived = []
