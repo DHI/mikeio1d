@@ -31,7 +31,7 @@ class ResultStructures(ResultLocations):
         self.structure_label = "s_"
         self.result_structure_map = {}
 
-        res1d.result_network.structures = self
+        res1d._network.structures = self
         self.set_structures()
         self.set_quantity_collections()
 

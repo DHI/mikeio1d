@@ -384,7 +384,7 @@ def test_time_series_id_from_dataset_dataitem_and_element(reach: ResultReach):
 
 
 def test_time_series_id_from_result_quantity(res1d_river_network: Res1D):
-    quantity_map = res1d_river_network.result_network.result_quantity_map
+    quantity_map = res1d_river_network._network.result_quantity_map
     for expected_tsid, quantity in quantity_map.items():
         if expected_tsid.duplicate > 0:
             # skip duplicates, this method does not support duplicates
