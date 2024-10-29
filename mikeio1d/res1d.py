@@ -301,10 +301,6 @@ class Res1D:
         """Clear the current active list of queries."""
         self._network.queue.clear()
 
-    def derived_quantities(self):
-        """Returns a list of derived quantities."""
-        return self._derived_quantities
-
     def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
         """Adds a derived quantity to the Res1D object, propogating changes to the network.
 
