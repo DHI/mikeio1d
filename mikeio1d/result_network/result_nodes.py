@@ -39,7 +39,7 @@ class ResultNodes(ResultLocations):
         self._group = TimeSeriesIdGroup.NODE
         self.node_label = "n_"
 
-        res1d.result_network.nodes = self
+        res1d._network.nodes = self
         self.set_nodes()
         self.set_quantity_collections()
 
@@ -101,10 +101,10 @@ class ResultNodes(ResultLocations):
         Examples
         --------
         # Convert nodes to a GeoDataFrame (without quantities)
-        >>> gdf = res1d.result_network.nodes.to_geopandas()
+        >>> gdf = res1d.nodes.to_geopandas()
 
         # Convert nodes to a GeoDataFrame (with quantities)
-        >>> gdf = res1d.result_network.nodes.to_geopandas(agg='mean')
+        >>> gdf = res1d.nodes.to_geopandas(agg='mean')
         """
         from ..geometry.geopandas import GeoPandasNodesConverter
 

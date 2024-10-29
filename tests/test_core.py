@@ -37,13 +37,13 @@ def test_mikeio1d_generates_expected_dataframe_for_filetype_read_all(result_read
 
 
 def sample_random_time_series_ids(res: Res1D) -> List[TimeSeriesId]:
-    all_tsids = list(res.result_network.result_quantity_map.keys())
+    all_tsids = list(res._network.result_quantity_map.keys())
     sample_tsids = [t for t in all_tsids if random.random() < 0.5]
     return sample_tsids
 
 
 def sample_random_queries(res: Res1D) -> List[str]:
-    all_tsids = list(res.result_network.result_quantity_map.values())
+    all_tsids = list(res._network.result_quantity_map.values())
     all_queries = [t.get_query() for t in all_tsids]
     sample_queries = [q for q in all_queries if random.random() < 0.5]
     return sample_queries

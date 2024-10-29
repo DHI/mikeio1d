@@ -101,7 +101,7 @@ class ResultQuantity:
 
     def add(self):
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
-        self.res1d.result_network.queue.append(self.timeseries_id)
+        self.res1d._network.queue.append(self.timeseries_id)
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
         """Read the time series data into a data frame.

@@ -188,28 +188,28 @@ def test_all_catchments_attributes(test_file):
 
 def test_catchment_attribute_access_maintains_backwards_compat(res1d_catchments):
     res = res1d_catchments
-    catchment = res.result_network.catchments["100_16_16"]
+    catchment = res.catchments["100_16_16"]
     with pytest.warns(UserWarning):
         assert catchment.Id == "100_16_16"
         assert pytest.approx(catchment.Area) == 22800.0
-    for name, catchment in res.result_network.catchments.items():
+    for name, catchment in res.catchments.items():
         assert catchment.CatchmentName == name
 
 
 def test_catchments_map_to_python_catchment(res1d_catchments):
     res = res1d_catchments
-    catchment = res.result_network.catchments["100_16_16"]
+    catchment = res.catchments["100_16_16"]
     assert isinstance(catchment, ResultCatchment)
 
 
 def test_catchment_static_attributes(res1d_catchments):
     res = res1d_catchments
-    catchment = res.result_network.catchments["100_16_16"]
+    catchment = res.catchments["100_16_16"]
     assert catchment.id == "100_16_16"
     assert pytest.approx(catchment.area) == 22800.0
     assert catchment.type == "Kinematic Wave"
     # check that static attributes are accessible for all catchments
-    for catchment in res.result_network.catchments.values():
+    for catchment in res.catchments.values():
         catchment.id
         catchment.area
         catchment.type

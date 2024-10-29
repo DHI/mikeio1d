@@ -46,7 +46,7 @@ class ResultReaches(ResultLocations):
         self.reach_label = "r_"
         self.result_reach_map = {}
 
-        res1d.result_network.reaches = self
+        res1d._network.reaches = self
         self.set_reaches()
         self.set_quantity_collections()
 
@@ -126,10 +126,10 @@ class ResultReaches(ResultLocations):
         Examples
         --------
         # Convert reaches to a GeoDataFrame (without quantities)
-        >>> gdf = res1d.result_network.reaches.to_geopandas()
+        >>> gdf = res1d.reaches.to_geopandas()
 
         # Convert reaches to a GeoDataFrame with aggregated quantities
-        >>> gdf = res1d.result_network.reaches.to_geopandas(agg='mean')
+        >>> gdf = res1d.reaches.to_geopandas(agg='mean')
         """
         from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
         from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented

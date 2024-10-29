@@ -3,14 +3,18 @@ The purpose of this test is to verify that the autocompletion of a network is wo
 """
 
 import pytest
-from IPython.terminal.interactiveshell import TerminalInteractiveShell
+from IPython.core.interactiveshell import InteractiveShell
 
 from typing import List
 
 
 @pytest.fixture(scope="module")
 def shell():
-    shell = TerminalInteractiveShell()
+    shell = InteractiveShell()
+    shell.run_cell("""
+    from mikeio1d.res1d import _allow_autocompletion_for_nested_network_in_ipython
+    _allow_autocompletion_for_nested_network_in_ipython()            
+    """)
     shell.run_cell(
         """
     from mikeio1d import Res1D

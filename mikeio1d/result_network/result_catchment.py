@@ -77,7 +77,7 @@ class ResultCatchment(ResultLocation):
         )
 
         catchment_result_quantity_map = (
-            self.res1d.result_network.catchments.result_quantity_map
+            self.res1d._network.catchments.result_quantity_map
         )
         self.add_to_result_quantity_map(
             quantity_id, result_quantity, catchment_result_quantity_map

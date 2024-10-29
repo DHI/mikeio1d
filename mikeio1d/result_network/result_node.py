@@ -85,7 +85,7 @@ class ResultNode(ResultLocation):
             quantity_id, result_quantity, self.result_quantity_map
         )
 
-        nodes_result_quantity_map = self.res1d.result_network.nodes.result_quantity_map
+        nodes_result_quantity_map = self.res1d._network.nodes.result_quantity_map
         self.add_to_result_quantity_map(
             quantity_id, result_quantity, nodes_result_quantity_map
         )

@@ -136,7 +136,7 @@ class ResultLocation(ABC):
         result_quantity = ResultQuantity(
             obj, data_item, self.res1d, m1d_dataset, element_index
         )
-        self.res1d.result_network.add_result_quantity_to_map(result_quantity)
+        self.res1d._network.add_result_quantity_to_map(result_quantity)
 
         quantity = data_item.Quantity
         quantity_id = quantity.Id
@@ -263,14 +263,14 @@ class ResultLocation(ABC):
         TimeSeriesId
             The TimeSeriesId key of the added ResultQuantity
         """
-        network = self.res1d.result_network
+        network = self.res1d._network
         tsid = network.add_result_quantity_to_map(result_quantity)
         return tsid
 
     def add_query(self, data_item):
         """Base method for adding a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
-        self.res1d.result_network.add_query(query)
+        self.res1d._network.add_query(query)
 
     @abstractclassmethod
     def get_query(self, data_item):

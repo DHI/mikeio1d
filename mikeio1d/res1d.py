@@ -142,7 +142,6 @@ class Res1D:
 
         # endregion deprecation
 
-
         self.result_reader = ResultReaderCreator.create(
             result_reader_type,
             self,
@@ -157,24 +156,10 @@ class Res1D:
             time=time,
         )
 
-        self.result_network = ResultNetwork(self)
-        self.network = self.result_network
+        self._network = ResultNetwork(self)
         self.result_writer = ResultWriter(self)
 
         self.clear_queue_after_reading = clear_queue_after_reading
-
-        self.network = self.result_network  # alias
-        """Network of the result file."""
-        self.catchments = self.result_network.catchments
-        """Catchments of the result file."""
-        self.reaches: ResultReaches = self.result_network.reaches
-        """Reaches of the result file."""
-        self.nodes = self.result_network.nodes
-        """Nodes of the result file."""
-        self.structures = self.result_network.structures
-        """Structures of the result file."""
-        self.global_data = self.result_network.global_data
-        """Global data of the result file."""
 
         self._derived_quantities = self._init_derived_quantities(derived_quantities)
 
@@ -222,7 +207,7 @@ class Res1D:
             Derived quantity to be added
         """
         derived_quantity = derived_quantity(self)
-        self.network.add_derived_quantity(derived_quantity)
+        self._network.add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
         """Removes a derived quantity from the Res1D object, propogating changes to the network.
@@ -236,7 +221,7 @@ class Res1D:
             derived_quantity, DerivedQuantity
         ):
             derived_quantity = derived_quantity._NAME
-        self.network.remove_derived_quantity(derived_quantity)
+        self._network.remove_derived_quantity(derived_quantity)
 
     def info(self) -> str:
         """Prints information about the result file."""
@@ -262,7 +247,7 @@ class Res1D:
         queries = make_list_if_not_iterable(queries)
 
         if queries is None or len(queries) == 0:
-            return self.result_network.queue
+            return self._network.queue
 
         is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
         if is_already_time_series_ids:
@@ -347,7 +332,43 @@ class Res1D:
 
     def clear_queue(self):
         """Clear the current active list of queries."""
-        self.result_network.queue.clear()
+        self._network.queue.clear()
+
+    @property
+    def result_network(self) -> ResultNetwork:
+        """Deprecated. Use network property instead."""
+        warnings.warn("The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.", FutureWarning)
+        return self.network
+
+    @property
+    def network(self) -> ResultNetwork:
+        """Network of the result file."""
+        return self._network
+
+    @property
+    def nodes(self) -> ResultNodes:
+        """Nodes of the result file."""
+        return self._network.nodes
+
+    @property
+    def reaches(self) -> ResultReaches:
+        """Reaches of the result file."""
+        return self._network.reaches
+    
+    @property
+    def catchments(self) -> ResultCatchments:
+        """Catchments of the result file."""
+        return self._network.catchments
+    
+    @property
+    def structures(self) -> ResultStructures:
+        """Structures of the result file."""
+        return self._network.structures
+    
+    @property
+    def global_data(self) -> ResultGlobalDatas:
+        """Global data of the result file."""
+        return self._network.global_data
 
     @property
     def time_index(self) -> pd.DatetimeIndex:
@@ -598,11 +619,11 @@ class Res1D:
             file_names_new.append(file_name)
         return file_names_new
 
-    __all__ = [
-        "Res1D",
-        "ResultNodes",
-        "ResultReaches",
-        "ResultCatchments",
-        "ResultStructures",
-        "ResultGlobalDatas",
-    ]
+__all__ = [
+    "Res1D",
+    "ResultNodes",
+    "ResultReaches",
+    "ResultCatchments",
+    "ResultStructures",
+    "ResultGlobalDatas",
+]

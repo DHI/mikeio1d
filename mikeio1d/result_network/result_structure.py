@@ -88,7 +88,7 @@ class ResultStructure(ResultLocation):
         )
 
         structure_result_quantity_map = (
-            self.res1d.result_network.structures.result_quantity_map
+            self.res1d._network.structures.result_quantity_map
         )
         self.add_to_result_quantity_map(
             quantity_id, result_quantity, structure_result_quantity_map

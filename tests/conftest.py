@@ -71,23 +71,23 @@ def node(res1d_network):
 
 @pytest.fixture
 def many_nodes(res1d_network):
-    nodes = res1d_network.result_network.nodes
+    nodes = res1d_network._network.nodes
     return [getattr(nodes, n) for n in nodes.__dict__.keys() if n.startswith(nodes.node_label)]
 
 
 @pytest.fixture
 def reach(res1d_network):
-    return res1d_network.result_network.reaches.r_100l1
+    return res1d_network._network.reaches.r_100l1
 
 
 @pytest.fixture
 def river_reach(res1d_river_network):
-    return res1d_river_network.result_network.reaches.river
+    return res1d_river_network._network.reaches.river
 
 
 @pytest.fixture
 def many_reaches(res1d_network):
-    reaches = res1d_network.result_network.reaches
+    reaches = res1d_network._network.reaches
     return [
         getattr(reaches, r) for r in reaches.__dict__.keys() if r.startswith(reaches.reach_label)
     ]
@@ -101,7 +101,7 @@ def catchment(res1d_catchments):
 
 @pytest.fixture
 def many_catchments(res1d_catchments):
-    catchments = res1d_catchments.result_network.catchments
+    catchments = res1d_catchments._network.catchments
     return [
         getattr(catchments, c)
         for c in catchments.__dict__.keys()
@@ -111,7 +111,7 @@ def many_catchments(res1d_catchments):
 
 @pytest.fixture
 def structure(res1d_network):
-    return res1d_network.result_network.structures["119w1"]
+    return res1d_network._network.structures["119w1"]
 
 
 @pytest.fixture
