@@ -166,7 +166,20 @@ class Res1D:
     def __repr__(self):
         return "<mikeio1d.Res1D>"
 
-    def _get_info(self) -> info:
+    def _init_derived_quantities(
+        self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
+    ) -> List[DerivedQuantity]:
+        if derived_quantity_classes is None:
+            derived_quantity_classes = get_default_derived_quantity_classes()
+
+        for dq in derived_quantity_classes:
+            self.add_derived_quantity(dq)
+
+    def info(self) -> None:
+        """Print information about the result file."""
+        print(self._get_info())
+
+    def _get_info(self) -> str:
         info = []
         if self.file_path:
             info.append(f"Start time: {str(self.start_time)}")
@@ -182,81 +195,6 @@ class Res1D:
 
         info = str.join("\n", info)
         return info
-
-    def _init_derived_quantities(
-        self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
-    ) -> List[DerivedQuantity]:
-        if derived_quantity_classes is None:
-            derived_quantity_classes = get_default_derived_quantity_classes()
-
-        for dq in derived_quantity_classes:
-            self.add_derived_quantity(dq)
-
-    # region Private methods
-
-    def derived_quantities(self):
-        """Returns a list of derived quantities."""
-        return self._derived_quantities
-
-    def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
-        """Adds a derived quantity to the Res1D object, propogating changes to the network.
-
-        Parameters
-        ----------
-        derived_quantity : Type[DerivedQuantity]
-            Derived quantity to be added
-        """
-        derived_quantity = derived_quantity(self)
-        self._network.add_derived_quantity(derived_quantity)
-
-    def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
-        """Removes a derived quantity from the Res1D object, propogating changes to the network.
-
-        Parameters
-        ----------
-        derived_quantity : DerivedQuantity | str
-            Derived quantity to be removed. Either DerivedQuantity class or its name.
-        """
-        if isinstance(derived_quantity, type) and issubclass(
-            derived_quantity, DerivedQuantity
-        ):
-            derived_quantity = derived_quantity._NAME
-        self._network.remove_derived_quantity(derived_quantity)
-
-    def info(self) -> str:
-        """Prints information about the result file."""
-        print(self._get_info())
-
-    def _get_timeseries_ids_to_read(
-        self, queries: List[QueryData] | List[TimeSeriesId]
-    ) -> List[TimeSeriesId]:
-        """Find out which list of TimeSeriesId objects should be used for reading.
-
-        If user supplies queries, then convert them to TimeSeriesId. Otherwise use the
-        current queue of TimeSeriesId objects.
-
-        Parameters
-        ----------
-        queries : List[QueryData] | List[TimeSeriesId]
-            List of queries or time series ids supplied in read() method.
-
-        Returns
-        -------
-        List of TimeSeriesId objects.
-        """
-        queries = make_list_if_not_iterable(queries)
-
-        if queries is None or len(queries) == 0:
-            return self._network.queue
-
-        is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
-        if is_already_time_series_ids:
-            return queries
-
-        queries = QueryDataConverter.convert_queries_to_time_series_ids(self, queries)
-        return queries
-
-    # endregion Private methods
 
     def read(
         self,
@@ -330,147 +268,67 @@ class Res1D:
         """
         return self.reader.read_all(column_mode=column_mode)
 
+    def _get_timeseries_ids_to_read(
+        self, queries: List[QueryData] | List[TimeSeriesId]
+    ) -> List[TimeSeriesId]:
+        """Find out which list of TimeSeriesId objects should be used for reading.
+
+        If user supplies queries, then convert them to TimeSeriesId. Otherwise use the
+        current queue of TimeSeriesId objects.
+
+        Parameters
+        ----------
+        queries : List[QueryData] | List[TimeSeriesId]
+            List of queries or time series ids supplied in read() method.
+
+        Returns
+        -------
+        List of TimeSeriesId objects.
+        """
+        queries = make_list_if_not_iterable(queries)
+
+        if queries is None or len(queries) == 0:
+            return self._network.queue
+
+        is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
+        if is_already_time_series_ids:
+            return queries
+
+        queries = QueryDataConverter.convert_queries_to_time_series_ids(self, queries)
+        return queries
+
     def clear_queue(self):
         """Clear the current active list of queries."""
         self._network.queue.clear()
 
-    @property
-    def result_network(self) -> ResultNetwork:
-        """Deprecated. Use network property instead."""
-        warnings.warn("The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.", FutureWarning)
-        return self.network
+    def derived_quantities(self):
+        """Returns a list of derived quantities."""
+        return self._derived_quantities
 
-    @property
-    def network(self) -> ResultNetwork:
-        """Network of the result file."""
-        return self._network
+    def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
+        """Adds a derived quantity to the Res1D object, propogating changes to the network.
 
-    @property
-    def nodes(self) -> ResultNodes:
-        """Nodes of the result file."""
-        return self._network.nodes
-
-    @property
-    def reaches(self) -> ResultReaches:
-        """Reaches of the result file."""
-        return self._network.reaches
-    
-    @property
-    def catchments(self) -> ResultCatchments:
-        """Catchments of the result file."""
-        return self._network.catchments
-    
-    @property
-    def structures(self) -> ResultStructures:
-        """Structures of the result file."""
-        return self._network.structures
-    
-    @property
-    def global_data(self) -> ResultGlobalDatas:
-        """Global data of the result file."""
-        return self._network.global_data
-
-    @property
-    def time_index(self) -> pd.DatetimeIndex:
-        """pandas.DatetimeIndex of the time index."""
-        return self.reader.time_index
-
-    @property
-    def start_time(self) -> datetime:
-        """Start time of the result file."""
-        return from_dotnet_datetime(self.data.StartTime)
-
-    @property
-    def end_time(self) -> datetime:
-        """End time of the result file."""
-        return from_dotnet_datetime(self.data.EndTime)
-
-    @property
-    def quantities(self) -> List[str]:
-        """Quantities in res1d file."""
-        return self.reader.quantities
-
-    @property
-    def derived_quantities(self) -> List[str]:
-        """Derived quantities available for res1d file."""
-        dq = [
-            *self.nodes.derived_quantities,
-            *self.reaches.derived_quantities,
-            *self.catchments.derived_quantities,
-            *self.structures.derived_quantities,
-        ]
-        return list(set(dq))
-
-    @property
-    def query(self):
+        Parameters
+        ----------
+        derived_quantity : Type[DerivedQuantity]
+            Derived quantity to be added
         """
-        .NET object ResultDataQuery to use for querying the loaded res1d data.
+        derived_quantity = derived_quantity(self)
+        self._network.add_derived_quantity(derived_quantity)
 
-        More information about ResultDataQuery class see:
-        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
+    def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
+        """Removes a derived quantity from the Res1D object, propogating changes to the network.
+
+        Parameters
+        ----------
+        derived_quantity : DerivedQuantity | str
+            Derived quantity to be removed. Either DerivedQuantity class or its name.
         """
-        return self.reader.query
-
-    @property
-    def searcher(self):
-        """
-        .NET object ResultDataSearcher to use for searching res1d data items on network.
-
-        More information about ResultDataSearcher class see:
-        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
-        """
-        return self.reader.searcher
-
-    @property
-    def file_path(self):
-        """File path of the result file."""
-        return self.reader.file_path
-
-    @property
-    def data(self):
-        """
-        .NET object ResultData with the loaded res1d data.
-
-        More information about ResultData class see:
-        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm
-        """
-        return self.reader.data
-
-    @property
-    def projection_string(self):
-        """Projection string of the result file."""
-        return self.data.ProjectionString
-
-    # region Query wrappers
-
-    def get_catchment_values(self, catchment_id, quantity):
-        return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
-
-    def get_node_values(self, node_id, quantity):
-        return to_numpy(self.query.GetNodeValues(node_id, quantity))
-
-    def get_reach_values(self, reach_name, chainage, quantity):
-        return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
-
-    def get_reach_value(self, reach_name, chainage, quantity, time):
-        if self.reader.is_lts_result_file():
-            raise NotImplementedError(
-                "The method is not implemented for LTS event statistics."
-            )
-
-        time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
-        return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
-
-    def get_reach_start_values(self, reach_name, quantity):
-        return to_numpy(self.query.GetReachStartValues(reach_name, quantity))
-
-    def get_reach_end_values(self, reach_name, quantity):
-        return to_numpy(self.query.GetReachEndValues(reach_name, quantity))
-
-    def get_reach_sum_values(self, reach_name, quantity):
-        return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
-
-    # endregion Query wrapper
+        if isinstance(derived_quantity, type) and issubclass(
+            derived_quantity, DerivedQuantity
+        ):
+            derived_quantity = derived_quantity._NAME
+        self._network.remove_derived_quantity(derived_quantity)
 
     def modify(self, data_frame: pd.DataFrame, file_path=None):
         """
@@ -618,6 +476,152 @@ class Res1D:
             file_name = entry.file_path if isinstance(entry, Res1D) else entry
             file_names_new.append(file_name)
         return file_names_new
+
+    @property
+    def result_network(self) -> ResultNetwork:
+        """Deprecated. Use network property instead."""
+        warnings.warn("The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.", FutureWarning)
+        return self.network
+
+    @property
+    def network(self) -> ResultNetwork:
+        """Network of the result file."""
+        return self._network
+
+    @property
+    def nodes(self) -> ResultNodes:
+        """Nodes of the result file."""
+        return self._network.nodes
+
+    @property
+    def reaches(self) -> ResultReaches:
+        """Reaches of the result file."""
+        return self._network.reaches
+    
+    @property
+    def catchments(self) -> ResultCatchments:
+        """Catchments of the result file."""
+        return self._network.catchments
+    
+    @property
+    def structures(self) -> ResultStructures:
+        """Structures of the result file."""
+        return self._network.structures
+    
+    @property
+    def global_data(self) -> ResultGlobalDatas:
+        """Global data of the result file."""
+        return self._network.global_data
+
+    @property
+    def time_index(self) -> pd.DatetimeIndex:
+        """pandas.DatetimeIndex of the time index."""
+        return self.reader.time_index
+
+    @property
+    def start_time(self) -> datetime:
+        """Start time of the result file."""
+        return from_dotnet_datetime(self.data.StartTime)
+
+    @property
+    def end_time(self) -> datetime:
+        """End time of the result file."""
+        return from_dotnet_datetime(self.data.EndTime)
+
+    @property
+    def quantities(self) -> List[str]:
+        """Quantities in res1d file."""
+        return self.reader.quantities
+
+    @property
+    def derived_quantities(self) -> List[str]:
+        """Derived quantities available for res1d file."""
+        dq = [
+            *self.nodes.derived_quantities,
+            *self.reaches.derived_quantities,
+            *self.catchments.derived_quantities,
+            *self.structures.derived_quantities,
+        ]
+        return list(set(dq))
+
+    @property
+    def query(self):
+        """
+        .NET object ResultDataQuery to use for querying the loaded res1d data.
+
+        More information about ResultDataQuery class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
+        """
+        return self.reader.query
+
+    @property
+    def searcher(self):
+        """
+        .NET object ResultDataSearcher to use for searching res1d data items on network.
+
+        More information about ResultDataSearcher class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
+        """
+        return self.reader.searcher
+
+    @property
+    def file_path(self):
+        """File path of the result file."""
+        return self.reader.file_path
+
+    @property
+    def data(self):
+        """
+        .NET object ResultData with the loaded res1d data.
+
+        More information about ResultData class see:
+        https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm
+        """
+        return self.reader.data
+
+    @property
+    def projection_string(self):
+        """Projection string of the result file."""
+        return self.data.ProjectionString
+
+
+    # region deprecation
+
+    def get_catchment_values(self, catchment_id, quantity):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
+
+    def get_node_values(self, node_id, quantity):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        return to_numpy(self.query.GetNodeValues(node_id, quantity))
+
+    def get_reach_values(self, reach_name, chainage, quantity):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
+
+    def get_reach_value(self, reach_name, chainage, quantity, time):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        if self.reader.is_lts_result_file():
+            raise NotImplementedError(
+                "The method is not implemented for LTS event statistics."
+            )
+
+        time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
+        return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
+
+    def get_reach_start_values(self, reach_name, quantity):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        return to_numpy(self.query.GetReachStartValues(reach_name, quantity))
+
+    def get_reach_end_values(self, reach_name, quantity):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        return to_numpy(self.query.GetReachEndValues(reach_name, quantity))
+
+    def get_reach_sum_values(self, reach_name, quantity):
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
+
+    # endregion deprecation
 
 __all__ = [
     "Res1D",
