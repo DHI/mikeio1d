@@ -241,7 +241,7 @@ class Res1D:
         timeseries_ids = self._get_timeseries_ids_to_read(queries)
 
         if len(timeseries_ids) == 0:
-            return self.read_all(column_mode=column_mode)
+            return self.reader.read_all(column_mode=column_mode)
 
         df = self.reader.read(timeseries_ids, column_mode=column_mode)
 
@@ -249,24 +249,6 @@ class Res1D:
             self.clear_queue()
 
         return df
-
-    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """Read all data from res1d file to dataframe.
-
-        Parameters
-        ----------
-        column_mode : str | ColumnMode (optional)
-            Specifies the type of column index of returned DataFrame.
-            'all' - column MultiIndex with levels matching TimeSeriesId objects.
-            'compact' - same as 'all', but removes levels with default values.
-            'timeseries' - column index of TimeSeriesId objects
-            'str' - column index of str representations of QueryData objects
-
-        Returns
-        -------
-        pd.DataFrame
-        """
-        return self.reader.read_all(column_mode=column_mode)
 
     def _get_timeseries_ids_to_read(
         self, queries: List[QueryData] | List[TimeSeriesId]
@@ -582,6 +564,11 @@ class Res1D:
 
 
     # region deprecation
+
+    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read all data from res1d file to dataframe. Deprecated, use read() instead."""
+        warnings.warn("This method will be deprecated in 1.0. Use read() instead.", FutureWarning)
+        return self.read(column_mode=column_mode)
 
     def get_catchment_values(self, catchment_id, quantity):
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
