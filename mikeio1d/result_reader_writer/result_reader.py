@@ -17,11 +17,9 @@ import pandas as pd
 import datetime
 
 from ..dotnet import from_dotnet_datetime
-from ..dotnet import to_dotnet_datetime
 from ..various import NAME_DELIMITER
 from ..quantities import TimeSeriesId
-
-from System import DateTime
+from .time_filter import TimeFilter
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
@@ -29,7 +27,6 @@ from DHI.Mike1D.ResultDataAccess import ResultDataSearch
 from DHI.Mike1D.ResultDataAccess import Filter
 from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 from DHI.Mike1D.ResultDataAccess import ResultTypes
-from DHI.Mike1D.ResultDataAccess import Period
 
 from DHI.Mike1D.Generic import Connection
 from DHI.Mike1D.Generic import Diagnostics
@@ -169,7 +166,8 @@ class ResultReader(ABC):
             return
 
         self.data_filter = Filter()
-        self._setup_filter_time()
+        self.time_filter = TimeFilter(self.data_filter)
+        self.time_filter.setup_from_user_params(time=self._time)
         self.data_subfilter = DataItemFilterName(self.data)
         self.data_filter.AddDataItemFilter(self.data_subfilter)
 
@@ -183,41 +181,6 @@ class ResultReader(ABC):
 
     def _add_catchment(self, catchment_id):
         self.data_subfilter.Catchments.Add(catchment_id)
-
-    def _setup_filter_time(self):
-        if self._time is None:
-            return
-        
-        period = self._make_period_from_time(self._time)
-        self.data_filter.Periods.Add(period)
-
-    def _make_period_from_time(self, time):
-        start, end = None, None
-
-        if isinstance(time, slice):
-            start = pd.to_datetime(time.start)
-            end = pd.to_datetime(time.stop)
-        elif isinstance(time, tuple) or isinstance(time, list):
-            if len(time) != 2:
-                raise ValueError("time tuple must be of length two: (start_time, end_time)")
-            start = pd.to_datetime(time[0])
-            end = pd.to_datetime(time[1])
-        else:
-            raise TypeError("time must be a slice object")
-        
-        if start is not None:
-            start = to_dotnet_datetime(start)
-            start = start.AddSeconds(-1) # default is inclusive on boundaries
-        else:
-            start = DateTime.MinValue
-
-        if end is not None:
-            end = to_dotnet_datetime(end)
-            end = end.AddSeconds(1) # default is inclusive on boundaries
-        else:
-            end = DateTime.MaxValue
-        
-        return Period(start, end)
 
     # endregion File loading
 
