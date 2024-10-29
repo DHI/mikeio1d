@@ -488,6 +488,11 @@ class Res1D:
     def end_time(self) -> datetime:
         """End time of the result file."""
         return from_dotnet_datetime(self.data.EndTime)
+    
+    @property
+    def n_time_steps(self) -> int:
+        """Number of time steps in the result file."""
+        return self.data.NumberOfTimeSteps
 
     @property
     def quantities(self) -> List[str]:
@@ -504,6 +509,11 @@ class Res1D:
             *self.structures.derived_quantities,
         ]
         return list(set(dq))
+    
+    @property
+    def file_path(self):
+        """File path of the result file."""
+        return self.reader.file_path
 
     @property
     def query(self):
@@ -524,11 +534,6 @@ class Res1D:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
         """
         return self.reader.searcher
-
-    @property
-    def file_path(self):
-        """File path of the result file."""
-        return self.reader.file_path
 
     @property
     def data(self):
