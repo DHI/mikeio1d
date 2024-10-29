@@ -124,13 +124,17 @@ class Res1D:
 
         def warn_deprecation(name: str, hint: str = ""):
             if name in kwargs:
-                warnings.warn(f"The '{name}' parameter will be deprecated in 1.0. {hint}", FutureWarning)
+                warnings.warn(
+                    f"The '{name}' parameter will be deprecated in 1.0. {hint}", FutureWarning
+                )
 
         warn_deprecation("lazy_load")
         warn_deprecation("col_name_delimiter")
         warn_deprecation("put_chainage_in_col_name")
         warn_deprecation("clear_queue_after_reading")
-        warn_deprecation("header_load", "Dynamic data is read lazily, so header_load is not needed.")
+        warn_deprecation(
+            "header_load", "Dynamic data is read lazily, so header_load is not needed."
+        )
         warn_deprecation("result_reader_type", "Use res1d.result_reader_type instead.")
 
         lazy_load = kwargs.get("lazy_load", False)
@@ -198,9 +202,7 @@ class Res1D:
 
     def read(
         self,
-        queries: Optional[
-            list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData
-        ] = None,
+        queries: Optional[list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
         """
@@ -283,11 +285,9 @@ class Res1D:
         derived_quantity : DerivedQuantity | str
             Derived quantity to be removed. Either DerivedQuantity class or its name.
         """
-        if isinstance(derived_quantity, type) and issubclass(
-            derived_quantity, DerivedQuantity
-        ):
+        if isinstance(derived_quantity, type) and issubclass(derived_quantity, DerivedQuantity):
             derived_quantity = derived_quantity._NAME
-        self._network.remove_derived_quantity(derived_quantity)
+        self.network.remove_derived_quantity(derived_quantity)
 
     def modify(self, data_frame: pd.DataFrame, file_path=None):
         """
@@ -329,9 +329,7 @@ class Res1D:
     def extract(
         self,
         file_path,
-        queries: Optional[
-            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
-        ] = None,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
         time_step_skipping_number=1,
         ext=None,
     ):
@@ -371,41 +369,29 @@ class Res1D:
     def to_csv(
         self,
         file_path,
-        queries: Optional[
-            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
-        ] = None,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
         time_step_skipping_number=1,
     ):
         """Extract to csv file."""
-        self.extract(
-            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV
-        )
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.CSV)
 
     def to_dfs0(
         self,
         file_path,
-        queries: Optional[
-            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
-        ] = None,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
         time_step_skipping_number=1,
     ):
         """Extract to dfs0 file."""
-        self.extract(
-            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0
-        )
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.DFS0)
 
     def to_txt(
         self,
         file_path,
-        queries: Optional[
-            List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId
-        ] = None,
+        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
         time_step_skipping_number=1,
     ):
         """Extract to txt file."""
-        self.extract(
-            file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT
-        )
+        self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
 
     @staticmethod
     def merge(file_names: List[str] | List[Res1D], merged_file_name: str):
@@ -453,17 +439,17 @@ class Res1D:
     def reaches(self) -> ResultReaches:
         """Reaches of the result file."""
         return self._network.reaches
-    
+
     @property
     def catchments(self) -> ResultCatchments:
         """Catchments of the result file."""
         return self._network.catchments
-    
+
     @property
     def structures(self) -> ResultStructures:
         """Structures of the result file."""
         return self._network.structures
-    
+
     @property
     def global_data(self) -> ResultGlobalDatas:
         """Global data of the result file."""
@@ -483,7 +469,7 @@ class Res1D:
     def end_time(self) -> datetime:
         """End time of the result file."""
         return from_dotnet_datetime(self.data.EndTime)
-    
+
     @property
     def number_of_time_steps(self) -> int:
         """Number of time steps in the result file."""
@@ -504,7 +490,7 @@ class Res1D:
             *self.structures.derived_quantities,
         ]
         return list(set(dq))
-    
+
     @property
     def file_path(self):
         """File path of the result file."""
@@ -545,7 +531,6 @@ class Res1D:
         """Projection string of the result file."""
         return self.data.ProjectionString
 
-
     # region deprecation
 
     def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
@@ -568,9 +553,7 @@ class Res1D:
     def get_reach_value(self, reach_name, chainage, quantity, time):
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         if self.reader.is_lts_result_file():
-            raise NotImplementedError(
-                "The method is not implemented for LTS event statistics."
-            )
+            raise NotImplementedError("The method is not implemented for LTS event statistics.")
 
         time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
         return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
@@ -586,7 +569,7 @@ class Res1D:
     def get_reach_sum_values(self, reach_name, quantity):
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
-    
+
     def clear_queue(self):
         """Clear the current active list of queries."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
@@ -595,10 +578,14 @@ class Res1D:
     @property
     def result_network(self) -> ResultNetwork:
         """Deprecated. Use network property instead."""
-        warnings.warn("The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.", FutureWarning)
+        warnings.warn(
+            "The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.",
+            FutureWarning,
+        )
         return self.network
 
     # endregion deprecation
+
 
 __all__ = [
     "Res1D",
