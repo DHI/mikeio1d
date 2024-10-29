@@ -70,7 +70,7 @@ class MikePath:
         This requires that the MIKE+Py package was already loaded.
         """
         mikepluspy = sys.modules.get("mikeplus")
-        if mikepluspy == None:
+        if mikepluspy is None:
             return
 
         import mikeplus
