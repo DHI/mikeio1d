@@ -268,6 +268,9 @@ class Res1D:
         ----------
         derived_quantity : Type[DerivedQuantity]
             Derived quantity to be added
+
+        Returns
+        -------
         """
         derived_quantity = derived_quantity(self)
         self._network.add_derived_quantity(derived_quantity)
@@ -305,10 +308,18 @@ class Res1D:
         """
         Saves the ResultData to a new res1d file.
 
+        Useful for persisting modified data, as well as converting supported result
+        file types (e.g. res11) into res1d.
+
         Parameters
         ----------
         file_path : str
             File path for the new res1d file.
+
+        Examples
+        --------
+        >>> res11_data = Res1D('results.res11')
+        >>> res11_data.save('results.res1d')
         """
         connection_original = self.data.Connection
         self.data.Connection = Connection.Create(file_path)
