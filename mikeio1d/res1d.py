@@ -241,7 +241,7 @@ class Res1D:
         df = self.reader.read(timeseries_ids, column_mode=column_mode)
 
         if self.clear_queue_after_reading:
-            self.clear_queue()
+            self._network.queue.clear()
 
         return df
 
@@ -260,10 +260,6 @@ class Res1D:
 
         queries = QueryDataConverter.convert_queries_to_time_series_ids(self, queries)
         return queries
-
-    def clear_queue(self):
-        """Clear the current active list of queries."""
-        self._network.queue.clear()
 
     def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
         """Adds a derived quantity to the Res1D object, propogating changes to the network.
@@ -359,7 +355,7 @@ class Res1D:
         extractor.export()
 
         if self.clear_queue_after_reading:
-            self.clear_queue()
+            self._network.queue.clear()
 
     def to_csv(
         self,
@@ -585,6 +581,11 @@ class Res1D:
     def get_reach_sum_values(self, reach_name, quantity):
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
+    
+    def clear_queue(self):
+        """Clear the current active list of queries."""
+        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self._network.queue.clear()
 
     # endregion deprecation
 
