@@ -169,14 +169,14 @@ def test_swmm_out_filter(test_file_path, helpers):
     nodes = ["9", "10"]
     reaches = ["10"]
     swmm_out = Res1D(test_file_path, nodes=nodes, reaches=reaches)
-    swmm_out.result_reader.column_mode = ColumnMode.ALL
+    swmm_out.reader.column_mode = ColumnMode.ALL
 
     df_flow_10 = swmm_out.read(QueryDataReach("SWMM_LINK_FLOW", "10"))
     df_depth_9 = swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "9"))
     df_depth_10 = swmm_out.read(QueryDataNode("SWMM_NODE_DEPTH", "10"))
 
     swmm_out_full = Res1D(test_file_path)
-    swmm_out_full.result_reader.column_mode = ColumnMode.ALL
+    swmm_out_full.reader.column_mode = ColumnMode.ALL
     df_full = swmm_out_full.read()
 
     helpers.assert_shared_columns_equal(df_full, df_flow_10)

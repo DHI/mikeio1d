@@ -97,7 +97,7 @@ class ResultLocation(ABC):
             q for qlist in self.result_quantity_map.values() for q in qlist
         ]
         timesries_ids = [q.timeseries_id for q in result_quantities]
-        df = self.res1d.result_reader.read(timesries_ids, column_mode=column_mode)
+        df = self.res1d.reader.read(timesries_ids, column_mode=column_mode)
         return df
 
     @property
