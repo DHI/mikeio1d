@@ -1,6 +1,6 @@
 {
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.formatOnSave": true,
     },
     "python.testing.pytestArgs": [
@@ -8,4 +8,5 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "notebook.formatOnSave.enabled": true,
 }

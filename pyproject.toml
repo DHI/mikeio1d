@@ -52,7 +52,7 @@ dependencies = [
 dev = [
     "hatch",
     "pytest",
-    "black",
+    "ruff",
     "matplotlib",
     "jupyterlab",
     "geopandas",
@@ -80,5 +80,9 @@ all = [
 "Homepage" = "https://github.com/DHI/mikeio1d"
 "Bug Tracker" = "https://github.com/DHI/mikeio1d/issues"
 
-[tool.black]
+[tool.ruff]
 line-length = 100
+ignore = [
+    "E402", # ignore for now
+    "F401", # ignore for now
+]
