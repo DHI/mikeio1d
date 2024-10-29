@@ -11,12 +11,16 @@ from typing import List
 @pytest.fixture(scope="module")
 def shell():
     shell = InteractiveShell()
-    shell.run_cell("""
-    from mikeio1d.res1d import _allow_autocompletion_for_nested_network_in_ipython
-    _allow_autocompletion_for_nested_network_in_ipython()            
-    """)
+    # Emulate importing mikeio1d for the first time (since pytest does not reload modules)
     shell.run_cell(
-        """
+    """
+    import mikeio1d
+    import importlib
+    importlib.reload(mikeio1d)
+    """
+    )
+    shell.run_cell(
+    """
     from mikeio1d import Res1D
     from tests import testdata
     res = Res1D(testdata.network_river_res1d)
@@ -26,7 +30,7 @@ def shell():
 
 
 def complete(shell, prompt) -> List[str]:
-    prompt, completions = shell.complete(prompt)
+    prompt, completions = shell.Completer.complete(prompt)
     completions = [c[len(prompt) :] for c in completions]
     return completions
 

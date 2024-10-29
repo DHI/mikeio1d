@@ -1,5 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Type
+
 import clr
 import warnings
+import sys
 
 from collections.abc import Iterable
 
@@ -81,3 +89,15 @@ def make_list_if_not_iterable(obj) -> list:
         return [obj]
 
     return obj
+
+def allow_nested_autocompletion_for_ipython(cls: Type):
+    """
+    Configures IPython to allow nested autocompletion for a class.
+
+    See https://github.com/ipython/ipython/pull/13852
+    """
+    if "IPython" not in sys.modules:
+        return
+    
+    from IPython.core import guarded_eval
+    guarded_eval.EVALUATION_POLICIES['limited'].allowed_getattr.add(cls)
