@@ -445,12 +445,6 @@ class Res1D:
         return file_names_new
 
     @property
-    def result_network(self) -> ResultNetwork:
-        """Deprecated. Use network property instead."""
-        warnings.warn("The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.", FutureWarning)
-        return self.network
-
-    @property
     def network(self) -> ResultNetwork:
         """Network of the result file."""
         return self._network
@@ -597,6 +591,12 @@ class Res1D:
         """Clear the current active list of queries."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         self._network.queue.clear()
+
+    @property
+    def result_network(self) -> ResultNetwork:
+        """Deprecated. Use network property instead."""
+        warnings.warn("The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.", FutureWarning)
+        return self.network
 
     # endregion deprecation
 
