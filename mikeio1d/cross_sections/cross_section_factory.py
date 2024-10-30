@@ -18,7 +18,6 @@ from DHI.Mike1D.CrossSectionModule import FlowResistance
 
 
 class CrossSectionFactory:
-
     @staticmethod
     def validate(m1d_cross_section):
         diagnostics = m1d_cross_section.Validate()

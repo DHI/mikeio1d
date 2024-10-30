@@ -14,10 +14,12 @@ from DHI.Mike1D.ResultDataAccess import Period
 
 from ..dotnet import to_dotnet_datetime
 
+
 class TimeFilter:
     """
     Wrapper class for applying time filters to a Filter object.
     """
+
     def __init__(self, filter):
         self._filter = filter
 
@@ -37,7 +39,6 @@ class TimeFilter:
         else:
             raise ValueError("time parameter must be a slice, tuple or list")
 
-
         if start is not None:
             start = pd.to_datetime(start)
 
@@ -45,12 +46,12 @@ class TimeFilter:
             end = pd.to_datetime(end)
 
         self.add_period(start, end)
-        
+
     def add_period(self, start: Union[None, datetime], end: Union[None, datetime]):
         """Adds a period to the filter."""
         if start is None and end is None:
             raise ValueError("Either start or end must be provided")
-        
+
         start = to_dotnet_datetime(start) if start else DateTime.MinValue
         end = to_dotnet_datetime(end) if end else DateTime.MaxValue
 
@@ -65,5 +66,5 @@ class TimeFilter:
         if start != DateTime.MinValue:
             start = start.AddSeconds(-1)
         if end != DateTime.MaxValue:
-            end = end.AddSeconds(1)    
+            end = end.AddSeconds(1)
         return start, end

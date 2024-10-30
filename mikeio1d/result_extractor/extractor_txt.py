@@ -53,7 +53,7 @@ class ExtractorTxt(Extractor):
 
         f.write(header1_format % "Quantity")
         for data_entry in output_data:
-            f.write(header2_format % data_entry.data_item.Quantity.Id),
+            (f.write(header2_format % data_entry.data_item.Quantity.Id),)
         f.write("\n")
 
     def write_name(self):
@@ -61,7 +61,7 @@ class ExtractorTxt(Extractor):
         result_data = self.result_data
         header1_format, header2_format = self.header1_format, self.header2_format
 
-        f.write(header1_format % "Name"),
+        (f.write(header1_format % "Name"),)
         nodes = list(result_data.Nodes)
         reaches = list(result_data.Reaches)
         catchments = list(result_data.Catchments)
@@ -71,16 +71,16 @@ class ExtractorTxt(Extractor):
             number_within_group = data_item.NumberWithinGroup
 
             if item_type_group == ItemTypeGroup.ReachItem:
-                f.write(header2_format % reaches[number_within_group].Name),
+                (f.write(header2_format % reaches[number_within_group].Name),)
 
             elif item_type_group == ItemTypeGroup.NodeItem:
-                f.write(header2_format % nodes[number_within_group].Id),
+                (f.write(header2_format % nodes[number_within_group].Id),)
 
             elif item_type_group == ItemTypeGroup.CatchmentItem:
-                f.write(header2_format % catchments[number_within_group].Id),
+                (f.write(header2_format % catchments[number_within_group].Id),)
 
             else:
-                f.write(header2_format % "-"),
+                (f.write(header2_format % "-"),)
         f.write("\n")
 
     def write_chainage(self):
@@ -89,23 +89,25 @@ class ExtractorTxt(Extractor):
         header1_format, header2_format = self.header1_format, self.header2_format
         chainage_format, chainage_formatcs = self.chainage_format, self.chainage_formatcs
 
-        f.write(header1_format % "Chainage"),
+        (f.write(header1_format % "Chainage"),)
         for data_entry in output_data:
             data_item = data_entry.data_item
             element_index = data_entry.element_index
 
             if data_item.ItemTypeGroup != ItemTypeGroup.ReachItem or data_item.IndexList is None:
-                f.write(header2_format % "-"),
+                (f.write(header2_format % "-"),)
                 continue
 
             index_list = list(data_item.IndexList)
             reaches = list(result_data.Reaches)
             gridpoints = list(reaches[data_item.NumberWithinGroup].GridPoints)
             gridpoint_index = index_list[element_index]
-            f.write(
-                chainage_format
-                % System.String.Format(chainage_formatcs, gridpoints[gridpoint_index].Chainage)
-            ),
+            (
+                f.write(
+                    chainage_format
+                    % System.String.Format(chainage_formatcs, gridpoints[gridpoint_index].Chainage)
+                ),
+            )
 
         f.write("\n")
 
@@ -125,10 +127,10 @@ class ExtractorTxt(Extractor):
                 continue
 
             time = times[time_step_index]
-            f.write(header1_format % (time.ToString("yyyy-MM-dd HH:mm:ss"))),
+            (f.write(header1_format % (time.ToString("yyyy-MM-dd HH:mm:ss"))),)
             for data_entry in output_data:
                 data_item = data_entry.data_item
                 element_index = data_entry.element_index
                 value = data_item.GetValue(time_step_index, element_index)
-                f.write(data_format % System.String.Format(data_formatcs, value)),
+                (f.write(data_format % System.String.Format(data_formatcs, value)),)
             f.write("\n")
