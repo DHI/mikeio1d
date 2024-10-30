@@ -156,7 +156,7 @@ class Res1D:
             time=time,
         )
 
-        self._network = ResultNetwork(self)
+        self.network = ResultNetwork(self)
         self.writer = ResultWriter(self)
 
         self.clear_queue_after_reading = clear_queue_after_reading
@@ -443,11 +443,6 @@ class Res1D:
             file_name = entry.file_path if isinstance(entry, Res1D) else entry
             file_names_new.append(file_name)
         return file_names_new
-
-    @property
-    def network(self) -> ResultNetwork:
-        """Network of the result file."""
-        return self._network
 
     @property
     def nodes(self) -> ResultNodes:
