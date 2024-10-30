@@ -69,7 +69,7 @@ class ResultGridPoint(ResultLocation):
         reach_result_quantity_map = self.result_reach.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, reach_result_quantity_map)
 
-        reaches_result_quantity_map = self.res1d._network.reaches.result_quantity_map
+        reaches_result_quantity_map = self.res1d.network.reaches.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, reaches_result_quantity_map)
 
         self.add_to_network_result_quantity_map(result_quantity)

@@ -83,16 +83,10 @@ class ResultStructure(ResultLocation):
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add structure result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(
-            quantity_id, result_quantity, self.result_quantity_map
-        )
+        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
-        structure_result_quantity_map = (
-            self.res1d._network.structures.result_quantity_map
-        )
-        self.add_to_result_quantity_map(
-            quantity_id, result_quantity, structure_result_quantity_map
-        )
+        structure_result_quantity_map = self.res1d.network.structures.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
 
         self.add_to_network_result_quantity_map(result_quantity)
 
@@ -140,7 +134,5 @@ class ResultStructure(ResultLocation):
         """Get a QueryDataStructure for given data item."""
         quantity_id = data_item.Quantity.Id
         structure_id = self.id
-        query = QueryDataStructure(
-            quantity_id, structure_id, self.reach.Name, self.chainage
-        )
+        query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self.chainage)
         return query

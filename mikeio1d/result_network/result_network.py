@@ -79,12 +79,10 @@ class ResultNetwork:
 
         self.result_quantity_map: Dict[TimeSeriesId, ResultQuantity] = {}
 
-        self.res1d._network = self
+        self.res1d.network = self
         self.set_result_locations()
 
-    def add_result_quantity_to_map(
-        self, result_quantity: ResultQuantity
-    ) -> TimeSeriesId:
+    def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
         """
         Add a ResultQuantity to map of all possible ResultQuantities.
 

@@ -37,7 +37,7 @@ class ResultCatchments(ResultLocations):
         ResultLocations.__init__(self, res1d)
         self.catchment_label = "c_"
 
-        res1d._network.catchments = self
+        res1d.network.catchments = self
         self.set_catchments()
         self.set_quantity_collections()
 

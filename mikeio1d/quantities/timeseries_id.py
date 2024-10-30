@@ -147,7 +147,7 @@ class TimeSeriesId:
         bool
             True if the TimeSeriesId is valid, False otherwise.
         """
-        quantity_map = res1d._network.result_quantity_map
+        quantity_map = res1d.network.result_quantity_map
         result_quantity = quantity_map.get(self, None)
         return result_quantity is not None
 
@@ -183,7 +183,7 @@ class TimeSeriesId:
         if self.derived:
             raise ValueError("Cannot convert derived TimeSeriesId to ResultQuantity")
 
-        quantity_map = res1d._network.result_quantity_map
+        quantity_map = res1d.network.result_quantity_map
         result_quantity = quantity_map.get(self, None)
 
         if result_quantity is None:
