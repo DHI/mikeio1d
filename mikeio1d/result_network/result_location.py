@@ -93,9 +93,7 @@ class ResultLocation(ABC):
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
         """
-        result_quantities = [
-            q for qlist in self.result_quantity_map.values() for q in qlist
-        ]
+        result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
         timesries_ids = [q.timeseries_id for q in result_quantities]
         df = self.res1d.reader.read(timesries_ids, column_mode=column_mode)
         return df
@@ -133,10 +131,8 @@ class ResultLocation(ABC):
     def set_quantity(self, obj, data_item, element_index=0):
         """Sets a single quantity attribute on the obj."""
         m1d_dataset = self.get_m1d_dataset(data_item)
-        result_quantity = ResultQuantity(
-            obj, data_item, self.res1d, m1d_dataset, element_index
-        )
-        self.res1d._network.add_result_quantity_to_map(result_quantity)
+        result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
+        self.res1d.network.add_result_quantity_to_map(result_quantity)
 
         quantity = data_item.Quantity
         quantity_id = quantity.Id
@@ -176,14 +172,10 @@ class ResultLocation(ABC):
 
     def set_quantity_derived(self, derived_quantity: DerivedQuantity):
         """Sets a single derived quantity attribute on the obj."""
-        result_quantity_derived = ResultQuantityDerived(
-            derived_quantity, self, self.res1d
-        )
+        result_quantity_derived = ResultQuantityDerived(derived_quantity, self, self.res1d)
         quantity_id = result_quantity_derived.name
 
-        self.result_quantity_derived_map[result_quantity_derived.name] = (
-            result_quantity_derived
-        )
+        self.result_quantity_derived_map[result_quantity_derived.name] = result_quantity_derived
 
         result_quantity_attribute_string = make_proper_variable_name(
             quantity_id, self.quantity_label
@@ -207,9 +199,7 @@ class ResultLocation(ABC):
         ...
 
     @abstractclassmethod
-    def add_to_result_quantity_maps(
-        self, quantity_id: str, result_quantity: ResultQuantity
-    ):
+    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """
         Base method for adding to result quantity maps, which is a dictionary
         from quantity id to a list of result quantities corresponding to that
@@ -247,9 +237,7 @@ class ResultLocation(ABC):
         else:
             result_quantity_map[quantity_id] = [result_quantity]
 
-    def add_to_network_result_quantity_map(
-        self, result_quantity: ResultQuantity
-    ) -> TimeSeriesId:
+    def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
         """
         Add a ResultQuantity to map of all possible ResultQuantities.
 
@@ -263,14 +251,14 @@ class ResultLocation(ABC):
         TimeSeriesId
             The TimeSeriesId key of the added ResultQuantity
         """
-        network = self.res1d._network
+        network = self.res1d.network
         tsid = network.add_result_quantity_to_map(result_quantity)
         return tsid
 
     def add_query(self, data_item):
         """Base method for adding a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
-        self.res1d._network.add_query(query)
+        self.res1d.network.add_query(query)
 
     @abstractclassmethod
     def get_query(self, data_item):

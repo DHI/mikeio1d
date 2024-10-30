@@ -46,7 +46,7 @@ class ResultReaches(ResultLocations):
         self.reach_label = "r_"
         self.result_reach_map = {}
 
-        res1d._network.reaches = self
+        res1d.network.reaches = self
         self.set_reaches()
         self.set_quantity_collections()
 
@@ -58,9 +58,7 @@ class ResultReaches(ResultLocations):
         for reach in self.data.Reaches:
             reach = impl(reach)
             result_reach = self.get_or_create_result_reach(reach)
-            result_reach_attribute_string = make_proper_variable_name(
-                reach.Name, self.reach_label
-            )
+            result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
             setattr(self, result_reach_attribute_string, result_reach)
 
     def set_quantity_collections(self):
@@ -146,17 +144,13 @@ class ResultReaches(ResultLocations):
 
         rfa = ResultFrameAggregator(agg, **agg_kwargs)
 
-        df_quantities = self.read(
-            column_mode="compact", include_derived=include_derived
-        )
+        df_quantities = self.read(column_mode="compact", include_derived=include_derived)
         df_quantities = rfa.aggregate(df_quantities)
 
         if segmented:
             gdf = gdf.merge(df_quantities, left_on=["name", "tag"], right_index=True)
         else:
-            df_quantities = df_quantities.groupby("name").agg(
-                rfa.get_agg_function("time")
-            )
+            df_quantities = df_quantities.groupby("name").agg(rfa.get_agg_function("time"))
             gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
 
         return gdf

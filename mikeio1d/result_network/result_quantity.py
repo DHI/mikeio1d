@@ -87,7 +87,9 @@ class ResultQuantity:
         elif isinstance(quantity, IQuantity):
             m1d_quantity = quantity
         else:
-            raise ValueError(f"quantity must be a ResultQuantity or IQuantity object. Got {type(quantity)}.")
+            raise ValueError(
+                f"quantity must be a ResultQuantity or IQuantity object. Got {type(quantity)}."
+            )
 
         description = m1d_quantity.Description
         unit_abbreviation = m1d_quantity.EumQuantity.UnitAbbreviation
@@ -101,7 +103,7 @@ class ResultQuantity:
 
     def add(self):
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
-        self.res1d._network.queue.append(self.timeseries_id)
+        self.res1d.network.queue.append(self.timeseries_id)
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
         """Read the time series data into a data frame.

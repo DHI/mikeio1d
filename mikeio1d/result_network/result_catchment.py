@@ -72,16 +72,10 @@ class ResultCatchment(ResultLocation):
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add catchment result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(
-            quantity_id, result_quantity, self.result_quantity_map
-        )
+        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
-        catchment_result_quantity_map = (
-            self.res1d._network.catchments.result_quantity_map
-        )
-        self.add_to_result_quantity_map(
-            quantity_id, result_quantity, catchment_result_quantity_map
-        )
+        catchment_result_quantity_map = self.res1d.network.catchments.result_quantity_map
+        self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
 
         self.add_to_network_result_quantity_map(result_quantity)
 

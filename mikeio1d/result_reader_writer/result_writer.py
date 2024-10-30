@@ -22,7 +22,7 @@ class ResultWriter:
 
     def __init__(self, res1d):
         self.res1d = res1d
-        self.result_network = res1d._network
+        self.result_network = res1d.network
 
     def modify(self, dataframe: pd.DataFrame):
         """

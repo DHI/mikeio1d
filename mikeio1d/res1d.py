@@ -243,7 +243,7 @@ class Res1D:
         df = self.reader.read(timeseries_ids, column_mode=column_mode)
 
         if self.clear_queue_after_reading:
-            self._network.queue.clear()
+            self.network.queue.clear()
 
         return df
 
@@ -254,7 +254,7 @@ class Res1D:
         queries = make_list_if_not_iterable(queries)
 
         if queries is None or len(queries) == 0:
-            return self._network.queue
+            return self.network.queue
 
         is_already_time_series_ids = isinstance(queries[0], TimeSeriesId)
         if is_already_time_series_ids:
@@ -275,7 +275,7 @@ class Res1D:
         -------
         """
         derived_quantity = derived_quantity(self)
-        self._network.add_derived_quantity(derived_quantity)
+        self.network.add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
         """Removes a derived quantity from the Res1D object, propogating changes to the network.
@@ -364,7 +364,7 @@ class Res1D:
         extractor.export()
 
         if self.clear_queue_after_reading:
-            self._network.queue.clear()
+            self.network.queue.clear()
 
     def to_csv(
         self,
@@ -433,27 +433,27 @@ class Res1D:
     @property
     def nodes(self) -> ResultNodes:
         """Nodes of the result file."""
-        return self._network.nodes
+        return self.network.nodes
 
     @property
     def reaches(self) -> ResultReaches:
         """Reaches of the result file."""
-        return self._network.reaches
+        return self.network.reaches
 
     @property
     def catchments(self) -> ResultCatchments:
         """Catchments of the result file."""
-        return self._network.catchments
+        return self.network.catchments
 
     @property
     def structures(self) -> ResultStructures:
         """Structures of the result file."""
-        return self._network.structures
+        return self.network.structures
 
     @property
     def global_data(self) -> ResultGlobalDatas:
         """Global data of the result file."""
-        return self._network.global_data
+        return self.network.global_data
 
     @property
     def time_index(self) -> pd.DatetimeIndex:
@@ -573,7 +573,7 @@ class Res1D:
     def clear_queue(self):
         """Clear the current active list of queries."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self._network.queue.clear()
+        self.network.queue.clear()
 
     @property
     def result_network(self) -> ResultNetwork:
