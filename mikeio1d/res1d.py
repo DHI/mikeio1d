@@ -485,7 +485,7 @@ class Res1D:
         return from_dotnet_datetime(self.data.EndTime)
     
     @property
-    def n_time_steps(self) -> int:
+    def number_of_time_steps(self) -> int:
         """Number of time steps in the result file."""
         return self.data.NumberOfTimeSteps
 
