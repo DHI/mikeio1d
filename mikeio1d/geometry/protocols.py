@@ -5,5 +5,4 @@ from shapely.geometry.base import BaseGeometry
 
 
 class ConvertableToShapely(Protocol):
-    def to_shapely(self) -> BaseGeometry:
-        ...
+    def to_shapely(self) -> BaseGeometry: ...

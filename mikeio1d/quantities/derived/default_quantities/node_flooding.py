@@ -20,9 +20,7 @@ class NodeFlooding(DerivedQuantity):
     _GROUPS = {TimeSeriesIdGroup.NODE}
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(
-        self, df_source: pd.DataFrame, locations: List[ResultLocation]
-    ) -> pd.DataFrame:
+    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
         dtype = df_source.dtypes.iloc[0]
         ground_levels = np.fromiter(self.get_ground_levels(locations), dtype=dtype)
         df_derived = df_source - ground_levels

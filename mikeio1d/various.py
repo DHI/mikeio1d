@@ -90,6 +90,7 @@ def make_list_if_not_iterable(obj) -> list:
 
     return obj
 
+
 def allow_nested_autocompletion_for_ipython(cls: Type):
     """
     Configures IPython to allow nested autocompletion for a class.
@@ -98,6 +99,7 @@ def allow_nested_autocompletion_for_ipython(cls: Type):
     """
     if "IPython" not in sys.modules:
         return
-    
+
     from IPython.core import guarded_eval
-    guarded_eval.EVALUATION_POLICIES['limited'].allowed_getattr.add(cls)
+
+    guarded_eval.EVALUATION_POLICIES["limited"].allowed_getattr.add(cls)

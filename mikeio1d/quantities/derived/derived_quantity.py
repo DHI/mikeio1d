@@ -22,7 +22,6 @@ from ..timeseries_id import TimeSeriesIdGroup
 
 
 class DerivedQuantity(ABC):
-
     _NAME = None
     _GROUPS = None
     _SOURCE_QUANTITY = None
@@ -33,7 +32,7 @@ class DerivedQuantity(ABC):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
-    
+
     def _validate(self) -> bool:
         """
         Validates the derived quantity.

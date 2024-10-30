@@ -44,6 +44,7 @@ from .res1d import Res1D
 from .xns11 import Xns11
 
 from .various import allow_nested_autocompletion_for_ipython
+
 allow_nested_autocompletion_for_ipython(Res1D)
 
 __all__ = ["Res1D", "Xns11"]

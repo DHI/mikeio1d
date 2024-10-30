@@ -23,9 +23,7 @@ class ReachQQManning(DerivedQuantity):
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
         dtype = df_source.dtypes.iloc[0]
-        full_flow_discharges = np.fromiter(
-            self.get_full_flow_discharges(locations), dtype=dtype
-        )
+        full_flow_discharges = np.fromiter(self.get_full_flow_discharges(locations), dtype=dtype)
         df_derived = df_source / full_flow_discharges
         return df_derived
 

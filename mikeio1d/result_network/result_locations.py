@@ -128,9 +128,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         include_derived: bool, default False
             Include derived quantities.
         """
-        result_quantities = [
-            q for qlist in self.result_quantity_map.values() for q in qlist
-        ]
+        result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
         timesries_ids = [q.timeseries_id for q in result_quantities]
 
         if include_derived:
@@ -149,9 +147,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         """Sets all quantity collection attributes."""
         for quantity_id in self.result_quantity_map:
             result_quantities = self.result_quantity_map[quantity_id]
-            result_quantity_collection = ResultQuantityCollection(
-                result_quantities, self.res1d
-            )
+            result_quantity_collection = ResultQuantityCollection(result_quantities, self.res1d)
             result_quantity_attribute_string = make_proper_variable_name(
                 quantity_id, self.quantity_label
             )
@@ -212,9 +208,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         )
         quantity_id = result_quantity_derived.name
 
-        self.result_quantity_derived_map[result_quantity_derived.name] = (
-            result_quantity_derived
-        )
+        self.result_quantity_derived_map[result_quantity_derived.name] = result_quantity_derived
 
         result_quantity_attribute_string = make_proper_variable_name(
             quantity_id, self.quantity_label

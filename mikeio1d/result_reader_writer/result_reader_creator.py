@@ -30,7 +30,7 @@ class ResultReaderCreator:
         catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        time = None,
+        time=None,
     ) -> ResultReader:
         reasult_readers: Dict[ResultReaderType, ResultReader] = {
             ResultReaderType.COPIER: ResultReaderCopier,
