@@ -8,14 +8,14 @@ from .library_loader import LibraryLoader
 
 
 class LibraryLoaders:
-    """
-    Helper class which finds all MIKE software .NET libraries
+    """Helper class which finds all MIKE software .NET libraries
     and assigns references to those libraries in MIKE.NET module.
 
     Parameters
     ----------
     mikenet_module: module
         Reference to MIKE.NET module
+
     """
 
     def __init__(self, mikenet_module):
@@ -27,8 +27,7 @@ class LibraryLoaders:
         self.create_loaders()
 
     def create_loaders(self):
-        """
-        Creates .NET library loaders and assigns relevant `load` methods
+        """Creates .NET library loaders and assigns relevant `load` methods
         to MIKE.NET module.
         """
         mikenet_module = self.mikenet_module
@@ -45,15 +44,13 @@ class LibraryLoaders:
         setattr(mikenet_module, "load", self.load)
 
     def load_all(self):
-        """
-        Loads all libraries present in library_loader_list.
+        """Loads all libraries present in library_loader_list.
         """
         for library_loader in self.library_loader_list:
             library_loader.load()
 
     def load(self, libraries=[]):
-        """
-        Loads all libraries specified by the list `libraries`.
+        """Loads all libraries specified by the list `libraries`.
 
         Parameters
         ----------
@@ -61,6 +58,7 @@ class LibraryLoaders:
             List of strings specifying what .NET libraries to load.
             This can also be set as a string having the name of the
             library to load.
+
         """
         if isinstance(libraries, str):
             libraries = [libraries]

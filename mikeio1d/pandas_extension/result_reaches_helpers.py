@@ -4,8 +4,7 @@ from .transposed_groupby import TransposedGroupBy
 
 
 def groupby_chainage(df: pd.DataFrame, **kwargs) -> TransposedGroupBy:
-    """
-    Group results for aggregation along the chainage axis.
+    """Group results for aggregation along the chainage axis.
 
     Parameters
     ----------
@@ -16,6 +15,7 @@ def groupby_chainage(df: pd.DataFrame, **kwargs) -> TransposedGroupBy:
     -------
     groupby : TransposedGroupBy
         GroupBy object, which can be used for aggregation.
+
     """
     fixed_level_names = [n for n in df.columns.names if n != "chainage"]
     groupby = TransposedGroupBy(transposed_groupby=df.T.groupby(fixed_level_names, **kwargs))
@@ -23,8 +23,7 @@ def groupby_chainage(df: pd.DataFrame, **kwargs) -> TransposedGroupBy:
 
 
 def agg_chainage(df: pd.DataFrame, agg=["first"], gb_kwargs: dict = {}, **kwargs) -> pd.DataFrame:
-    """
-    Aggregate results along the chainage axis.
+    """Aggregate results along the chainage axis.
 
     Parameters
     ----------
@@ -37,6 +36,7 @@ def agg_chainage(df: pd.DataFrame, agg=["first"], gb_kwargs: dict = {}, **kwargs
     -------
     df : pd.DataFrame
         DataFrame with aggregated results.
+
     """
     groupby = groupby_chainage(df, **gb_kwargs)
     return groupby.agg(agg, **kwargs)

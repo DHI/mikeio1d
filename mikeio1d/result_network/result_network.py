@@ -22,8 +22,7 @@ from ..quantities import DerivedQuantity
 
 
 class ResultNetwork:
-    """
-    Class for storing ResultData network wrapper.
+    """Class for storing ResultData network wrapper.
 
     This class is mainly used to provide for network
     location attributes, which can then be accessed
@@ -68,6 +67,7 @@ class ResultNetwork:
     >>> resnet.reaches.reach1.m_0_0.WaterLevel.add()
     >>> resnet.reaches.reach2.m_0_0.WaterLevel.add()
     ```
+
     """
 
     def __init__(self, res1d):
@@ -83,8 +83,7 @@ class ResultNetwork:
         self.set_result_locations()
 
     def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
-        """
-        Add a ResultQuantity to map of all possible ResultQuantities.
+        """Add a ResultQuantity to map of all possible ResultQuantities.
 
         Parameters
         ----------
@@ -95,6 +94,7 @@ class ResultNetwork:
         -------
         TimeSeriesId
             The TimeSeriesId key of the added ResultQuantity
+
         """
         tsid = TimeSeriesId.from_result_quantity(result_quantity)
         while tsid in self.result_quantity_map:
@@ -107,8 +107,7 @@ class ResultNetwork:
         return tsid
 
     def set_result_locations(self):
-        """
-        Assign nodes, reaches, catchments, global_data properties.
+        """Assign nodes, reaches, catchments, global_data properties.
         """
         res1d = self.res1d
         self.nodes = ResultNodes(res1d)
@@ -118,21 +117,20 @@ class ResultNetwork:
         self.global_data = ResultGlobalDatas(res1d)
 
     def add_timeseries_id(self, timeseries_id: TimeSeriesId):
-        """
-        Add a TimeSeriesId to the queue list, which can be used
+        """Add a TimeSeriesId to the queue list, which can be used
         when calling res1D.read().
         """
         if timeseries_id not in self.queue:
             self.queue.append(timeseries_id)
 
     def add_derived_quantity(self, derived_quantity: ResultQuantity):
-        """
-        Add a derived quantity to the result network.
+        """Add a derived quantity to the result network.
 
         Parameters
         ----------
         derived_quantity : Type[ResultQuantity]
             Derived quantity to be added to the result network.
+
         """
         self.nodes.add_derived_quantity(derived_quantity)
         self.reaches.add_derived_quantity(derived_quantity)
@@ -140,13 +138,13 @@ class ResultNetwork:
         self.structures.add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: ResultQuantity | str):
-        """
-        Remove a derived quantity from the result network.
+        """Remove a derived quantity from the result network.
 
         Parameters
         ----------
         derived_quantity : ResultQuantity or str
             Derived quantity to be removed from the result network. Either a ResultQuantity object or its name.
+
         """
         self.nodes.remove_derived_quantity(derived_quantity)
         self.reaches.remove_derived_quantity(derived_quantity)
@@ -154,8 +152,7 @@ class ResultNetwork:
         self.structures.remove_derived_quantity(derived_quantity)
 
     def to_geopandas(self) -> GeoDataFrame:
-        """
-        Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed.
+        """Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed.
         """
         gpd = try_import_geopandas()  # noqa: F841
         gdf_nodes = self.nodes.to_geopandas()

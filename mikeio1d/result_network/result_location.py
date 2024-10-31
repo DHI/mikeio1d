@@ -24,8 +24,7 @@ from ..quantities import DerivedQuantity
 
 
 class ResultLocation(ABC):
-    """
-    A base class for a network location (node, reach)
+    """A base class for a network location (node, reach)
     or a catchment wrapper class.
 
     Parameters
@@ -48,6 +47,7 @@ class ResultLocation(ABC):
     element_indices : list
         List of integers representing element index for entries in data_items.
         For non grid point locations this is typically None.
+
     """
 
     def __init__(self, data_items, res1d: Res1D):
@@ -82,8 +82,7 @@ class ResultLocation(ABC):
         return repr
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """
-        Read the time series data for all quantities at this location into a DataFrame.
+        """Read the time series data for all quantities at this location into a DataFrame.
 
         Parameters
         ----------
@@ -92,6 +91,7 @@ class ResultLocation(ABC):
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
+
         """
         result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
         timesries_ids = [q.timeseries_id for q in result_quantities]
@@ -145,8 +145,7 @@ class ResultLocation(ABC):
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
 
     def _can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
-        """
-        Check if a derived quantity can be added to the result locations."""
+        """Check if a derived quantity can be added to the result locations."""
         if self.group not in derived_quantity.groups:
             return False
         elif derived_quantity.source_quantity not in self.quantities:
@@ -195,13 +194,13 @@ class ResultLocation(ABC):
         -------
         IRes1DDataSet
             IRes1DDataSet object associated with ResultLocation.
+
         """
         ...
 
     @abstractclassmethod
     def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
-        """
-        Base method for adding to result quantity maps, which is a dictionary
+        """Base method for adding to result quantity maps, which is a dictionary
         from quantity id to a list of result quantities corresponding to that
         quantity id.
 
@@ -211,6 +210,7 @@ class ResultLocation(ABC):
             Quantity id.
         result_quantity : ResultQuantity
             One of the possible ResultQuantity objects corresponding to a quantity id.
+
         """
         ...
 
@@ -220,8 +220,7 @@ class ResultLocation(ABC):
         result_quantity: ResultQuantity,
         result_quantity_map: Dict[str, List[ResultQuantity]],
     ):
-        """
-        Method for adding to a given result quantity map.
+        """Method for adding to a given result quantity map.
 
         Parameters
         ----------
@@ -231,6 +230,7 @@ class ResultLocation(ABC):
             One of the possible ResultQuantity objects corresponding to a quantity id.
         result_quantity_map : dict
             Dictionary from quantity id to a list of ResultQuantity objects.
+
         """
         if quantity_id in result_quantity_map:
             result_quantity_map[quantity_id].append(result_quantity)
@@ -238,8 +238,7 @@ class ResultLocation(ABC):
             result_quantity_map[quantity_id] = [result_quantity]
 
     def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
-        """
-        Add a ResultQuantity to map of all possible ResultQuantities.
+        """Add a ResultQuantity to map of all possible ResultQuantities.
 
         Parameters
         ----------
@@ -250,6 +249,7 @@ class ResultLocation(ABC):
         -------
         TimeSeriesId
             The TimeSeriesId key of the added ResultQuantity
+
         """
         network = self.res1d.network
         tsid = network.add_result_quantity_to_map(result_quantity)

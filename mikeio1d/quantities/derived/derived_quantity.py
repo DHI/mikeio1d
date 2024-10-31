@@ -34,13 +34,13 @@ class DerivedQuantity(ABC):
         return f"<{self.__class__.__name__}>"
 
     def _validate(self) -> bool:
-        """
-        Validates the derived quantity.
+        """Validates the derived quantity.
 
         Returns
         -------
         bool
             True if the derived quantity is valid, False otherwise.
+
         """
         if not isinstance(self._NAME, str):
             raise ValueError("DerivedQuantity must have str value for '_NAME'.")
@@ -70,8 +70,7 @@ class DerivedQuantity(ABC):
 
     @abstractmethod
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
-        """
-        Calculates the derived quantity based on the source quantity.
+        """Calculates the derived quantity based on the source quantity.
 
         Parameters
         ----------
@@ -84,17 +83,18 @@ class DerivedQuantity(ABC):
         -------
         pd.DataFrame
             DataFrame with the derived quantity for all relevant groups.
+
         """
         ...
 
     def generate(self, df_source: pd.DataFrame = None) -> pd.DataFrame:
-        """
-        Generate the derived quantity based on the source quantity.
+        """Generate the derived quantity based on the source quantity.
 
         Returns
         -------
         pd.DataFrame
             DataFrame with the derived quantity for all relevant groups.
+
         """
         if df_source is None:
             df_source = self._create_source_dataframe()
@@ -108,8 +108,7 @@ class DerivedQuantity(ABC):
         return df_derived
 
     def create_source_dataframe_for_location(self, result_location: ResultLocation) -> pd.DataFrame:
-        """
-        Generates a DataFrame with the source quantities required to calculate the derived quantity.
+        """Generates a DataFrame with the source quantities required to calculate the derived quantity.
 
         Parameters
         ----------
@@ -120,6 +119,7 @@ class DerivedQuantity(ABC):
         -------
         pd.DataFrame
             DataFrame with the source quantities for the specified ResultLocation.
+
         """
         tsids = self._get_source_timeseries_ids_for_location(result_location)
         df_source = self.res1d.reader.read(tsids, column_mode="compact")
@@ -128,8 +128,7 @@ class DerivedQuantity(ABC):
     def create_source_dataframe_for_locations(
         self, result_locations: ResultLocations
     ) -> pd.DataFrame:
-        """
-        Generates a DataFrame with the source quantities required to calculate the derived quantity.
+        """Generates a DataFrame with the source quantities required to calculate the derived quantity.
 
         Parameters
         ----------
@@ -140,6 +139,7 @@ class DerivedQuantity(ABC):
         -------
         pd.DataFrame
             DataFrame with the source quantities for the specified ResultLocations.
+
         """
         tsids = self._get_source_timeseries_ids_for_locations(result_locations)
         df_source = self.res1d.reader.read(tsids, column_mode="compact")
@@ -153,8 +153,7 @@ class DerivedQuantity(ABC):
         return result_locations
 
     def _create_time_series_id_from_source(self, source: TimeSeriesId) -> TimeSeriesId:
-        """
-        Create a TimeSeriesId for the derived quantity based on the source quantity TimeSeriesId.
+        """Create a TimeSeriesId for the derived quantity based on the source quantity TimeSeriesId.
         """
         derived_tsid = replace(source, quantity=self.name, derived=True)
         return derived_tsid
@@ -162,8 +161,7 @@ class DerivedQuantity(ABC):
     def _create_time_series_ids_from_source(
         self, source_timeseries_ids: List[TimeSeriesId]
     ) -> List[TimeSeriesId]:
-        """
-        Creates a list of TimeSeriesId for the derived quantity based on a list of source quantity TimeSeriesId objects.
+        """Creates a list of TimeSeriesId for the derived quantity based on a list of source quantity TimeSeriesId objects.
         """
         derived_tsids = [
             self._create_time_series_id_from_source(tsid) for tsid in source_timeseries_ids
@@ -171,8 +169,7 @@ class DerivedQuantity(ABC):
         return derived_tsids
 
     def _create_derived_columns(self, df_columns: pd.MultiIndex) -> pd.MultiIndex:
-        """
-        Creates a column index for the derived quantity based on the source quantity's DataFrame.columns.
+        """Creates a column index for the derived quantity based on the source quantity's DataFrame.columns.
         """
         source_tsids = TimeSeriesId.from_multiindex(df_columns)
         derived_tsids = self._create_time_series_ids_from_source(source_tsids)
@@ -182,8 +179,7 @@ class DerivedQuantity(ABC):
     def _get_source_timeseries_ids_for_locations(
         self, result_locations: ResultLocations
     ) -> List[TimeSeriesId]:
-        """
-        Generates a list of TimeSeriesId for the source quantity for a particular ResultLocations object.
+        """Generates a list of TimeSeriesId for the source quantity for a particular ResultLocations object.
         """
         if result_locations.group not in self.groups:
             return []
@@ -197,8 +193,7 @@ class DerivedQuantity(ABC):
     def _get_source_timeseries_ids_for_location(
         self, result_location: ResultLocation
     ) -> List[TimeSeriesId]:
-        """
-        Generates a list of TimeSeriesId for the source quantity for a particular ResultLocation object.
+        """Generates a list of TimeSeriesId for the source quantity for a particular ResultLocation object.
         """
         if result_location.group not in self.groups:
             return []

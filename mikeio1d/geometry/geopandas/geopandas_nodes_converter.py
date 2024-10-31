@@ -16,22 +16,21 @@ from mikeio1d.quantities import TimeSeriesIdGroup
 
 
 class GeoPandasNodesConverter(GeoPandasConverter):
-    """
-    For converting ResultNodes to a GeoDataFrame.
+    """For converting ResultNodes to a GeoDataFrame.
 
-    Example
+    Example:
     -------
     >>> res = Res1D("results.res1d")
     >>> converter = GeoPandasNodesConverter()
     >>> gdf = converter.to_geopandas(res.nodes)
+
     """
 
     def __init__(self):
         super().__init__()
 
     def _create_dataframe_data_dict(self, nodes: ResultNodes) -> dict[str, tuple]:
-        """
-        Creates a dictionary with the data needed to create a GeoDataFrame.
+        """Creates a dictionary with the data needed to create a GeoDataFrame.
         """
         names = [node.id for node in nodes.values()]
         geometries = [NodePoint.from_res1d_node(node._node).to_shapely() for node in nodes.values()]
@@ -43,8 +42,7 @@ class GeoPandasNodesConverter(GeoPandasConverter):
         return data
 
     def to_geopandas(self, nodes: ResultNodes) -> GeoDataFrame:
-        """
-        Convert ResultNodes to a GeoDataFrame.
+        """Convert ResultNodes to a GeoDataFrame.
         """
         data = self._create_dataframe_data_dict(nodes)
         crs = self.get_crs(nodes.res1d)

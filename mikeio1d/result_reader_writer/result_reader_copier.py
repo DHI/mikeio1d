@@ -25,8 +25,7 @@ from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
 
 class ResultReaderCopier(ResultReader):
-    """
-    Class for reading the ResultData object TimeData
+    """Class for reading the ResultData object TimeData
     into Pandas data frame using ResultDataCopier object
     from DHI.Mike1D.MikeIO library.
     """
@@ -160,8 +159,7 @@ class ResultReaderCopier(ResultReader):
         m1d_data_item,
         i: int,
     ) -> TimeSeriesId:
-        """
-        Returns a unique TimeSeriesId for given data set, data item and element index.
+        """Returns a unique TimeSeriesId for given data set, data item and element index.
 
         Parameters
         ----------
@@ -178,6 +176,7 @@ class ResultReaderCopier(ResultReader):
         -------
         TimeSeriesId
             A unique TimeSeriesId object.
+
         """
         timeseries_id = TimeSeriesId.from_dataset_dataitem_and_element(
             m1d_data_set, m1d_data_item, i

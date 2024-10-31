@@ -5,8 +5,7 @@ from html import escape
 
 
 class ValidPythonIdentifierTranslatorTable:
-    """
-    Translator table for replacing invalid python characters with a valid identifier.
+    """Translator table for replacing invalid python characters with a valid identifier.
 
     Used as argument to Python's built-in str.translate() method.
 
@@ -14,6 +13,7 @@ class ValidPythonIdentifierTranslatorTable:
     ----------
     replacement : str, default = "_"
        The character to replace invalid characters with.
+
     """
 
     def __init__(self, replacement="_"):
@@ -31,8 +31,7 @@ _translator_table = ValidPythonIdentifierTranslatorTable()
 
 
 def make_proper_variable_name(string: str, extra_string_before_digit="_"):
-    """
-    Makes a more proper variable name.
+    """Makes a more proper variable name.
 
     It is assumed that the input string never is or after manipulations
     becomes an '_' or an empty string.
@@ -53,8 +52,7 @@ def make_proper_variable_name(string: str, extra_string_before_digit="_"):
 
 
 def build_html_repr_from_sections(header: str, sections: List[Tuple[str, List | Dict]]):
-    """
-    Builds an html representation from a list of sections.
+    """Builds an html representation from a list of sections.
 
     Parameters
     ----------
@@ -64,6 +62,7 @@ def build_html_repr_from_sections(header: str, sections: List[Tuple[str, List | 
         List of tuples with section name and section content.
         The section content can be either a list of values or
         a dictionary of key value pairs.
+
     """
     repr = escape(header)
     repr += _build_html_repr_section_style()  # TODO: A better way to inject css?
@@ -79,8 +78,7 @@ def build_html_repr_from_sections(header: str, sections: List[Tuple[str, List | 
 
 
 def _build_html_repr_section_style():
-    """
-    Builds a style string for html representation."""
+    """Builds a style string for html representation."""
     style = """
     <style>
         ul {
@@ -94,8 +92,7 @@ def _build_html_repr_section_style():
 
 
 def _build_html_repr_section_from_dict(name, keyvalues):
-    """
-    Builds a section from a dictionary."""
+    """Builds a section from a dictionary."""
     section = "<details>"
     section += f"<summary>{name}</summary>"
     section += "<ul>"
@@ -107,8 +104,7 @@ def _build_html_repr_section_from_dict(name, keyvalues):
 
 
 def _build_html_repr_section_from_list(name, values):
-    """
-    Builds a section from a list."""
+    """Builds a section from a list."""
     section = "<details>"
     section += f"<summary>{name}</summary>"
     section += "<ul>"

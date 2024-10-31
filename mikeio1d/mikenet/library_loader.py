@@ -4,8 +4,7 @@ from warnings import warn
 
 
 class LibraryLoader:
-    """
-    Helper class which assigns 'load_[LIRABRY_NAME]' to MIKE.NET module.
+    """Helper class which assigns 'load_[LIRABRY_NAME]' to MIKE.NET module.
 
     Parameters
     ----------
@@ -13,6 +12,7 @@ class LibraryLoader:
         Library file_name to load. Typically this is a full path to the library (dll).
     mikenet_module: module
         Reference to MIKET.NET module
+
     """
 
     def __init__(self, file_name, mikenet_module):
@@ -29,8 +29,7 @@ class LibraryLoader:
         setattr(mikenet_module, load_function_name, self.load)
 
     def load(self):
-        """
-        A method which adds a reference of a relevant library to Python.NET (CLR)
+        """A method which adds a reference of a relevant library to Python.NET (CLR)
         and also adds a reference to the MIKE.NET.
         """
         clr.AddReference(self.library_name)

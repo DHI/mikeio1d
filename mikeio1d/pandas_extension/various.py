@@ -10,8 +10,7 @@ from .transposed_groupby import TransposedGroupBy
 
 
 def compact_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Convert a DataFrame with a hierarchical column index to a compact DataFrame.
+    """Convert a DataFrame with a hierarchical column index to a compact DataFrame.
 
     A compact DataFrame removes levels where every value matches the TimeSeriesId default value.
 
@@ -24,6 +23,7 @@ def compact_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     -------
     df : pd.DataFrame
         Compact DataFrame.
+
     """
     index = df.columns
 
@@ -50,8 +50,7 @@ def compact_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def groupby_level(df: pd.DataFrame, level_name: str) -> pd.DataFrame:
-    """
-    Group DataFrame for aggregations along the specific level name.
+    """Group DataFrame for aggregations along the specific level name.
 
     Parameters
     ----------
@@ -69,6 +68,7 @@ def groupby_level(df: pd.DataFrame, level_name: str) -> pd.DataFrame:
     --------
     >>> df.m1d.groupby_level("duplicate").first()
     Out[1]: The DataFrame with the first value for each duplicate.
+
     """
     if level_name not in df.columns.names:
         raise ValueError(f"Level name {level_name} not found in columns.")

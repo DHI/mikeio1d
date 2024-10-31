@@ -12,8 +12,7 @@ from .reach_point import ReachPoint
 
 
 class ReachGeometry:
-    """
-    A utility class for working with reach geometries.
+    """A utility class for working with reach geometries.
     """
 
     def __init__(self, points: List[ReachPoint]):
@@ -21,8 +20,7 @@ class ReachGeometry:
 
     @staticmethod
     def from_m1d_reaches(m1d_reaches) -> ReachGeometry:
-        """
-        Create a ReachGeometry from a list of IRes1DReach objects.
+        """Create a ReachGeometry from a list of IRes1DReach objects.
 
         Parameters
         ----------
@@ -31,8 +29,8 @@ class ReachGeometry:
         Returns
         -------
         ReachGeometry
-        """
 
+        """
         if not isinstance(m1d_reaches, Iterable):
             m1d_reaches = [m1d_reaches]
 

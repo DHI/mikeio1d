@@ -3,8 +3,7 @@ from .result_location import ResultLocation
 
 
 class ResultGridPoint(ResultLocation):
-    """
-    Class for wrapping a single ResultData grid point.
+    """Class for wrapping a single ResultData grid point.
 
     Parameters
     ----------
@@ -23,6 +22,7 @@ class ResultGridPoint(ResultLocation):
     structure_data_items : list of IDataItem object.
         List of IDataItem objects belonging to a structures
         defined on the current grid point.
+
     """
 
     def __init__(self, reach, gridpoint, data_items, result_reach, res1d):
@@ -58,8 +58,9 @@ class ResultGridPoint(ResultLocation):
         Returns
         -------
         IRes1DDataSet
-            IRes1DDataSet object associated with ResultGridPoint."""
+            IRes1DDataSet object associated with ResultGridPoint.
 
+        """
         return self.reach
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):

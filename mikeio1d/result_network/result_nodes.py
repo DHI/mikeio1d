@@ -16,8 +16,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultNodes(ResultLocations):
-    """
-    Class for wrapping ResultData nodes.
+    """Class for wrapping ResultData nodes.
 
     By itself it is also a dict, which contains
     mapping between node ID and IRes1DNode object.
@@ -32,6 +31,7 @@ class ResultNodes(ResultLocations):
     node_label : str
         A label, which is appended if the node name starts
         with a number. The value used is node_label = 'n_'
+
     """
 
     def __init__(self, res1d):
@@ -47,8 +47,7 @@ class ResultNodes(ResultLocations):
         self._geometries = None
 
     def set_nodes(self):
-        """
-        Set attributes to the current ResultNodes object based
+        """Set attributes to the current ResultNodes object based
         on the node ID.
         """
         for node in self.data.Nodes:
@@ -59,8 +58,7 @@ class ResultNodes(ResultLocations):
             setattr(self, result_node_attribute_string, result_node)
 
     def set_res1d_node_to_dict(self, result_node):
-        """
-        Create a dict entry from node ID to ResultNode object.
+        """Create a dict entry from node ID to ResultNode object.
         """
         self[result_node.id] = result_node
 
@@ -70,8 +68,7 @@ class ResultNodes(ResultLocations):
         agg_kwargs: Dict[str : str | Callable] = {},
         include_derived: bool = False,
     ) -> GeoDataFrame:
-        """
-        Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.
+        """Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.
 
         By default, quantities are not included. To include quantities, use the `agg` and `agg_kwargs` parameters.
 
@@ -81,7 +78,8 @@ class ResultNodes(ResultLocations):
             Defines how to aggregate the quantities in time and space.
             Accepts any str or callable that is accepted by pandas.DataFrame.agg.
 
-            Examples:
+        Examples
+        --------
             - 'mean'  : mean value of all quantities
             - 'max'   : maximum value of all quantities
             -  np.max : maximum value of all quantities
@@ -103,6 +101,7 @@ class ResultNodes(ResultLocations):
 
         # Convert nodes to a GeoDataFrame (with quantities)
         >>> gdf = res1d.nodes.to_geopandas(agg='mean')
+
         """
         from ..geometry.geopandas import GeoPandasNodesConverter
 

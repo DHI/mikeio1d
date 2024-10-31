@@ -14,13 +14,13 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultNode(ResultLocation):
-    """
-    Class for wrapping a single ResultData node.
+    """Class for wrapping a single ResultData node.
 
     Parameters
     ----------
     res1d : Res1D
         Res1D object the node belongs to.
+
     """
 
     def __init__(self, node, res1d):
@@ -57,8 +57,9 @@ class ResultNode(ResultLocation):
         Returns
         -------
         IRes1DDataSet
-            IRes1DDataSet object associated with ResultNode."""
+            IRes1DDataSet object associated with ResultNode.
 
+        """
         return self._node
 
     def set_static_attributes(self):
@@ -97,8 +98,7 @@ class ResultNode(ResultLocation):
 
     @property
     def geometry(self) -> NodePoint:
-        """
-        A geometric representation of the node. Requires shapely.
+        """A geometric representation of the node. Requires shapely.
         """
         try_import_shapely()
         from ..geometry import NodePoint

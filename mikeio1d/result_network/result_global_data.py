@@ -4,8 +4,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultGlobalData(ResultLocation):
-    """
-    Class for wrapping ResultData global data items.
+    """Class for wrapping ResultData global data items.
 
     By itself it is also a dict, which contains
     mapping between data item quantity ID and IDataItem object.
@@ -18,6 +17,7 @@ class ResultGlobalData(ResultLocation):
         A wrapper object for all global data items.
     res1d : Res1D
         Res1D object the global data belongs to.
+
     """
 
     def __init__(self, data_item, global_datas, res1d):
@@ -38,13 +38,13 @@ class ResultGlobalData(ResultLocation):
         Returns
         -------
         IRes1DDataSet
-            IRes1DDataSet object associated with ResultGlobalData."""
+            IRes1DDataSet object associated with ResultGlobalData.
 
+        """
         return self.res1d.data.GlobalData
 
     def set_quantities(self):
-        """
-        Override of base set_quantities.
+        """Override of base set_quantities.
         Here only a single data item is used for ResultGlobalData.
         Also the quantity attribute is assigned to self.global_data.
         """

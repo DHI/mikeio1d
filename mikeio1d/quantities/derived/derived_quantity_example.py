@@ -25,8 +25,7 @@ class ExampleDerivedQuantity(DerivedQuantity):
     _SOURCE_QUANTITY = "WaterLevel"
 
     def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
-        """
-        Transform the source quantities into the derived quantity.
+        """Transform the source quantities into the derived quantity.
 
         Parameters
         ----------
@@ -40,8 +39,8 @@ class ExampleDerivedQuantity(DerivedQuantity):
         pd.DataFrame
             A DataFrame containing the derived quantity. Must be the same shape as df_source.
             Additionally, the columns of the DataFrame must be in the same order as df_source.
-        """
 
+        """
         # Replace with your derivation logic
         df_derived = df_source + 1
 

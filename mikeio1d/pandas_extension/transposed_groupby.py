@@ -2,8 +2,7 @@ import pandas as pd
 
 
 class TransposedGroupBy:
-    """
-    Same as pandas.DataFrameGroupBy, but returns the transpose of the result.
+    """Same as pandas.DataFrameGroupBy, but returns the transpose of the result.
 
     Useful where a groupby is performed on a transposed DataFrame, and after
     aggregation the result should be transposed back.
@@ -19,6 +18,7 @@ class TransposedGroupBy:
     >>> groupby = TransposedGroupBy(df.T.groupby(['quantity]))
     >>> groupby.agg(['mean', 'max'])
     ... # performs agg function, then returns the transpose of the result.
+
     """
 
     def __init__(self, transposed_groupby):

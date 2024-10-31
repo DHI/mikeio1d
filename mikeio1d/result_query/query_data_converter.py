@@ -46,8 +46,7 @@ class QueryDataConverter:
     def convert_queries_to_time_series_ids(
         res1d: Res1D, queries: list[QueryData]
     ) -> List[TimeSeriesId]:
-        """
-        Convert queries to TimeSeriesId objects.
+        """Convert queries to TimeSeriesId objects.
 
         Parameters
         ----------
@@ -60,13 +59,13 @@ class QueryDataConverter:
         -------
         List[TimeSeriesId]
             List of timeseries ids.
+
         """
         return [QueryDataConverter(query).to_timeseries_id(res1d) for query in queries]
 
     @staticmethod
     def convert_time_series_id_to_query(time_series_id: TimeSeriesId) -> QueryData:
-        """
-        Convert TimeSeriesId object to QueryData object.
+        """Convert TimeSeriesId object to QueryData object.
 
         Parameters
         ----------
@@ -77,5 +76,6 @@ class QueryDataConverter:
         -------
         QueryData
             QueryData object.
+
         """
         return QueryData.from_timeseries_id(time_series_id)

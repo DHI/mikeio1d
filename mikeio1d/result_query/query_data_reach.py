@@ -30,6 +30,7 @@ class QueryDataReach(QueryData):
     Examples
     --------
     `QueryDataReach('WaterLevel', 'reach1', 10)` is a valid query.
+
     """
 
     def __init__(self, quantity, name=None, chainage=None, validate=True):

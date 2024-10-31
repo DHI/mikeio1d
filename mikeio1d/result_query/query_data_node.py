@@ -25,6 +25,7 @@ class QueryDataNode(QueryData):
     Examples
     --------
     `QueryDataNode('WaterLevel', 'node1')` is a valid query.
+
     """
 
     def __init__(self, quantity, name=None, validate=True):

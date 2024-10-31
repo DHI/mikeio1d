@@ -17,8 +17,7 @@ from ..quantities import TimeSeriesId
 
 
 class QueryData(ABC):
-    """
-    Base query class that declares what data to extract from a .res1d file.
+    """Base query class that declares what data to extract from a .res1d file.
 
     Parameters
     ----------
@@ -28,6 +27,7 @@ class QueryData(ABC):
         Name or ID of location under interest.
     validate: bool
         Flag specifying to validate the query.
+
     """
 
     delete_value = -1e-30

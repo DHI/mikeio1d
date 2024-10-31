@@ -34,6 +34,7 @@ class QueryDataStructure(QueryDataReach):
     Examples
     --------
     `QueryDataStructure('DischargeInStructure', 'structure1')` is a valid query.
+
     """
 
     def __init__(self, quantity, structure=None, name=None, chainage=None, validate=True):

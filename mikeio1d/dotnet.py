@@ -60,8 +60,8 @@ def from_dotnet_datetime(x, round_to_milliseconds=True):
 
 
 def asNumpyArray(x):
-    """
-    Convert .NET array to numpy array
+    """Convert .NET array to numpy array
+
     Parameters
     ----------
     x : System.Array
@@ -74,6 +74,7 @@ def asNumpyArray(x):
     -----
     Given a CLR `System.Array` returns a `numpy.ndarray`.  See _MAP_NET_NP for
     the mapping of CLR types to Numpy dtypes.
+
     """
     dims = np.empty(x.Rank, dtype=int)
     for i in range(x.Rank):
@@ -99,8 +100,7 @@ def asNumpyArray(x):
 
 
 def to_dotnet_array(x):
-    """
-    Convert numpy array to .NET array with same data type (single, double,...)
+    """Convert numpy array to .NET array with same data type (single, double,...)
 
     Parameters
     ----------
@@ -114,6 +114,7 @@ def to_dotnet_array(x):
     -----
     Given a `numpy.ndarray` returns a CLR `System.Array`.  See _MAP_NP_NET for
     the mapping of Numpy dtypes to CLR types.
+
     """
     dims = x.shape
     dtype = x.dtype
@@ -152,8 +153,7 @@ def to_dotnet_float_array(x):
 
 
 def to_numpy(src):
-    """
-    Convert .NET array to numpy array
+    """Convert .NET array to numpy array
 
     Parameters
     ----------
@@ -164,7 +164,6 @@ def to_numpy(src):
     np.ndarray
 
     """
-
     src_hndl = GCHandle.Alloc(src, GCHandleType.Pinned)
     try:
         src_ptr = src_hndl.AddrOfPinnedObject().ToInt64()
@@ -179,8 +178,7 @@ def to_numpy(src):
 
 
 def pythonnet_implementation(clr_object):
-    """
-    Retrieve actual .NET object implementation.
+    """Retrieve actual .NET object implementation.
     Relevant for pythonnet versions 3.0 and above.
 
     Parameters

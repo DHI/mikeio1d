@@ -46,8 +46,7 @@ class ColumnMode(str, Enum):
 
 
 class ResultReader(ABC):
-    """
-    Class for reading the ResultData object TimeData
+    """Class for reading the ResultData object TimeData
     into Pandas data frame.
 
     Parameters
@@ -72,6 +71,7 @@ class ResultReader(ABC):
         (and optionally chainage) in the data frame label.
     put_chainage_in_col_name : bool
         Flag specifying to add chainage into data frame column label.
+
     """
 
     def __init__(
@@ -159,8 +159,7 @@ class ResultReader(ABC):
         self.searcher = ResultDataSearch(self.data)
 
     def _setup_filter(self):
-        """
-        Setup the filter for result data object.
+        """Setup the filter for result data object.
         """
         if not self.use_filter:
             return
@@ -190,8 +189,7 @@ class ResultReader(ABC):
         timeseries_ids: List[TimeSeriesId] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
-        """
-        Read the time series data into a data frame.
+        """Read the time series data into a data frame.
 
         Parameters
         ----------
@@ -204,13 +202,13 @@ class ResultReader(ABC):
         Returns
         -------
         pd.DataFrame
+
         """
         ...
 
     @abstractmethod
     def read_all(self, column_mode: Optional[str | ColumnMode]) -> pd.DataFrame:
-        """
-        Read all time series data into a data frame.
+        """Read all time series data into a data frame.
 
         Parameters
         ----------
@@ -220,6 +218,7 @@ class ResultReader(ABC):
         Returns
         -------
         pd.DataFrame
+
         """
         ...
 
@@ -310,6 +309,7 @@ class ResultReader(ABC):
         column_level_names : list of str, optional
             The column level names of the data frame, by default None.
             Only used if the data frame has a MultiIndex column index.
+
         """
         if isinstance(quantity_column, str):
             time_suffix = f"Time{self.col_name_delimiter}"

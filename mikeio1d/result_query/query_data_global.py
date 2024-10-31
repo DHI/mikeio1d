@@ -23,6 +23,7 @@ class QueryDataGlobal(QueryData):
     Examples
     --------
     `QueryDataGlobal('TimeStep')` is a valid query.
+
     """
 
     def __init__(self, quantity, validate=True):

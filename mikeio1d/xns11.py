@@ -41,9 +41,11 @@ def read(file_path: str | Path, queries: QueryData | List[QueryData]) -> pd.Data
         full path and file name to the xns11 file.
     queries: a single query or a list of queries
         `QueryData` objects that define the requested data.
+
     Returns
     -------
     pd.DataFrame
+
     """
     queries = queries if isinstance(queries, list) else [queries]
     with open(file_path) as xns11:
@@ -69,6 +71,7 @@ def open(file_path: str | Path) -> Xns11:
     >>> with open("file.xns11") as x11:
     >>>     print(x11.topoid_names)
     ['topoid1', 'topoid2']
+
     """
     if not os.path.exists(file_path):
         raise FileExistsError(f"File {file_path} does not exist.")
@@ -77,8 +80,7 @@ def open(file_path: str | Path) -> Xns11:
 
 
 class Xns11:
-    """
-    A class to read and write xns11 files.
+    """A class to read and write xns11 files.
 
     Parameters
     ----------
@@ -229,8 +231,7 @@ class Xns11:
 
     @property
     def interpolation_type(self):
-        """
-        Defines how an interpolated cross section are interpolated.
+        """Defines how an interpolated cross section are interpolated.
 
         Returns
         -------
@@ -243,6 +244,7 @@ class Xns11:
                 Interpolates the raw data and calculates processed data from the new raw data.
             - Middling: 2
                 Interpolation happens during runtime by requesting values at neighbour cross sections and interpolate between those.
+
         """
         return self._cross_section_data.XSInterpolationType
 
@@ -392,12 +394,10 @@ class Xns11:
         return built_queries
 
     def _find_points(self, queries, chainage_tolerance=0.1):
-        """
-        From a list of queries returns a dictionary with the required
+        """From a list of queries returns a dictionary with the required
         information for each requested point to extract its geometry
         later on.
         """
-
         PointInfo = namedtuple("PointInfo", ["index", "value"])
 
         found_points = defaultdict(list)
@@ -436,9 +436,11 @@ class Xns11:
         ----------
         queries: list
             `QueryData` objects that define the requested data.
+
         Returns
         -------
         pd.DataFrame
+
         """
         self._validate_queries(queries)
         built_queries = self._build_queries(queries)
@@ -465,6 +467,7 @@ class QueryData:
     >>> QueryData('topoid1', 'reach1', 10) # is a valid query.
     >>> QueryData('topoid1', 'reach1')     # requests all the points for `topoid1` of `reach1`.
     >>> QueryData('topoid1') requests all the points for `topid1` of the file.
+
     """
 
     def __init__(self, topoid_name, reach_name=None, chainage=None):
