@@ -19,8 +19,7 @@ from DHI.Mike1D.Generic import IQuantity
 
 
 class ResultQuantity:
-    """
-    Class for wrapping a single ResultData data item quantity.
+    """Class for wrapping a single ResultData data item quantity.
 
     ResultQuantity objects are the last attributes assigned to a network.
     They have the ability to add a query.
@@ -45,6 +44,7 @@ class ResultQuantity:
         A unique TimeSeriesId object corresponding to the data item. This is
         unmutable and set when the ResultQuantity is added to a network. A value
         of None indicates that the ResultQuantity has not been added to a network.
+
     """
 
     def __init__(
@@ -68,8 +68,7 @@ class ResultQuantity:
 
     @staticmethod
     def prettify_quantity(quantity: ResultQuantity | IQuantity, latex_format=False) -> str:
-        """
-        Get a pretty string representation of a ResultQuantity's type and unit.
+        """Get a pretty string representation of a ResultQuantity's type and unit.
 
         Parameters
         ----------
@@ -77,10 +76,12 @@ class ResultQuantity:
             ResultQuantity object or DHI.Mike1D.Generic.IQuantity object.
         latex_format: bool, optional
             If True, the unit abbreviation will use LaTeX-formatted text.
+
         Returns
         -------
         str
             A string representation of the quantity type and unit.
+
         """
         if isinstance(quantity, ResultQuantity):
             m1d_quantity = quantity.data_item.Quantity
@@ -116,6 +117,7 @@ class ResultQuantity:
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
+
         """
         return self.res1d.read(self.timeseries_id, column_mode=column_mode)
 

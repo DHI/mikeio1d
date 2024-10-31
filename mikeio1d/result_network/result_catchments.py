@@ -15,8 +15,7 @@ from ..pandas_extension import ResultFrameAggregator
 
 
 class ResultCatchments(ResultLocations):
-    """
-    Class for wrapping ResultData catchments.
+    """Class for wrapping ResultData catchments.
 
     By itself it is also a dict, which contains
     mapping between catchment ID and IRes1DCatchment object.
@@ -31,6 +30,7 @@ class ResultCatchments(ResultLocations):
     catchment_label : str
         A label, which is appended if the catchment name starts
         with a number. The value used is catchment_label = 'c_'
+
     """
 
     def __init__(self, res1d):
@@ -45,8 +45,7 @@ class ResultCatchments(ResultLocations):
         self._geometries = None
 
     def set_catchments(self):
-        """
-        Set attributes to the current ResultCatchments object based
+        """Set attributes to the current ResultCatchments object based
         on the catchment ID.
         """
         for catchment in self.data.Catchments:
@@ -59,8 +58,7 @@ class ResultCatchments(ResultLocations):
             setattr(self, result_catchment_attribute_string, result_catchment)
 
     def set_res1d_catchment_to_dict(self, catchment):
-        """
-        Create a dict entry from catchment ID to ResultCatchment object.
+        """Create a dict entry from catchment ID to ResultCatchment object.
         """
         self[catchment.id] = catchment
 
@@ -69,8 +67,7 @@ class ResultCatchments(ResultLocations):
         agg: str | Callable = None,
         agg_kwargs: Dict[str : str | Callable] = {},
     ) -> GeoDataFrame:
-        """
-        Convert catchments to a geopandas.GeoDataFrame object.
+        """Convert catchments to a geopandas.GeoDataFrame object.
 
         By default, quantities are not included. To include quantities, use the `agg` and `agg_kwargs` parameters.
 
@@ -80,7 +77,8 @@ class ResultCatchments(ResultLocations):
             Defines how to aggregate the quantities in time and space.
             Accepts any str or callable that is accepted by pandas.DataFrame.agg.
 
-            Examples:
+        Examples
+        --------
             - 'mean'  : mean value of all quantities
             - 'max'   : maximum value of all quantities
             -  np.max : maximum value of all quantities
@@ -92,6 +90,7 @@ class ResultCatchments(ResultLocations):
         -------
         gdf : geopandas.GeoDataFrame
             A GeoDataFrame object with catchments as Polygon geometries.
+
         """
         from ..geometry.geopandas import GeoPandasCatchmentsConverter
 

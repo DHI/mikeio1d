@@ -11,13 +11,13 @@ from shapely.geometry import LineString
 
 
 class CrossSectionGeometry:
-    """
-    A utility class for working with cross section geometries.
+    """A utility class for working with cross section geometries.
 
     Parameters
     ----------
     m1d_cross_section : ICrossSection
         A cross section from MIKE 1D.
+
     """
 
     def __init__(self, m1d_cross_section):
@@ -25,13 +25,13 @@ class CrossSectionGeometry:
 
     @property
     def coords(self) -> List[Tuple[float, float]]:
-        """
-        Get the coordinates of the cross section.
+        """Get the coordinates of the cross section.
 
         Returns
         -------
         list of tuples
             List of (x, y) coordinates.
+
         """
         if self._m1d_cross_section.Coordinates is None:
             return []

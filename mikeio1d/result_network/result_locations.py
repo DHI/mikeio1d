@@ -30,8 +30,7 @@ from ..quantities import DerivedQuantity
 
 
 class ResultLocations(Dict[str, ResultLocation]):
-    """
-    A base class for a network locations (nodes, reaches)
+    """A base class for a network locations (nodes, reaches)
     or a catchments wrapper class.
 
     Parameters
@@ -52,6 +51,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         Dictionary from quantity id to a list of ResultQuantity objects.
     result_quantity_derived_map : dict
         Dictionary from derived quantity id to a ResultQuantityDerivedCollection object.
+
     """
 
     def __init__(self, res1d: Res1D):
@@ -114,8 +114,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         column_mode: Optional[str | ColumnMode] = None,
         include_derived: bool = False,
     ) -> pd.DataFrame:
-        """
-        Read the time series data for all quantities at these locations into a DataFrame.
+        """Read the time series data for all quantities at these locations into a DataFrame.
 
         Parameters
         ----------
@@ -127,6 +126,7 @@ class ResultLocations(Dict[str, ResultLocation]):
 
         include_derived: bool, default False
             Include derived quantities.
+
         """
         result_quantities = [q for qlist in self.result_quantity_map.values() for q in qlist]
         timesries_ids = [q.timeseries_id for q in result_quantities]
@@ -154,8 +154,7 @@ class ResultLocations(Dict[str, ResultLocation]):
             setattr(self, result_quantity_attribute_string, result_quantity_collection)
 
     def _can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
-        """
-        Check if a derived quantity can be added to the result locations."""
+        """Check if a derived quantity can be added to the result locations."""
         if self.group not in derived_quantity.groups:
             return False
         elif derived_quantity.source_quantity not in self.result_quantity_map:
@@ -163,13 +162,13 @@ class ResultLocations(Dict[str, ResultLocation]):
         return True
 
     def add_derived_quantity(self, derived_quantity: DerivedQuantity):
-        """
-        Add a derived quantity to the result network.
+        """Add a derived quantity to the result network.
 
         Parameters
         ----------
         derived_quantity : DerivedQuantity
             Derived quantity to be added to the result network.
+
         """
         if self._can_add_derived_quantity(derived_quantity):
             self.set_quantity_derived(derived_quantity)
@@ -178,13 +177,13 @@ class ResultLocations(Dict[str, ResultLocation]):
             location.add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
-        """
-        Remove a derived quantity from the result network.
+        """Remove a derived quantity from the result network.
 
         Parameters
         ----------
         derived_quantity : DerivedQuantity or str
             Derived quantity to be removed from the result network. Either a DerivedQuantity object or its name.
+
         """
         # remove from self.result_quantity_derived_map
         if isinstance(derived_quantity, DerivedQuantity):
@@ -216,8 +215,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         setattr(self, result_quantity_attribute_string, result_quantity_derived)
 
     def set_res1d_object_to_dict(self, dict_key, obj):
-        """
-        Create a dict entry from a key name to an object
+        """Create a dict entry from a key name to an object
         or a list of objects.
         """
         obj = impl(obj)

@@ -5,8 +5,7 @@ import pythonnet
 
 
 class MikePath:
-    """
-    Class for handling MIKE binary paths.
+    """Class for handling MIKE binary paths.
 
     Attributes
     ----------
@@ -20,6 +19,7 @@ class MikePath:
         String which will be appended to mike_install_path for full location of binaries.
     mike_bin_path: string
         Actual path for MIKE binaries, which is either mikeio1d_bin_path or mike_install_path/bin/x64.
+
     """
 
     is_linux = platform.system() == "Linux"
@@ -43,14 +43,14 @@ class MikePath:
 
     @staticmethod
     def setup_mike_installation(syspath):
-        """
-        Adds MIKE installation bin path and MIKE IO 1D bin path to the
+        """Adds MIKE installation bin path and MIKE IO 1D bin path to the
         given PATH variable.
 
         Parameters
         ----------
         syspath: list of str
             List of strings defining PATH variable.
+
         """
         MikePath.update_mike_bin_to_mikepluspy_bin_if_used()
 
@@ -65,8 +65,7 @@ class MikePath:
 
     @staticmethod
     def update_mike_bin_to_mikepluspy_bin_if_used():
-        """
-        Updates the path for MIKE assemblies to the ones used by MIKE+Py package.
+        """Updates the path for MIKE assemblies to the ones used by MIKE+Py package.
         This requires that the MIKE+Py package was already loaded.
         """
         mikepluspy = sys.modules.get("mikeplus")

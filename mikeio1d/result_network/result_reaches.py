@@ -16,8 +16,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultReaches(ResultLocations):
-    """
-    Class for wrapping ResultData reaches.
+    """Class for wrapping ResultData reaches.
 
     By itself it is also a dict, which contains
     mapping between reach name and IRes1DReach object
@@ -38,6 +37,7 @@ class ResultReaches(ResultLocations):
         Dictionary from reach name to a list of ResultReach objects.
         This is needed, because the reach name is not necessarily unique and
         several reaches could have the same name.
+
     """
 
     def __init__(self, res1d):
@@ -51,8 +51,7 @@ class ResultReaches(ResultLocations):
         self.set_quantity_collections()
 
     def set_reaches(self):
-        """
-        Set attributes to the current ResultReaches object based
+        """Set attributes to the current ResultReaches object based
         on the reach name.
         """
         for reach in self.data.Reaches:
@@ -68,8 +67,7 @@ class ResultReaches(ResultLocations):
             ResultLocations.set_quantity_collections(result_reach)
 
     def get_or_create_result_reach(self, reach):
-        """
-        Create or get already existing ResultReach object.
+        """Create or get already existing ResultReach object.
         There potentially could be just a single ResultReach object,
         for many IRes1DReach object, which have the same name.
 
@@ -92,8 +90,7 @@ class ResultReaches(ResultLocations):
         segmented: bool = True,
         include_derived: bool = False,
     ) -> GeoDataFrame:
-        """
-        Convert reaches to a geopandas.GeoDataFrame object.
+        """Convert reaches to a geopandas.GeoDataFrame object.
 
         By default, quantities are not included. To include quantities, use the `agg` and `agg_kwargs` parameters.
 
@@ -103,7 +100,8 @@ class ResultReaches(ResultLocations):
             Defines how to aggregate the quantities in time and space.
             Accepts any str or callable that is accepted by pandas.DataFrame.agg.
 
-            Examples:
+        Examples
+        --------
             - 'mean'  : mean value of all quantities
             - 'max'   : maximum value of all quantities
             -  np.max : maximum value of all quantities
@@ -128,6 +126,7 @@ class ResultReaches(ResultLocations):
 
         # Convert reaches to a GeoDataFrame with aggregated quantities
         >>> gdf = res1d.reaches.to_geopandas(agg='mean')
+
         """
         from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
         from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented

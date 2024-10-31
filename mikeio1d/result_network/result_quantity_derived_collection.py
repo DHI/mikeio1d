@@ -21,7 +21,6 @@ class ResultQuantityDerivedCollection(ResultQuantityDerived):
         self.res1d: Res1D = res1d
 
     def _create_source_dataframe(self) -> pd.DataFrame:
-        """
-        Create a data frame with the source quantities for the derived quantity.
+        """Create a data frame with the source quantities for the derived quantity.
         """
         return self.derived_quantity.create_source_dataframe_for_locations(self.result_locations)

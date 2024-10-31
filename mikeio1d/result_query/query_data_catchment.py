@@ -25,6 +25,7 @@ class QueryDataCatchment(QueryData):
     Examples
     --------
     `QueryDataCatchment('TotalRunoff', 'catchment1')` is a valid query.
+
     """
 
     def __init__(self, quantity, name=None, validate=True):

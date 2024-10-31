@@ -5,8 +5,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultStructures(ResultLocations):
-    """
-    Class for wrapping ResultData structure data items.
+    """Class for wrapping ResultData structure data items.
 
     By itself it is also a dict, which contains
     mapping between structure ID and a ResultStructure object.
@@ -23,6 +22,7 @@ class ResultStructures(ResultLocations):
         with a number. The value used is structure_label = 's_'
     result_structure_map : dict
         Dictionary from structure ID to a ResultStructure object.
+
     """
 
     def __init__(self, res1d):
@@ -36,8 +36,7 @@ class ResultStructures(ResultLocations):
         self.set_quantity_collections()
 
     def set_structures(self):
-        """
-        Set attributes to the current ResultReaches object based
+        """Set attributes to the current ResultReaches object based
         on the reach name.
         """
         for reach in self.data.Reaches:
@@ -70,8 +69,7 @@ class ResultStructures(ResultLocations):
         return False
 
     def get_or_create_result_structure(self, reach, data_item):
-        """
-        Create or get already existing ResultStructure object.
+        """Create or get already existing ResultStructure object.
 
         Also update a result_structure_map dict entry from structure ID
         to a ResultStructure object.

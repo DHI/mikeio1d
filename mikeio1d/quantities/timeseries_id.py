@@ -67,8 +67,7 @@ class TimeSeriesIdGroup(str, Enum):
 
 @dataclass(frozen=True)
 class TimeSeriesId:
-    """
-    A unique identifier for a timeseries result on the Mike 1D network.
+    """A unique identifier for a timeseries result on the Mike 1D network.
     """
 
     quantity: str = ""
@@ -146,6 +145,7 @@ class TimeSeriesId:
         -------
         bool
             True if the TimeSeriesId is valid, False otherwise.
+
         """
         quantity_map = res1d.network.result_quantity_map
         result_quantity = quantity_map.get(self, None)
@@ -163,6 +163,7 @@ class TimeSeriesId:
         DataEntry
             A DataEntry object containing the assosciated Mike1D objects,
             or None if the TimeSeriesId is derived.
+
         """
         if self.derived:
             raise ValueError("Cannot convert derived TimeSeriesId to DataEntry")
@@ -179,6 +180,7 @@ class TimeSeriesId:
         ResultQuantity
             A ResultQuantity object containing the assosciated Mike1D objects,
             or None if the TimeSeriesId is derived.
+
         """
         if self.derived:
             raise ValueError("Cannot convert derived TimeSeriesId to ResultQuantity")
@@ -192,13 +194,13 @@ class TimeSeriesId:
         return result_quantity
 
     def get_location(self, res1d: Res1D) -> ResultLocation:
-        """
-        Gets the ResultLocation associated with the TimeSeriesId.
+        """Gets the ResultLocation associated with the TimeSeriesId.
 
         Returns
         -------
         ResultLocation
             The ResultLocation associated with the TimeSeriesId (e.g. ResultNode, ResultReach, etc.)
+
         """
         if self.derived:
             raise NotImplementedError("Cannot convert derived TimeSeriesId to ResultLocation")
@@ -215,6 +217,7 @@ class TimeSeriesId:
         TimeSeriesId
             A TimeSeriesId object with the same fields as the original,
             except with duplicate incremented by 1.
+
         """
         return TimeSeriesId(
             quantity=self.quantity,
@@ -234,6 +237,7 @@ class TimeSeriesId:
         TimeSeriesId
             A TimeSeriesId object with the same fields as the original,
             except with duplicate decremented by 1.
+
         """
         if self.duplicate == 0:
             raise ValueError("Cannot decrement duplicate below 0")
@@ -270,8 +274,7 @@ class TimeSeriesId:
 
     @staticmethod
     def to_multiindex(timeseries_ids: List[TimeSeriesId], compact=False) -> pd.MultiIndex:
-        """
-        Convert a list of TimeSeriesId objects to a pandas MultiIndex.
+        """Convert a list of TimeSeriesId objects to a pandas MultiIndex.
 
         Parameters
         ----------
@@ -284,6 +287,7 @@ class TimeSeriesId:
         -------
         pd.MultiIndex
             The converted MultiIndex.
+
         """
         index = pd.MultiIndex.from_tuples(
             [tsid.astuple() for tsid in timeseries_ids],
@@ -361,8 +365,9 @@ class TimeSeriesId:
         m1d_dataitem : IRes1DDataItem
             The dataitem to create a TimeSeriesId for.
         element_index : int
-            The index of the element within the IRes1DDataItem."""
+            The index of the element within the IRes1DDataItem.
 
+        """
         quantity = m1d_dataitem.Quantity.Id
         group = TimeSeriesIdGroup.from_m1d_data_item(m1d_dataitem)
 
@@ -396,8 +401,7 @@ class TimeSeriesId:
 
     @staticmethod
     def create_reach_span_tag(m1d_dataset) -> str:
-        """
-        Creates a tag for an IRes1DReach object based on its chainage span.
+        """Creates a tag for an IRes1DReach object based on its chainage span.
 
         Parameters
         ----------
@@ -408,6 +412,7 @@ class TimeSeriesId:
         -------
         str
             The tag for the reach (e.g. '0.0-100.0')
+
         """
         if not hasattr(m1d_dataset, "GridPoints"):
             return ""
@@ -451,8 +456,9 @@ class TimeSeriesId:
         item_id : str, optional
             The item id to prepend to the name, by default None
         delimiter : str, optional
-            The delimiter to use between the item id and the name"""
+            The delimiter to use between the item id and the name
 
+        """
         name = None
 
         if hasattr(m1d_dataset, "Name"):
@@ -472,8 +478,7 @@ class TimeSeriesId:
 
     @staticmethod
     def try_from_obj(obj: Any) -> TimeSeriesId:
-        """
-        Try to convert an object to a TimeSeriesId object.
+        """Try to convert an object to a TimeSeriesId object.
 
         Parameters
         ----------
@@ -484,6 +489,7 @@ class TimeSeriesId:
         -------
         TimeSeriesId
             The converted TimeSeriesId object.
+
         """
         if isinstance(obj, TimeSeriesId):
             return obj

@@ -5,8 +5,7 @@ from ..quantities import TimeSeriesId
 
 
 class ResultWriter:
-    """
-    Class for modifying the ResultData object TimeData
+    """Class for modifying the ResultData object TimeData
     using the value of Pandas data frame.
 
     Parameters
@@ -18,6 +17,7 @@ class ResultWriter:
     ----------
     result_network : ResultNetwork
         ResultNetwork object corresponding to res1d.
+
     """
 
     def __init__(self, res1d):
@@ -25,14 +25,14 @@ class ResultWriter:
         self.result_network = res1d.network
 
     def modify(self, dataframe: pd.DataFrame):
-        """
-        Modifies the ResultData object TimeData based on the provided data frame.
+        """Modifies the ResultData object TimeData based on the provided data frame.
         It will override the relevant TimeData values by the values of the data frame.
 
         Parameters
         ----------
         dataframe : pandas.DataFrame
             Pandas dataframe object with TimeSeriesId compatible multiindex.
+
         """
         try:
             TimeSeriesId.try_from_obj(dataframe.columns[0])
@@ -50,8 +50,7 @@ class ResultWriter:
             self.set_values(time_index, values, data_item, element_index)
 
     def set_values(self, time_index, values, data_item, element_index):
-        """
-        Modifies the TimeData value of the data item for given element index.
+        """Modifies the TimeData value of the data item for given element index.
 
         Parameters
         ----------
@@ -63,6 +62,7 @@ class ResultWriter:
             MIKE 1D IDataItem object.
         element_index : int
             Element index into data item.
+
         """
         if len(values) == data_item.TimeData.NumberOfTimeSteps:
             self.set_values_all(values, data_item, element_index)
@@ -70,11 +70,9 @@ class ResultWriter:
             self.set_values_indexed(time_index, values, data_item, element_index)
 
     def set_values_all(self, values, data_item, element_index):
-        """
-        Sets the values of all entries in TimeData
+        """Sets the values of all entries in TimeData
         of the data item for given element index.
         """
-
         # Pick the first available value.
         # TODO: Some of the query IDs can be not unique. Figure out how to handle this case.
         values_count = len(values)
@@ -85,8 +83,7 @@ class ResultWriter:
             data_item.TimeData.SetValue(i, element_index, value)
 
     def set_values_indexed(self, time_index, values, data_item, element_index):
-        """
-        Sets only the provided for time_index and values in TimeData
+        """Sets only the provided for time_index and values in TimeData
         of the data item for given element index.
         """
         res1d_time_index = self.res1d.time_index

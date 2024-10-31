@@ -1,5 +1,4 @@
-"""
-MIKE.NET: Module for loading MIKE software .NET libraries
+"""MIKE.NET: Module for loading MIKE software .NET libraries
 =========================================================
 
 MIKE.NET is a module which creates helper methods for loading and referencing

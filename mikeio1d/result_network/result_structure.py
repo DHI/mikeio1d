@@ -7,8 +7,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultStructure(ResultLocation):
-    """
-    Class for wrapping a list of ResultData structure data items
+    """Class for wrapping a list of ResultData structure data items
     belonging to the same structure.
 
     Parameters
@@ -28,6 +27,7 @@ class ResultStructure(ResultLocation):
         A dictionary from quantity id to a data item.
     chainage : float
         Chainage where the structure is located on the reach.
+
     """
 
     def __init__(self, structure_id, reach, data_items, res1d):
@@ -70,8 +70,9 @@ class ResultStructure(ResultLocation):
         Returns
         -------
         IRes1DDataSet
-            IRes1DDataSet object associated with ResultStructure."""
+            IRes1DDataSet object associated with ResultStructure.
 
+        """
         return self.reach
 
     def set_static_attributes(self):
@@ -91,13 +92,13 @@ class ResultStructure(ResultLocation):
         self.add_to_network_result_quantity_map(result_quantity)
 
     def add_res1d_structure_data_item(self, data_item):
-        """
-        Add a IDataItem to ResultStructure.
+        """Add a IDataItem to ResultStructure.
 
         Parameters
         ----------
         data_item: IDataItem
             A MIKE 1D IDataItem object.
+
         """
         if self.chainage is None:
             index_list = list(data_item.IndexList)
@@ -111,8 +112,7 @@ class ResultStructure(ResultLocation):
 
     @staticmethod
     def get_structure_id(reach, data_item):
-        """
-        Gets structure ID either from IDataItem.ItemId or for structure reaches
+        """Gets structure ID either from IDataItem.ItemId or for structure reaches
         from actual Res1DStructureGridPoint structure.
         """
         if data_item.ItemId is not None:

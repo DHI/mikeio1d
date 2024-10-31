@@ -10,21 +10,20 @@ from shapely.geometry import Polygon
 
 @dataclass(frozen=True)
 class CatchmentGeometry:
-    """
-    A utility class for working with catchment geometries.
+    """A utility class for working with catchment geometries.
 
     Parameters
     ----------
     points : List[Tuple[float, float]]
         List of points (x, y) defining the catchment boundary. The first and last points should be the same.
+
     """
 
     points: List[Tuple[float, float]]
 
     @staticmethod
     def from_res1d_catchment(res1d_catchment) -> CatchmentGeometry:
-        """
-        Create a CatchmentGeometry from an IRes1DCatchment object.
+        """Create a CatchmentGeometry from an IRes1DCatchment object.
         """
         shape = res1d_catchment.Shape[0]  # there will always be one element
         points = []

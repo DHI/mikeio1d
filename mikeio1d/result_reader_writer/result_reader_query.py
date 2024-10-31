@@ -20,8 +20,7 @@ from ..result_query import QueryDataCreator
 
 
 class ResultReaderQuery(ResultReader):
-    """
-    Class for reading the ResultData object TimeData
+    """Class for reading the ResultData object TimeData
     into Pandas data frame using ResultDataQuery object.
     """
 

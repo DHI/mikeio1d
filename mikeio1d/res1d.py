@@ -63,8 +63,7 @@ from DHI.Mike1D.Generic import Connection
 
 
 class Res1D:
-    """
-    Class for reading data from 1D network result files. Currently supported formats are:
+    """Class for reading data from 1D network result files. Currently supported formats are:
 
     * MIKE 1D network and catchment res1d files
     * MIKE 1D Long Term Statistics (LTS) res1d files
@@ -108,6 +107,7 @@ class Res1D:
     >>> times = slice('2020-01-01', '2020-01-02')
     >>> res1d = Res1D('MyRes1D.res1d', nodes=nodes, reaches=reaches, time=times)
     >>> res1d.read()
+
     """
 
     def __init__(
@@ -205,8 +205,7 @@ class Res1D:
         queries: Optional[list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
-        """
-        Reads result data into a pandas DataFrame.
+        """Reads result data into a pandas DataFrame.
 
         Parameters
         ----------
@@ -224,7 +223,7 @@ class Res1D:
         pd.DataFrame
 
         Notes
-        -------
+        -----
         The `queries` parameter is intended for internal use by mikeio1d. It mainly exists for historical
         reasons and is not recommended for general use. The preferred way to query data is via the fluent API,
         e.g. `res.nodes['node1'].WaterLevel.read()`.
@@ -233,8 +232,8 @@ class Res1D:
         --------
         >>> res = Res1D('results.res1d')
         >>> res1d.read()
-        """
 
+        """
         timeseries_ids = self._get_timeseries_ids_to_read(queries)
 
         if len(timeseries_ids) == 0:
@@ -273,6 +272,7 @@ class Res1D:
 
         Returns
         -------
+
         """
         derived_quantity = derived_quantity(self)
         self.network.add_derived_quantity(derived_quantity)
@@ -284,14 +284,14 @@ class Res1D:
         ----------
         derived_quantity : DerivedQuantity | str
             Derived quantity to be removed. Either DerivedQuantity class or its name.
+
         """
         if isinstance(derived_quantity, type) and issubclass(derived_quantity, DerivedQuantity):
             derived_quantity = derived_quantity._NAME
         self.network.remove_derived_quantity(derived_quantity)
 
     def modify(self, data_frame: pd.DataFrame, file_path=None):
-        """
-        Modifies the ResultData object TimeData based on the provided data frame.
+        """Modifies the ResultData object TimeData based on the provided data frame.
 
         Parameters
         ----------
@@ -299,14 +299,14 @@ class Res1D:
             Pandas data frame object with column names based on query labels
         file_path : str
             File path for the new res1d file. Optional.
+
         """
         self.writer.modify(data_frame)
         if file_path is not None:
             self.save(file_path)
 
     def save(self, file_path):
-        """
-        Saves the ResultData to a new res1d file.
+        """Saves the ResultData to a new res1d file.
 
         Useful for persisting modified data, as well as converting supported result
         file types (e.g. res11) into res1d.
@@ -320,6 +320,7 @@ class Res1D:
         --------
         >>> res11_data = Res1D('results.res11')
         >>> res11_data.save('results.res1d')
+
         """
         connection_original = self.data.Connection
         self.data.Connection = Connection.Create(file_path)
@@ -333,8 +334,7 @@ class Res1D:
         time_step_skipping_number=1,
         ext=None,
     ):
-        """
-        Extract given queries to provided file.
+        """Extract given queries to provided file.
         File type is determined from file_path extension.
         The supported formats are:
         * csv
@@ -352,6 +352,7 @@ class Res1D:
         ext : str
             Output file type to use instead of determining it from extension.
             Can be 'csv', 'dfs0', 'txt'.
+
         """
         ext = os.path.splitext(file_path)[-1] if ext is None else ext
 
@@ -395,8 +396,7 @@ class Res1D:
 
     @staticmethod
     def merge(file_names: List[str] | List[Res1D], merged_file_name: str):
-        """
-        Merges res1d files.
+        """Merges res1d files.
 
         It is possible to merge three kinds of result files:
         * Regular res1d (HD, RR, etc.)
@@ -416,6 +416,7 @@ class Res1D:
             List of res1d file names to merge.
         merged_file_name : str
             File name of the res1d file to store the merged data.
+
         """
         file_names = Res1D._convert_res1d_to_str_for_file_names(file_names)
         result_merger = ResultMerger(file_names)
@@ -498,8 +499,7 @@ class Res1D:
 
     @property
     def query(self):
-        """
-        .NET object ResultDataQuery to use for querying the loaded res1d data.
+        """.NET object ResultDataQuery to use for querying the loaded res1d data.
 
         More information about ResultDataQuery class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
@@ -508,8 +508,7 @@ class Res1D:
 
     @property
     def searcher(self):
-        """
-        .NET object ResultDataSearcher to use for searching res1d data items on network.
+        """.NET object ResultDataSearcher to use for searching res1d data items on network.
 
         More information about ResultDataSearcher class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultDataQuery.htm
@@ -518,8 +517,7 @@ class Res1D:
 
     @property
     def data(self):
-        """
-        .NET object ResultData with the loaded res1d data.
+        """.NET object ResultData with the loaded res1d data.
 
         More information about ResultData class see:
         https://manuals.mikepoweredbydhi.help/latest/General/Class_Library/DHI_MIKE1D/html/T_DHI_Mike1D_ResultDataAccess_ResultData.htm

@@ -4,8 +4,7 @@ from enum import IntEnum
 
 
 class ResistanceType(IntEnum):
-    """
-    The type of resistance used in the cross section.
+    """The type of resistance used in the cross section.
 
     This is a simple wrapper of DHI.Mike1D.Generic.ResistanceFormulation
     """
@@ -50,8 +49,7 @@ class ResistanceType(IntEnum):
 
 
 class ResistanceDistribution(IntEnum):
-    """
-    The type of resistance distribution used in the cross section.
+    """The type of resistance distribution used in the cross section.
 
     This is a simple wrapper of DHI.Mike1D.Generic.ResistanceDistribution.
     """
@@ -82,8 +80,7 @@ class ResistanceDistribution(IntEnum):
 
 
 class RadiusType(IntEnum):
-    """
-    The type of hydraulic radius to use in the cross section.
+    """The type of hydraulic radius to use in the cross section.
 
     This is a simple wrapper of DHI.Mike1D.Generic.RadiusType.
     """
@@ -103,8 +100,7 @@ class RadiusType(IntEnum):
 
 
 class ProcessLevelsMethod(IntEnum):
-    """
-    How to generate processing levels.
+    """How to generate processing levels.
 
     This is a simple wrapper of DHI.Mike1D.Generic.ProcessingOption
     """

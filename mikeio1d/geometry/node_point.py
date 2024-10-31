@@ -8,8 +8,7 @@ from shapely.geometry import Point
 
 @dataclass(frozen=True)
 class NodePoint:
-    """
-    A utility class for working with node geometries.
+    """A utility class for working with node geometries.
 
     Parameters
     ----------
@@ -17,6 +16,7 @@ class NodePoint:
         X coordinate
     y : float
         Y coordinate
+
     """
 
     x: float
@@ -24,8 +24,7 @@ class NodePoint:
 
     @staticmethod
     def from_res1d_node(res1d_node) -> NodePoint:
-        """
-        Create a NodePoint from an IRes1DNode object.
+        """Create a NodePoint from an IRes1DNode object.
         """
         xcoord = res1d_node.XCoordinate
         ycoord = res1d_node.YCoordinate

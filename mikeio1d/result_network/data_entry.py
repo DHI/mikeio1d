@@ -11,7 +11,9 @@ class DataEntry(object):
     element_index : int
         Element index of the specific timeseries within IDataItem object.
     m1d_dataset : IRes1DDataset, optional
-        The associated Mike1D IRes1DDataset object, by default None."""
+        The associated Mike1D IRes1DDataset object, by default None.
+
+    """
 
     def __init__(self, data_item, element_index, m1d_dataset=None):
         self.data_item = data_item
@@ -28,7 +30,8 @@ class DataEntry(object):
         Parameters
         ----------
         data_entries : DataEntryNet
-            The DataEntryNet object to append this DataEntry to."""
+            The DataEntryNet object to append this DataEntry to.
 
+        """
         data_entry_net = self.to_dotnet()
         data_entries.Add(data_entry_net)

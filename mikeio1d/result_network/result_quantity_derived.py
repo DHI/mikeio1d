@@ -33,14 +33,12 @@ class ResultQuantityDerived:
         return self.derived_quantity.name
 
     def add(self):
-        """
-        Add a ResultQuantity to ResultNetwork.read_queue.
+        """Add a ResultQuantity to ResultNetwork.read_queue.
         """
         raise NotImplementedError("Derived quantities cannot be added to a network.")
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """
-        Read the time series data into a data frame.
+        """Read the time series data into a data frame.
 
         Parameters
         ----------
@@ -50,8 +48,8 @@ class ResultQuantityDerived:
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
-        """
 
+        """
         df_source = self._create_source_dataframe()
         df_derived = self.derived_quantity.generate(df_source)
         return df_derived.droplevel("derived", axis=1)
@@ -65,7 +63,6 @@ class ResultQuantityDerived:
         return ax
 
     def _create_source_dataframe(self) -> pd.DataFrame:
-        """
-        Create the source DataFrame used to calculate the derived quantity.
+        """Create the source DataFrame used to calculate the derived quantity.
         """
         return self.derived_quantity.create_source_dataframe_for_location(self.result_location)

@@ -16,8 +16,7 @@ from ..dotnet import to_dotnet_datetime
 
 
 class TimeFilter:
-    """
-    Wrapper class for applying time filters to a Filter object.
+    """Wrapper class for applying time filters to a Filter object.
     """
 
     def __init__(self, filter):
@@ -25,7 +24,6 @@ class TimeFilter:
 
     def setup_from_user_params(self, *, time: Union[None, slice, tuple, list]):
         """Sets up the filter using a user supplied parameters."""
-
         if time is None:
             return
 

@@ -15,8 +15,7 @@ class ReachPointType(Enum):
 
 @dataclass(frozen=True, order=True)
 class ReachPoint:
-    """
-    A utility class for working with points along a reach.
+    """A utility class for working with points along a reach.
 
     Parameters
     ----------
@@ -30,6 +29,7 @@ class ReachPoint:
         Y coordinate
     z : float
         Z coordinate
+
     """
 
     point_type: ReachPointType = field(compare=False)
@@ -49,8 +49,7 @@ class ReachPoint:
 
     @staticmethod
     def from_digipoint(res1d_digipoint):
-        """
-        Create a ReachPoint from an IRes1DDigiPoint object.
+        """Create a ReachPoint from an IRes1DDigiPoint object.
         """
         return ReachPoint(
             ReachPointType.DIGIPOINT,
@@ -62,8 +61,7 @@ class ReachPoint:
 
     @staticmethod
     def from_gridpoint(res1d_gridpoint):
-        """
-        Create a ReachPoint from an IRes1DGridPoint object.
+        """Create a ReachPoint from an IRes1DGridPoint object.
         """
         return ReachPoint(
             ReachPointType.GRIDPOINT,

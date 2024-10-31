@@ -12,8 +12,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultCatchment(ResultLocation):
-    """
-    Class for wrapping a single ResultData catchment.
+    """Class for wrapping a single ResultData catchment.
 
     Parameters
     ----------
@@ -21,6 +20,7 @@ class ResultCatchment(ResultLocation):
         MIKE 1D IRes1DCatchment object.
     res1d : Res1D
         Res1D object the catchment belongs to.
+
     """
 
     def __init__(self, catchment, res1d):
@@ -60,8 +60,9 @@ class ResultCatchment(ResultLocation):
         Returns
         -------
         IRes1DDataSet
-            IRes1DDataSet object associated with ResultCatchment."""
+            IRes1DDataSet object associated with ResultCatchment.
 
+        """
         return self._catchment
 
     def set_static_attributes(self):
@@ -88,8 +89,7 @@ class ResultCatchment(ResultLocation):
 
     @property
     def geometry(self) -> CatchmentGeometry:
-        """
-        A geometric representation of the catchment. Requires shapely.
+        """A geometric representation of the catchment. Requires shapely.
         """
         try_import_shapely()
         from ..geometry import CatchmentGeometry

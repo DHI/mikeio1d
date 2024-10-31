@@ -16,8 +16,7 @@ from mikeio1d.various import pyproj_crs_from_projection_string
 
 
 class GeoPandasConverter(ABC):
-    """
-    Abstract base class for converting to GeoPandas.
+    """Abstract base class for converting to GeoPandas.
     """
 
     @abstractmethod
