@@ -83,9 +83,10 @@ all = [
 [tool.ruff]
 include = ["pyproject.toml", "mikeio1d/**/*.py"]
 line-length = 100
-lint.extend-select = ["D"]
+lint.extend-select = ["D", "PD"]
 lint.ignore = [
     "E402", # ignore for now
     "F401", # ignore for now
+    "PD901" # allow using 'df' for pd.DataFrame type
 ]
 lint.pydocstyle.convention = "numpy"
