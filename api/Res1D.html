@@ -305,6 +305,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mikeio1d.Res1D.add_derived_quantity" id="toc-mikeio1d.Res1D.add_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.Res1D.add_derived_quantity">add_derived_quantity</a></li>
   <li><a href="#mikeio1d.Res1D.clear_queue" id="toc-mikeio1d.Res1D.clear_queue" class="nav-link" data-scroll-target="#mikeio1d.Res1D.clear_queue">clear_queue</a></li>
   <li><a href="#mikeio1d.Res1D.extract" id="toc-mikeio1d.Res1D.extract" class="nav-link" data-scroll-target="#mikeio1d.Res1D.extract">extract</a></li>
+  <li><a href="#mikeio1d.Res1D.get_catchment_values" id="toc-mikeio1d.Res1D.get_catchment_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_catchment_values">get_catchment_values</a></li>
+  <li><a href="#mikeio1d.Res1D.get_node_values" id="toc-mikeio1d.Res1D.get_node_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_node_values">get_node_values</a></li>
+  <li><a href="#mikeio1d.Res1D.get_reach_end_values" id="toc-mikeio1d.Res1D.get_reach_end_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_end_values">get_reach_end_values</a></li>
+  <li><a href="#mikeio1d.Res1D.get_reach_start_values" id="toc-mikeio1d.Res1D.get_reach_start_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_start_values">get_reach_start_values</a></li>
+  <li><a href="#mikeio1d.Res1D.get_reach_sum_values" id="toc-mikeio1d.Res1D.get_reach_sum_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_sum_values">get_reach_sum_values</a></li>
+  <li><a href="#mikeio1d.Res1D.get_reach_value" id="toc-mikeio1d.Res1D.get_reach_value" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_value">get_reach_value</a></li>
+  <li><a href="#mikeio1d.Res1D.get_reach_values" id="toc-mikeio1d.Res1D.get_reach_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_values">get_reach_values</a></li>
   <li><a href="#mikeio1d.Res1D.info" id="toc-mikeio1d.Res1D.info" class="nav-link" data-scroll-target="#mikeio1d.Res1D.info">info</a></li>
   <li><a href="#mikeio1d.Res1D.merge" id="toc-mikeio1d.Res1D.merge" class="nav-link" data-scroll-target="#mikeio1d.Res1D.merge">merge</a></li>
   <li><a href="#mikeio1d.Res1D.modify" id="toc-mikeio1d.Res1D.modify" class="nav-link" data-scroll-target="#mikeio1d.Res1D.modify">modify</a></li>
@@ -329,7 +336,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D" class="level1">
 <h1>Res1D</h1>
 <p><code>Res1D(self, file_path=None, reaches=None, nodes=None, catchments=None, time=None, derived_quantities=None, **kwargs)</code></p>
-<p>Class for reading data from 1D network result files. Currently supported formats are:</p>
+<p>Class for reading data from 1D network result files.</p>
+<p>Currently supported formats are:</p>
 <ul>
 <li>MIKE 1D network and catchment res1d files</li>
 <li>MIKE 1D Long Term Statistics (LTS) res1d files</li>
@@ -505,7 +513,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><a href="#mikeio1d.Res1D.add_derived_quantity">add_derived_quantity</a></td>
-<td>Adds a derived quantity to the Res1D object, propogating changes to the network.</td>
+<td>Add a derived quantity to the Res1D object, propogating changes to the network.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.Res1D.clear_queue">clear_queue</a></td>
@@ -516,42 +524,70 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Extract given queries to provided file.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.Res1D.get_catchment_values">get_catchment_values</a></td>
+<td>Get catchment values. Deprecated, use network.catchments instead.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.Res1D.get_node_values">get_node_values</a></td>
+<td>Get node values. Deprecated, use network.nodes instead.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.Res1D.get_reach_end_values">get_reach_end_values</a></td>
+<td>Get reach end values. Deprecated, use network.reaches instead.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.Res1D.get_reach_start_values">get_reach_start_values</a></td>
+<td>Get reach start values. Deprecated, use network.reaches instead.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.Res1D.get_reach_sum_values">get_reach_sum_values</a></td>
+<td>Get reach sum values. Deprecated, use network.reaches instead.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.Res1D.get_reach_value">get_reach_value</a></td>
+<td>Get reach value. Deprecated, use network.reaches instead.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.Res1D.get_reach_values">get_reach_values</a></td>
+<td>Get reach values. Deprecated, use network.reaches instead.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.info">info</a></td>
 <td>Print information about the result file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.merge">merge</a></td>
-<td>Merges res1d files.</td>
-</tr>
-<tr class="even">
-<td><a href="#mikeio1d.Res1D.modify">modify</a></td>
-<td>Modifies the ResultData object TimeData based on the provided data frame.</td>
+<td>Merge res1d files.</td>
 </tr>
 <tr class="odd">
-<td><a href="#mikeio1d.Res1D.read">read</a></td>
-<td>Reads result data into a pandas DataFrame.</td>
+<td><a href="#mikeio1d.Res1D.modify">modify</a></td>
+<td>Modify the ResultData object TimeData based on the provided data frame.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.Res1D.read">read</a></td>
+<td>Read result data into a pandas DataFrame.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.read_all">read_all</a></td>
 <td>Read all data from res1d file to dataframe. Deprecated, use read() instead.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.remove_derived_quantity">remove_derived_quantity</a></td>
-<td>Removes a derived quantity from the Res1D object, propogating changes to the network.</td>
+<td>Remove a derived quantity from the Res1D object, propogating changes to the network.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.Res1D.save">save</a></td>
+<td>Save the ResultData to a new res1d file.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.Res1D.save">save</a></td>
-<td>Saves the ResultData to a new res1d file.</td>
-</tr>
-<tr class="odd">
 <td><a href="#mikeio1d.Res1D.to_csv">to_csv</a></td>
 <td>Extract to csv file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.to_dfs0">to_dfs0</a></td>
 <td>Extract to dfs0 file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.to_txt">to_txt</a></td>
 <td>Extract to txt file.</td>
 </tr>
@@ -560,7 +596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.add_derived_quantity" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.add_derived_quantity">add_derived_quantity</h3>
 <p><code>Res1D.add_derived_quantity(derived_quantity)</code></p>
-<p>Adds a derived quantity to the Res1D object, propogating changes to the network.</p>
+<p>Add a derived quantity to the Res1D object, propogating changes to the network.</p>
 <section id="parameters-1" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
@@ -597,7 +633,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.extract" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.extract">extract</h3>
 <p><code>Res1D.extract(file_path, queries=None, time_step_skipping_number=1, ext=None)</code></p>
-<p>Extract given queries to provided file. File type is determined from file_path extension. The supported formats are: * csv * dfs0 * txt</p>
+<p>Extract given queries to provided file.</p>
+<p>File type is determined from file_path extension. The supported formats are: * csv * dfs0 * txt</p>
 <section id="parameters-2" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
@@ -644,6 +681,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </section>
 </section>
+<section id="mikeio1d.Res1D.get_catchment_values" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_catchment_values">get_catchment_values</h3>
+<p><code>Res1D.get_catchment_values(catchment_id, quantity)</code></p>
+<p>Get catchment values. Deprecated, use network.catchments instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_node_values" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_node_values">get_node_values</h3>
+<p><code>Res1D.get_node_values(node_id, quantity)</code></p>
+<p>Get node values. Deprecated, use network.nodes instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_reach_end_values" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_reach_end_values">get_reach_end_values</h3>
+<p><code>Res1D.get_reach_end_values(reach_name, quantity)</code></p>
+<p>Get reach end values. Deprecated, use network.reaches instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_reach_start_values" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_reach_start_values">get_reach_start_values</h3>
+<p><code>Res1D.get_reach_start_values(reach_name, quantity)</code></p>
+<p>Get reach start values. Deprecated, use network.reaches instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_reach_sum_values" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_reach_sum_values">get_reach_sum_values</h3>
+<p><code>Res1D.get_reach_sum_values(reach_name, quantity)</code></p>
+<p>Get reach sum values. Deprecated, use network.reaches instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_reach_value" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_reach_value">get_reach_value</h3>
+<p><code>Res1D.get_reach_value(reach_name, chainage, quantity, time)</code></p>
+<p>Get reach value. Deprecated, use network.reaches instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_reach_values" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_reach_values">get_reach_values</h3>
+<p><code>Res1D.get_reach_values(reach_name, chainage, quantity)</code></p>
+<p>Get reach values. Deprecated, use network.reaches instead.</p>
+</section>
 <section id="mikeio1d.Res1D.info" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.info">info</h3>
 <p><code>Res1D.info()</code></p>
@@ -652,7 +724,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.merge" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.merge">merge</h3>
 <p><code>Res1D.merge(file_names, merged_file_name)</code></p>
-<p>Merges res1d files.</p>
+<p>Merge res1d files.</p>
 <p>It is possible to merge three kinds of result files: * Regular res1d (HD, RR, etc.) * LTS extreme statistics * LTS chronological statistics</p>
 <p>For regular res1d files the requirement is that the simulation start time of the first file matches the simulation end time of the second file (the same principle for subsequent files).</p>
 <p>For LTS result files, meaningful merged result file is obtained when simulation periods for the files do not overlap.</p>
@@ -693,7 +765,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.modify" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.modify">modify</h3>
 <p><code>Res1D.modify(data_frame, file_path=None)</code></p>
-<p>Modifies the ResultData object TimeData based on the provided data frame.</p>
+<p>Modify the ResultData object TimeData based on the provided data frame.</p>
 <section id="parameters-4" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="caption-top table">
@@ -731,7 +803,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.read">read</h3>
 <p><code>Res1D.read(queries=None, column_mode=None)</code></p>
-<p>Reads result data into a pandas DataFrame.</p>
+<p>Read result data into a pandas DataFrame.</p>
 <section id="parameters-5" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
 <table class="caption-top table">
@@ -800,7 +872,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.remove_derived_quantity" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.remove_derived_quantity">remove_derived_quantity</h3>
 <p><code>Res1D.remove_derived_quantity(derived_quantity)</code></p>
-<p>Removes a derived quantity from the Res1D object, propogating changes to the network.</p>
+<p>Remove a derived quantity from the Res1D object, propogating changes to the network.</p>
 <section id="parameters-6" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-6">Parameters</h4>
 <table class="caption-top table">
@@ -832,7 +904,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.Res1D.save" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.save">save</h3>
 <p><code>Res1D.save(file_path)</code></p>
-<p>Saves the ResultData to a new res1d file.</p>
+<p>Save the ResultData to a new res1d file.</p>
 <p>Useful for persisting modified data, as well as converting supported result file types (e.g.&nbsp;res11) into res1d.</p>
 <section id="parameters-7" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>

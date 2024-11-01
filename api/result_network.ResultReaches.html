@@ -305,6 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mikeio1d.result_network.ResultReaches.get_or_create_result_reach" id="toc-mikeio1d.result_network.ResultReaches.get_or_create_result_reach" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.get_or_create_result_reach">get_or_create_result_reach</a></li>
   <li><a href="#mikeio1d.result_network.ResultReaches.read" id="toc-mikeio1d.result_network.ResultReaches.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.read">read</a></li>
   <li><a href="#mikeio1d.result_network.ResultReaches.remove_derived_quantity" id="toc-mikeio1d.result_network.ResultReaches.remove_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.remove_derived_quantity">remove_derived_quantity</a></li>
+  <li><a href="#mikeio1d.result_network.ResultReaches.set_quantity_collections" id="toc-mikeio1d.result_network.ResultReaches.set_quantity_collections" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.set_quantity_collections">set_quantity_collections</a></li>
   <li><a href="#mikeio1d.result_network.ResultReaches.set_quantity_derived" id="toc-mikeio1d.result_network.ResultReaches.set_quantity_derived" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.set_quantity_derived">set_quantity_derived</a></li>
   <li><a href="#mikeio1d.result_network.ResultReaches.set_reaches" id="toc-mikeio1d.result_network.ResultReaches.set_reaches" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.set_reaches">set_reaches</a></li>
   <li><a href="#mikeio1d.result_network.ResultReaches.set_res1d_object_to_dict" id="toc-mikeio1d.result_network.ResultReaches.set_res1d_object_to_dict" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.set_res1d_object_to_dict">set_res1d_object_to_dict</a></li>
@@ -404,18 +405,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Remove a derived quantity from the result network.</td>
 </tr>
 <tr class="odd">
-<td><a href="#mikeio1d.result_network.ResultReaches.set_quantity_derived">set_quantity_derived</a></td>
-<td>Sets a single derived quantity attribute on the obj.</td>
+<td><a href="#mikeio1d.result_network.ResultReaches.set_quantity_collections">set_quantity_collections</a></td>
+<td>Set quantity collections to the current ResultReaches object.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.result_network.ResultReaches.set_reaches">set_reaches</a></td>
-<td>Set attributes to the current ResultReaches object based</td>
+<td><a href="#mikeio1d.result_network.ResultReaches.set_quantity_derived">set_quantity_derived</a></td>
+<td>Set a single derived quantity attribute on the obj.</td>
 </tr>
 <tr class="odd">
-<td><a href="#mikeio1d.result_network.ResultReaches.set_res1d_object_to_dict">set_res1d_object_to_dict</a></td>
-<td>Create a dict entry from a key name to an object</td>
+<td><a href="#mikeio1d.result_network.ResultReaches.set_reaches">set_reaches</a></td>
+<td>Set attributes to the current ResultReaches object based on the reach name.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.result_network.ResultReaches.set_res1d_object_to_dict">set_res1d_object_to_dict</a></td>
+<td>Create a dict entry from a key name to an object or a list of objects.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReaches.to_geopandas">to_geopandas</a></td>
 <td>Convert reaches to a geopandas.GeoDataFrame object.</td>
 </tr>
@@ -456,7 +461,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="mikeio1d.result_network.ResultReaches.get_or_create_result_reach" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.get_or_create_result_reach">get_or_create_result_reach</h3>
 <p><code>result_network.ResultReaches.get_or_create_result_reach(reach)</code></p>
-<p>Create or get already existing ResultReach object. There potentially could be just a single ResultReach object, for many IRes1DReach object, which have the same name.</p>
+<p>Create or get already existing ResultReach object.</p>
+<p>There potentially could be just a single ResultReach object, for many IRes1DReach object, which have the same name.</p>
 <p>Also update self’s dict entry from reach name to a ResultReach object.</p>
 </section>
 <section id="mikeio1d.result_network.ResultReaches.read" class="level3">
@@ -529,10 +535,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </section>
 </section>
+<section id="mikeio1d.result_network.ResultReaches.set_quantity_collections" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.set_quantity_collections">set_quantity_collections</h3>
+<p><code>result_network.ResultReaches.set_quantity_collections()</code></p>
+<p>Set quantity collections to the current ResultReaches object.</p>
+</section>
 <section id="mikeio1d.result_network.ResultReaches.set_quantity_derived" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.set_quantity_derived">set_quantity_derived</h3>
 <p><code>result_network.ResultReaches.set_quantity_derived(derived_quantity)</code></p>
-<p>Sets a single derived quantity attribute on the obj.</p>
+<p>Set a single derived quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultReaches.set_reaches" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.set_reaches">set_reaches</h3>
@@ -553,10 +564,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 5%">
+<col style="width: 4%">
+<col style="width: 10%">
+<col style="width: 78%">
 <col style="width: 6%">
-<col style="width: 83%">
-<col style="width: 3%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -570,29 +581,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td><code>agg</code></td>
 <td>str or callable</td>
-<td>Defines how to aggregate the quantities in time and space. Accepts any str or callable that is accepted by pandas.DataFrame.agg. Examples: - ‘mean’ : mean value of all quantities - ‘max’ : maximum value of all quantities - np.max : maximum value of all quantities</td>
+<td>Defines how to aggregate the quantities in time and space. Accepts any str or callable that is accepted by pandas.DataFrame.agg.</td>
 <td><code>None</code></td>
-</tr>
-<tr class="even">
-<td><code>agg_kwargs</code></td>
-<td>dict</td>
-<td>Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}).</td>
-<td><code>{}</code></td>
-</tr>
-<tr class="odd">
-<td><code>segmented</code></td>
-<td>bool, (default=True)</td>
-<td>True - one LineString per IRes1DReach object. False - one LineString per reach name.</td>
-<td><code>True</code></td>
-</tr>
-<tr class="even">
-<td><code>include_derived</code></td>
-<td>bool</td>
-<td>Include derived quantities.</td>
-<td><code>False</code></td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="examples" class="level4">
+<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<pre><code>- 'mean'  : mean value of all quantities
+- 'max'   : maximum value of all quantities
+-  np.max : maximum value of all quantities</code></pre>
+<p>agg_kwargs : dict, default {} Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}). segmented : bool, (default=True) True - one LineString per IRes1DReach object. False - one LineString per reach name. include_derived : bool, default False Include derived quantities.</p>
 </section>
 <section id="returns" class="level4">
 <h4 class="anchored" data-anchor-id="returns">Returns</h4>
@@ -615,19 +615,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="examples" class="level4">
-<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<section id="examples-1" class="level4">
+<h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
 </section>
 </section>
 </section>
 </section>
 <section id="convert-reaches-to-a-geodataframe-without-quantities" class="level1">
 <h1>Convert reaches to a GeoDataFrame (without quantities)</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="convert-reaches-to-a-geodataframe-with-aggregated-quantities" class="level1">
 <h1>Convert reaches to a GeoDataFrame with aggregated quantities</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

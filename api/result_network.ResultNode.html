@@ -275,6 +275,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#mikeio1d.result_network.ResultNode.get_m1d_dataset" id="toc-mikeio1d.result_network.ResultNode.get_m1d_dataset" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.get_m1d_dataset">get_m1d_dataset</a></li>
   <li><a href="#mikeio1d.result_network.ResultNode.get_query" id="toc-mikeio1d.result_network.ResultNode.get_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.get_query">get_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultNode.read" id="toc-mikeio1d.result_network.ResultNode.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultNode.remove_derived_quantity" id="toc-mikeio1d.result_network.ResultNode.remove_derived_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.remove_derived_quantity">remove_derived_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultNode.set_quantities" id="toc-mikeio1d.result_network.ResultNode.set_quantities" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.set_quantities">set_quantities</a></li>
   <li><a href="#mikeio1d.result_network.ResultNode.set_quantity" id="toc-mikeio1d.result_network.ResultNode.set_quantity" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.set_quantity">set_quantity</a></li>
   <li><a href="#mikeio1d.result_network.ResultNode.set_quantity_derived" id="toc-mikeio1d.result_network.ResultNode.set_quantity_derived" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNode.set_quantity_derived">set_quantity_derived</a></li>
@@ -361,7 +362,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultNode.add_query">add_query</a></td>
-<td>Base method for adding a query to ResultNetwork.queries list.</td>
+<td>Add a query to ResultNetwork.queries list.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultNode.add_to_network_result_quantity_map">add_to_network_result_quantity_map</a></td>
@@ -369,7 +370,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultNode.add_to_result_quantity_map">add_to_result_quantity_map</a></td>
-<td>Method for adding to a given result quantity map.</td>
+<td>Add to a given result quantity map.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultNode.add_to_result_quantity_maps">add_to_result_quantity_maps</a></td>
@@ -388,22 +389,26 @@ ul.task-list li input[type="checkbox"] {
 <td>Read the time series data for all quantities at this location into a DataFrame.</td>
 </tr>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultNode.remove_derived_quantity">remove_derived_quantity</a></td>
+<td>Remove a derived quantity from the result location.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultNode.set_quantities">set_quantities</a></td>
-<td>Sets all quantity attributes.</td>
+<td>Set all quantity attributes.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultNode.set_quantity">set_quantity</a></td>
-<td>Sets a single quantity attribute on the obj.</td>
-</tr>
-<tr class="odd">
-<td><a href="#mikeio1d.result_network.ResultNode.set_quantity_derived">set_quantity_derived</a></td>
-<td>Sets a single derived quantity attribute on the obj.</td>
+<td>Set a single quantity attribute on the obj.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.result_network.ResultNode.set_static_attribute">set_static_attribute</a></td>
-<td>Add static attribute. This shows up in the html repr</td>
+<td><a href="#mikeio1d.result_network.ResultNode.set_quantity_derived">set_quantity_derived</a></td>
+<td>Set a single derived quantity attribute on the obj.</td>
 </tr>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultNode.set_static_attribute">set_static_attribute</a></td>
+<td>Add static attribute. This shows up in the html repr.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultNode.set_static_attributes">set_static_attributes</a></td>
 <td>Set static attributes. These show up in the html repr.</td>
 </tr>
@@ -417,7 +422,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="mikeio1d.result_network.ResultNode.add_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.add_query">add_query</h3>
 <p><code>result_network.ResultNode.add_query(data_item)</code></p>
-<p>Base method for adding a query to ResultNetwork.queries list.</p>
+<p>Add a query to ResultNetwork.queries list.</p>
 </section>
 <section id="mikeio1d.result_network.ResultNode.add_to_network_result_quantity_map" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.add_to_network_result_quantity_map">add_to_network_result_quantity_map</h3>
@@ -471,7 +476,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="mikeio1d.result_network.ResultNode.add_to_result_quantity_map" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.add_to_result_quantity_map">add_to_result_quantity_map</h3>
 <p><code>result_network.ResultNode.add_to_result_quantity_map(quantity_id, result_quantity, result_quantity_map)</code></p>
-<p>Method for adding to a given result quantity map.</p>
+<p>Add to a given result quantity map.</p>
 <section id="parameters-2" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
@@ -597,25 +602,30 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
+<section id="mikeio1d.result_network.ResultNode.remove_derived_quantity" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.remove_derived_quantity">remove_derived_quantity</h3>
+<p><code>result_network.ResultNode.remove_derived_quantity(derived_quantity)</code></p>
+<p>Remove a derived quantity from the result location.</p>
+</section>
 <section id="mikeio1d.result_network.ResultNode.set_quantities" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.set_quantities">set_quantities</h3>
 <p><code>result_network.ResultNode.set_quantities()</code></p>
-<p>Sets all quantity attributes.</p>
+<p>Set all quantity attributes.</p>
 </section>
 <section id="mikeio1d.result_network.ResultNode.set_quantity" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.set_quantity">set_quantity</h3>
 <p><code>result_network.ResultNode.set_quantity(obj, data_item, element_index=0)</code></p>
-<p>Sets a single quantity attribute on the obj.</p>
+<p>Set a single quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultNode.set_quantity_derived" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.set_quantity_derived">set_quantity_derived</h3>
 <p><code>result_network.ResultNode.set_quantity_derived(derived_quantity)</code></p>
-<p>Sets a single derived quantity attribute on the obj.</p>
+<p>Set a single derived quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultNode.set_static_attribute" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.set_static_attribute">set_static_attribute</h3>
 <p><code>result_network.ResultNode.set_static_attribute(key, value)</code></p>
-<p>Add static attribute. This shows up in the html repr</p>
+<p>Add static attribute. This shows up in the html repr.</p>
 </section>
 <section id="mikeio1d.result_network.ResultNode.set_static_attributes" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNode.set_static_attributes">set_static_attributes</h3>

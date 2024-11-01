@@ -367,15 +367,15 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchments.set_catchments">set_catchments</a></td>
-<td>Set attributes to the current ResultCatchments object based</td>
+<td>Set attributes to the current ResultCatchments object based on the catchment ID.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchments.set_quantity_collections">set_quantity_collections</a></td>
-<td>Sets all quantity collection attributes.</td>
+<td>Set all quantity collection attributes.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchments.set_quantity_derived">set_quantity_derived</a></td>
-<td>Sets a single derived quantity attribute on the obj.</td>
+<td>Set a single derived quantity attribute on the obj.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchments.set_res1d_catchment_to_dict">set_res1d_catchment_to_dict</a></td>
@@ -383,7 +383,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultCatchments.set_res1d_object_to_dict">set_res1d_object_to_dict</a></td>
-<td>Create a dict entry from a key name to an object</td>
+<td>Create a dict entry from a key name to an object or a list of objects.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultCatchments.to_geopandas">to_geopandas</a></td>
@@ -501,12 +501,12 @@ ul.task-list li input[type="checkbox"] {
 <section id="mikeio1d.result_network.ResultCatchments.set_quantity_collections" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchments.set_quantity_collections">set_quantity_collections</h3>
 <p><code>result_network.ResultCatchments.set_quantity_collections()</code></p>
-<p>Sets all quantity collection attributes.</p>
+<p>Set all quantity collection attributes.</p>
 </section>
 <section id="mikeio1d.result_network.ResultCatchments.set_quantity_derived" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchments.set_quantity_derived">set_quantity_derived</h3>
 <p><code>result_network.ResultCatchments.set_quantity_derived(derived_quantity)</code></p>
-<p>Sets a single derived quantity attribute on the obj.</p>
+<p>Set a single derived quantity attribute on the obj.</p>
 </section>
 <section id="mikeio1d.result_network.ResultCatchments.set_res1d_catchment_to_dict" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultCatchments.set_res1d_catchment_to_dict">set_res1d_catchment_to_dict</h3>
@@ -528,9 +528,9 @@ ul.task-list li input[type="checkbox"] {
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 86%">
-<col style="width: 3%">
+<col style="width: 10%">
+<col style="width: 78%">
+<col style="width: 6%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -544,17 +544,18 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><code>agg</code></td>
 <td>str or callable</td>
-<td>Defines how to aggregate the quantities in time and space. Accepts any str or callable that is accepted by pandas.DataFrame.agg. Examples: - ‘mean’ : mean value of all quantities - ‘max’ : maximum value of all quantities - np.max : maximum value of all quantities</td>
+<td>Defines how to aggregate the quantities in time and space. Accepts any str or callable that is accepted by pandas.DataFrame.agg.</td>
 <td><code>None</code></td>
-</tr>
-<tr class="even">
-<td><code>agg_kwargs</code></td>
-<td>dict</td>
-<td>Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}).</td>
-<td><code>{}</code></td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="examples" class="level4">
+<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<pre><code>- 'mean'  : mean value of all quantities
+- 'max'   : maximum value of all quantities
+-  np.max : maximum value of all quantities</code></pre>
+<p>agg_kwargs : dict, default {} Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}).</p>
 </section>
 <section id="returns" class="level4">
 <h4 class="anchored" data-anchor-id="returns">Returns</h4>
