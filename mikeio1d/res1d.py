@@ -9,6 +9,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Optional
     from typing import Union
     from typing import Type
+    from typing import Set
 
     from datetime import datetime
 
@@ -432,6 +433,11 @@ class Res1D:
             file_name = entry.file_path if isinstance(entry, Res1D) else entry
             file_names_new.append(file_name)
         return file_names_new
+
+    @staticmethod
+    def get_supported_file_extensions() -> Set[str]:
+        """Get supported file extensions for Res1D."""
+        return {".res1d", ".res11", ".resx", ".res", ".out", ".prf", ".crf"}
 
     @property
     def nodes(self) -> ResultNodes:
