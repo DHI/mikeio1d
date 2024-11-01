@@ -47,7 +47,7 @@ class ResultWriter:
             data_item = data_entry.data_item
             element_index = data_entry.element_index
 
-            values = series.values
+            values = series.to_numpy()
             time_index = series.index
             self.set_values(time_index, values, data_item, element_index)
 

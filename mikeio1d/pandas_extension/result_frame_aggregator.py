@@ -300,7 +300,11 @@ class ResultFrameAggregator:
             if level not in entity_index.names:
                 continue
 
-            is_singular = entity_index.get_level_values(level).nunique() == 1
+            is_singular = False
+            data = entity_index.get_level_values(level).to_numpy()
+            if data.shape[0] == 1 or (data[0] == data).all():
+                is_singular = True
+
             if is_singular:
                 entity_index = entity_index.droplevel(level)
 
@@ -312,7 +316,7 @@ class ResultFrameAggregator:
         for level in self._quantity_levels:
             if level not in df.columns.names:
                 continue
-            df = df.stack(level, future_stack=True)
+            df = df.stack(level, future_stack=True)  # noqa: PD013 - convert to .melt in future
 
         df = df.T
 
