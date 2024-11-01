@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import List
+from typing import Set
 
 from collections import defaultdict, namedtuple
 from warnings import warn
@@ -227,6 +228,11 @@ class Xns11:
             xns.add_xsection(xs)
 
         return xns
+
+    @staticmethod
+    def get_supported_file_extensions() -> Set[str]:
+        """Get supported file extensions for Xns11."""
+        return {".xns11"}
 
     @property
     def file(self):
