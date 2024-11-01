@@ -1,5 +1,7 @@
 """MIKE IO 1D library for Python."""
 
+from __future__ import annotations
+
 import sys
 import platform
 from pathlib import Path

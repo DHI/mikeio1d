@@ -83,7 +83,7 @@ all = [
 [tool.ruff]
 include = ["pyproject.toml", "mikeio1d/**/*.py"]
 line-length = 100
-lint.extend-select = ["D", "PD", "NPY"]
+lint.extend-select = ["D", "PD", "NPY", "FA"]
 lint.ignore = [
     "E402", # ignore for now
     "F401", # ignore for now
