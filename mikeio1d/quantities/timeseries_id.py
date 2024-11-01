@@ -348,7 +348,7 @@ class TimeSeriesId:
     @staticmethod
     def _get_multiindex_as_list_of_dicts(index: pd.MultiIndex) -> List[dict]:
         """Convert a pandas MultiIndex to a list of dicts, where keys are the level name and values are the column names."""
-        return [dict(zip(index.names, col)) for col in index.values]
+        return [dict(zip(index.names, col)) for col in index.to_numpy()]
 
     @staticmethod
     def _is_multiindex_complete(index: pd.MultiIndex) -> bool:

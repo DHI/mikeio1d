@@ -720,7 +720,7 @@ class CrossSection:
     @markers.setter
     def markers(self, df: pd.DataFrame):
         df_current_markers = self.markers
-        for marker in df_current_markers.marker.values:
+        for marker in df_current_markers.marker.to_numpy():
             self.unset_marker(marker)
         for _, row in df.iterrows():
             marker, x, z = row.marker, row.x, row.z
