@@ -1,3 +1,5 @@
+"""Module for ResultReach class."""
+
 from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
@@ -25,8 +27,7 @@ from DHI.Mike1D.Generic import PredefinedQuantity
 
 
 class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
-    """Class for wrapping a list of ResultData reaches
-    having the same reach name.
+    """Class for wrapping a list of ResultData reaches having the same reach name.
 
     Parameters
     ----------
@@ -68,9 +69,11 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_static_attributes()
 
     def __repr__(self) -> str:
+        """Return a string representation of ResultReach."""
         return f"<Reach: {self.name}>"
 
     def __getattr__(self, name: str):
+        """Get attributes, warnings of deprecated attributes."""
         # TODO: Remove this in 1.0.0
         if hasattr(self.reaches[0], name):
             warnings.warn(
@@ -81,6 +84,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             object.__getattribute__(self, name)
 
     def __getitem__(self, key: str | int) -> ResultGridPoint:
+        """Get a ResultGridPoint object by chainage."""
         if isinstance(key, int):
             return self.gridpoints[key]
         return super().__getitem__(key)
@@ -114,8 +118,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             return np.nan
 
     def _get_reach_for_chainage(self, chainage: float):
-        """Returns the relevant .NET Res1DReach for the specified chainage.
-        """
+        """Return the relevant .NET Res1DReach for the specified chainage."""
         for reach in self.reaches:
             start_chainage = reach.LocationSpan.StartChainage
             end_chainage = reach.LocationSpan.EndChainage
@@ -125,18 +128,15 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         raise ValueError(f"Invalid chainage of {chainage} for reach {self.name}")
 
     def _get_start_node(self):
-        """Returns the start node of the reach.
-        """
+        """Return the start node of the reach."""
         return self.res1d.data.Nodes[self.reaches[0].StartNodeIndex].Id
 
     def _get_end_node(self):
-        """Returns the end node of the reach.
-        """
+        """Return the end node of the reach."""
         return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
 
     def _get_full_flow_discharge(self) -> float:
-        """Returns the full flow discharge of the reach.
-        """
+        """Return the full flow discharge of the reach."""
         ffd_quantity_type = Quantity.Create(PredefinedQuantity.FullReachDischarge)
 
         ffd_network_data = None
@@ -157,10 +157,12 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     @property
     def chainages(self) -> List[str]:
+        """List of chainages for the reach."""
         return list(self.keys())
 
     @property
     def gridpoints(self) -> List[ResultGridPoint]:
+        """List of gridpoints for the reach."""
         return list(self.values())
 
     def set_static_attributes(self):
@@ -178,6 +180,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
 
     def try_set_static_attribute_length(self):
+        """Try to set the length attribute. If it fails, ignore it."""
         try:
             self.set_static_attribute("length", self._get_total_length())
         except Exception as _:
@@ -229,8 +232,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         )
 
     def set_gridpoints(self, reach):
-        """Assign chainage attributes to a current ResultReach object
-        from a data provided by IRes1DReach.
+        """Assign chainage attributes to a current ResultReach object from a data provided by IRes1DReach.
 
         Parameters
         ----------
@@ -255,8 +257,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             self.set_gridpoint(reach, gridpoint)
 
     def set_gridpoint(self, reach, gridpoint):
-        """Assign chainage attribute to a current ResultReach object
-        from a data provided by IRes1DReach and IRes1DGridPoint.
+        """Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.
 
         Parameters
         ----------
@@ -281,8 +282,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self[chainage_str] = result_gridpoint
 
     def set_gridpoint_data_items(self, reach):
-        """Assign data items to ResultGridPoint object belonging to current ResultReach
-        from IRes1DReach data items.
+        """Assign data items to ResultGridPoint object belonging to current ResultReach from IRes1DReach data items.
 
         Parameters
         ----------
@@ -303,25 +303,25 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
                     result_gridpoint.add_structure_data_item(data_item)
 
     def get_query(self, data_item):
+        """Get a query for a data item."""
         raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+        """Add a quantity to the result quantity maps."""
         raise NotImplementedError(
             "add_to_result_quantity_maps not implemented for ResultReach. Use ResultGridPoint."
         )
 
     @property
     def geometry(self) -> ReachGeometry:
-        """A geometric representation of the reach. Requires shapely.
-        """
+        """A geometric representation of the reach. Requires shapely."""
         try_import_shapely()
         from ..geometry import ReachGeometry
 
         return ReachGeometry.from_m1d_reaches(self.reaches)
 
     def interpolate_reach_ground_level(self, chainage: float) -> float:
-        """Interpolates the ground level at a given chainage by linear interpolation
-        from the bounding node ground levels.
+        """Interpolate the ground level at a given chainage by linear interpolation from the bounding node ground levels.
 
         Parameters
         ----------
@@ -349,8 +349,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         return start_ground_level + ground_slope * (chainage - start_chainage)
 
     def interpolate_reach_critical_level(self, chainage: float) -> float:
-        """Interpolates the critical level at a given chainage by linear interpolation
-        from the bounding node critical levels.
+        """Interpolate the critical level at a given chainage by linear interpolation from the bounding node critical levels.
 
         Parameters
         ----------

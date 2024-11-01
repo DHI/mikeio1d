@@ -1,3 +1,5 @@
+"""Module for ResultQuantityDerivedCollection class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -13,6 +15,8 @@ from .result_quantity_derived import ResultQuantityDerived
 
 
 class ResultQuantityDerivedCollection(ResultQuantityDerived):
+    """Class for a collection of derived quantities."""
+
     def __init__(
         self, derived_quantity: DerivedQuantity, result_locations: ResultLocations, res1d: Res1D
     ):
@@ -21,6 +25,5 @@ class ResultQuantityDerivedCollection(ResultQuantityDerived):
         self.res1d: Res1D = res1d
 
     def _create_source_dataframe(self) -> pd.DataFrame:
-        """Create a data frame with the source quantities for the derived quantity.
-        """
+        """Create a data frame with the source quantities for the derived quantity."""
         return self.derived_quantity.create_source_dataframe_for_locations(self.result_locations)

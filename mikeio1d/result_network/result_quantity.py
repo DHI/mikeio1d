@@ -1,3 +1,5 @@
+"""Module for ResultQuantity class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -64,6 +66,7 @@ class ResultQuantity:
         self._name = data_item.Quantity.Id
 
     def __repr__(self) -> str:
+        """Return a string representation of the object."""
         return f"<Quantity: {ResultQuantity.prettify_quantity(self)}>"
 
     @staticmethod
@@ -100,6 +103,7 @@ class ResultQuantity:
 
     @property
     def name(self) -> str:
+        """Name of the quantity id assosciated with collection."""
         return self._name
 
     def add(self):

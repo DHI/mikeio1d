@@ -1,3 +1,5 @@
+"""Package for QueryData classes."""
+
 from .query_data import QueryData
 from .query_data_catchment import QueryDataCatchment
 from .query_data_global import QueryDataGlobal

@@ -1,3 +1,5 @@
+"""GeoPandasReachesConverterSegmented class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -33,8 +35,7 @@ class GeoPandasReachesConverterSegmented(GeoPandasConverter):
         super().__init__()
 
     def _create_dataframe_data_dict(self, reaches: ResultReaches) -> dict[str, tuple]:
-        """Creates a dictionary with the data needed to create a GeoDataFrame.
-        """
+        """Create a dictionary with the data needed to create a GeoDataFrame."""
         data = {
             "group": [],
             "name": [],
@@ -50,8 +51,7 @@ class GeoPandasReachesConverterSegmented(GeoPandasConverter):
         return data
 
     def to_geopandas(self, reaches: ResultReaches) -> GeoDataFrame:
-        """Convert ResultReaches to a GeoDataFrame.
-        """
+        """Convert ResultReaches to a GeoDataFrame."""
         data = self._create_dataframe_data_dict(reaches)
         crs = self.get_crs(reaches.res1d)
         gdf = GeoDataFrame(data=data, crs=crs)

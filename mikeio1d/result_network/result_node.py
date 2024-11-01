@@ -1,3 +1,5 @@
+"""Module for ResultNode class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -31,9 +33,11 @@ class ResultNode(ResultLocation):
         self.set_static_attributes()
 
     def __repr__(self) -> str:
+        """Return a string representation of the object."""
         return f"<{self.type}: {self.id}>"
 
     def __getattr__(self, name: str):
+        """Warn if accessing deprecated attributes."""
         # TODO: Remove this in 1.0.0
         if name == "node":
             warn("Accessing IRes1DNode attribute via .node is deprecated. Use ._node.")
@@ -98,8 +102,7 @@ class ResultNode(ResultLocation):
 
     @property
     def geometry(self) -> NodePoint:
-        """A geometric representation of the node. Requires shapely.
-        """
+        """A geometric representation of the node. Requires shapely."""
         try_import_shapely()
         from ..geometry import NodePoint
 

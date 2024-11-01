@@ -1,3 +1,5 @@
+"""Module for ResultNodes class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -47,9 +49,7 @@ class ResultNodes(ResultLocations):
         self._geometries = None
 
     def set_nodes(self):
-        """Set attributes to the current ResultNodes object based
-        on the node ID.
-        """
+        """Set attributes to the current ResultNodes object based on the node ID."""
         for node in self.data.Nodes:
             node = impl(node)
             result_node = ResultNode(node, self.res1d)
@@ -58,8 +58,7 @@ class ResultNodes(ResultLocations):
             setattr(self, result_node_attribute_string, result_node)
 
     def set_res1d_node_to_dict(self, result_node):
-        """Create a dict entry from node ID to ResultNode object.
-        """
+        """Create a dict entry from node ID to ResultNode object."""
         self[result_node.id] = result_node
 
     def to_geopandas(

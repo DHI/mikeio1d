@@ -1,3 +1,5 @@
+"""DerivedQuantityManager class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -19,6 +21,7 @@ class DerivedQuantityManager:
     _instance = None
 
     def __new__(cls):
+        """Singleton pattern."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
@@ -28,6 +31,7 @@ class DerivedQuantityManager:
 
     @property
     def derived_quantities(self) -> Dict[DerivedQuantityName, DerivedQuantity]:
+        """Get the derived quantities."""
         return self._derived_quantities
 
     def register(self, derived_quantity: type[DerivedQuantity]):
@@ -54,6 +58,7 @@ class DerivedQuantityManager:
 
     @staticmethod
     def create_default_manager():
+        """Create a default derived quantity manager."""
         derived_quantity_manager = DerivedQuantityManager()
         for dq in default_derived_quantities:
             derived_quantity_manager.register(dq)

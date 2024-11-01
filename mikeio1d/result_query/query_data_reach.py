@@ -1,3 +1,5 @@
+"""Module for QueryDataReach class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -51,6 +53,7 @@ class QueryDataReach(QueryData):
             raise ValueError("Argument 'chainage' cannot be set if name is None.")
 
     def get_values(self, res1d: Res1D):
+        """Get the time series data for the query."""
         self._check_invalid_quantity(res1d)
 
         name = self._name
@@ -68,6 +71,7 @@ class QueryDataReach(QueryData):
         return self.from_dotnet_to_python(values)
 
     def to_timeseries_id(self) -> TimeSeriesId:
+        """Convert the query to a TimeSeriesId object."""
         quantity = self.quantity
         group = TimeSeriesIdGroup.REACH
         name = self.name
@@ -90,6 +94,7 @@ class QueryDataReach(QueryData):
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataReach:
+        """Convert a TimeSeriesId object to a QueryDataReach object."""
         chainage = timeseries_id.chainage
         if isnan(chainage):
             chainage = None
@@ -124,9 +129,11 @@ class QueryDataReach(QueryData):
 
     @property
     def chainage(self):
+        """Chainage value."""
         return self._chainage
 
     def __repr__(self):
+        """Return a string representation of the query."""
         name = self._name
         chainage = self._chainage
         quantity = self._quantity

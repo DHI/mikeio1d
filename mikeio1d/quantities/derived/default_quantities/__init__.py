@@ -1,3 +1,5 @@
+"""Contains a helper function to get a list of all derived quantity classes in this package."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -14,8 +16,7 @@ from ..derived_quantity import DerivedQuantity
 
 
 def get_default_derived_quantity_classes() -> List[Type[DerivedQuantity]]:
-    """Helper function to get a list of all derived quantity classes in this package.
-    """
+    """Get list of all derived quantity classes in this package."""
     derived_quantity_classes = []
     for importer, modname, ispkg in pkgutil.iter_modules(__path__):
         module = importlib.import_module("." + modname, __name__)

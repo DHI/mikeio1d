@@ -1,3 +1,5 @@
+"""Module for ResultMerger class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -25,8 +27,7 @@ class ResultMerger:
         self.file_names = file_names
 
     def merge(self, merged_file_name: str):
-        """Merges the data from in file_names to a file
-        specified by merged_file_name.
+        """Merge the data from in file_names to a file specified by merged_file_name.
 
         Parameters
         ----------

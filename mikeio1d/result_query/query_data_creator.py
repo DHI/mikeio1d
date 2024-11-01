@@ -1,3 +1,5 @@
+"""Module for creating QueryData objects from TimeSeriesId."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -16,6 +18,8 @@ from mikeio1d.quantities import TimeSeriesIdGroup
 
 
 class QueryDataCreator:
+    """Factory class for creating QueryData objects from TimeSeriesId."""
+
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryData:
         """Create query from TimeSeriesIdGroup."""

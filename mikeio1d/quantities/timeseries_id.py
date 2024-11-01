@@ -1,3 +1,5 @@
+"""TimeSeriesId class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -35,12 +37,15 @@ class TimeSeriesIdGroup(str, Enum):
     STRUCTURE = "Structure"
 
     def __hash__(self) -> int:
+        """Hashes a TimeSeriesIdGroup object."""
         return self.value.__hash__()
 
     def __repr__(self) -> str:
+        """Representation of a TimeSeriesIdGroup object."""
         return self.value.__repr__()
 
     def __str__(self) -> str:
+        """Return string representation of a TimeSeriesIdGroup object."""
         return self.value.__str__()
 
     @staticmethod
@@ -67,8 +72,7 @@ class TimeSeriesIdGroup(str, Enum):
 
 @dataclass(frozen=True)
 class TimeSeriesId:
-    """A unique identifier for a timeseries result on the Mike 1D network.
-    """
+    """A unique identifier for a timeseries result on the Mike 1D network."""
 
     quantity: str = ""
     """The name of the physical quantity (e.g. 'Discharge')"""
@@ -86,6 +90,7 @@ class TimeSeriesId:
     """Whether the timeseries is derived rather than saved in the result file."""
 
     def __post_init__(self):
+        """Post initialization validation of TimeSeriesId object."""
         self._validate_group()
         self._validate_chainage()
 
@@ -105,7 +110,7 @@ class TimeSeriesId:
         raise ValueError(f"Invalid group for TimeSeriesId: {self.group}")
 
     def __eq__(self, other: TimeSeriesId) -> bool:
-        """Checks equality between two TimeSeriesId objects."""
+        """Check equality between two TimeSeriesId objects."""
         if other is self:
             return True
         if not isinstance(other, TimeSeriesId):
@@ -132,7 +137,7 @@ class TimeSeriesId:
         return hash(str(self))
 
     def is_valid(self, res1d: Res1D) -> bool:
-        """Checks whether a TimeSeriesId is valid for a given Res1D object.
+        """Check whether a TimeSeriesId is valid for a given Res1D object.
 
         A TimeSeriesId is valid if it exists in the global result quantity map.
 
@@ -152,11 +157,11 @@ class TimeSeriesId:
         return result_quantity is not None
 
     def astuple(self) -> Tuple:
-        """Converts a TimeSeriesId to a tuple."""
+        """Convert a TimeSeriesId to a tuple."""
         return dataclasses.astuple(self)
 
     def to_data_entry(self, res1d: Res1D) -> DataEntry:
-        """Converts a TimeSeriesId to its assosciated Mike1D objects.
+        """Convert a TimeSeriesId to its assosciated Mike1D objects.
 
         Returns
         -------
@@ -173,7 +178,7 @@ class TimeSeriesId:
         return data_entry
 
     def to_result_quantity(self, res1d: Res1D) -> ResultQuantity:
-        """Converts a TimeSeriesId to a ResultQuantity object.
+        """Convert a TimeSeriesId to a ResultQuantity object.
 
         Returns
         -------
@@ -194,7 +199,7 @@ class TimeSeriesId:
         return result_quantity
 
     def get_location(self, res1d: Res1D) -> ResultLocation:
-        """Gets the ResultLocation associated with the TimeSeriesId.
+        """Get the ResultLocation associated with the TimeSeriesId.
 
         Returns
         -------
@@ -210,7 +215,7 @@ class TimeSeriesId:
         return location
 
     def next_duplicate(self) -> TimeSeriesId:
-        """Creates a duplicate TimeSeriesId object.
+        """Create a duplicate TimeSeriesId object.
 
         Returns
         -------
@@ -230,7 +235,7 @@ class TimeSeriesId:
         )
 
     def prev_duplicate(self) -> TimeSeriesId:
-        """Creates a duplicate TimeSeriesId object.
+        """Create a duplicate TimeSeriesId object.
 
         Returns
         -------
@@ -253,7 +258,7 @@ class TimeSeriesId:
 
     @staticmethod
     def from_query(query: QueryData) -> TimeSeriesId:
-        """Converts a QueryData object to a TimeSeriesId object."""
+        """Convert a QueryData object to a TimeSeriesId object."""
         return query.to_timeseries_id()
 
     @staticmethod
@@ -401,7 +406,7 @@ class TimeSeriesId:
 
     @staticmethod
     def create_reach_span_tag(m1d_dataset) -> str:
-        """Creates a tag for an IRes1DReach object based on its chainage span.
+        """Create a tag for an IRes1DReach object based on its chainage span.
 
         Parameters
         ----------

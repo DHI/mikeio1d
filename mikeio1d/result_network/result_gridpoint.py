@@ -1,3 +1,5 @@
+"""ResultGridPoint class."""
+
 from ..query import QueryDataReach
 from .result_location import ResultLocation
 
@@ -84,10 +86,10 @@ class ResultGridPoint(ResultLocation):
         return query
 
     def add_data_item(self, data_item, element_index):
-        """Adds data item to grid point data items list."""
+        """Add data item to grid point data items list."""
         self.data_items.append(data_item)
         self.element_indices.append(element_index)
 
     def add_structure_data_item(self, data_item):
-        """Adds data item to structure data items list."""
+        """Add data item to structure data items list."""
         self.structure_data_items.append(data_item)

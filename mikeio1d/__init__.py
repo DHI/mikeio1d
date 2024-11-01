@@ -1,3 +1,5 @@
+"""MIKE IO 1D library for Python."""
+
 import sys
 import platform
 

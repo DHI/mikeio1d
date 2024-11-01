@@ -1,3 +1,5 @@
+"""ExtractorDfs0 class."""
+
 from .extractor import Extractor
 
 import System
@@ -14,15 +16,17 @@ from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
 
 class ExtractorDfs0(Extractor):
-    """Class which extracts data to dfs0 file format"""
+    """Class which extracts data to dfs0 file format."""
 
     def export(self):
+        """Export data to dfs0 file."""
         self.factory = DfsFactory()
         self.builder = self.create_dfs_builder()
         self.define_dynamic_data_items()
         self.write_data_items()
 
     def create_dfs_builder(self):
+        """Create dfs builder."""
         result_data = self.result_data
         factory = self.factory
 
@@ -39,6 +43,7 @@ class ExtractorDfs0(Extractor):
         return builder
 
     def define_dynamic_data_items(self):
+        """Define dynamic data items."""
         output_data = self.output_data
         result_data = self.result_data
         builder = self.builder
@@ -80,6 +85,7 @@ class ExtractorDfs0(Extractor):
             builder.AddDynamicItem(item.GetDynamicItemInfo())
 
     def write_data_items(self):
+        """Write data items."""
         output_data = self.output_data
         result_data = self.result_data
         builder = self.builder

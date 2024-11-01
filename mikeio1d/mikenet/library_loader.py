@@ -1,3 +1,5 @@
+"""LibraryLoader class."""
+
 import clr
 from pathlib import Path
 from warnings import warn
@@ -29,9 +31,7 @@ class LibraryLoader:
         setattr(mikenet_module, load_function_name, self.load)
 
     def load(self):
-        """A method which adds a reference of a relevant library to Python.NET (CLR)
-        and also adds a reference to the MIKE.NET.
-        """
+        """Add a reference of a relevant library to Python.NET (CLR) and also add a reference to the MIKE.NET."""
         clr.AddReference(self.library_name)
 
         try:

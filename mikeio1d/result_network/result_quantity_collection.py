@@ -1,3 +1,5 @@
+"""Module for ResultQuantityCollection class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -35,6 +37,7 @@ class ResultQuantityCollection(ResultQuantity):
         self.res1d = res1d
 
     def __repr__(self) -> str:
+        """Return a string representation of the object."""
         pretty_quantity = ResultQuantity.prettify_quantity(self.result_quantities[0])
         return f"<QuantityCollection ({len(self.result_quantities)}): {pretty_quantity}>"
 
@@ -46,8 +49,7 @@ class ResultQuantityCollection(ResultQuantity):
         return self.result_quantities[0].name
 
     def add(self):
-        """Add queries to ResultNetwork.queries from a list of result quantities.
-        """
+        """Add queries to ResultNetwork.queries from a list of result quantities."""
         for result_quantity in self.result_quantities:
             result_quantity.add()
 

@@ -1,3 +1,5 @@
+"""Module for ResultStructure class."""
+
 from warnings import warn
 
 from ..dotnet import pythonnet_implementation as impl
@@ -7,8 +9,7 @@ from ..quantities import TimeSeriesIdGroup
 
 
 class ResultStructure(ResultLocation):
-    """Class for wrapping a list of ResultData structure data items
-    belonging to the same structure.
+    """Class for wrapping a list of ResultData structure data items belonging to the same structure.
 
     Parameters
     ----------
@@ -46,10 +47,12 @@ class ResultStructure(ResultLocation):
         self.set_static_attributes()
 
     def __repr__(self) -> str:
+        """Return a string representation of ResultStructure."""
         return f"<{self.type}: {self.id}>"
 
     @property
     def structure_id(self):
+        """Get structure ID."""
         # TODO: Remove this in 1.0.0
         warn(
             "Please use .id instead of .structure_id. This attribute will be removed in the future."
@@ -112,9 +115,7 @@ class ResultStructure(ResultLocation):
 
     @staticmethod
     def get_structure_id(reach, data_item):
-        """Gets structure ID either from IDataItem.ItemId or for structure reaches
-        from actual Res1DStructureGridPoint structure.
-        """
+        """Get structure ID either from IDataItem.ItemId or for structure reaches from actual Res1DStructureGridPoint structure."""
         if data_item.ItemId is not None:
             return data_item.ItemId
 

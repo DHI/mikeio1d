@@ -1,3 +1,5 @@
+"""DataEntry class."""
+
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
 

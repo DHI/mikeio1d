@@ -1,3 +1,5 @@
+"""Module for ResultStructures class."""
+
 from .result_locations import ResultLocations
 from .result_structure import ResultStructure
 from .various import make_proper_variable_name
@@ -36,9 +38,7 @@ class ResultStructures(ResultLocations):
         self.set_quantity_collections()
 
     def set_structures(self):
-        """Set attributes to the current ResultReaches object based
-        on the reach name.
-        """
+        """Set attributes to the current ResultReaches object based on the reach name."""
         for reach in self.data.Reaches:
             for data_item in reach.DataItems:
                 if not self.is_structure(reach, data_item):
@@ -52,6 +52,7 @@ class ResultStructures(ResultLocations):
                 setattr(self, result_structure_attribute_string, result_structure)
 
     def is_structure(self, reach, data_item):
+        """Check if a data item is a structure data item."""
         # Data items on reaches with defined ItemId correspond to structure data items.
         if data_item.ItemId is not None:
             return True

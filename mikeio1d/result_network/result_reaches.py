@@ -1,3 +1,5 @@
+"""Module for ResultReaches class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -51,9 +53,7 @@ class ResultReaches(ResultLocations):
         self.set_quantity_collections()
 
     def set_reaches(self):
-        """Set attributes to the current ResultReaches object based
-        on the reach name.
-        """
+        """Set attributes to the current ResultReaches object based on the reach name."""
         for reach in self.data.Reaches:
             reach = impl(reach)
             result_reach = self.get_or_create_result_reach(reach)
@@ -61,6 +61,7 @@ class ResultReaches(ResultLocations):
             setattr(self, result_reach_attribute_string, result_reach)
 
     def set_quantity_collections(self):
+        """Set quantity collections to the current ResultReaches object."""
         ResultLocations.set_quantity_collections(self)
         for reach_name in self:
             result_reach = self[reach_name]
@@ -68,6 +69,7 @@ class ResultReaches(ResultLocations):
 
     def get_or_create_result_reach(self, reach):
         """Create or get already existing ResultReach object.
+
         There potentially could be just a single ResultReach object,
         for many IRes1DReach object, which have the same name.
 

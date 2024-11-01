@@ -1,3 +1,5 @@
+"""The Marker enum and related functions."""
+
 from __future__ import annotations
 
 from enum import IntEnum
@@ -21,29 +23,28 @@ class Marker(IntEnum):
     RIGHT_LOW_FLOW_BANK = 5
 
     def __repr__(self) -> str:
+        """Return a string representation of the marker."""
         return Marker.pretty(self)
 
     def __int__(self) -> int:
+        """Return the integer value of the marker."""
         return self.value
 
     @staticmethod
     def is_default_marker(marker: int | Marker) -> bool:
-        """Check if the int/Marker is a default marker (e.g. left levee bank).
-        """
+        """Check if the int/Marker is a default marker (e.g. left levee bank)."""
         marker = int(marker)
         return marker in (e.value for e in Marker)
 
     @staticmethod
     def is_user_marker(marker: int | Marker) -> bool:
-        """Check if the int/Marker is a user marker (i.e. value > 7)
-        """
+        """Check if the int/Marker is a user marker (i.e. value > 7)."""
         MIN_USER_MARKER = 8
         return marker >= MIN_USER_MARKER
 
     @staticmethod
     def pretty(marker: int | Marker) -> str:
-        """A pretty string presentation of the marker.
-        """
+        """Get a pretty string presentation of the marker."""
         if Marker.is_default_marker(marker):
             marker = marker if isinstance(marker, Marker) else Marker(marker)
             return marker.name.replace("_", " ").title() + f" ({marker.value})"
@@ -54,13 +55,11 @@ class Marker(IntEnum):
 
     @staticmethod
     def from_pretty(marker: str) -> int:
-        """Parses a string created from Marker.pretty to the corresponding marker value.
-        """
+        """Parse a string created from Marker.pretty to the corresponding marker value."""
         marker = int(marker.split("(")[-1][:-1])
         return marker
 
     @staticmethod
     def list_from_string(s: str) -> List[int]:
-        """Convert a string of comma-separated markers to a list of integers.
-        """
+        """Convert a string of comma-separated markers to a list of integers."""
         return [int(m) for m in s.split(",")]

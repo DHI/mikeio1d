@@ -1,3 +1,5 @@
+"""Module for ResultNetwork class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -107,8 +109,7 @@ class ResultNetwork:
         return tsid
 
     def set_result_locations(self):
-        """Assign nodes, reaches, catchments, global_data properties.
-        """
+        """Assign nodes, reaches, catchments, global_data properties."""
         res1d = self.res1d
         self.nodes = ResultNodes(res1d)
         self.reaches = ResultReaches(res1d)
@@ -117,9 +118,7 @@ class ResultNetwork:
         self.global_data = ResultGlobalDatas(res1d)
 
     def add_timeseries_id(self, timeseries_id: TimeSeriesId):
-        """Add a TimeSeriesId to the queue list, which can be used
-        when calling res1D.read().
-        """
+        """Add a TimeSeriesId to the queue list, which can be used when calling res1D.read()."""
         if timeseries_id not in self.queue:
             self.queue.append(timeseries_id)
 
@@ -152,8 +151,7 @@ class ResultNetwork:
         self.structures.remove_derived_quantity(derived_quantity)
 
     def to_geopandas(self) -> GeoDataFrame:
-        """Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed.
-        """
+        """Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed."""
         gpd = try_import_geopandas()  # noqa: F841
         gdf_nodes = self.nodes.to_geopandas()
         gdf_reaches = self.reaches.to_geopandas()

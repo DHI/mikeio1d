@@ -1,3 +1,5 @@
+"""Various utility functions for mikeio1d."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -18,15 +20,15 @@ NAME_DELIMITER = ":"
 
 
 def mike1d_quantities():
-    """Returns all predefined Mike1D quantities.
+    """Return all predefined Mike1D quantities.
+
     Useful for knowing what quantity string to query.
     """
     return [quantity for quantity in Enum.GetNames(clr.GetClrType(PredefinedQuantity))]
 
 
 def try_import_geopandas():
-    """Try 'import geopandas as gpd' and raise ImportError if not installed.
-    """
+    """Try 'import geopandas as gpd' and raise ImportError if not installed."""
     try:
         import geopandas as gpd
     except ImportError:
@@ -36,8 +38,7 @@ def try_import_geopandas():
 
 
 def try_import_shapely():
-    """Try 'import shapely' and raise ImportError if not installed.
-    """
+    """Try 'import shapely' and raise ImportError if not installed."""
     try:
         import shapely
     except ImportError:
@@ -47,8 +48,7 @@ def try_import_shapely():
 
 
 def pyproj_crs_from_projection_string(projection_string: str):
-    """Convert a projection string to a pyproj CRS object.
-    """
+    """Convert a projection string to a pyproj CRS object."""
     from pyproj import CRS
 
     try:
@@ -88,7 +88,7 @@ def make_list_if_not_iterable(obj) -> list:
 
 
 def allow_nested_autocompletion_for_ipython(cls: Type):
-    """Configures IPython to allow nested autocompletion for a class.
+    """Configure IPython to allow nested autocompletion for a class.
 
     See https://github.com/ipython/ipython/pull/13852
     """

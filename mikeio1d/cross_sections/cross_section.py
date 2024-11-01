@@ -1,3 +1,5 @@
+"""CrossSection class."""
+
 from __future__ import annotations
 from warnings import warn
 
@@ -103,6 +105,7 @@ class CrossSection:
         return CrossSection(m1d_cross_section)
 
     def __repr__(self) -> str:
+        """Return a string representation of the cross section."""
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
 
     @property
@@ -132,12 +135,12 @@ class CrossSection:
 
     @property
     def interpolated(self) -> bool:
-        """Is the cross section interpolated? (i.e. not measured)"""
+        """Is the cross section interpolated? (i.e. not measured)."""
         return self._m1d_cross_section.Interpolated
 
     @property
     def is_open(self) -> bool:
-        """Is the cross section open? (i.e. not closed)"""
+        """Is the cross section open? (i.e. not closed)."""
         return self._m1d_cross_section.IsOpen
 
     @property
@@ -148,6 +151,7 @@ class CrossSection:
     @property
     def min_water_depth(self) -> float:
         """Minimum water depth of the cross section.
+
         If the water depth goes below this depth, it will be corrected to match this depth.
 
         This can be negative, in case the cross section has a slot attached.
@@ -646,8 +650,7 @@ class CrossSection:
         self.recompute_processed()
 
     def _update_marker(self, marker: int | Marker, point_index: int):
-        """Update the marker of the specified point_index.
-        """
+        """Update the marker of the specified point_index."""
         marker = int(marker)
         base_xs = self._m1d_cross_section.BaseCrossSection
         if Marker.is_default_marker(marker):
@@ -751,7 +754,7 @@ class CrossSection:
         self._update_marker(marker, point_index)
 
     def unset_marker(self, marker: int | Marker):
-        """Removes the specified marker from the cross section.
+        """Remove the specified marker from the cross section.
 
         Parameters
         ----------

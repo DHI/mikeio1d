@@ -1,3 +1,5 @@
+"""Module for the TimeFilter class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -16,14 +18,13 @@ from ..dotnet import to_dotnet_datetime
 
 
 class TimeFilter:
-    """Wrapper class for applying time filters to a Filter object.
-    """
+    """Wrapper class for applying time filters to a Filter object."""
 
     def __init__(self, filter):
         self._filter = filter
 
     def setup_from_user_params(self, *, time: Union[None, slice, tuple, list]):
-        """Sets up the filter using a user supplied parameters."""
+        """Set up the filter using a user supplied parameters."""
         if time is None:
             return
 
@@ -46,7 +47,7 @@ class TimeFilter:
         self.add_period(start, end)
 
     def add_period(self, start: Union[None, datetime], end: Union[None, datetime]):
-        """Adds a period to the filter."""
+        """Add a period to the filter."""
         if start is None and end is None:
             raise ValueError("Either start or end must be provided")
 

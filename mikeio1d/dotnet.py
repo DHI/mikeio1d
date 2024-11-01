@@ -1,3 +1,5 @@
+"""Utilities for interfacing with .NET objects."""
+
 import datetime
 import numpy as np
 import ctypes
@@ -34,7 +36,7 @@ _MAP_NET_NP = {
 
 
 def to_dotnet_datetime(x):
-    """Convert from python datetime to .NET System.DateTime"""
+    """Convert from python datetime to .NET System.DateTime."""
     dotnet_datetime = System.DateTime(x.year, x.month, x.day, x.hour, x.minute, x.second)
     # Get .NET ticks microseconds
     ticks = x.microsecond * 10
@@ -43,7 +45,7 @@ def to_dotnet_datetime(x):
 
 
 def from_dotnet_datetime(x, round_to_milliseconds=True):
-    """Convert from .NET System.DateTime to python datetime"""
+    """Convert from .NET System.DateTime to python datetime."""
     # Get microseconds from .NET ticks
     microseconds = x.Ticks % 10**7 // 10
     time = datetime.datetime(x.Year, x.Month, x.Day, x.Hour, x.Minute, x.Second, microseconds)
@@ -60,7 +62,7 @@ def from_dotnet_datetime(x, round_to_milliseconds=True):
 
 
 def asNumpyArray(x):
-    """Convert .NET array to numpy array
+    """Convert .NET array to numpy array.
 
     Parameters
     ----------
@@ -100,7 +102,7 @@ def asNumpyArray(x):
 
 
 def to_dotnet_array(x):
-    """Convert numpy array to .NET array with same data type (single, double,...)
+    """Convert numpy array to .NET array with same data type (single, double,...).
 
     Parameters
     ----------
@@ -139,21 +141,21 @@ def to_dotnet_array(x):
     return netArray
 
 
-def asnetarray_v2(x):
+def _asnetarray_v2(x):
     if any([type(xi) is list for xi in x]):
         # Array of array
-        return asnetarray_v2([asnetarray_v2(xi) for xi in x])
+        return _asnetarray_v2([_asnetarray_v2(xi) for xi in x])
     else:
         # Array
         return System.Array[type(x[1])](x)
 
 
-def to_dotnet_float_array(x):
+def _to_dotnet_float_array(x):
     return to_dotnet_array(x.astype(np.float32))
 
 
 def to_numpy(src):
-    """Convert .NET array to numpy array
+    """Convert .NET array to numpy array.
 
     Parameters
     ----------
@@ -179,6 +181,7 @@ def to_numpy(src):
 
 def pythonnet_implementation(clr_object):
     """Retrieve actual .NET object implementation.
+
     Relevant for pythonnet versions 3.0 and above.
 
     Parameters

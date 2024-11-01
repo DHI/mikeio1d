@@ -1,3 +1,5 @@
+"""Module for ResultReaderQuery class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -20,13 +22,12 @@ from ..result_query import QueryDataCreator
 
 
 class ResultReaderQuery(ResultReader):
-    """Class for reading the ResultData object TimeData
-    into Pandas data frame using ResultDataQuery object.
-    """
+    """Class for reading the ResultData object TimeData into Pandas data frame using ResultDataQuery object."""
 
     def read(
         self, timeseries_ids: List[TimeSeriesId], column_mode: Optional[ColumnMode] = None
     ) -> pd.DataFrame:
+        """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""
         if column_mode is not None:
             raise NotImplementedError(
                 f"ResultReaderQuery does not support column_mode {column_mode}."
@@ -47,6 +48,7 @@ class ResultReaderQuery(ResultReader):
         return df
 
     def read_all(self, column_mode: Optional[ColumnMode] = None) -> pd.DataFrame:
+        """Read all TimeData into a Pandas data frame."""
         if column_mode is not None:
             raise NotImplementedError(
                 f"ResultReaderQuery does not support column_mode {column_mode}."

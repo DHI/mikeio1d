@@ -1,3 +1,8 @@
+"""ExampleDerivedQuantity class.
+
+This module contains the ExampleDerivedQuantity class, which is an example of how to create a derived quantity.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

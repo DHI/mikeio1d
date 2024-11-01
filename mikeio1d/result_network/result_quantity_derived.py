@@ -1,3 +1,5 @@
+"""Module for the ResultQuantityDerived class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -15,6 +17,8 @@ from ..quantities import DerivedQuantity
 
 
 class ResultQuantityDerived:
+    """Class for a derived quantity that can be read and plotted."""
+
     def __init__(
         self,
         derived_quantity: DerivedQuantity,
@@ -26,15 +30,16 @@ class ResultQuantityDerived:
         self.res1d: Res1D = res1d
 
     def __repr__(self) -> str:
+        """Return a string representation of the object."""
         return f"<DerivedQuantity: {self.name}>"
 
     @property
     def name(self) -> str:
+        """Return the name of the derived quantity."""
         return self.derived_quantity.name
 
     def add(self):
-        """Add a ResultQuantity to ResultNetwork.read_queue.
-        """
+        """Add a ResultQuantity to ResultNetwork.read_queue."""
         raise NotImplementedError("Derived quantities cannot be added to a network.")
 
     def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
@@ -63,6 +68,5 @@ class ResultQuantityDerived:
         return ax
 
     def _create_source_dataframe(self) -> pd.DataFrame:
-        """Create the source DataFrame used to calculate the derived quantity.
-        """
+        """Create the source DataFrame used to calculate the derived quantity."""
         return self.derived_quantity.create_source_dataframe_for_location(self.result_location)

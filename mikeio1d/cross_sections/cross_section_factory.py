@@ -1,3 +1,5 @@
+"""CrossSectionFactory class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -18,8 +20,11 @@ from DHI.Mike1D.CrossSectionModule import FlowResistance
 
 
 class CrossSectionFactory:
+    """Factory for creating cross sections."""
+
     @staticmethod
     def validate(m1d_cross_section):
+        """Validate a cross section."""
         diagnostics = m1d_cross_section.Validate()
         if diagnostics.ErrorCountRecursive > 0:
             message = diagnostics.Errors.Count + " errors in cross section."
@@ -35,6 +40,7 @@ class CrossSectionFactory:
         topo_id: str,
         default_markers: bool = True,
     ):
+        """Create an open cross section from x and z data."""
         builder = M1DCrossSectionFactory()
 
         builder.BuildOpen("")

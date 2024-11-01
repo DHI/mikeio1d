@@ -1,3 +1,5 @@
+"""Module for the QueryDataGlobal class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -30,6 +32,7 @@ class QueryDataGlobal(QueryData):
         super().__init__(quantity, validate=validate)
 
     def get_values(self, res1d):
+        """Get the time series data for the query."""
         self._check_invalid_quantity(res1d)
 
         data_item = res1d.global_data[self._quantity]
@@ -40,6 +43,7 @@ class QueryDataGlobal(QueryData):
         return self.from_dotnet_to_python(values)
 
     def to_timeseries_id(self) -> TimeSeriesId:
+        """Convert to TimeSeriesId."""
         tsid = TimeSeriesId(
             quantity=self.quantity,
             group=TimeSeriesIdGroup.GLOBAL,
@@ -51,7 +55,9 @@ class QueryDataGlobal(QueryData):
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataGlobal:
+        """Create a QueryDataGlobal from a TimeSeriesId."""
         return QueryDataGlobal(timeseries_id.quantity, validate=False)
 
     def __repr__(self):
+        """Return a string representation of the query."""
         return self._quantity
