@@ -1,3 +1,5 @@
+"""Package for fluent access to MIKE 1D results."""
+
 from .result_catchment import ResultCatchment
 from .result_catchments import ResultCatchments
 from .result_gridpoint import ResultGridPoint

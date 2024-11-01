@@ -1,3 +1,5 @@
+"""Res1D class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -63,7 +65,9 @@ from DHI.Mike1D.Generic import Connection
 
 
 class Res1D:
-    """Class for reading data from 1D network result files. Currently supported formats are:
+    """Class for reading data from 1D network result files.
+
+    Currently supported formats are:
 
     * MIKE 1D network and catchment res1d files
     * MIKE 1D Long Term Statistics (LTS) res1d files
@@ -168,6 +172,7 @@ class Res1D:
         self._derived_quantities = self._init_derived_quantities(derived_quantities)
 
     def __repr__(self):
+        """Return string representation of the Res1D object."""
         return "<mikeio1d.Res1D>"
 
     def _init_derived_quantities(
@@ -205,7 +210,7 @@ class Res1D:
         queries: Optional[list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
-        """Reads result data into a pandas DataFrame.
+        """Read result data into a pandas DataFrame.
 
         Parameters
         ----------
@@ -263,22 +268,18 @@ class Res1D:
         return queries
 
     def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
-        """Adds a derived quantity to the Res1D object, propogating changes to the network.
+        """Add a derived quantity to the Res1D object, propogating changes to the network.
 
         Parameters
         ----------
         derived_quantity : Type[DerivedQuantity]
             Derived quantity to be added
-
-        Returns
-        -------
-
         """
         derived_quantity = derived_quantity(self)
         self.network.add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
-        """Removes a derived quantity from the Res1D object, propogating changes to the network.
+        """Remove a derived quantity from the Res1D object, propogating changes to the network.
 
         Parameters
         ----------
@@ -291,7 +292,7 @@ class Res1D:
         self.network.remove_derived_quantity(derived_quantity)
 
     def modify(self, data_frame: pd.DataFrame, file_path=None):
-        """Modifies the ResultData object TimeData based on the provided data frame.
+        """Modify the ResultData object TimeData based on the provided data frame.
 
         Parameters
         ----------
@@ -306,7 +307,7 @@ class Res1D:
             self.save(file_path)
 
     def save(self, file_path):
-        """Saves the ResultData to a new res1d file.
+        """Save the ResultData to a new res1d file.
 
         Useful for persisting modified data, as well as converting supported result
         file types (e.g. res11) into res1d.
@@ -335,6 +336,7 @@ class Res1D:
         ext=None,
     ):
         """Extract given queries to provided file.
+
         File type is determined from file_path extension.
         The supported formats are:
         * csv
@@ -396,7 +398,7 @@ class Res1D:
 
     @staticmethod
     def merge(file_names: List[str] | List[Res1D], merged_file_name: str):
-        """Merges res1d files.
+        """Merge res1d files.
 
         It is possible to merge three kinds of result files:
         * Regular res1d (HD, RR, etc.)
@@ -537,18 +539,22 @@ class Res1D:
         return self.read(column_mode=column_mode)
 
     def get_catchment_values(self, catchment_id, quantity):
+        """Get catchment values. Deprecated, use network.catchments instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
 
     def get_node_values(self, node_id, quantity):
+        """Get node values. Deprecated, use network.nodes instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetNodeValues(node_id, quantity))
 
     def get_reach_values(self, reach_name, chainage, quantity):
+        """Get reach values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
+        """Get reach value. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         if self.reader.is_lts_result_file():
             raise NotImplementedError("The method is not implemented for LTS event statistics.")
@@ -557,14 +563,17 @@ class Res1D:
         return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
 
     def get_reach_start_values(self, reach_name, quantity):
+        """Get reach start values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetReachStartValues(reach_name, quantity))
 
     def get_reach_end_values(self, reach_name, quantity):
+        """Get reach end values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetReachEndValues(reach_name, quantity))
 
     def get_reach_sum_values(self, reach_name, quantity):
+        """Get reach sum values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
 

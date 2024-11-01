@@ -1,3 +1,5 @@
+"""ResultCatchments class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -45,9 +47,7 @@ class ResultCatchments(ResultLocations):
         self._geometries = None
 
     def set_catchments(self):
-        """Set attributes to the current ResultCatchments object based
-        on the catchment ID.
-        """
+        """Set attributes to the current ResultCatchments object based on the catchment ID."""
         for catchment in self.data.Catchments:
             catchment = impl(catchment)
             result_catchment = ResultCatchment(catchment, self.res1d)
@@ -58,8 +58,7 @@ class ResultCatchments(ResultLocations):
             setattr(self, result_catchment_attribute_string, result_catchment)
 
     def set_res1d_catchment_to_dict(self, catchment):
-        """Create a dict entry from catchment ID to ResultCatchment object.
-        """
+        """Create a dict entry from catchment ID to ResultCatchment object."""
         self[catchment.id] = catchment
 
     def to_geopandas(

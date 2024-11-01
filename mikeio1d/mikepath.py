@@ -1,3 +1,5 @@
+"""Module for handling MIKE binary paths."""
+
 import os
 import sys
 import platform
@@ -43,8 +45,7 @@ class MikePath:
 
     @staticmethod
     def setup_mike_installation(syspath):
-        """Adds MIKE installation bin path and MIKE IO 1D bin path to the
-        given PATH variable.
+        """Add MIKE installation bin path and MIKE IO 1D bin path to the given PATH variable.
 
         Parameters
         ----------
@@ -65,7 +66,8 @@ class MikePath:
 
     @staticmethod
     def update_mike_bin_to_mikepluspy_bin_if_used():
-        """Updates the path for MIKE assemblies to the ones used by MIKE+Py package.
+        """Update the path for MIKE assemblies to the ones used by MIKE+Py package.
+
         This requires that the MIKE+Py package was already loaded.
         """
         mikepluspy = sys.modules.get("mikeplus")
@@ -82,6 +84,7 @@ class MikePath:
 
     @staticmethod
     def setup_mike_installation_custom(syspath):
+        """Add DHI.Mike.Install to the syspath and setup the MIKE installation."""
         # Some of the MIKE libraries will need to be resolved by DHI.Mike.Install,
         # so set it up here.
         import clr
@@ -95,6 +98,7 @@ class MikePath:
 
     @staticmethod
     def setup_mike_installation_linux():
+        """Set up MIKE installation on Linux."""
         # This mikecore import statement is for resolution of MIKE Core native libraries on Linux.
         # Note that setting LD_LIBRARY_PATH in the process has no effect.
         # The mikecore has patchelfed MIKE Core libraries,

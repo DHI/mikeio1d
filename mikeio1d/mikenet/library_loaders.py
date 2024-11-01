@@ -1,3 +1,5 @@
+"""Module for loading MIKE software .NET libraries."""
+
 import os
 import sys
 from glob import glob
@@ -8,8 +10,7 @@ from .library_loader import LibraryLoader
 
 
 class LibraryLoaders:
-    """Helper class which finds all MIKE software .NET libraries
-    and assigns references to those libraries in MIKE.NET module.
+    """Helper class which finds all MIKE software .NET libraries and assigns references to those libraries in MIKE.NET module.
 
     Parameters
     ----------
@@ -27,9 +28,7 @@ class LibraryLoaders:
         self.create_loaders()
 
     def create_loaders(self):
-        """Creates .NET library loaders and assigns relevant `load` methods
-        to MIKE.NET module.
-        """
+        """Create .NET library loaders and assigns relevant `load` methods to MIKE.NET module."""
         mikenet_module = self.mikenet_module
 
         for pattern in MikePath.library_patterns:
@@ -44,13 +43,12 @@ class LibraryLoaders:
         setattr(mikenet_module, "load", self.load)
 
     def load_all(self):
-        """Loads all libraries present in library_loader_list.
-        """
+        """Load all libraries present in library_loader_list."""
         for library_loader in self.library_loader_list:
             library_loader.load()
 
     def load(self, libraries=[]):
-        """Loads all libraries specified by the list `libraries`.
+        """Load all libraries specified by the list `libraries`.
 
         Parameters
         ----------

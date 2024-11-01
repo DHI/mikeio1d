@@ -1,3 +1,5 @@
+"""CrossSectionGeometry class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -38,4 +40,5 @@ class CrossSectionGeometry:
         return [(p.X, p.Y) for p in self._m1d_cross_section.Coordinates]
 
     def to_shapely(self) -> BaseGeometry:
+        """Convert the cross section to a Shapely LineString."""
         return LineString(self.coords)

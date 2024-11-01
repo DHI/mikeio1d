@@ -1,3 +1,5 @@
+"""Helper functions for working with results along the chainage axis."""
+
 import pandas as pd
 
 from .transposed_groupby import TransposedGroupBy

@@ -1,3 +1,5 @@
+"""ExtractorTxt class."""
+
 from .extractor import Extractor
 
 import System
@@ -6,9 +8,10 @@ from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
 
 class ExtractorTxt(Extractor):
-    """Class which extracts data to text file"""
+    """Class which extracts data to text file."""
 
     def export(self):
+        """Export data to text file."""
         self.f = open(self.out_file_name, "w")
         self.set_output_format()
         self.write_item_type()
@@ -19,6 +22,7 @@ class ExtractorTxt(Extractor):
         self.f.close()
 
     def set_output_format(self):
+        """Set output format."""
         self.header1_format = "%-20s"
         self.header2_format = "%15s"
         self.chainage_format = "%15s"
@@ -27,6 +31,7 @@ class ExtractorTxt(Extractor):
         self.data_formatcs = "{0,15:0.000000}"
 
     def write_item_type(self):
+        """Write item type."""
         output_data, f = self.output_data, self.f
         header1_format, header2_format = self.header1_format, self.header2_format
 
@@ -48,6 +53,7 @@ class ExtractorTxt(Extractor):
         f.write("\n")
 
     def write_quantity(self):
+        """Write quantity."""
         output_data, f = self.output_data, self.f
         header1_format, header2_format = self.header1_format, self.header2_format
 
@@ -57,6 +63,7 @@ class ExtractorTxt(Extractor):
         f.write("\n")
 
     def write_name(self):
+        """Write name."""
         output_data, f = self.output_data, self.f
         result_data = self.result_data
         header1_format, header2_format = self.header1_format, self.header2_format
@@ -84,6 +91,7 @@ class ExtractorTxt(Extractor):
         f.write("\n")
 
     def write_chainage(self):
+        """Write chainage."""
         output_data, f = self.output_data, self.f
         result_data = self.result_data
         header1_format, header2_format = self.header1_format, self.header2_format
@@ -112,6 +120,7 @@ class ExtractorTxt(Extractor):
         f.write("\n")
 
     def write_data_items(self):
+        """Write data items."""
         output_data, f = self.output_data, self.f
         result_data = self.result_data
         header1_format, data_format, data_formatcs = (

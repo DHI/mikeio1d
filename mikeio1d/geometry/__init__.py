@@ -1,3 +1,5 @@
+"""Package for geometry objects."""
+
 from .node_point import NodePoint
 from .reach_point import ReachPoint
 from .reach_geometry import ReachGeometry

@@ -1,3 +1,5 @@
+"""Provides a custom accessor for Pandas DataFrames."""
+
 import pandas as pd
 
 from .transposed_groupby import TransposedGroupBy
@@ -9,8 +11,9 @@ from .various import groupby_level
 
 @pd.api.extensions.register_dataframe_accessor("m1d")
 class Mikeio1dAccessor:
-    """This class uses Pandas Extension API to register a custom accessor for DataFrames. More
-    information can be found here:
+    """Uses Pandas Extension API to register a custom accessor for DataFrames.
+
+    More information can be found here:
 
     https://pandas.pydata.org/docs/development/extending.html#registering-custom-accessors
 
@@ -36,8 +39,7 @@ class Mikeio1dAccessor:
             raise ValueError("DataFrame must have chainage column.")
 
     def agg_chainage(self, agg=None) -> pd.DataFrame:
-        """Convenience wrapper for ResultReaches.agg_chainage.
-        """
+        """Wrap ResultReaches.agg_chainage."""
         self._validate_has_chainage()
         kwargs = {}
         if agg is not None:
@@ -46,38 +48,29 @@ class Mikeio1dAccessor:
         return agg_chainage(self._obj, **kwargs)
 
     def groupby_chainage(self, *args, **kwargs) -> TransposedGroupBy:
-        """Convenience wrapper for pd.DataFrame.groupby. The groupby is performed on
-        the columns of the DataFrame, which are in the form of a MultiIndex.
-        """
+        """Wrap pd.DataFrame.groupby. The groupby is performed on the columns of the DataFrame, which are in the form of a MultiIndex."""
         self._validate_has_chainage()
         df: pd.DataFrame = self._obj
         return groupby_chainage(df, *args, **kwargs)
 
     def groupby_level(self, level_name: str) -> pd.DataFrame:
-        """Convenience wrapper for groupby_level. The groupby is performed on
-        the columns of the DataFrame, which are in the form of a MultiIndex.
-        """
+        """Wrap groupby_level. The groupby is performed on the columns of the DataFrame, which are in the form of a MultiIndex."""
         self._validate(self._obj)
         df: pd.DataFrame = self._obj
         return groupby_level(df, level_name)
 
     def groupby(self, *args, **kwargs) -> TransposedGroupBy:
-        """Convenience wrapper for pd.DataFrame.groupby. The groupby is performed on
-        the columns of the DataFrame, which are in the form of a MultiIndex.
-        """
+        """Wrap pd.DataFrame.groupby. The groupby is performed on the columns of the DataFrame, which are in the form of a MultiIndex."""
         df: pd.DataFrame = self._obj
         groupby = TransposedGroupBy(transposed_groupby=df.T.groupby(*args, **kwargs))
         return groupby
 
     def query(self, *args, **kwargs) -> pd.DataFrame:
-        """Convenience wrapper for pd.DataFrame.query. The query is performed on
-        the columns of the DataFrame, which are in the form of a MultiIndex.
-        """
+        """Wrap pd.DataFrame.query. The query is performed on the columns of the DataFrame, which are in the form of a MultiIndex."""
         df = self._obj
         return df.T.query(*args, **kwargs).T
 
     def compact(self, *args, **kwargs) -> pd.DataFrame:
-        """Convenience wrapper for compact_dataframe.
-        """
+        """Wrap compact_dataframe."""
         df = self._obj
         return compact_dataframe(df, *args, **kwargs)

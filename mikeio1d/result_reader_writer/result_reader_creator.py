@@ -1,3 +1,5 @@
+"""Module for ResultReaderCreator class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -13,11 +15,15 @@ from .result_reader_query import ResultReaderQuery
 
 
 class ResultReaderType:
+    """Enum class for ResultReader types."""
+
     COPIER = "copier"
     QUERY = "query"
 
 
 class ResultReaderCreator:
+    """Class for creating ResultReader objects."""
+
     @staticmethod
     def create(
         result_reader_type,
@@ -32,6 +38,7 @@ class ResultReaderCreator:
         put_chainage_in_col_name=True,
         time=None,
     ) -> ResultReader:
+        """Create a ResultReader object based on the provided type."""
         reasult_readers: Dict[ResultReaderType, ResultReader] = {
             ResultReaderType.COPIER: ResultReaderCopier,
             ResultReaderType.QUERY: ResultReaderQuery,

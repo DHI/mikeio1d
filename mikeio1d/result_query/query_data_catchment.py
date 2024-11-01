@@ -1,3 +1,5 @@
+"""Module for the QueryDataCatchment class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -32,6 +34,7 @@ class QueryDataCatchment(QueryData):
         super().__init__(quantity, name, validate)
 
     def get_values(self, res1d: Res1D):
+        """Get the time series data for the query."""
         self._check_invalid_quantity(res1d)
 
         values = res1d.query.GetCatchmentValues(self._name, self._quantity)
@@ -41,6 +44,7 @@ class QueryDataCatchment(QueryData):
         return self.from_dotnet_to_python(values)
 
     def to_timeseries_id(self) -> TimeSeriesId:
+        """Convert to TimeSeriesId."""
         tsid = TimeSeriesId(
             quantity=self.quantity,
             group=TimeSeriesIdGroup.CATCHMENT,
@@ -53,4 +57,5 @@ class QueryDataCatchment(QueryData):
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataCatchment:
+        """Create a QueryDataCatchment from a TimeSeriesId."""
         return QueryDataCatchment(timeseries_id.quantity, timeseries_id.name, validate=False)

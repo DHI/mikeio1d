@@ -1,3 +1,5 @@
+"""Module for ResultReaderCopier class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -25,10 +27,7 @@ from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
 
 class ResultReaderCopier(ResultReader):
-    """Class for reading the ResultData object TimeData
-    into Pandas data frame using ResultDataCopier object
-    from DHI.Mike1D.MikeIO library.
-    """
+    """Class for reading the ResultData object TimeData into Pandas data frame using ResultDataCopier object from DHI.Mike1D.MikeIO library."""
 
     def __init__(
         self,
@@ -64,6 +63,7 @@ class ResultReaderCopier(ResultReader):
         timeseries_ids: List[TimeSeriesId] = None,
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
+        """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""
         if timeseries_ids is None:
             return self.read_all(column_mode=column_mode)
 
@@ -77,6 +77,7 @@ class ResultReaderCopier(ResultReader):
         return df
 
     def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read all TimeData into a Pandas data frame."""
         data_entries, timeseries_ids = self.get_all_data_entries_and_timeseries_ids()
 
         df = self.create_data_frame(data_entries, timeseries_ids, column_mode=column_mode)
@@ -89,6 +90,7 @@ class ResultReaderCopier(ResultReader):
         timeseries_ids: List[TimeSeriesId],
         column_mode: Optional[str | ColumnMode] = None,
     ):
+        """Create a Pandas DataFrame from the given data entries and TimeSeriesIds."""
         number_of_timesteps = self.data.NumberOfTimeSteps
         number_of_items = len(data_entries)
 
@@ -112,7 +114,7 @@ class ResultReaderCopier(ResultReader):
         timeseries_ids: List[TimeSeriesId],
         column_mode: Optional[ColumnMode] = None,
     ) -> pd.MultiIndex | pd.Index:
-        """Creates a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
+        """Create a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
         if column_mode is None:
             column_mode = self.column_mode
 
@@ -131,6 +133,7 @@ class ResultReaderCopier(ResultReader):
             raise ValueError(f"Unknown column_mode: {column_mode}")
 
     def get_all_data_entries_and_timeseries_ids(self) -> Tuple[DataEntryNet, List[TimeSeriesId]]:
+        """Get all data entries and TimeSeriesIds from the ResultData object."""
         data_entries = self.result_data_copier.GetEmptyDataEntriesList()
         timeseries_ids: List[TimeSeriesId] = []
         timeseries_ids_set = set()
@@ -159,7 +162,7 @@ class ResultReaderCopier(ResultReader):
         m1d_data_item,
         i: int,
     ) -> TimeSeriesId:
-        """Returns a unique TimeSeriesId for given data set, data item and element index.
+        """Return a unique TimeSeriesId for given data set, data item and element index.
 
         Parameters
         ----------

@@ -1,3 +1,5 @@
+"""ResultLocations class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -30,8 +32,7 @@ from ..quantities import DerivedQuantity
 
 
 class ResultLocations(Dict[str, ResultLocation]):
-    """A base class for a network locations (nodes, reaches)
-    or a catchments wrapper class.
+    """A base class for a network locations (nodes, reaches) or a catchments wrapper class.
 
     Parameters
     ----------
@@ -64,6 +65,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         self._group = None
 
     def __repr__(self) -> str:
+        """Return a string representation of the object."""
         return f"<{self.__class__.__name__}>"
 
     def _repr_html_(self) -> str:
@@ -144,7 +146,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         return df
 
     def set_quantity_collections(self):
-        """Sets all quantity collection attributes."""
+        """Set all quantity collection attributes."""
         for quantity_id in self.result_quantity_map:
             result_quantities = self.result_quantity_map[quantity_id]
             result_quantity_collection = ResultQuantityCollection(result_quantities, self.res1d)
@@ -201,7 +203,7 @@ class ResultLocations(Dict[str, ResultLocation]):
             location.remove_derived_quantity(derived_quantity)
 
     def set_quantity_derived(self, derived_quantity: DerivedQuantity):
-        """Sets a single derived quantity attribute on the obj."""
+        """Set a single derived quantity attribute on the obj."""
         result_quantity_derived = ResultQuantityDerivedCollection(
             derived_quantity, self, self.res1d
         )
@@ -215,9 +217,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         setattr(self, result_quantity_attribute_string, result_quantity_derived)
 
     def set_res1d_object_to_dict(self, dict_key, obj):
-        """Create a dict entry from a key name to an object
-        or a list of objects.
-        """
+        """Create a dict entry from a key name to an object or a list of objects."""
         obj = impl(obj)
         if dict_key in self:
             value = self[dict_key]

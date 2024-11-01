@@ -1,3 +1,5 @@
+"""Package for reading and writing results from MIKE IO 1D files."""
+
 from .result_reader_creator import ResultReaderCreator
 from .result_reader_creator import ResultReaderType
 

@@ -1,3 +1,5 @@
+"""CrossSectionCollection class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -72,11 +74,13 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
                 raise ValueError(f"Topo ID mismatch: {key[2]} != {cross_section.topo_id}")
 
     def __repr__(self) -> str:
+        """Return a string representation of the collection."""
         return f"<CrossSectionCollection {len(self)}>"
 
     def __getitem__(
         self, key: Tuple[LocationId, Chainage, TopoId]
     ) -> CrossSection | CrossSectionCollection:
+        """Get a cross section or a collection of cross sections."""
         if isinstance(key, str):
             return self.__getitem__((key, ..., ...))
 
@@ -101,14 +105,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         )
 
     def __or__(self, other) -> CrossSectionCollection:
+        """Merge two collections."""
         if isinstance(other, CrossSectionCollection):
             return CrossSectionCollection({**self, **other})
         else:
             super().__or__(other)
 
     def add_xsection(self, xsection: CrossSection):
-        """Add a cross section to the collection.
-        """
+        """Add a cross section to the collection."""
         location_id = xsection.location_id
         chainage = f"{xsection.chainage:.3f}"
         topo_id = xsection.topo_id
@@ -119,26 +123,23 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
 
     @property
     def location_ids(self) -> Set[str]:
-        """Unique location IDs in the collection.
-        """
+        """Unique location IDs in the collection."""
         return set([k[0] for k in self.keys()])
 
     @property
     def chainages(self) -> Set[str]:
-        """Unique chainages in the collection (as string with 3 decimals).
-        """
+        """Unique chainages in the collection (as string with 3 decimals)."""
         return set([k[1] for k in self.keys()])
 
     @property
     def topo_ids(self) -> Set[str]:
-        """Unique topo IDs in the collection.
-        """
+        """Unique topo IDs in the collection."""
         return set([k[2] for k in self.keys()])
 
     def sel(
         self, location_id: str = ..., chainage: str | float = ..., topo_id: str = ...
     ) -> CrossSection | List[CrossSection]:
-        """This method is used to select cross sections from the collection.
+        """Select cross sections from the collection.
 
         Parameters
         ----------
@@ -161,14 +162,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return self[location_id, chainage, topo_id]
 
     def plot(self, *args, **kwargs):
+        """Plot all cross sections in the collection."""
         for xs in self.values():
             ax = xs.plot(*args, **kwargs)
             kwargs["ax"] = ax
         return ax
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Converts the collection to a DataFrame.
-        """
+        """Convert the collection to a DataFrame."""
         location_ids = [k[0] for k in self.keys()]
         chainages = [k[1] for k in self.keys()]
         topo_ids = [k[2] for k in self.keys()]
@@ -185,7 +186,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return df
 
     def to_geopandas(self) -> gpd.GeoDataFrame:
-        """Converts the collection to a GeoDataFrame.
+        """Convert the collection to a GeoDataFrame.
 
         Note:
         ----
@@ -209,8 +210,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         return gdf
 
     def to_geopandas_markers(self) -> gpd.GeoDataFrame:
-        """Converts the collection to a GeoDataFrame of the markers as points.
-        """
+        """Convert the collection to a GeoDataFrame of the markers as points."""
         try_import_geopandas()
         import geopandas as gpd
 

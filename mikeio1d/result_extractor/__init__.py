@@ -1,3 +1,5 @@
+"""Package for extracting data from MIKE 1D result files."""
+
 from .extractor_creator import ExtractorCreator
 from .extractor_creator import ExtractorOutputFileType
 

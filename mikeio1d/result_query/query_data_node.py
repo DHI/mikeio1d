@@ -1,3 +1,5 @@
+"""Module for QueryDataNode class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -32,6 +34,7 @@ class QueryDataNode(QueryData):
         super().__init__(quantity, name, validate)
 
     def get_values(self, res1d):
+        """Get the time series data for the query."""
         self._check_invalid_quantity(res1d)
 
         values = res1d.query.GetNodeValues(self._name, self._quantity)
@@ -41,6 +44,7 @@ class QueryDataNode(QueryData):
         return self.from_dotnet_to_python(values)
 
     def to_timeseries_id(self) -> TimeSeriesId:
+        """Convert to TimeSeriesId."""
         tsid = TimeSeriesId(
             quantity=self.quantity,
             group=TimeSeriesIdGroup.NODE,
@@ -53,4 +57,5 @@ class QueryDataNode(QueryData):
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataNode:
+        """Create a QueryDataNode from a TimeSeriesId."""
         return QueryDataNode(timeseries_id.quantity, timeseries_id.name, validate=False)

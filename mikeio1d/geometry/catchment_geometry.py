@@ -1,3 +1,5 @@
+"""CatchmentGeometry class."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -23,8 +25,7 @@ class CatchmentGeometry:
 
     @staticmethod
     def from_res1d_catchment(res1d_catchment) -> CatchmentGeometry:
-        """Create a CatchmentGeometry from an IRes1DCatchment object.
-        """
+        """Create a CatchmentGeometry from an IRes1DCatchment object."""
         shape = res1d_catchment.Shape[0]  # there will always be one element
         points = []
         for i in range(shape.VertexCount()):

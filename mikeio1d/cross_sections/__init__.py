@@ -1,3 +1,5 @@
+"""Package for working with cross sections in 1D models."""
+
 from .cross_section import CrossSection
 from .marker import Marker
 from .cross_section_collection import CrossSectionCollection

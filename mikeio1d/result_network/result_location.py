@@ -1,3 +1,5 @@
+"""ResultLocation class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -24,8 +26,7 @@ from ..quantities import DerivedQuantity
 
 
 class ResultLocation(ABC):
-    """A base class for a network location (node, reach)
-    or a catchment wrapper class.
+    """A base class for a network location (node, reach) or a catchment wrapper class.
 
     Parameters
     ----------
@@ -60,6 +61,7 @@ class ResultLocation(ABC):
         self._static_attributes = []
 
     def __repr__(self) -> str:
+        """Return a string representation of the object."""
         return f"<{self.__class__.__name__}>"
 
     def _repr_html_(self) -> str:
@@ -114,12 +116,12 @@ class ResultLocation(ABC):
         return list(self.result_quantity_derived_map.keys())
 
     def set_static_attribute(self, key, value):
-        """Add static attribute. This shows up in the html repr"""
+        """Add static attribute. This shows up in the html repr."""
         self._static_attributes.append(key)
         setattr(self, key, value)
 
     def set_quantities(self):
-        """Sets all quantity attributes."""
+        """Set all quantity attributes."""
         element_indices = self.element_indices
         data_items = list(self.data_items)
         data_items_count = len(data_items)
@@ -129,7 +131,7 @@ class ResultLocation(ABC):
             self.set_quantity(self, data_item, element_index)
 
     def set_quantity(self, obj, data_item, element_index=0):
-        """Sets a single quantity attribute on the obj."""
+        """Set a single quantity attribute on the obj."""
         m1d_dataset = self.get_m1d_dataset(data_item)
         result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
         self.res1d.network.add_result_quantity_to_map(result_quantity)
@@ -158,6 +160,7 @@ class ResultLocation(ABC):
             self.set_quantity_derived(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+        """Remove a derived quantity from the result location."""
         if isinstance(derived_quantity, DerivedQuantity):
             derived_quantity = derived_quantity.name
 
@@ -170,7 +173,7 @@ class ResultLocation(ABC):
             delattr(self, result_quantity_attribute_string)
 
     def set_quantity_derived(self, derived_quantity: DerivedQuantity):
-        """Sets a single derived quantity attribute on the obj."""
+        """Set a single derived quantity attribute on the obj."""
         result_quantity_derived = ResultQuantityDerived(derived_quantity, self, self.res1d)
         quantity_id = result_quantity_derived.name
 
@@ -183,7 +186,7 @@ class ResultLocation(ABC):
 
     @abstractclassmethod
     def get_m1d_dataset(self, m1d_dataitem=None):
-        """Base method for getting IRes1DDataSet object associated with ResultLocation.
+        """Get IRes1DDataSet object associated with ResultLocation.
 
         Parameters
         ----------
@@ -200,9 +203,9 @@ class ResultLocation(ABC):
 
     @abstractclassmethod
     def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
-        """Base method for adding to result quantity maps, which is a dictionary
-        from quantity id to a list of result quantities corresponding to that
-        quantity id.
+        """Add to result quantity maps.
+
+        Result quantity map is a dictionary from quantity id to a list of result quantities corresponding to that quantity id.
 
         Parameters
         ----------
@@ -220,7 +223,7 @@ class ResultLocation(ABC):
         result_quantity: ResultQuantity,
         result_quantity_map: Dict[str, List[ResultQuantity]],
     ):
-        """Method for adding to a given result quantity map.
+        """Add to a given result quantity map.
 
         Parameters
         ----------
@@ -256,11 +259,11 @@ class ResultLocation(ABC):
         return tsid
 
     def add_query(self, data_item):
-        """Base method for adding a query to ResultNetwork.queries list."""
+        """Add a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
 
     @abstractclassmethod
     def get_query(self, data_item):
-        """Base method for creating a query for given data item."""
+        """Create a query for given data item."""
         ...

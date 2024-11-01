@@ -1,3 +1,5 @@
+"""Module for the Xns11 class."""
+
 from __future__ import annotations
 
 from typing import List
@@ -32,8 +34,7 @@ class FileNotOpenedError(BaseXns11Error):
 
 
 def read(file_path: str | Path, queries: QueryData | List[QueryData]) -> pd.DataFrame:
-    """Read the requested data from the xns11 file and
-    return a Pandas DataFrame.
+    """Read the requested data from the xns11 file and return a Pandas DataFrame.
 
     Parameters
     ----------
@@ -53,9 +54,10 @@ def read(file_path: str | Path, queries: QueryData | List[QueryData]) -> pd.Data
 
 
 def open(file_path: str | Path) -> Xns11:
-    """Open a xns11 file as a Xns11 object that has convenient methods
-    to extract specific data from the file. It is recommended to use it
-    as a context manager.
+    """Open a xns11 file as a Xns11 object.
+
+    Has convenient methods to extract specific data from the file.
+    It is recommended to use it as a context manager.
 
     Parameters
     ----------
@@ -145,6 +147,7 @@ class Xns11:
         self._init_xsections()
 
     def __repr__(self):
+        """Return a string representation of the object."""
         return "<mikeio1d.Xns11>"
 
     def _load_file(self):
@@ -163,9 +166,11 @@ class Xns11:
         return info
 
     def __enter__(self):
+        """Context manager enter method."""
         return self
 
     def __exit__(self, *excinfo):
+        """Context manager exit method."""
         pass
 
     def _init_cross_section_data(self):
@@ -181,7 +186,7 @@ class Xns11:
             self.xsections.add_xsection(CrossSection(xs))
 
     def info(self):
-        """Prints information about the result file."""
+        """Print information about the result file."""
         info = self._get_info()
         print(info)
 
@@ -256,7 +261,7 @@ class Xns11:
 
     @property
     def topoid_names(self):
-        """A list of the topo-id names"""
+        """A list of the topo-id names."""
         if self._topoid_names:
             return self._topoid_names
         return [topoid.TopoId for topoid in self._topoids]
@@ -269,14 +274,14 @@ class Xns11:
 
     @property
     def reach_names(self):
-        """A list of the reach names"""
+        """A list of the reach names."""
         if self._reach_names:
             return self._reachs_names
         return [reach.ReachId for reach in self._topoids]
 
     @staticmethod
     def _topoid_in_reach(self, reach):
-        """A list of the topo-ID contained in a reach."""
+        """List topo-IDs contained in a reach."""
         return [
             r.TopoId
             for r in list(self.file.GetReachTopoIdEnumerable())
@@ -285,7 +290,7 @@ class Xns11:
 
     @staticmethod
     def _chainages(reach):
-        """A list of chainages of a reach topo-ID combination."""
+        """List chainages of a reach topo-ID combination."""
         return [r.Key for r in list(reach.GetChainageSortedCrossSections())]
 
     def _get_values(self, points):
@@ -356,17 +361,6 @@ class Xns11:
                     )
 
     def _build_queries(self, queries):
-        """ "
-        A query can be in an undefined state if reach_name and/or chainage
-        isn't set. This function takes care of building lists of queries
-        for these cases. Chainages are rounded to three decimal places.
-
-        >>> self._build_queries([QueryData("topoid1", "reach1")])
-        [
-            QueryData("topoid1", "reach1", 56.68),
-            QueryData("topoid1", "reach1", 121.98)
-        ]
-        """
         built_queries = []
         for q in queries:
             # e.g. QueryData("topoid1", "reach1", 58.68)
@@ -394,10 +388,6 @@ class Xns11:
         return built_queries
 
     def _find_points(self, queries, chainage_tolerance=0.1):
-        """From a list of queries returns a dictionary with the required
-        information for each requested point to extract its geometry
-        later on.
-        """
         PointInfo = namedtuple("PointInfo", ["index", "value"])
 
         found_points = defaultdict(list)
@@ -429,8 +419,7 @@ class Xns11:
         return dict(found_points)
 
     def read(self, queries):
-        """Read the requested data from the xns11 file and
-        return a Pandas DataFrame.
+        """Read the requested data from the xns11 file and return a Pandas DataFrame.
 
         Parameters
         ----------
@@ -450,8 +439,7 @@ class Xns11:
 
 
 class QueryData:
-    """A query object that declares what data should be
-    extracted from a .xns11 file.
+    """A query object that declares what data should be extracted from a .xns11 file.
 
     Parameters
     ----------
@@ -491,19 +479,26 @@ class QueryData:
 
     @property
     def topoid_name(self):
+        """Topo ID."""
         return self._topoid_name
 
     @property
     def reach_name(self):
+        """Reach name."""
         return self._reach_name
 
     @property
     def chainage(self):
+        """Chainage."""
         return self._chainage
 
     def __repr__(self):
+        """Return a string representation of the object."""
         return (
             f"QueryData(topoid_name='{self.topoid_name}', "
             f"reach_name='{self.reach_name}', "
             f"chainage={self.chainage})"
         )
+
+
+__all__ = ["Xns11"]

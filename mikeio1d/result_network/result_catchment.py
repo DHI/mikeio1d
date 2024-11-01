@@ -1,3 +1,5 @@
+"""ResultCatchment class."""
+
 from __future__ import annotations
 from warnings import warn
 from typing import TYPE_CHECKING
@@ -31,9 +33,11 @@ class ResultCatchment(ResultLocation):
         self.set_static_attributes()
 
     def __repr__(self) -> str:
+        """Return a string representation of the ResultCatchment object."""
         return f"<Catchment: {self.id}>"
 
     def __getattr__(self, name: str):
+        """Warn if accessing deprecated attributes."""
         # TODO: Remove this in 1.0.0
         if name == "catchment":
             warn(
@@ -89,8 +93,7 @@ class ResultCatchment(ResultLocation):
 
     @property
     def geometry(self) -> CatchmentGeometry:
-        """A geometric representation of the catchment. Requires shapely.
-        """
+        """A geometric representation of the catchment. Requires shapely."""
         try_import_shapely()
         from ..geometry import CatchmentGeometry
 

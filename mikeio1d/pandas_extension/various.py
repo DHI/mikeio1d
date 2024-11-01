@@ -1,3 +1,5 @@
+"""Various functions for working with pandas DataFrames."""
+
 from __future__ import annotations
 
 from dataclasses import fields

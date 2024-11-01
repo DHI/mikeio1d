@@ -1,3 +1,5 @@
+"""ResultGlobalData class."""
+
 from ..query import QueryDataGlobal
 from .result_location import ResultLocation
 from ..quantities import TimeSeriesIdGroup
@@ -44,7 +46,8 @@ class ResultGlobalData(ResultLocation):
         return self.res1d.data.GlobalData
 
     def set_quantities(self):
-        """Override of base set_quantities.
+        """Set quantities for ResultGlobalData.
+
         Here only a single data item is used for ResultGlobalData.
         Also the quantity attribute is assigned to self.global_data.
         """

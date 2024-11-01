@@ -1,10 +1,12 @@
+"""ExtractorAll class."""
+
 from .extractor_dfs0 import ExtractorDfs0
 from .extractor_csv import ExtractorCsv
 from .extractor_txt import ExtractorTxt
 
 
 class ExtractorAll:
-    """Class which extracts data into all supported file formats"""
+    """Class which extracts data into all supported file formats."""
 
     def __init__(self, out_file_name, output_data, result_data, time_step_skipping_number=1):
         self.all_extractors = [
@@ -29,5 +31,6 @@ class ExtractorAll:
         ]
 
     def export(self):
+        """Export data to all supported file formats."""
         for extractor in self.all_extractors:
             extractor.export()

@@ -1,3 +1,5 @@
+"""GeioPandasReachesConverter class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -40,8 +42,7 @@ class GeoPandasReachesConverter(GeoPandasConverter):
         return self._reach_to_geometry(reach).to_shapely()
 
     def _create_dataframe_data_dict(self, reaches: ResultReaches) -> dict[str, tuple]:
-        """Creates a dictionary with the data needed to create a GeoDataFrame.
-        """
+        """Create a dictionary with the data needed to create a GeoDataFrame."""
         names = [reach.name for reach in reaches.values()]
         geometries = [self._reach_to_shapely(reach) for reach in reaches.values()]
         data = {
@@ -52,8 +53,7 @@ class GeoPandasReachesConverter(GeoPandasConverter):
         return data
 
     def to_geopandas(self, reaches: ResultReaches) -> GeoDataFrame:
-        """Convert ResultReaches to a GeoDataFrame.
-        """
+        """Convert ResultReaches to a GeoDataFrame."""
         data = self._create_dataframe_data_dict(reaches)
         crs = self.get_crs(reaches.res1d)
         gdf = GeoDataFrame(data=data, crs=crs)

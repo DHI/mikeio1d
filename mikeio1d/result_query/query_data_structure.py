@@ -1,3 +1,5 @@
+"""Module for QueryDataStructure class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -43,9 +45,11 @@ class QueryDataStructure(QueryDataReach):
 
     @property
     def structure(self):
+        """Structure name."""
         return self._structure
 
     def get_values(self, res1d: Res1D):
+        """Get the time series data for the query."""
         self._check_invalid_quantity(res1d)
 
         result_structure = self._get_result_structure(res1d)
@@ -62,6 +66,7 @@ class QueryDataStructure(QueryDataReach):
         return self.from_dotnet_to_python(values)
 
     def to_timeseries_id(self) -> TimeSeriesId:
+        """Convert the query to a TimeSeriesId object."""
         chainage = self.chainage
         if chainage is None or chainage == "":
             chainage = float("nan")
@@ -76,6 +81,7 @@ class QueryDataStructure(QueryDataReach):
 
     @staticmethod
     def from_timeseries_id(timeseries_id: TimeSeriesId) -> QueryDataStructure:
+        """Convert a TimeSeriesId object to a QueryDataStructure object."""
         chainage = timeseries_id.chainage
         if isnan(chainage):
             chainage = None
@@ -112,6 +118,7 @@ class QueryDataStructure(QueryDataReach):
             self._chainage = result_structure.chainage
 
     def __repr__(self):
+        """Return a string representation of the query."""
         structure = self._structure
         name = self._name
         chainage = self._chainage

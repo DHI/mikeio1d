@@ -1,3 +1,5 @@
+"""ResultFrameAggregator class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -101,8 +103,7 @@ class ResultFrameAggregator:
     def _create_agg_functions_dict(
         self, agg_default: str | Callable, agg_kwargs: Dict
     ) -> Dict[str, Any]:
-        """Creates the 'agg_functions' attribute dictionary from the supplied aggregation functions.
-        """
+        """Create the 'agg_functions' attribute dictionary from the supplied aggregation functions."""
         agg_functions = {level: agg_default for level in self._agg_levels}
         for level, func in agg_kwargs.items():
             if level in agg_functions:
@@ -114,8 +115,7 @@ class ResultFrameAggregator:
         self._validate_agg_functions()
 
     def _validate_levels(self):
-        """Validate that entity, quantity, and agg levels are consistent with TimeSeriesId.
-        """
+        """Validate that entity, quantity, and agg levels are consistent with TimeSeriesId."""
         entity_levels = set(self._entity_levels)
         agg_levels = set(self._agg_levels)
         quantity_levels = set(self._quantity_levels)
@@ -152,8 +152,7 @@ class ResultFrameAggregator:
             raise ValueError("Agg levels should start with 'duplicate'.")
 
     def _validate_agg_functions(self):
-        """Validate that the agg functions are complete and valid.
-        """
+        """Validate that the agg functions are complete and valid."""
         functions = set(self._agg_functions.keys())
         if not functions == set(self._agg_levels):
             raise ValueError("Missing aggregation function for one of the agg_levels.")
@@ -162,8 +161,7 @@ class ResultFrameAggregator:
             self._validate_agg_function(level_name, agg)
 
     def _validate_agg_function(self, level_name: str, agg: Any):
-        """Validate that the agg function is a callable or a string.
-        """
+        """Validate that the agg function is a callable or a string."""
         if level_name not in self._agg_levels:
             raise ValueError(f"Level name '{level_name}' is not a valid level for aggregation.")
 
@@ -174,8 +172,7 @@ class ResultFrameAggregator:
             )
 
     def aggregate(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Aggregate along the duplicate, chainage, and time dimensions.
-        """
+        """Aggregate along the duplicate, chainage, and time dimensions."""
         self._validate_df(df)
 
         for agg_level in self._agg_levels[:-1]:
@@ -191,29 +188,22 @@ class ResultFrameAggregator:
 
     @property
     def entity_levels(self) -> List[str]:
-        """The DataFrame column levels used to uniquely identify an entity.
-        (e.g. ['group','name','tag']).
-        """
+        """The DataFrame column levels used to uniquely identify an entity. (e.g. ['group','name','tag'])."""
         return self._entity_levels
 
     @property
     def agg_levels(self) -> List[str]:
-        """The DataFrame column levels that will be aggregated along, in order.
-        (e.g. ['duplicate','chainage','time']).
-        """
+        """The DataFrame column levels that will be aggregated along, in order. (e.g. ['duplicate','chainage','time'])."""
         return self._agg_levels
 
     @property
     def quantity_levels(self) -> List[str]:
-        """The DataFrame column levels used to uniquely identify a quantity
-        (e.g. ['quantity','derived']).
-        """
+        """The DataFrame column levels used to uniquely identify a quantity (e.g. ['quantity','derived'])."""
         return self._quantity_levels
 
     @property
     def agg_functions(self) -> Dict[str, Any]:
-        """A dictionary with keys matching agg_levels, and values being the aggregation functions.
-        """
+        """A dictionary with keys matching agg_levels, and values being the aggregation functions."""
         return self._agg_functions
 
     def set_agg_function(self, level_name: str, agg: Any):
@@ -262,8 +252,7 @@ class ResultFrameAggregator:
         return level_name in df.columns.names
 
     def _aggregate_along_level(self, df: pd.DataFrame, level: str, agg: Any) -> pd.DataFrame:
-        """Aggregate along the specified column level.
-        """
+        """Aggregate along the specified column level."""
         if not self._has_level_name(df, level):
             return df
 
@@ -271,13 +260,11 @@ class ResultFrameAggregator:
         return df
 
     def _aggregate_along_time(self, df: pd.DataFrame, agg: Any) -> pd.DataFrame:
-        """Aggregate along the time dimension (the rows of the DataFrame).
-        """
+        """Aggregate along the time dimension (the rows of the DataFrame)."""
         return df.agg([agg])
 
     def _finalize_quantity_index(self, quantity_index: pd.Index) -> pd.Index:
-        """Finalize format of quantity_index.
-        """
+        """Finalize format of quantity_index."""
         if len(self._quantity_levels) == 1:
             return quantity_index
 
@@ -302,8 +289,7 @@ class ResultFrameAggregator:
         return quantity_index
 
     def _finalize_entity_index(self, entity_index: pd.Index) -> pd.Index:
-        """Finalize format of entity_index.
-        """
+        """Finalize format of entity_index."""
         if len(self._entity_levels) == 1:
             return entity_index
 
@@ -321,8 +307,7 @@ class ResultFrameAggregator:
         return entity_index
 
     def _finalize_df_post_aggregate(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Finalize the DataFrame formatting after aggregation.
-        """
+        """Finalize the DataFrame formatting after aggregation."""
         df = df.rename_axis(self._agg_level_name)
         for level in self._quantity_levels:
             if level not in df.columns.names:

@@ -1,3 +1,5 @@
+"""Module for ResultWriter class."""
+
 import numpy as np
 import pandas as pd
 
@@ -5,8 +7,7 @@ from ..quantities import TimeSeriesId
 
 
 class ResultWriter:
-    """Class for modifying the ResultData object TimeData
-    using the value of Pandas data frame.
+    """Class for modifying the ResultData object TimeData using the value of Pandas data frame.
 
     Parameters
     ----------
@@ -25,7 +26,8 @@ class ResultWriter:
         self.result_network = res1d.network
 
     def modify(self, dataframe: pd.DataFrame):
-        """Modifies the ResultData object TimeData based on the provided data frame.
+        """Modify the ResultData object TimeData based on the provided data frame.
+
         It will override the relevant TimeData values by the values of the data frame.
 
         Parameters
@@ -50,7 +52,7 @@ class ResultWriter:
             self.set_values(time_index, values, data_item, element_index)
 
     def set_values(self, time_index, values, data_item, element_index):
-        """Modifies the TimeData value of the data item for given element index.
+        """Modify the TimeData value of the data item for given element index.
 
         Parameters
         ----------
@@ -70,9 +72,7 @@ class ResultWriter:
             self.set_values_indexed(time_index, values, data_item, element_index)
 
     def set_values_all(self, values, data_item, element_index):
-        """Sets the values of all entries in TimeData
-        of the data item for given element index.
-        """
+        """Set the values of all entries in TimeData of the data item for given element index."""
         # Pick the first available value.
         # TODO: Some of the query IDs can be not unique. Figure out how to handle this case.
         values_count = len(values)
@@ -83,9 +83,7 @@ class ResultWriter:
             data_item.TimeData.SetValue(i, element_index, value)
 
     def set_values_indexed(self, time_index, values, data_item, element_index):
-        """Sets only the provided for time_index and values in TimeData
-        of the data item for given element index.
-        """
+        """Set only the provided for time_index and values in TimeData of the data item for given element index."""
         res1d_time_index = self.res1d.time_index
 
         # Pick just the first column.

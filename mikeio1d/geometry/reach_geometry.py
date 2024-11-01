@@ -1,3 +1,5 @@
+"""ReachGeometry class."""
+
 from __future__ import annotations
 
 from functools import lru_cache
@@ -12,8 +14,7 @@ from .reach_point import ReachPoint
 
 
 class ReachGeometry:
-    """A utility class for working with reach geometries.
-    """
+    """A utility class for working with reach geometries."""
 
     def __init__(self, points: List[ReachPoint]):
         self._points = sorted(points)
@@ -43,22 +44,27 @@ class ReachGeometry:
 
     @property
     def chainages(self) -> List[float]:
+        """List of unique chainages."""
         return [p.chainage for p in self._get_unique_points()]
 
     @property
     def points(self) -> List[ReachPoint]:
+        """List of unique points."""
         return self._points
 
     @property
     def digipoints(self) -> List[ReachPoint]:
+        """List of digipoints."""
         return [p for p in self.points if p.is_digipoint()]
 
     @property
     def gridpoints(self) -> List[ReachPoint]:
+        """List of gridpoints."""
         return [p for p in self.points if p.is_gridpoint()]
 
     @property
     def length(self) -> float:
+        """Length of the reach."""
         return self.chainages[-1] - self.chainages[0]
 
     def to_shapely(self) -> BaseGeometry:
@@ -91,12 +97,12 @@ class ReachGeometry:
 
     @lru_cache(maxsize=None)
     def _get_unique_points(self) -> List[ReachPoint]:
-        """Removes points sharing the same chainage and coordinates."""
+        """Remove points sharing the same chainage and coordinates."""
         return sorted(list(set(self._points)))
 
     @lru_cache(maxsize=None)
     def _get_distances(self) -> List[float]:
-        """Returns a list of geometric distances between all unique points."""
+        """Return a list of geometric distances between all unique points."""
         points = self._get_unique_points()
         distances = []
         total_distance = 0.0

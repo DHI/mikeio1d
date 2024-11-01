@@ -1,3 +1,5 @@
+"""Module for QueryData base class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -64,10 +66,12 @@ class QueryData(ABC):
 
     @property
     def quantity(self):
+        """Return the quantity."""
         return self._quantity
 
     @property
     def name(self):
+        """Return the name."""
         return self._name
 
     @abstractmethod
@@ -85,4 +89,5 @@ class QueryData(ABC):
             raise NoDataForQuery(str(self))
 
     def __repr__(self):
+        """Return the string representation of the query."""
         return NAME_DELIMITER.join([self._quantity, self._name])

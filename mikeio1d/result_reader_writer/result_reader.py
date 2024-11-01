@@ -1,3 +1,5 @@
+"""Module for ResultReader class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -46,8 +48,7 @@ class ColumnMode(str, Enum):
 
 
 class ResultReader(ABC):
-    """Class for reading the ResultData object TimeData
-    into Pandas data frame.
+    """Class for reading the ResultData object TimeData into Pandas data frame.
 
     Parameters
     ----------
@@ -159,8 +160,7 @@ class ResultReader(ABC):
         self.searcher = ResultDataSearch(self.data)
 
     def _setup_filter(self):
-        """Setup the filter for result data object.
-        """
+        """Set up the filter for result data object."""
         if not self.use_filter:
             return
 
@@ -223,7 +223,7 @@ class ResultReader(ABC):
         ...
 
     def is_data_set_included(self, data_set):
-        """Skip filtered data sets"""
+        """Skip filtered data sets."""
         name = self.get_data_set_name(data_set)
         if self.use_filter and name not in self._catchments + self._reaches + self._nodes:
             return False
@@ -243,10 +243,12 @@ class ResultReader(ABC):
         return self._time_index
 
     def get_data_set_name(self, data_set, item_id=None):
+        """Get the name of the data set."""
         name = TimeSeriesId.get_dataset_name(data_set, item_id, self.col_name_delimiter)
         return name
 
     def get_column_name(self, data_set, data_item, i):
+        """Get the column name for the data frame."""
         quantity_id = data_item.Quantity.Id
         item_id = data_item.ItemId
         name = self.get_data_set_name(data_set, item_id)
@@ -268,6 +270,7 @@ class ResultReader(ABC):
     # region Methods for LTS result files
 
     def update_time_quantities(self, df: pd.DataFrame):
+        """Update the time quantities in the data frame to datetime objects."""
         if not self.is_lts_result_file():
             return
 
@@ -300,7 +303,7 @@ class ResultReader(ABC):
         quantity_column: str | TimeSeriesId | tuple,
         column_level_names: Optional[List[str]] = None,
     ) -> bool:
-        """Determines if the quantity_column is the LTS event time column.
+        """Determine if the quantity_column is the LTS event time column.
 
         Parameters
         ----------
@@ -325,8 +328,13 @@ class ResultReader(ABC):
             raise TypeError(f"Unsupported type {type(quantity_column)} for quantity_column.")
 
     def is_lts_result_file(self):
-        # For pythonnet version > 3.0 it is possible to call
-        # return self._data.ResultType.Equals(ResultTypes.LTSEvents)
+        """Check if the result file is an LTS result file.
+
+        Notes
+        -----
+        For pythonnet version > 3.0 it is possible to call
+        return self._data.ResultType.Equals(ResultTypes.LTSEvents)
+        """
         return int(self.data.ResultType) == int(ResultTypes.LTSEvents)
 
     @property

@@ -1,3 +1,5 @@
+"""Various helper functions for the result network module."""
+
 from __future__ import annotations
 import re
 from typing import List, Tuple, Dict
@@ -20,6 +22,7 @@ class ValidPythonIdentifierTranslatorTable:
         self.replacement = replacement
 
     def __getitem__(self, key):
+        """Return the replacement character if the key is not a valid python identifier character."""
         key = chr(key)
         if key.isdigit() or key.isidentifier():
             return key
@@ -31,7 +34,7 @@ _translator_table = ValidPythonIdentifierTranslatorTable()
 
 
 def make_proper_variable_name(string: str, extra_string_before_digit="_"):
-    """Makes a more proper variable name.
+    """Make a more proper variable name.
 
     It is assumed that the input string never is or after manipulations
     becomes an '_' or an empty string.
@@ -52,7 +55,7 @@ def make_proper_variable_name(string: str, extra_string_before_digit="_"):
 
 
 def build_html_repr_from_sections(header: str, sections: List[Tuple[str, List | Dict]]):
-    """Builds an html representation from a list of sections.
+    """Build an html representation from a list of sections.
 
     Parameters
     ----------
@@ -78,7 +81,7 @@ def build_html_repr_from_sections(header: str, sections: List[Tuple[str, List | 
 
 
 def _build_html_repr_section_style():
-    """Builds a style string for html representation."""
+    """Build a style string for html representation."""
     style = """
     <style>
         ul {
@@ -92,7 +95,7 @@ def _build_html_repr_section_style():
 
 
 def _build_html_repr_section_from_dict(name, keyvalues):
-    """Builds a section from a dictionary."""
+    """Build a section from a dictionary."""
     section = "<details>"
     section += f"<summary>{name}</summary>"
     section += "<ul>"
@@ -104,7 +107,7 @@ def _build_html_repr_section_from_dict(name, keyvalues):
 
 
 def _build_html_repr_section_from_list(name, values):
-    """Builds a section from a list."""
+    """Build a section from a list."""
     section = "<details>"
     section += f"<summary>{name}</summary>"
     section += "<ul>"

@@ -1,3 +1,5 @@
+"""TransposedGroupBy class."""
+
 import pandas as pd
 
 
@@ -25,6 +27,8 @@ class TransposedGroupBy:
         self.transposed_groupby = transposed_groupby
 
     def __getattr__(self, name):
+        """Return the transposed result of the method."""
+
         def method(*args, **kwargs):
             result = getattr(self.transposed_groupby, name)(*args, **kwargs)
             if isinstance(result, pd.DataFrame):
