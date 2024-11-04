@@ -20,6 +20,7 @@ import pandas as pd
 import datetime
 
 from ..dotnet import from_dotnet_datetime
+from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 from ..quantities import TimeSeriesId
 from .time_filter import TimeFilter
@@ -376,3 +377,13 @@ class ResultReader(ABC):
         return self._time_index
 
     # endregion Methods for LTS result files
+
+    @property
+    def bridge(self):
+        """The bridge object for the result data."""
+        return impl(self.data.Bridge)
+
+    @property
+    def number_of_time_steps(self):
+        """Number of time steps in the result data."""
+        return self.bridge.NumberOfTimeSteps

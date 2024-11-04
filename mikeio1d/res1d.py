@@ -194,7 +194,7 @@ class Res1D:
         if self.file_path:
             info.append(f"Start time: {str(self.start_time)}")
             info.append(f"End time: {str(self.end_time)}")
-            info.append(f"# Timesteps: {str(self.data.NumberOfTimeSteps)}")
+            info.append(f"# Timesteps: {str(self.reader.number_of_time_steps)}")
             info.append(f"# Catchments: {self.data.Catchments.get_Count()}")
             info.append(f"# Nodes: {self.data.Nodes.get_Count()}")
             info.append(f"# Reaches: {self.data.Reaches.get_Count()}")
@@ -499,7 +499,7 @@ class Res1D:
     @property
     def number_of_time_steps(self) -> int:
         """Number of time steps in the result file."""
-        return self.data.NumberOfTimeSteps
+        return self.reader.number_of_time_steps
 
     @property
     def quantities(self) -> List[str]:
