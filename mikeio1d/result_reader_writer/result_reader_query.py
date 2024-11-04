@@ -28,6 +28,8 @@ class ResultReaderQuery(ResultReader):
         self, timeseries_ids: List[TimeSeriesId], column_mode: Optional[ColumnMode] = None
     ) -> pd.DataFrame:
         """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""
+        self.load_dynamic_data()
+
         if column_mode is not None:
             raise NotImplementedError(
                 f"ResultReaderQuery does not support column_mode {column_mode}."
@@ -49,6 +51,8 @@ class ResultReaderQuery(ResultReader):
 
     def read_all(self, column_mode: Optional[ColumnMode] = None) -> pd.DataFrame:
         """Read all TimeData into a Pandas data frame."""
+        self.load_dynamic_data()
+
         if column_mode is not None:
             raise NotImplementedError(
                 f"ResultReaderQuery does not support column_mode {column_mode}."
@@ -74,6 +78,8 @@ class ResultReaderQuery(ResultReader):
 
     def get_values(self, data_set, data_item):
         """Get all time series values in given data_item."""
+        self.load_dynamic_data()
+
         for i in range(data_item.NumberOfElements):
             col_name = self.get_column_name(data_set, data_item, i)
             yield data_item.CreateTimeSeriesData(i), col_name

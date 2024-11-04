@@ -55,6 +55,8 @@ class ResultReaches(ResultLocations):
     def set_reaches(self):
         """Set attributes to the current ResultReaches object based on the reach name."""
         for reach in self.data.Reaches:
+            if not self.res1d.reader.is_data_set_included(reach):
+                continue
             reach = impl(reach)
             result_reach = self.get_or_create_result_reach(reach)
             result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)

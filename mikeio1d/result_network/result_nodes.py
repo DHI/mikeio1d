@@ -51,6 +51,8 @@ class ResultNodes(ResultLocations):
     def set_nodes(self):
         """Set attributes to the current ResultNodes object based on the node ID."""
         for node in self.data.Nodes:
+            if not self.res1d.reader.is_data_set_included(node):
+                continue
             node = impl(node)
             result_node = ResultNode(node, self.res1d)
             self.set_res1d_node_to_dict(result_node)
