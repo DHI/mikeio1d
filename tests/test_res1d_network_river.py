@@ -312,6 +312,8 @@ def test_res1d_modification_filtered(test_file, column_mode, expected_exception)
 
 def test_extraction_to_csv_dfs0_txt(test_file):
     res1d = test_file
+    res1d.read()
+
     res1d.clear_queue_after_reading = False
 
     res1d.reaches.WaterLevel.add()

@@ -258,6 +258,8 @@ class ResultReader(ABC):
     @property
     def time_index(self):
         """pandas.DatetimeIndex of the time index."""
+        self.load_dynamic_data()
+
         if self._time_index is not None:
             return self._time_index
 
