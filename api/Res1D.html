@@ -312,6 +312,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mikeio1d.Res1D.get_reach_sum_values" id="toc-mikeio1d.Res1D.get_reach_sum_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_sum_values">get_reach_sum_values</a></li>
   <li><a href="#mikeio1d.Res1D.get_reach_value" id="toc-mikeio1d.Res1D.get_reach_value" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_value">get_reach_value</a></li>
   <li><a href="#mikeio1d.Res1D.get_reach_values" id="toc-mikeio1d.Res1D.get_reach_values" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_reach_values">get_reach_values</a></li>
+  <li><a href="#mikeio1d.Res1D.get_supported_file_extensions" id="toc-mikeio1d.Res1D.get_supported_file_extensions" class="nav-link" data-scroll-target="#mikeio1d.Res1D.get_supported_file_extensions">get_supported_file_extensions</a></li>
   <li><a href="#mikeio1d.Res1D.info" id="toc-mikeio1d.Res1D.info" class="nav-link" data-scroll-target="#mikeio1d.Res1D.info">info</a></li>
   <li><a href="#mikeio1d.Res1D.merge" id="toc-mikeio1d.Res1D.merge" class="nav-link" data-scroll-target="#mikeio1d.Res1D.merge">merge</a></li>
   <li><a href="#mikeio1d.Res1D.modify" id="toc-mikeio1d.Res1D.modify" class="nav-link" data-scroll-target="#mikeio1d.Res1D.modify">modify</a></li>
@@ -552,42 +553,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Get reach values. Deprecated, use network.reaches instead.</td>
 </tr>
 <tr class="odd">
+<td><a href="#mikeio1d.Res1D.get_supported_file_extensions">get_supported_file_extensions</a></td>
+<td>Get supported file extensions for Res1D.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.info">info</a></td>
 <td>Print information about the result file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.merge">merge</a></td>
 <td>Merge res1d files.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.modify">modify</a></td>
 <td>Modify the ResultData object TimeData based on the provided data frame.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.read">read</a></td>
 <td>Read result data into a pandas DataFrame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.read_all">read_all</a></td>
 <td>Read all data from res1d file to dataframe. Deprecated, use read() instead.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.remove_derived_quantity">remove_derived_quantity</a></td>
 <td>Remove a derived quantity from the Res1D object, propogating changes to the network.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.save">save</a></td>
 <td>Save the ResultData to a new res1d file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.to_csv">to_csv</a></td>
 <td>Extract to csv file.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.Res1D.to_dfs0">to_dfs0</a></td>
 <td>Extract to dfs0 file.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.Res1D.to_txt">to_txt</a></td>
 <td>Extract to txt file.</td>
 </tr>
@@ -715,6 +720,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_reach_values">get_reach_values</h3>
 <p><code>Res1D.get_reach_values(reach_name, chainage, quantity)</code></p>
 <p>Get reach values. Deprecated, use network.reaches instead.</p>
+</section>
+<section id="mikeio1d.Res1D.get_supported_file_extensions" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_supported_file_extensions">get_supported_file_extensions</h3>
+<p><code>Res1D.get_supported_file_extensions()</code></p>
+<p>Get supported file extensions for Res1D.</p>
 </section>
 <section id="mikeio1d.Res1D.info" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.info">info</h3>
