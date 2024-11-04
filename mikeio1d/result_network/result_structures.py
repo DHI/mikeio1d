@@ -40,6 +40,8 @@ class ResultStructures(ResultLocations):
     def set_structures(self):
         """Set attributes to the current ResultReaches object based on the reach name."""
         for reach in self.data.Reaches:
+            if not self.res1d.reader.is_data_set_included(reach):
+                continue
             for data_item in reach.DataItems:
                 if not self.is_structure(reach, data_item):
                     continue

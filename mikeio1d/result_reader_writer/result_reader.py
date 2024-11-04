@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
+    from ..res1d import Res1D
 
 import warnings
 
@@ -22,6 +23,7 @@ from ..dotnet import from_dotnet_datetime
 from ..various import NAME_DELIMITER
 from ..quantities import TimeSeriesId
 from .time_filter import TimeFilter
+from ..result_network import ResultNetwork
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
@@ -88,7 +90,7 @@ class ResultReader(ABC):
         put_chainage_in_col_name=True,
         time=None,
     ):
-        self.res1d = res1d
+        self.res1d: Res1D = res1d
 
         self.file_path = file_path
         self.file_extension = os.path.splitext(file_path)[-1]
@@ -102,9 +104,9 @@ class ResultReader(ABC):
 
         self.use_filter = any([reaches, nodes, catchments, time])
 
+        self._loaded = False
+
         self._load_header()
-        if not header_load:
-            self._load_file()
 
         self._time_index = None
 
@@ -153,11 +155,16 @@ class ResultReader(ABC):
 
         if self.file_extension.lower() in [".resx", ".crf", ".prf", ".xrf"]:
             self.data.Load(self.diagnostics)
+            # required since ResultData.Load() creates new network objects, invalidating ResultNetwork references
+            self.res1d.network = ResultNetwork(self.res1d)
         else:
             self.data.LoadData(self.diagnostics)
 
-        self.query = ResultDataQuery(self.data)
-        self.searcher = ResultDataSearch(self.data)
+    def load_dynamic_data(self):
+        """Load the dynamic data from the file."""
+        if not self._loaded:
+            self._load_file()
+            self._loaded = True
 
     def _setup_filter(self):
         """Set up the filter for result data object."""
@@ -228,6 +235,24 @@ class ResultReader(ABC):
         if self.use_filter and name not in self._catchments + self._reaches + self._nodes:
             return False
         return True
+
+    @property
+    def query(self):
+        """For querying the result data."""
+        if not self._loaded:
+            self.load_dynamic_data()
+        if not hasattr(self, "_query"):
+            self._query = ResultDataQuery(self.data)
+        return self._query
+
+    @property
+    def searcher(self):
+        """For searching the result data."""
+        if not self._loaded:
+            self.load_dynamic_data()
+        if not hasattr(self, "_searcher"):
+            self._searcher = ResultDataSearch(self.data)
+        return self._searcher
 
     @property
     def time_index(self):

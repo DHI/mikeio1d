@@ -64,6 +64,8 @@ class ResultReaderCopier(ResultReader):
         column_mode: Optional[str | ColumnMode] = None,
     ) -> pd.DataFrame:
         """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""
+        self.load_dynamic_data()
+
         if timeseries_ids is None:
             return self.read_all(column_mode=column_mode)
 
@@ -78,6 +80,8 @@ class ResultReaderCopier(ResultReader):
 
     def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
         """Read all TimeData into a Pandas data frame."""
+        self.load_dynamic_data()
+
         data_entries, timeseries_ids = self.get_all_data_entries_and_timeseries_ids()
 
         df = self.create_data_frame(data_entries, timeseries_ids, column_mode=column_mode)
@@ -91,8 +95,17 @@ class ResultReaderCopier(ResultReader):
         column_mode: Optional[str | ColumnMode] = None,
     ):
         """Create a Pandas DataFrame from the given data entries and TimeSeriesIds."""
+        if data_entries is None:
+            raise ValueError("Could not create DataFrame with no data entries")
+
         number_of_timesteps = self.data.NumberOfTimeSteps
         number_of_items = len(data_entries)
+
+        if number_of_timesteps == 0:
+            raise ValueError("Could not create DataFrame with zero timesteps")
+
+        if number_of_items == 0:
+            raise ValueError("Could not create DataFrame with zero items")
 
         shape = (number_of_timesteps, number_of_items)
         data_array = np.zeros(shape, dtype=np.dtype("float32"), order="F")

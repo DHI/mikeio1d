@@ -50,6 +50,8 @@ class ResultCatchments(ResultLocations):
         """Set attributes to the current ResultCatchments object based on the catchment ID."""
         for catchment in self.data.Catchments:
             catchment = impl(catchment)
+            if not self.res1d.reader.is_data_set_included(catchment):
+                continue
             result_catchment = ResultCatchment(catchment, self.res1d)
             self.set_res1d_catchment_to_dict(result_catchment)
             result_catchment_attribute_string = make_proper_variable_name(
