@@ -437,7 +437,24 @@ class Res1D:
     @staticmethod
     def get_supported_file_extensions() -> Set[str]:
         """Get supported file extensions for Res1D."""
-        return {".res1d", ".res11", ".resx", ".res", ".out", ".prf", ".crf"}
+        return {
+            # MIKE 1D
+            ".res1d",
+            # MIKE 11
+            ".res11",
+            # MOUSE
+            ".prf",
+            ".crf",
+            ".xrf"
+            # EPANET
+            ".res",
+            # SWMM
+            ".out",
+            # Water Hammer
+            ".whr",
+            # EPANET, SWMM, Water Hammer
+            ".resx",
+        }
 
     @property
     def nodes(self) -> ResultNodes:
