@@ -50,7 +50,7 @@ class ResultReaches(ResultLocations):
 
         res1d.network.reaches = self
         self.set_reaches()
-        self.set_quantity_collections()
+        self._set_quantity_collections()
 
     def set_reaches(self):
         """Set attributes to the current ResultReaches object based on the reach name."""
@@ -62,12 +62,12 @@ class ResultReaches(ResultLocations):
             result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
             setattr(self, result_reach_attribute_string, result_reach)
 
-    def set_quantity_collections(self):
+    def _set_quantity_collections(self):
         """Set quantity collections to the current ResultReaches object."""
-        ResultLocations.set_quantity_collections(self)
+        ResultLocations._set_quantity_collections(self)
         for reach_name in self:
             result_reach = self[reach_name]
-            ResultLocations.set_quantity_collections(result_reach)
+            ResultLocations._set_quantity_collections(result_reach)
 
     def get_or_create_result_reach(self, reach):
         """Create or get already existing ResultReach object.

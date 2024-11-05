@@ -35,7 +35,7 @@ class ResultStructures(ResultLocations):
 
         res1d.network.structures = self
         self.set_structures()
-        self.set_quantity_collections()
+        self._set_quantity_collections()
 
     def set_structures(self):
         """Set attributes to the current ResultReaches object based on the reach name."""
@@ -86,6 +86,6 @@ class ResultStructures(ResultLocations):
             return result_structure
 
         result_structure = ResultStructure(structure_id, reach, [data_item], self.res1d)
-        self.set_res1d_object_to_dict(structure_id, result_structure)
+        self._set_res1d_object_to_dict(structure_id, result_structure)
         result_structure_map[structure_id] = result_structure
         return result_structure

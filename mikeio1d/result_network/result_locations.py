@@ -145,7 +145,7 @@ class ResultLocations(Dict[str, ResultLocation]):
 
         return df
 
-    def set_quantity_collections(self):
+    def _set_quantity_collections(self):
         """Set all quantity collection attributes."""
         for quantity_id in self.result_quantity_map:
             result_quantities = self.result_quantity_map[quantity_id]
@@ -163,7 +163,7 @@ class ResultLocations(Dict[str, ResultLocation]):
             return False
         return True
 
-    def add_derived_quantity(self, derived_quantity: DerivedQuantity):
+    def _add_derived_quantity(self, derived_quantity: DerivedQuantity):
         """Add a derived quantity to the result network.
 
         Parameters
@@ -173,12 +173,12 @@ class ResultLocations(Dict[str, ResultLocation]):
 
         """
         if self._can_add_derived_quantity(derived_quantity):
-            self.set_quantity_derived(derived_quantity)
+            self._set_quantity_derived(derived_quantity)
 
         for location in self.values():
             location.add_derived_quantity(derived_quantity)
 
-    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+    def _remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
         """Remove a derived quantity from the result network.
 
         Parameters
@@ -202,7 +202,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         for location in self.values():
             location.remove_derived_quantity(derived_quantity)
 
-    def set_quantity_derived(self, derived_quantity: DerivedQuantity):
+    def _set_quantity_derived(self, derived_quantity: DerivedQuantity):
         """Set a single derived quantity attribute on the obj."""
         result_quantity_derived = ResultQuantityDerivedCollection(
             derived_quantity, self, self.res1d
@@ -216,7 +216,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         )
         setattr(self, result_quantity_attribute_string, result_quantity_derived)
 
-    def set_res1d_object_to_dict(self, dict_key, obj):
+    def _set_res1d_object_to_dict(self, dict_key, obj):
         """Create a dict entry from a key name to an object or a list of objects."""
         obj = impl(obj)
         if dict_key in self:
