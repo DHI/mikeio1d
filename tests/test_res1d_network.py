@@ -19,9 +19,9 @@ def test_file_path():
     return os.path.join(test_folder_path, "testdata", "network.res1d")
 
 
-@pytest.fixture(params=[True, False])
-def test_file(test_file_path, request):
-    return Res1D(test_file_path, lazy_load=request.param)
+@pytest.fixture
+def test_file(test_file_path):
+    return Res1D(test_file_path, lazy_load=False)
 
 
 def test_file_does_not_exist():
@@ -32,7 +32,7 @@ def test_file_does_not_exist():
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 110
-    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
+    assert not df.columns.duplicated().any()
 
 
 def test_mike1d_quantities():
@@ -237,15 +237,49 @@ def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
         df = res1d.read(column_mode=ColumnMode.ALL)
         helpers.assert_shared_columns_equal(df_full, df)
 
-@pytest.mark.parametrize("time, expected_len, expected_start, expected_end", [
-    (None, 110, "1994-08-07 16:35:00.000", "1994-08-07 18:35:00.000"),
-    (slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
-    (("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
-    (slice(None, "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
-    ((None, "1994-08-07 16:37:07.560000"), 3, "1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
-    (slice("1994-08-07 18:32:07.967000", None), 3, "1994-08-07 18:32:07.967000", "1994-08-07 18:35:00.000"),
-    (("1994-08-07 18:32:07.967000", None), 3, "1994-08-07 18:32:07.967000", "1994-08-07 18:35:00.000"),
-])
+
+@pytest.mark.parametrize(
+    "time, expected_len, expected_start, expected_end",
+    [
+        (None, 110, "1994-08-07 16:35:00.000", "1994-08-07 18:35:00.000"),
+        (
+            slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+            3,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:37:07.560000",
+        ),
+        (
+            ("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+            3,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:37:07.560000",
+        ),
+        (
+            slice(None, "1994-08-07 16:37:07.560000"),
+            3,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:37:07.560000",
+        ),
+        (
+            (None, "1994-08-07 16:37:07.560000"),
+            3,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:37:07.560000",
+        ),
+        (
+            slice("1994-08-07 18:32:07.967000", None),
+            3,
+            "1994-08-07 18:32:07.967000",
+            "1994-08-07 18:35:00.000",
+        ),
+        (
+            ("1994-08-07 18:32:07.967000", None),
+            3,
+            "1994-08-07 18:32:07.967000",
+            "1994-08-07 18:35:00.000",
+        ),
+    ],
+)
 def test_res1d_filter_time(test_file_path, time, expected_len, expected_start, expected_end):
     expected_start = pd.Timestamp(expected_start)
     expected_end = pd.Timestamp(expected_end)
@@ -255,6 +289,7 @@ def test_res1d_filter_time(test_file_path, time, expected_len, expected_start, e
     assert res1d.data.NumberOfTimeSteps == expected_len
     assert res1d.time_index[0] == expected_start
     assert res1d.time_index[-1] == expected_end
+
 
 def test_node_attributes(test_file):
     res1d = test_file

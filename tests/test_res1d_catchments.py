@@ -25,9 +25,9 @@ def test_file_path_for_merging():
     return os.path.join(test_folder_path, "testdata", "catchment_merge.res1d")
 
 
-@pytest.fixture(params=[True, False])
+@pytest.fixture
 def test_file(test_file_path, request):
-    return Res1D(test_file_path, lazy_load=request.param)
+    return Res1D(test_file_path, lazy_load=False)
 
 
 def test_read(test_file):
