@@ -108,6 +108,7 @@ class TestCrossSectionUnits:
         assert coords[1][0] == 938163.08
         assert coords[1][1] == 377291.372
 
+    @pytest.mark.optional_dependency
     def test_geometry(self, cs_basic):
         pytest.importorskip("shapely")
         from mikeio1d.geometry import CrossSectionGeometry
