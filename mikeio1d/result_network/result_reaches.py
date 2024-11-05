@@ -49,16 +49,16 @@ class ResultReaches(ResultLocations):
         self.result_reach_map = {}
 
         res1d.network.reaches = self
-        self.set_reaches()
+        self._set_reaches()
         self._set_quantity_collections()
 
-    def set_reaches(self):
+    def _set_reaches(self):
         """Set attributes to the current ResultReaches object based on the reach name."""
         for reach in self.data.Reaches:
             if not self.res1d.reader.is_data_set_included(reach):
                 continue
             reach = impl(reach)
-            result_reach = self.get_or_create_result_reach(reach)
+            result_reach = self._get_or_create_result_reach(reach)
             result_reach_attribute_string = make_proper_variable_name(reach.Name, self.reach_label)
             setattr(self, result_reach_attribute_string, result_reach)
 
@@ -69,7 +69,7 @@ class ResultReaches(ResultLocations):
             result_reach = self[reach_name]
             ResultLocations._set_quantity_collections(result_reach)
 
-    def get_or_create_result_reach(self, reach):
+    def _get_or_create_result_reach(self, reach):
         """Create or get already existing ResultReach object.
 
         There potentially could be just a single ResultReach object,
