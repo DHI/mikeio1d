@@ -44,7 +44,7 @@ def sample_random_time_series_ids(res: Res1D) -> List[TimeSeriesId]:
 
 def sample_random_queries(res: Res1D) -> List[str]:
     all_tsids = list(res.network.result_quantity_map.values())
-    all_queries = [t.get_query() for t in all_tsids]
+    all_queries = [t._get_query() for t in all_tsids]
     sample_queries = [q for q in all_queries if random.random() < 0.5]
     return sample_queries
 

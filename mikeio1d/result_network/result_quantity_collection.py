@@ -84,10 +84,10 @@ class ResultQuantityCollection(ResultQuantity):
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
         return timeseries_ids
 
-    def get_query(self):
+    def _get_query(self):
         """Get queries corresponding to ResultQuantityCollection."""
         queries = []
         for result_quantity in self.result_quantities:
-            query = result_quantity.get_query()
+            query = result_quantity._get_query()
             queries.append(query)
         return queries

@@ -174,7 +174,7 @@ class TimeSeriesId:
             raise ValueError("Cannot convert derived TimeSeriesId to DataEntry")
 
         result_quantity = self.to_result_quantity(res1d)
-        data_entry = result_quantity.get_data_entry()
+        data_entry = result_quantity._get_data_entry()
         return data_entry
 
     def to_result_quantity(self, res1d: Res1D) -> ResultQuantity:

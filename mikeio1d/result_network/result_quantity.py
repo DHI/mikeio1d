@@ -139,28 +139,28 @@ class ResultQuantity:
 
     def to_csv(self, file_path, time_step_skipping_number=1):
         """Extract time series data into a csv file."""
-        query = self.get_query()
+        query = self._get_query()
         self.res1d.to_csv(file_path, query, time_step_skipping_number)
 
     def to_dfs0(self, file_path, time_step_skipping_number=1):
         """Extract time series data into a dfs0 file."""
-        query = self.get_query()
+        query = self._get_query()
         self.res1d.to_dfs0(file_path, query, time_step_skipping_number)
 
     def to_txt(self, file_path, time_step_skipping_number=1):
         """Extract time series data into a txt file."""
-        query = self.get_query()
+        query = self._get_query()
         self.res1d.to_txt(file_path, query, time_step_skipping_number)
 
-    def get_query(self):
+    def _get_query(self):
         """Get query corresponding to ResultQuantity."""
         return QueryDataCreator.from_timeseries_id(self._timeseries_id)
 
-    def get_data_entry(self):
+    def _get_data_entry(self):
         """Get DataEntry corresponding to ResultQuantity."""
         return DataEntry(self.data_item, self.element_index, self.m1d_dataset)
 
-    def get_data_entry_net(self):
+    def _get_data_entry_net(self):
         """Get DataEntryNet corresponding to ResultQuantity."""
         return DataEntryNet(self.data_item, self.element_index)
 
