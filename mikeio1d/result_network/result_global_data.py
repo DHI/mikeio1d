@@ -29,7 +29,7 @@ class ResultGlobalData(ResultLocation):
         self.global_datas = global_datas
         self._set_quantities()
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGlobalData.
 
         Parameters

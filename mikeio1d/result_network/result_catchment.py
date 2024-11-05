@@ -30,7 +30,7 @@ class ResultCatchment(ResultLocation):
         self._group = TimeSeriesIdGroup.CATCHMENT
         self._catchment = catchment
         self._set_quantities()
-        self.set_static_attributes()
+        self._set_static_attributes()
 
     def __repr__(self) -> str:
         """Return a string representation of the ResultCatchment object."""
@@ -53,7 +53,7 @@ class ResultCatchment(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultCatchment.
 
         Parameters
@@ -69,7 +69,7 @@ class ResultCatchment(ResultLocation):
         """
         return self._catchment
 
-    def set_static_attributes(self):
+    def _set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._set_static_attribute("id", self._catchment.Id)
         self._set_static_attribute("area", self._catchment.Area)

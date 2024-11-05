@@ -42,9 +42,9 @@ class ResultStructure(ResultLocation):
 
         self.data_items_dict = {}
         for data_item in data_items:
-            self.add_res1d_structure_data_item(data_item)
+            self._add_res1d_structure_data_item(data_item)
 
-        self.set_static_attributes()
+        self._set_static_attributes()
 
     def __repr__(self) -> str:
         """Return a string representation of ResultStructure."""
@@ -59,7 +59,7 @@ class ResultStructure(ResultLocation):
         )
         return self.id
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultStructure.
 
         This is the reach IRes1DDataSet object because ResultStructure objects do not
@@ -78,7 +78,7 @@ class ResultStructure(ResultLocation):
         """
         return self.reach
 
-    def set_static_attributes(self):
+    def _set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []
         self._set_static_attribute("id", self.id)
@@ -96,7 +96,7 @@ class ResultStructure(ResultLocation):
 
         self._add_to_network_result_quantity_map(result_quantity)
 
-    def add_res1d_structure_data_item(self, data_item):
+    def _add_res1d_structure_data_item(self, data_item):
         """Add a IDataItem to ResultStructure.
 
         Parameters
@@ -116,7 +116,7 @@ class ResultStructure(ResultLocation):
         self._set_quantity(self, data_item)
 
     @staticmethod
-    def get_structure_id(reach, data_item):
+    def _get_structure_id(reach, data_item):
         """Get structure ID either from IDataItem.ItemId or for structure reaches from actual Res1DStructureGridPoint structure."""
         if data_item.ItemId is not None:
             return data_item.ItemId
@@ -129,7 +129,7 @@ class ResultStructure(ResultLocation):
 
         return None
 
-    def get_data_item(self, quantity_id):
+    def _get_data_item(self, quantity_id):
         """Retrieve a data item for given quantity id."""
         return self.data_items_dict[quantity_id]
 

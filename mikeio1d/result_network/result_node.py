@@ -30,7 +30,7 @@ class ResultNode(ResultLocation):
         self._group = TimeSeriesIdGroup.NODE
         self._node = node
         self._set_quantities()
-        self.set_static_attributes()
+        self._set_static_attributes()
 
     def __repr__(self) -> str:
         """Return a string representation of the object."""
@@ -50,7 +50,7 @@ class ResultNode(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultNode.
 
         Parameters
@@ -66,7 +66,7 @@ class ResultNode(ResultLocation):
         """
         return self._node
 
-    def set_static_attributes(self):
+    def _set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []
 

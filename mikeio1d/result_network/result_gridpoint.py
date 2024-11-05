@@ -46,7 +46,7 @@ class ResultGridPoint(ResultLocation):
         self._set_static_attribute("ycoord", self.gridpoint.Y)
         self._set_static_attribute("bottom_level", self.gridpoint.Z)
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGridPoint.
 
         This is the reach IRes1DDataSet object because grid points do not
@@ -85,11 +85,11 @@ class ResultGridPoint(ResultLocation):
         query = QueryDataReach(quantity_id, reach_name, chainage)
         return query
 
-    def add_data_item(self, data_item, element_index):
+    def _add_data_item(self, data_item, element_index):
         """Add data item to grid point data items list."""
         self.data_items.append(data_item)
         self.element_indices.append(element_index)
 
-    def add_structure_data_item(self, data_item):
+    def _add_structure_data_item(self, data_item):
         """Add data item to structure data items list."""
         self.structure_data_items.append(data_item)

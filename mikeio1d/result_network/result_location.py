@@ -132,7 +132,7 @@ class ResultLocation(ABC):
 
     def _set_quantity(self, obj, data_item, element_index=0):
         """Set a single quantity attribute on the obj."""
-        m1d_dataset = self.get_m1d_dataset(data_item)
+        m1d_dataset = self._get_m1d_dataset(data_item)
         result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
         self.res1d.network.add_result_quantity_to_map(result_quantity)
 
@@ -185,7 +185,7 @@ class ResultLocation(ABC):
         setattr(self, result_quantity_attribute_string, result_quantity_derived)
 
     @abstractclassmethod
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultLocation.
 
         Parameters

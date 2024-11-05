@@ -77,12 +77,12 @@ class ResultStructures(ResultLocations):
         Also update a result_structure_map dict entry from structure ID
         to a ResultStructure object.
         """
-        structure_id = ResultStructure.get_structure_id(reach, data_item)
+        structure_id = ResultStructure._get_structure_id(reach, data_item)
 
         result_structure_map = self.result_structure_map
         if structure_id in result_structure_map:
             result_structure = result_structure_map[structure_id]
-            result_structure.add_res1d_structure_data_item(data_item)
+            result_structure._add_res1d_structure_data_item(data_item)
             return result_structure
 
         result_structure = ResultStructure(structure_id, reach, [data_item], self.res1d)

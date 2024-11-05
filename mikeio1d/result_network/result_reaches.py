@@ -80,7 +80,7 @@ class ResultReaches(ResultLocations):
         """
         if reach.Name in self:
             result_reach = self[reach.Name]
-            result_reach.add_res1d_reach(reach)
+            result_reach._add_res1d_reach(reach)
             return result_reach
 
         result_reach = ResultReach([reach], self.res1d)

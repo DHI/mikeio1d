@@ -64,9 +64,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
         self.reaches = []
         for reach in reaches:
-            self.add_res1d_reach(reach)
+            self._add_res1d_reach(reach)
 
-        self.set_static_attributes()
+        self._set_static_attributes()
 
     def __repr__(self) -> str:
         """Return a string representation of ResultReach."""
@@ -165,10 +165,10 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """List of gridpoints for the reach."""
         return list(self.values())
 
-    def set_static_attributes(self):
+    def _set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._set_static_attribute("name", self.reaches[0].Name)
-        self.try_set_static_attribute_length()
+        self._try_set_static_attribute_length()
         self._set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
         self._set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
         self._set_static_attribute("n_gridpoints", self._get_total_gridpoints())
@@ -179,14 +179,14 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self._set_static_attribute("height", self._get_height())
         self._set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
 
-    def try_set_static_attribute_length(self):
+    def _try_set_static_attribute_length(self):
         """Try to set the length attribute. If it fails, ignore it."""
         try:
             self._set_static_attribute("length", self._get_total_length())
         except Exception as _:
             pass
 
-    def add_res1d_reach(self, reach):
+    def _add_res1d_reach(self, reach):
         """Add a IRes1DReach to ResultReach.
 
         Parameters
@@ -197,13 +197,13 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """
         self.reaches.append(reach)
         self.data_items.append(reach.DataItems)
-        self.set_gridpoints(reach)
-        self.set_gridpoint_data_items(reach)
+        self._set_gridpoints(reach)
+        self._set_gridpoint_data_items(reach)
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint._set_quantities()
         self.dataset = self.reaches
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def _get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultReach.
 
         A ResultReach may consist of several IRes1DDataSet objects. Therefore,
@@ -231,7 +231,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             m1d_dataitem,
         )
 
-    def set_gridpoints(self, reach):
+    def _set_gridpoints(self, reach):
         """Assign chainage attributes to a current ResultReach object from a data provided by IRes1DReach.
 
         Parameters
@@ -249,14 +249,14 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         gridpoint_count = reach.GridPoints.Count
         if gridpoint_count == 0:
             gridpoint = Res1DGridPoint()
-            self.set_gridpoint(reach, gridpoint)
+            self._set_gridpoint(reach, gridpoint)
 
         gridpoints = list(reach.GridPoints)
         for i in range(gridpoint_count):
             gridpoint = gridpoints[i]
-            self.set_gridpoint(reach, gridpoint)
+            self._set_gridpoint(reach, gridpoint)
 
-    def set_gridpoint(self, reach, gridpoint):
+    def _set_gridpoint(self, reach, gridpoint):
         """Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.
 
         Parameters
@@ -281,7 +281,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         chainage_str = f"{gridpoint.Chainage:.3f}"
         self[chainage_str] = result_gridpoint
 
-    def set_gridpoint_data_items(self, reach):
+    def _set_gridpoint_data_items(self, reach):
         """Assign data items to ResultGridPoint object belonging to current ResultReach from IRes1DReach data items.
 
         Parameters
@@ -298,9 +298,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
                 gridpoint_index = index_list[element_index]
                 result_gridpoint = self.current_reach_result_gridpoints[gridpoint_index]
                 if data_item.ItemId is None:
-                    result_gridpoint.add_data_item(data_item, element_index)
+                    result_gridpoint._add_data_item(data_item, element_index)
                 else:
-                    result_gridpoint.add_structure_data_item(data_item)
+                    result_gridpoint._add_structure_data_item(data_item)
 
     def _get_query(self, data_item):
         """Get a query for a data item."""
