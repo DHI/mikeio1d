@@ -162,7 +162,7 @@ class ResultReader(ABC):
             self.data.LoadData(self.diagnostics)
 
     def load_dynamic_data(self):
-        """Load the dynamic data from the file."""
+        """Load the dynamic data from the file if it has not already  been loaded."""
         if not self._loaded:
             self._load_file()
             self._loaded = True
