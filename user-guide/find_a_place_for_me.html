@@ -370,7 +370,7 @@ Note
 <li>Global data</li>
 </ul>
 <p>When you first open a result file, you’ll see how many of these elements types exist in the file.</p>
-<div id="61c70a92" class="cell" data-execution_count="1">
+<div id="ee9d5732" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -426,7 +426,7 @@ Tip
 <p>There’s various ways to read data into dataframes and make plots.</p>
 <section id="read-everything" class="level3">
 <h3 class="anchored" data-anchor-id="read-everything">Read everything</h3>
-<div id="c148c0ca" class="cell" data-execution_count="2">
+<div id="701e910a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
@@ -591,7 +591,7 @@ Tip
 </section>
 <section id="read-a-specific-result" class="level3">
 <h3 class="anchored" data-anchor-id="read-a-specific-result">Read a specific result</h3>
-<div id="79f521a5" class="cell" data-execution_count="3">
+<div id="855da949" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -635,7 +635,7 @@ Tip
 </section>
 <section id="read-a-group-of-results" class="level3">
 <h3 class="anchored" data-anchor-id="read-a-group-of-results">Read a group of results</h3>
-<div id="50f9bb50" class="cell" data-execution_count="4">
+<div id="a025761d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes.WaterLevel.read()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -800,7 +800,7 @@ Tip
 </section>
 <section id="combine-various-results-into-one-dataframe" class="level3">
 <h3 class="anchored" data-anchor-id="combine-various-results-into-one-dataframe">Combine various results into one dataframe</h3>
-<div id="a109371b" class="cell" data-execution_count="5">
+<div id="837194f6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.add()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>].Discharge.add()</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
@@ -852,7 +852,7 @@ Tip
 </section>
 <section id="use-plot-instead-of-read" class="level3">
 <h3 class="anchored" data-anchor-id="use-plot-instead-of-read">Use plot() instead of read()</h3>
-<div id="3b950e31" class="cell" data-execution_count="6">
+<div id="caa679bf" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -875,7 +875,7 @@ Tip
 <p>You can easily see what static and dynamic data is associated with a network element within a jupyter notebook.</p>
 <section id="descriptive-html-representations" class="level3">
 <h3 class="anchored" data-anchor-id="descriptive-html-representations">Descriptive html representations</h3>
-<div id="1848fc74" class="cell" data-execution_count="7">
+<div id="864ae283" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> res.nodes[<span class="st">'101'</span>]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>node</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -893,7 +893,7 @@ Tip
 </section>
 <section id="descriptive-string-representations" class="level3">
 <h3 class="anchored" data-anchor-id="descriptive-string-representations">Descriptive string representations</h3>
-<div id="4ed53214" class="cell" data-execution_count="8">
+<div id="461a4835" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> res.nodes[<span class="st">'101'</span>]</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">str</span>(node)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -903,7 +903,7 @@ Tip
 </section>
 <section id="accessing-static-data" class="level3">
 <h3 class="anchored" data-anchor-id="accessing-static-data">Accessing static data</h3>
-<div id="294666de" class="cell" data-execution_count="9">
+<div id="b465a001" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>node <span class="op">=</span> res.nodes[<span class="st">'101'</span>]</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>node.<span class="bu">id</span>, node.<span class="bu">type</span>, node.ground_level</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
