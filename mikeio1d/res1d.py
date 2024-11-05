@@ -303,6 +303,7 @@ class Res1D:
             File path for the new res1d file. Optional.
 
         """
+        self.reader.load_dynamic_data()
         self.writer.modify(data_frame)
         if file_path is not None:
             self.save(file_path)
@@ -324,6 +325,7 @@ class Res1D:
         >>> res11_data.save('results.res1d')
 
         """
+        self.reader.load_dynamic_data()
         connection_original = self.data.Connection
         self.data.Connection = Connection.Create(file_path)
         self.data.Save()
@@ -357,6 +359,8 @@ class Res1D:
             Can be 'csv', 'dfs0', 'txt'.
 
         """
+        self.reader.load_dynamic_data()
+
         ext = os.path.splitext(file_path)[-1] if ext is None else ext
 
         timeseries_ids = self._get_timeseries_ids_to_read(queries)
@@ -564,21 +568,25 @@ class Res1D:
     def get_catchment_values(self, catchment_id, quantity):
         """Get catchment values. Deprecated, use network.catchments instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
 
     def get_node_values(self, node_id, quantity):
         """Get node values. Deprecated, use network.nodes instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         return to_numpy(self.query.GetNodeValues(node_id, quantity))
 
     def get_reach_values(self, reach_name, chainage, quantity):
         """Get reach values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
 
     def get_reach_value(self, reach_name, chainage, quantity, time):
         """Get reach value. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         if self.reader.is_lts_result_file():
             raise NotImplementedError("The method is not implemented for LTS event statistics.")
 
@@ -588,16 +596,19 @@ class Res1D:
     def get_reach_start_values(self, reach_name, quantity):
         """Get reach start values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         return to_numpy(self.query.GetReachStartValues(reach_name, quantity))
 
     def get_reach_end_values(self, reach_name, quantity):
         """Get reach end values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         return to_numpy(self.query.GetReachEndValues(reach_name, quantity))
 
     def get_reach_sum_values(self, reach_name, quantity):
         """Get reach sum values. Deprecated, use network.reaches instead."""
         warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
+        self.reader.load_dynamic_data()
         return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
 
     def clear_queue(self):
