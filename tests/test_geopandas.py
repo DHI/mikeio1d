@@ -1,5 +1,6 @@
 import pytest
 
+pytestmark = pytest.mark.optional_dependency
 pytest.importorskip("geopandas")
 
 from geopandas import GeoDataFrame  # noqa: E402
@@ -68,9 +69,9 @@ def test_network_to_geopandas_basic(res1d_network):
     """Test that network.to_geopandas() returns a GeoDataFrame."""
     gdf = res1d_network.network.to_geopandas()
     assert isinstance(gdf, GeoDataFrame)
-    assert len(gdf) == len(res1d_network.nodes) + len(
-        res1d_network.reaches
-    ) + len(res1d_network.catchments)
+    assert len(gdf) == len(res1d_network.nodes) + len(res1d_network.reaches) + len(
+        res1d_network.catchments
+    )
     assert all(isinstance(x, (Point, LineString, Polygon)) for x in gdf.geometry)
 
 

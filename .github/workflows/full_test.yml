@@ -44,4 +44,4 @@ jobs:
         pip install .[all]
     - name: Test with pytest (optional dependencies)
       run: |
-        pytest -c .pytest-ci.ini 
+        pytest -c .pytest-ci.ini -m "optional_dependency"

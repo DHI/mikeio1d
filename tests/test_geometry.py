@@ -1,6 +1,7 @@
 import pytest
 import random
 
+pytestmark = pytest.mark.optional_dependency
 pytest.importorskip("geopandas")
 
 import shapely  # noqa: E402

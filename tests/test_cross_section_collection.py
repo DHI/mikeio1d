@@ -226,6 +226,7 @@ class TestCrossSectionCollectionUnits:
         xs = df.cross_section.iloc[0]
         assert xs == xs_expected
 
+    @pytest.mark.optional_dependency
     def test_to_geopandas(self, many_real_cross_sections):
         pytest.importorskip("geopandas")
         import geopandas as gpd
@@ -247,6 +248,7 @@ class TestCrossSectionCollectionUnits:
         expected_geometry = list(csc.values())[-1].geometry.to_shapely()
         assert gdf.geometry.iloc[-1] == expected_geometry
 
+    @pytest.mark.optional_dependency
     def test_to_geopandas_markers(self, many_real_cross_sections):
         pytest.importorskip("geopandas")
         import geopandas as gpd
