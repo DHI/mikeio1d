@@ -115,12 +115,12 @@ class ResultLocation(ABC):
         """A list of available derived quantities."""
         return list(self.result_quantity_derived_map.keys())
 
-    def set_static_attribute(self, key, value):
+    def _set_static_attribute(self, key, value):
         """Add static attribute. This shows up in the html repr."""
         self._static_attributes.append(key)
         setattr(self, key, value)
 
-    def set_quantities(self):
+    def _set_quantities(self):
         """Set all quantity attributes."""
         element_indices = self.element_indices
         data_items = list(self.data_items)
@@ -128,9 +128,9 @@ class ResultLocation(ABC):
         for i in range(data_items_count):
             data_item = data_items[i]
             element_index = element_indices[i] if element_indices is not None else 0
-            self.set_quantity(self, data_item, element_index)
+            self._set_quantity(self, data_item, element_index)
 
-    def set_quantity(self, obj, data_item, element_index=0):
+    def _set_quantity(self, obj, data_item, element_index=0):
         """Set a single quantity attribute on the obj."""
         m1d_dataset = self.get_m1d_dataset(data_item)
         result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
@@ -144,7 +144,7 @@ class ResultLocation(ABC):
         )
         setattr(obj, result_quantity_attribute_string, result_quantity)
 
-        self.add_to_result_quantity_maps(quantity_id, result_quantity)
+        self._add_to_result_quantity_maps(quantity_id, result_quantity)
 
     def _can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
         """Check if a derived quantity can be added to the result locations."""
@@ -154,12 +154,12 @@ class ResultLocation(ABC):
             return False
         return True
 
-    def add_derived_quantity(self, derived_quantity: DerivedQuantity):
+    def _add_derived_quantity(self, derived_quantity: DerivedQuantity):
         """Add a derived quantity to the result location."""
         if self._can_add_derived_quantity(derived_quantity):
-            self.set_quantity_derived(derived_quantity)
+            self._set_quantity_derived(derived_quantity)
 
-    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+    def _remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
         """Remove a derived quantity from the result location."""
         if isinstance(derived_quantity, DerivedQuantity):
             derived_quantity = derived_quantity.name
@@ -172,7 +172,7 @@ class ResultLocation(ABC):
         if hasattr(self, result_quantity_attribute_string):
             delattr(self, result_quantity_attribute_string)
 
-    def set_quantity_derived(self, derived_quantity: DerivedQuantity):
+    def _set_quantity_derived(self, derived_quantity: DerivedQuantity):
         """Set a single derived quantity attribute on the obj."""
         result_quantity_derived = ResultQuantityDerived(derived_quantity, self, self.res1d)
         quantity_id = result_quantity_derived.name
@@ -202,7 +202,7 @@ class ResultLocation(ABC):
         ...
 
     @abstractclassmethod
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def _add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """Add to result quantity maps.
 
         Result quantity map is a dictionary from quantity id to a list of result quantities corresponding to that quantity id.
@@ -217,7 +217,7 @@ class ResultLocation(ABC):
         """
         ...
 
-    def add_to_result_quantity_map(
+    def _add_to_result_quantity_map(
         self,
         quantity_id: str,
         result_quantity: ResultQuantity,
@@ -240,7 +240,7 @@ class ResultLocation(ABC):
         else:
             result_quantity_map[quantity_id] = [result_quantity]
 
-    def add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
+    def _add_to_network_result_quantity_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
         """Add a ResultQuantity to map of all possible ResultQuantities.
 
         Parameters
@@ -258,12 +258,12 @@ class ResultLocation(ABC):
         tsid = network.add_result_quantity_to_map(result_quantity)
         return tsid
 
-    def add_query(self, data_item):
+    def _add_query(self, data_item):
         """Add a query to ResultNetwork.queries list."""
-        query = self.get_query(data_item)
+        query = self._get_query(data_item)
         self.res1d.network.add_query(query)
 
     @abstractclassmethod
-    def get_query(self, data_item):
+    def _get_query(self, data_item):
         """Create a query for given data item."""
         ...

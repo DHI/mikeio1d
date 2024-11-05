@@ -81,18 +81,20 @@ class ResultStructure(ResultLocation):
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
         self._static_attributes = []
-        self.set_static_attribute("id", self.id)
-        self.set_static_attribute("type", self.reach.Name.split(":")[0])
-        self.set_static_attribute("chainage", self.chainage)
+        self._set_static_attribute("id", self.id)
+        self._set_static_attribute("type", self.reach.Name.split(":")[0])
+        self._set_static_attribute("chainage", self.chainage)
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def _add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add structure result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+        self._add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
         structure_result_quantity_map = self.res1d.network.structures.result_quantity_map
-        self.add_to_result_quantity_map(quantity_id, result_quantity, structure_result_quantity_map)
+        self._add_to_result_quantity_map(
+            quantity_id, result_quantity, structure_result_quantity_map
+        )
 
-        self.add_to_network_result_quantity_map(result_quantity)
+        self._add_to_network_result_quantity_map(result_quantity)
 
     def add_res1d_structure_data_item(self, data_item):
         """Add a IDataItem to ResultStructure.
@@ -111,7 +113,7 @@ class ResultStructure(ResultLocation):
 
         self.data_items.append(data_item)
         self.data_items_dict[data_item.Quantity.Id] = data_item
-        self.set_quantity(self, data_item)
+        self._set_quantity(self, data_item)
 
     @staticmethod
     def get_structure_id(reach, data_item):
@@ -131,7 +133,7 @@ class ResultStructure(ResultLocation):
         """Retrieve a data item for given quantity id."""
         return self.data_items_dict[quantity_id]
 
-    def get_query(self, data_item):
+    def _get_query(self, data_item):
         """Get a QueryDataStructure for given data item."""
         quantity_id = data_item.Quantity.Id
         structure_id = self.id

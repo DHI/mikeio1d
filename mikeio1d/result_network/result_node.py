@@ -29,7 +29,7 @@ class ResultNode(ResultLocation):
         ResultLocation.__init__(self, node.DataItems, res1d)
         self._group = TimeSeriesIdGroup.NODE
         self._node = node
-        self.set_quantities()
+        self._set_quantities()
         self.set_static_attributes()
 
     def __repr__(self) -> str:
@@ -71,29 +71,29 @@ class ResultNode(ResultLocation):
         self._static_attributes = []
 
         node_type = self._node.GetType().Name[5:]  # Removes 'Res1D' from type name
-        self.set_static_attribute("id", self._node.Id)
-        self.set_static_attribute("type", node_type)
-        self.set_static_attribute("xcoord", self._node.XCoordinate)
-        self.set_static_attribute("ycoord", self._node.YCoordinate)
+        self._set_static_attribute("id", self._node.Id)
+        self._set_static_attribute("type", node_type)
+        self._set_static_attribute("xcoord", self._node.XCoordinate)
+        self._set_static_attribute("ycoord", self._node.YCoordinate)
 
         # Collect attributes depending on node type
         if self.type in ["Basin", "Manhole", "SewerJunction"]:
-            self.set_static_attribute("ground_level", self._node.GroundLevel)
-            self.set_static_attribute("bottom_level", self._node.BottomLevel)
-            self.set_static_attribute("critical_level", self._node.CriticalLevel)
+            self._set_static_attribute("ground_level", self._node.GroundLevel)
+            self._set_static_attribute("bottom_level", self._node.BottomLevel)
+            self._set_static_attribute("critical_level", self._node.CriticalLevel)
         if self.type == "Manhole":
-            self.set_static_attribute("diameter", self._node.Diameter)
+            self._set_static_attribute("diameter", self._node.Diameter)
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def _add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add node result quantity to result quantity maps."""
-        self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
+        self._add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
         nodes_result_quantity_map = self.res1d.network.nodes.result_quantity_map
-        self.add_to_result_quantity_map(quantity_id, result_quantity, nodes_result_quantity_map)
+        self._add_to_result_quantity_map(quantity_id, result_quantity, nodes_result_quantity_map)
 
-        self.add_to_network_result_quantity_map(result_quantity)
+        self._add_to_network_result_quantity_map(result_quantity)
 
-    def get_query(self, data_item):
+    def _get_query(self, data_item):
         """Get a QueryDataNode for given data item."""
         quantity_id = data_item.Quantity.Id
         node_id = self._node.ID

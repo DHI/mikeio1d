@@ -167,22 +167,22 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        self.set_static_attribute("name", self.reaches[0].Name)
+        self._set_static_attribute("name", self.reaches[0].Name)
         self.try_set_static_attribute_length()
-        self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
-        self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
-        self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
+        self._set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
+        self._set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
+        self._set_static_attribute("n_gridpoints", self._get_total_gridpoints())
         # For resx files, the start and end node indices are not available
         if not self.res1d.file_path.endswith(".resx"):
-            self.set_static_attribute("start_node", self._get_start_node())
-            self.set_static_attribute("end_node", self._get_end_node())
-        self.set_static_attribute("height", self._get_height())
-        self.set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
+            self._set_static_attribute("start_node", self._get_start_node())
+            self._set_static_attribute("end_node", self._get_end_node())
+        self._set_static_attribute("height", self._get_height())
+        self._set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
 
     def try_set_static_attribute_length(self):
         """Try to set the length attribute. If it fails, ignore it."""
         try:
-            self.set_static_attribute("length", self._get_total_length())
+            self._set_static_attribute("length", self._get_total_length())
         except Exception as _:
             pass
 
@@ -200,7 +200,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         self.set_gridpoints(reach)
         self.set_gridpoint_data_items(reach)
         for result_gridpoint in self.current_reach_result_gridpoints:
-            result_gridpoint.set_quantities()
+            result_gridpoint._set_quantities()
         self.dataset = self.reaches
 
     def get_m1d_dataset(self, m1d_dataitem=None):
@@ -302,11 +302,11 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
                 else:
                     result_gridpoint.add_structure_data_item(data_item)
 
-    def get_query(self, data_item):
+    def _get_query(self, data_item):
         """Get a query for a data item."""
         raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def _add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add a quantity to the result quantity maps."""
         raise NotImplementedError(
             "add_to_result_quantity_maps not implemented for ResultReach. Use ResultGridPoint."

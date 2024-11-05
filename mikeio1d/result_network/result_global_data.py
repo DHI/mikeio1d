@@ -27,7 +27,7 @@ class ResultGlobalData(ResultLocation):
         self._group = TimeSeriesIdGroup.GLOBAL
         self.data_item = data_item
         self.global_datas = global_datas
-        self.set_quantities()
+        self._set_quantities()
 
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGlobalData.
@@ -45,20 +45,20 @@ class ResultGlobalData(ResultLocation):
         """
         return self.res1d.data.GlobalData
 
-    def set_quantities(self):
+    def _set_quantities(self):
         """Set quantities for ResultGlobalData.
 
         Here only a single data item is used for ResultGlobalData.
         Also the quantity attribute is assigned to self.global_data.
         """
         data_item = self.data_item
-        self.set_quantity(self.global_datas, data_item)
+        self._set_quantity(self.global_datas, data_item)
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def _add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add global data result quantity to result quantity maps."""
-        self.add_to_network_result_quantity_map(result_quantity)
+        self._add_to_network_result_quantity_map(result_quantity)
 
-    def get_query(self, data_item):
+    def _get_query(self, data_item):
         """Get a QueryDataGlobal for given data item."""
         quantity_id = data_item.Quantity.Id
         query = QueryDataGlobal(quantity_id)

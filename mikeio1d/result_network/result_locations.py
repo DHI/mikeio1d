@@ -176,7 +176,7 @@ class ResultLocations(Dict[str, ResultLocation]):
             self._set_quantity_derived(derived_quantity)
 
         for location in self.values():
-            location.add_derived_quantity(derived_quantity)
+            location._add_derived_quantity(derived_quantity)
 
     def _remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
         """Remove a derived quantity from the result network.
@@ -200,7 +200,7 @@ class ResultLocations(Dict[str, ResultLocation]):
             delattr(self, result_quantity_attribute_string)
 
         for location in self.values():
-            location.remove_derived_quantity(derived_quantity)
+            location._remove_derived_quantity(derived_quantity)
 
     def _set_quantity_derived(self, derived_quantity: DerivedQuantity):
         """Set a single derived quantity attribute on the obj."""
