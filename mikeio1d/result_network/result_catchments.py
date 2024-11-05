@@ -40,26 +40,26 @@ class ResultCatchments(ResultLocations):
         self.catchment_label = "c_"
 
         res1d.network.catchments = self
-        self.set_catchments()
+        self._set_catchments()
         self._set_quantity_collections()
 
         self._catchment_ids = None
         self._geometries = None
 
-    def set_catchments(self):
+    def _set_catchments(self):
         """Set attributes to the current ResultCatchments object based on the catchment ID."""
         for catchment in self.data.Catchments:
             catchment = impl(catchment)
             if not self.res1d.reader.is_data_set_included(catchment):
                 continue
             result_catchment = ResultCatchment(catchment, self.res1d)
-            self.set_res1d_catchment_to_dict(result_catchment)
+            self._set_res1d_catchment_to_dict(result_catchment)
             result_catchment_attribute_string = make_proper_variable_name(
                 result_catchment.id, self.catchment_label
             )
             setattr(self, result_catchment_attribute_string, result_catchment)
 
-    def set_res1d_catchment_to_dict(self, catchment):
+    def _set_res1d_catchment_to_dict(self, catchment):
         """Create a dict entry from catchment ID to ResultCatchment object."""
         self[catchment.id] = catchment
 
