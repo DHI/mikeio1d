@@ -134,7 +134,7 @@ class ResultLocation(ABC):
         """Set a single quantity attribute on the obj."""
         m1d_dataset = self._get_m1d_dataset(data_item)
         result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
-        self.res1d.network.add_result_quantity_to_map(result_quantity)
+        self.res1d.network._add_result_quantity_to_map(result_quantity)
 
         quantity = data_item.Quantity
         quantity_id = quantity.Id
@@ -255,7 +255,7 @@ class ResultLocation(ABC):
 
         """
         network = self.res1d.network
-        tsid = network.add_result_quantity_to_map(result_quantity)
+        tsid = network._add_result_quantity_to_map(result_quantity)
         return tsid
 
     def _add_query(self, data_item):

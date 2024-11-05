@@ -82,9 +82,9 @@ class ResultNetwork:
         self.result_quantity_map: Dict[TimeSeriesId, ResultQuantity] = {}
 
         self.res1d.network = self
-        self.set_result_locations()
+        self._set_result_locations()
 
-    def add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
+    def _add_result_quantity_to_map(self, result_quantity: ResultQuantity) -> TimeSeriesId:
         """Add a ResultQuantity to map of all possible ResultQuantities.
 
         Parameters
@@ -108,7 +108,7 @@ class ResultNetwork:
 
         return tsid
 
-    def set_result_locations(self):
+    def _set_result_locations(self):
         """Assign nodes, reaches, catchments, global_data properties."""
         res1d = self.res1d
         self.nodes = ResultNodes(res1d)
@@ -117,12 +117,12 @@ class ResultNetwork:
         self.structures = ResultStructures(res1d)
         self.global_data = ResultGlobalDatas(res1d)
 
-    def add_timeseries_id(self, timeseries_id: TimeSeriesId):
+    def _add_timeseries_id(self, timeseries_id: TimeSeriesId):
         """Add a TimeSeriesId to the queue list, which can be used when calling res1D.read()."""
         if timeseries_id not in self.queue:
             self.queue.append(timeseries_id)
 
-    def add_derived_quantity(self, derived_quantity: ResultQuantity):
+    def _add_derived_quantity(self, derived_quantity: ResultQuantity):
         """Add a derived quantity to the result network.
 
         Parameters
@@ -136,7 +136,7 @@ class ResultNetwork:
         self.catchments._add_derived_quantity(derived_quantity)
         self.structures._add_derived_quantity(derived_quantity)
 
-    def remove_derived_quantity(self, derived_quantity: ResultQuantity | str):
+    def _remove_derived_quantity(self, derived_quantity: ResultQuantity | str):
         """Remove a derived quantity from the result network.
 
         Parameters

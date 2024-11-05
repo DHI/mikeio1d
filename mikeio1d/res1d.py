@@ -277,7 +277,7 @@ class Res1D:
             Derived quantity to be added
         """
         derived_quantity = derived_quantity(self)
-        self.network.add_derived_quantity(derived_quantity)
+        self.network._add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
         """Remove a derived quantity from the Res1D object, propogating changes to the network.
@@ -290,7 +290,7 @@ class Res1D:
         """
         if isinstance(derived_quantity, type) and issubclass(derived_quantity, DerivedQuantity):
             derived_quantity = derived_quantity._NAME
-        self.network.remove_derived_quantity(derived_quantity)
+        self.network._remove_derived_quantity(derived_quantity)
 
     def modify(self, data_frame: pd.DataFrame, file_path=None):
         """Modify the ResultData object TimeData based on the provided data frame.
