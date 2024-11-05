@@ -34,26 +34,26 @@ class ResultStructures(ResultLocations):
         self.result_structure_map = {}
 
         res1d.network.structures = self
-        self.set_structures()
+        self._set_structures()
         self._set_quantity_collections()
 
-    def set_structures(self):
+    def _set_structures(self):
         """Set attributes to the current ResultReaches object based on the reach name."""
         for reach in self.data.Reaches:
             if not self.res1d.reader.is_data_set_included(reach):
                 continue
             for data_item in reach.DataItems:
-                if not self.is_structure(reach, data_item):
+                if not self._is_structure(reach, data_item):
                     continue
 
-                result_structure = self.get_or_create_result_structure(reach, data_item)
+                result_structure = self._get_or_create_result_structure(reach, data_item)
                 structure_id = result_structure.id
                 result_structure_attribute_string = make_proper_variable_name(
                     structure_id, self.structure_label
                 )
                 setattr(self, result_structure_attribute_string, result_structure)
 
-    def is_structure(self, reach, data_item):
+    def _is_structure(self, reach, data_item):
         """Check if a data item is a structure data item."""
         # Data items on reaches with defined ItemId correspond to structure data items.
         if data_item.ItemId is not None:
@@ -71,7 +71,7 @@ class ResultStructures(ResultLocations):
 
         return False
 
-    def get_or_create_result_structure(self, reach, data_item):
+    def _get_or_create_result_structure(self, reach, data_item):
         """Create or get already existing ResultStructure object.
 
         Also update a result_structure_map dict entry from structure ID
