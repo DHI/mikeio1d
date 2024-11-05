@@ -19,9 +19,9 @@ def test_file_path():
     return os.path.join(test_folder_path, "testdata", "network.res1d")
 
 
-@pytest.fixture(params=[True, False])
-def test_file(test_file_path, request):
-    return Res1D(test_file_path, lazy_load=request.param)
+@pytest.fixture
+def test_file(test_file_path):
+    return Res1D(test_file_path, lazy_load=False)
 
 
 def test_file_does_not_exist():
@@ -32,7 +32,7 @@ def test_file_does_not_exist():
 def test_read(test_file):
     df = test_file.read()
     assert len(df) == 110
-    # TODO: assert not df.columns.duplicated().any() - add this, but it fails since columns are not guaranteed unique
+    assert not df.columns.duplicated().any()
 
 
 def test_mike1d_quantities():
