@@ -42,24 +42,24 @@ class ResultNodes(ResultLocations):
         self.node_label = "n_"
 
         res1d.network.nodes = self
-        self.set_nodes()
+        self._set_nodes()
         self._set_quantity_collections()
 
         self._node_ids = None
         self._geometries = None
 
-    def set_nodes(self):
+    def _set_nodes(self):
         """Set attributes to the current ResultNodes object based on the node ID."""
         for node in self.data.Nodes:
             if not self.res1d.reader.is_data_set_included(node):
                 continue
             node = impl(node)
             result_node = ResultNode(node, self.res1d)
-            self.set_res1d_node_to_dict(result_node)
+            self._set_res1d_node_to_dict(result_node)
             result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
             setattr(self, result_node_attribute_string, result_node)
 
-    def set_res1d_node_to_dict(self, result_node):
+    def _set_res1d_node_to_dict(self, result_node):
         """Create a dict entry from node ID to ResultNode object."""
         self[result_node.id] = result_node
 
