@@ -23,6 +23,7 @@ from enum import Enum
 import pandas as pd
 
 from ..various import NAME_DELIMITER
+from ..various import DELETE_VALUE
 
 from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
@@ -428,8 +429,26 @@ class TimeSeriesId:
         start_gp = m1d_dataset.GridPoints[0]
         end_gp = m1d_dataset.GridPoints[m1d_dataset.GridPoints.Count - 1]
 
-        tag = f"{start_gp.Chainage:.1f}-{end_gp.Chainage:.1f}"
+        tag = TimeSeriesId.create_reach_span_tag_from_gridpoints(start_gp, end_gp)
         return tag
+
+    @staticmethod
+    def create_reach_span_tag_from_gridpoints(start_gp, end_gp) -> str:
+        """Create a tag for an IRes1DReach object based on its start and end gridpoints.
+
+        Parameters
+        ----------
+        start_gp : IRes1DGridPoint
+            The MIKE 1D gridpoint at the start of the reach.
+        end_gp : IRes1DGridPoint
+            The MIKE 1D gridpoint at the end of the reach.
+
+        Returns
+        -------
+        str
+            The tag for the reach (e.g. '0.0-100.0')
+        """
+        return f"{start_gp.Chainage:.1f}-{end_gp.Chainage:.1f}"
 
     @staticmethod
     def from_result_quantity(result_quantity: ResultQuantity) -> TimeSeriesId:
@@ -438,15 +457,23 @@ class TimeSeriesId:
         Note: this method assumes there are no duplicates (e.g. duplicate = 0). To get the
         unique TimeSeriesId of a ResultQuantity, access its timeseries_id property.
         """
-        m1d_dataitem = result_quantity.data_item
-        m1d_dataset = result_quantity.m1d_dataset
-        element_index = result_quantity.element_index
+        result_location = result_quantity.result_location
+        nan = float("nan")
 
-        timeseries_id = TimeSeriesId.from_dataset_dataitem_and_element(
-            m1d_dataset, m1d_dataitem, element_index
+        group = result_location._group
+        quantity = result_quantity._name
+        name = getattr(result_location, "_name", "")
+        tag = getattr(result_location, "_tag", "")
+        chainage = getattr(result_location, "chainage", nan)
+        chainage = nan if chainage == DELETE_VALUE else chainage
+
+        return TimeSeriesId(
+            quantity=quantity,
+            group=group,
+            name=name,
+            chainage=chainage,
+            tag=tag,
         )
-
-        return timeseries_id
 
     @staticmethod
     def get_dataset_name(m1d_dataset, item_id=None, delimiter=NAME_DELIMITER) -> str:

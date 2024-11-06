@@ -10,6 +10,7 @@ if TYPE_CHECKING:  # pragma: no cover
 from math import isnan
 
 from ..various import NAME_DELIMITER
+from ..various import DELETE_VALUE
 from .query_data import QueryData
 from ..quantities import TimeSeriesId
 from ..quantities import TimeSeriesIdGroup
@@ -140,6 +141,6 @@ class QueryDataReach(QueryData):
 
         return (
             NAME_DELIMITER.join([quantity, name, f"{chainage:g}"])
-            if chainage is not None and chainage != self.delete_value
+            if chainage is not None and chainage != DELETE_VALUE
             else NAME_DELIMITER.join([quantity, name])
         )

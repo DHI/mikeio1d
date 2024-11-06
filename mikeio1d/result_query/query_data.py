@@ -32,8 +32,6 @@ class QueryData(ABC):
 
     """
 
-    delete_value = -1e-30
-
     def __init__(self, quantity, name=None, validate=True):
         self._name = name
         self._quantity = quantity
