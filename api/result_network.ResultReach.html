@@ -273,6 +273,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map" id="toc-mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_to_network_result_quantity_map">add_to_network_result_quantity_map</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.add_to_result_quantity_map" id="toc-mikeio1d.result_network.ResultReach.add_to_result_quantity_map" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_to_result_quantity_map">add_to_result_quantity_map</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.add_to_result_quantity_maps" id="toc-mikeio1d.result_network.ResultReach.add_to_result_quantity_maps" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.add_to_result_quantity_maps">add_to_result_quantity_maps</a></li>
+  <li><a href="#mikeio1d.result_network.ResultReach.create_reach_span_tag" id="toc-mikeio1d.result_network.ResultReach.create_reach_span_tag" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.create_reach_span_tag">create_reach_span_tag</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.get_m1d_dataset" id="toc-mikeio1d.result_network.ResultReach.get_m1d_dataset" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.get_m1d_dataset">get_m1d_dataset</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.get_query" id="toc-mikeio1d.result_network.ResultReach.get_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.get_query">get_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_critical_level" id="toc-mikeio1d.result_network.ResultReach.interpolate_reach_critical_level" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReach.interpolate_reach_critical_level">interpolate_reach_critical_level</a></li>
@@ -410,62 +411,66 @@ ul.task-list li input[type="checkbox"] {
 <td>Add a quantity to the result quantity maps.</td>
 </tr>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultReach.create_reach_span_tag">create_reach_span_tag</a></td>
+<td>Create reach span tag to be set on ResultGridPoint.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.get_m1d_dataset">get_m1d_dataset</a></td>
 <td>Get IRes1DDataSet object associated with ResultReach.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.get_query">get_query</a></td>
 <td>Get a query for a data item.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_critical_level">interpolate_reach_critical_level</a></td>
 <td>Interpolate the critical level at a given chainage by linear interpolation from the bounding node critical levels.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.interpolate_reach_ground_level">interpolate_reach_ground_level</a></td>
 <td>Interpolate the ground level at a given chainage by linear interpolation from the bounding node ground levels.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.read">read</a></td>
 <td>Read the time series data for all quantities at this location into a DataFrame.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.remove_derived_quantity">remove_derived_quantity</a></td>
 <td>Remove a derived quantity from the result location.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_gridpoint">set_gridpoint</a></td>
 <td>Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.set_gridpoint_data_items">set_gridpoint_data_items</a></td>
 <td>Assign data items to ResultGridPoint object belonging to current ResultReach from IRes1DReach data items.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_gridpoints">set_gridpoints</a></td>
 <td>Assign chainage attributes to a current ResultReach object from a data provided by IRes1DReach.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.set_quantities">set_quantities</a></td>
 <td>Set all quantity attributes.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_quantity">set_quantity</a></td>
 <td>Set a single quantity attribute on the obj.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.set_quantity_derived">set_quantity_derived</a></td>
 <td>Set a single derived quantity attribute on the obj.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.set_static_attribute">set_static_attribute</a></td>
 <td>Add static attribute. This shows up in the html repr.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.set_static_attributes">set_static_attributes</a></td>
 <td>Set static attributes. These show up in the html repr.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.try_set_static_attribute_length">try_set_static_attribute_length</a></td>
 <td>Try to set the length attribute. If it fails, ignore it.</td>
 </tr>
@@ -604,6 +609,11 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.add_to_result_quantity_maps">add_to_result_quantity_maps</h3>
 <p><code>result_network.ResultReach.add_to_result_quantity_maps(quantity_id, result_quantity)</code></p>
 <p>Add a quantity to the result quantity maps.</p>
+</section>
+<section id="mikeio1d.result_network.ResultReach.create_reach_span_tag" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.create_reach_span_tag">create_reach_span_tag</h3>
+<p><code>result_network.ResultReach.create_reach_span_tag(gridpoints)</code></p>
+<p>Create reach span tag to be set on ResultGridPoint.</p>
 </section>
 <section id="mikeio1d.result_network.ResultReach.get_m1d_dataset" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.get_m1d_dataset">get_m1d_dataset</h3>
@@ -797,7 +807,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="mikeio1d.result_network.ResultReach.set_gridpoint" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReach.set_gridpoint">set_gridpoint</h3>
-<p><code>result_network.ResultReach.set_gridpoint(reach, gridpoint)</code></p>
+<p><code>result_network.ResultReach.set_gridpoint(reach, gridpoint, tag='')</code></p>
 <p>Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.</p>
 <section id="parameters-8" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-8">Parameters</h4>
