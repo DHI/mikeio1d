@@ -449,7 +449,7 @@ class Res1D:
             # MOUSE
             ".prf",
             ".crf",
-            ".xrf"
+            ".xrf",
             # EPANET
             ".res",
             # SWMM
