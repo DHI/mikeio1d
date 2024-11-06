@@ -8,6 +8,29 @@
 
 ### Changed
 
+### [0.9.0] - 2024-11-06
+
+### Added
+
+- Create Res1D/Xns11 objects using mikeio1d.open().
+- Filter dynamic data loaded in time now with mikeio1d.Res1d(..., time=(start,end)).
+- Added some new notebook examples for Res1D.
+- Add additional linting rules for documentation, numpy, and pandas.
+
+### Fixed
+
+- Autocompletion was flaky when accessing objects with many dots.
+- Improved docstring consistency throughout codebase.
+
+### Changed
+
+- Updated notebooks to latest scripting API and reorganized.
+- Only load header by default (performance improvement).
+- Reduce calls to pythonnet (performance improvement).
+- Speed up CI tests.
+- Clean Res1D scripting API, adding deprecation warnings.
+- Use Ruff instead of black for formatting and linting.
+
 ### [0.8.2] - 2024-10-14
 
 ### Fixed
