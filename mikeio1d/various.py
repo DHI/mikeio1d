@@ -17,6 +17,7 @@ from System import Enum
 from DHI.Mike1D.Generic import PredefinedQuantity
 
 NAME_DELIMITER = ":"
+DELETE_VALUE = -1e-30
 
 
 def mike1d_quantities():

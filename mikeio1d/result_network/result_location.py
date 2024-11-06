@@ -52,6 +52,8 @@ class ResultLocation(ABC):
     """
 
     def __init__(self, data_items, res1d: Res1D):
+        self._name = ""
+        self._tag = ""
         self.data_items = data_items
         self.res1d = res1d
         self.quantity_label = "q_"

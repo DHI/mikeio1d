@@ -28,6 +28,7 @@ class ResultCatchment(ResultLocation):
     def __init__(self, catchment, res1d):
         ResultLocation.__init__(self, catchment.DataItems, res1d)
         self._group = TimeSeriesIdGroup.CATCHMENT
+        self._name = catchment.Id
         self._catchment = catchment
         self.set_quantities()
         self.set_static_attributes()

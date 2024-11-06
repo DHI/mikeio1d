@@ -1,6 +1,7 @@
 """ResultGridPoint class."""
 
 from ..query import QueryDataReach
+from ..quantities import TimeSeriesIdGroup
 from .result_location import ResultLocation
 
 
@@ -27,9 +28,13 @@ class ResultGridPoint(ResultLocation):
 
     """
 
-    def __init__(self, reach, gridpoint, data_items, result_reach, res1d):
+    def __init__(self, reach, gridpoint, data_items, result_reach, res1d, tag=""):
         empty_data_item_list = []
         ResultLocation.__init__(self, empty_data_item_list, res1d)
+        self._group = TimeSeriesIdGroup.REACH
+        self._name = reach.Name
+        self._chainage = gridpoint.Chainage
+        self._tag = tag
         self.reach = reach
         self.gridpoint = gridpoint
         self.result_reach = result_reach

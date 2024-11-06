@@ -15,6 +15,7 @@ from .result_location import ResultLocation
 from .result_gridpoint import ResultGridPoint
 from .various import make_proper_variable_name
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesId
 from ..quantities import TimeSeriesIdGroup
 from ..dotnet import pythonnet_implementation as impl
 
@@ -252,11 +253,22 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             self.set_gridpoint(reach, gridpoint)
 
         gridpoints = list(reach.GridPoints)
+        tag = self.create_reach_span_tag(gridpoints)
         for i in range(gridpoint_count):
             gridpoint = gridpoints[i]
-            self.set_gridpoint(reach, gridpoint)
+            self.set_gridpoint(reach, gridpoint, tag)
 
-    def set_gridpoint(self, reach, gridpoint):
+    def create_reach_span_tag(self, gridpoints):
+        """Create reach span tag to be set on ResultGridPoint."""
+        if len(gridpoints) == 0:
+            return ""
+
+        start_gp = gridpoints[0]
+        end_gp = gridpoints[-1]
+        tag = TimeSeriesId.create_reach_span_tag_from_gridpoints(start_gp, end_gp)
+        return tag
+
+    def set_gridpoint(self, reach, gridpoint, tag=""):
         """Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.
 
         Parameters
@@ -269,7 +281,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """
         current_reach_result_gridpoints = self.current_reach_result_gridpoints
 
-        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d)
+        result_gridpoint = ResultGridPoint(reach, gridpoint, reach.DataItems, self, self.res1d, tag)
         current_reach_result_gridpoints.append(result_gridpoint)
 
         chainage_string = f"{gridpoint.Chainage:g}"

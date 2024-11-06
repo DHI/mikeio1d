@@ -36,6 +36,8 @@ class ResultStructure(ResultLocation):
         ResultLocation.__init__(self, empty_list, res1d)
 
         self._group = TimeSeriesIdGroup.STRUCTURE
+        self._name = structure_id
+        self._tag = reach.Name
         self.id = structure_id
         self.reach = reach
         self.chainage = None
