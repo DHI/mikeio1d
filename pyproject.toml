@@ -59,6 +59,15 @@ dev = [
     "folium",
     "mapclassify"
 ]
+notebooks = [
+    "matplotlib",
+    "ipykernel",
+    "nbformat",
+    "nbconvert",
+    "geopandas",
+    "folium",
+    "mapclassify",
+]
 docs = [
     "quarto-cli",
     "quartodoc==0.7.6"
