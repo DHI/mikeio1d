@@ -2,24 +2,16 @@
 
 from __future__ import annotations
 
-from typing import List
-from typing import Set
-
+import os.path
 from collections import defaultdict, namedtuple
+from pathlib import Path
 from warnings import warn
 
-import os.path
-from pathlib import Path
-import tempfile
-
 import pandas as pd
-
-from .cross_sections import CrossSection
-from .cross_sections import CrossSectionCollection
-
-from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
-from DHI.Mike1D.CrossSectionModule import CrossSectionData
+from DHI.Mike1D.CrossSectionModule import CrossSectionData, CrossSectionDataFactory
 from DHI.Mike1D.Generic import Connection, Diagnostics, Location
+
+from .cross_sections import CrossSection, CrossSectionCollection
 
 
 class BaseXns11Error(Exception):
@@ -34,7 +26,7 @@ class FileNotOpenedError(BaseXns11Error):
     """Accessing data from a file that is not opened."""
 
 
-def read(file_path: str | Path, queries: QueryData | List[QueryData]) -> pd.DataFrame:
+def read(file_path: str | Path, queries: QueryData | list[QueryData]) -> pd.DataFrame:
     """Read the requested data from the xns11 file and return a Pandas DataFrame.
 
     Parameters
@@ -230,7 +222,7 @@ class Xns11:
         return xns
 
     @staticmethod
-    def get_supported_file_extensions() -> Set[str]:
+    def get_supported_file_extensions() -> set[str]:
         """Get supported file extensions for Xns11."""
         return {".xns11"}
 
