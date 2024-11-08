@@ -45,11 +45,11 @@ class ResultGridPoint(ResultLocation):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        self.set_static_attribute("reach_name", self.reach.Name)
-        self.set_static_attribute("chainage", self.gridpoint.Chainage)
-        self.set_static_attribute("xcoord", self.gridpoint.X)
-        self.set_static_attribute("ycoord", self.gridpoint.Y)
-        self.set_static_attribute("bottom_level", self.gridpoint.Z)
+        self.set_static_attribute("reach_name")
+        self.set_static_attribute("chainage")
+        self.set_static_attribute("xcoord")
+        self.set_static_attribute("ycoord")
+        self.set_static_attribute("bottom_level")
 
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultGridPoint.
@@ -98,3 +98,28 @@ class ResultGridPoint(ResultLocation):
     def add_structure_data_item(self, data_item):
         """Add data item to structure data items list."""
         self.structure_data_items.append(data_item)
+
+    @property
+    def reach_name(self):
+        """Name of reach the gridpoint is on."""
+        return self.reach.Name
+
+    @property
+    def chainage(self):
+        """Chainage of the gridpoint."""
+        return self.gridpoint.Chainage
+
+    @property
+    def xcoord(self):
+        """X coordinate of the gridpoint."""
+        return self.gridpoint.X
+
+    @property
+    def ycoord(self):
+        """Y coordinate of the gridpoint."""
+        return self.gridpoint.Y
+
+    @property
+    def bottom_level(self):
+        """Bottom level of the gridpoint."""
+        return self.gridpoint.Z

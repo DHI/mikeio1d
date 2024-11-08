@@ -117,10 +117,9 @@ class ResultLocation(ABC):
         """A list of available derived quantities."""
         return list(self.result_quantity_derived_map.keys())
 
-    def set_static_attribute(self, key, value):
+    def set_static_attribute(self, name: str):
         """Add static attribute. This shows up in the html repr."""
-        self._static_attributes.append(key)
-        setattr(self, key, value)
+        self._static_attributes.append(name)
 
     def set_quantities(self):
         """Set all quantity attributes."""

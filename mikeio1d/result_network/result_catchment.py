@@ -72,9 +72,9 @@ class ResultCatchment(ResultLocation):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        self.set_static_attribute("id", self._catchment.Id)
-        self.set_static_attribute("area", self._catchment.Area)
-        self.set_static_attribute("type", self._catchment.Type)
+        self.set_static_attribute("id")
+        self.set_static_attribute("area")
+        self.set_static_attribute("type")
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add catchment result quantity to result quantity maps."""
@@ -91,6 +91,21 @@ class ResultCatchment(ResultLocation):
         catchment_id = self._catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
         return query
+
+    @property
+    def id(self) -> str:
+        """The ID of the catchment."""
+        return self._catchment.Id
+
+    @property
+    def area(self) -> float:
+        """The area of the catchment."""
+        return self._catchment.Area
+
+    @property
+    def type(self) -> str:
+        """The type of the catchment."""
+        return self._catchment.Type
 
     @property
     def geometry(self) -> CatchmentGeometry:
