@@ -39,6 +39,19 @@ def run_notebook(notebook_path: Path):
     return nb
 
 
+def strip_metadata(nb):
+    """
+    Strip the metadata from the notebook.
+
+    Args:
+        nb: The notebook object from nbformat.
+    """
+    for cell in nb.cells:
+        if "metadata" in cell:
+            cell.metadata = {}
+    return nb
+
+
 def count_errors_and_warnings(nb):
     """
     Count the number of errors and warnings in the notebook.
@@ -81,6 +94,7 @@ def main():
 
     for notebook_path in find_notebooks():
         nb = run_notebook(notebook_path)
+        nb = strip_metadata(nb)
         save_notebook(nb, notebook_path)
 
         errors, warnings = count_errors_and_warnings(nb)
