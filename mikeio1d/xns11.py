@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os.path
 from collections import defaultdict, namedtuple
 from pathlib import Path
 from warnings import warn
@@ -56,9 +55,6 @@ def open(file_path: str | Path) -> Xns11:
     ['topoid1', 'topoid2']
 
     """
-    if not os.path.exists(file_path):
-        raise FileExistsError(f"File {file_path} does not exist.")
-
     return Xns11(file_path)
 
 
@@ -95,9 +91,7 @@ class Xns11:
     """
 
     def __init__(self, file_path: str | Path = None):
-        self.file_path: str | Path = file_path
-        if file_path is not None and not os.path.exists(file_path):
-            raise FileExistsError(f"File '{file_path}' does not exist.")
+        self.file_path = self._validate_file_path(file_path)
         self._cross_section_data_factory = CrossSectionDataFactory()
         self._cross_section_data = None
         self._reach_names = None
@@ -130,12 +124,22 @@ class Xns11:
         """Return a string representation of the object."""
         return "<mikeio1d.Xns11>"
 
+    def _validate_file_path(self, file_path: str | Path | None) -> Path | None:
+        """Validate user supplied file path, return a Path object if valid."""
+        # file path is not strictly required (e.g. creating a new xns11 file)
+        if not file_path:
+            return None
+
+        file_path = Path(file_path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"File not found: {file_path}")
+
+        return file_path
+
     def _load_file(self):
         """Load the file."""
-        if not os.path.exists(self.file_path):
-            raise FileExistsError(f"File {self.file_path} does not exist.")
         self._cross_section_data = self._cross_section_data_factory.Open(
-            Connection.Create(self.file_path), Diagnostics("Error loading file.")
+            Connection.Create(str(self.file_path)), Diagnostics("Error loading file.")
         )
 
     def _get_info(self) -> str:
@@ -155,7 +159,7 @@ class Xns11:
 
     def _init_cross_section_data(self):
         """Initialize the CrossSectionData object."""
-        if self.file_path and os.path.exists(self.file_path):
+        if self.file_path:
             return self._load_file()
         self._cross_section_data = CrossSectionData()
 
