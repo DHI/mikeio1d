@@ -14,18 +14,6 @@ from DHI.Mike1D.Generic import Connection, Diagnostics, Location
 from .cross_sections import CrossSection, CrossSectionCollection
 
 
-class BaseXns11Error(Exception):
-    """Base class for Xns11 errors."""
-
-
-class DataNotFoundInFile(BaseXns11Error):
-    """Data not found in file."""
-
-
-class FileNotOpenedError(BaseXns11Error):
-    """Accessing data from a file that is not opened."""
-
-
 def read(file_path: str | Path, queries: QueryData | list[QueryData]) -> pd.DataFrame:
     """Read the requested data from the xns11 file and return a Pandas DataFrame.
 
@@ -112,7 +100,6 @@ class Xns11:
             raise FileExistsError(f"File '{file_path}' does not exist.")
         self._cross_section_data_factory = CrossSectionDataFactory()
         self._cross_section_data = None
-
         self._reach_names = None
         self.__reaches = None
         self._topoid_names = None
@@ -320,10 +307,10 @@ class Xns11:
         """Check whether the queries point to existing data in the file."""
         for q in queries:
             if q.topoid_name not in self.topoid_names:
-                raise DataNotFoundInFile(f"Topo-id '{q.topoid_name}' was not found.")
+                raise ValueError(f"Topo-id '{q.topoid_name}' was not found.")
             if q.reach_name is not None:
                 if q.reach_name not in self.reach_names:
-                    raise DataNotFoundInFile(f"Reach '{q.reach_name}' was not found.")
+                    raise ValueError(f"Reach '{q.reach_name}' was not found.")
                 else:
                     found_topo_id_in_reach = False
                     for reach in self._reaches:
@@ -335,7 +322,7 @@ class Xns11:
                         # Raise an error if the combination reach and topo-id does not exist
                         topoid_names_in_reach = self._topoid_in_reach(self, reach)
                         if q.topoid_name not in topoid_names_in_reach:
-                            raise DataNotFoundInFile(
+                            raise ValueError(
                                 f"Topo-ID '{q.topoid_name}' was not found in reach '{q.reach_name}'."
                             )
                         found_topo_id_in_reach = True
@@ -354,7 +341,7 @@ class Xns11:
                             found_chainage = True
                             break
                 if not found_chainage:
-                    raise DataNotFoundInFile(
+                    raise ValueError(
                         f"Chainage {q.chainage} was not found in reach '{q.reach_name}' for Topo-ID '{q.topoid_name}'."
                     )
 

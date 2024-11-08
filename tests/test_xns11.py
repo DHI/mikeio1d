@@ -1,6 +1,6 @@
 import pytest
 
-from mikeio1d.xns11 import read, Xns11, QueryData, FileNotOpenedError, DataNotFoundInFile
+from mikeio1d.xns11 import read, Xns11, QueryData
 
 
 def test_query_validate():
@@ -73,17 +73,17 @@ def test_read_bad_queries(file):
     """Querying data not available in the file must return an error"""
 
     # Bad topo-id
-    with pytest.raises(DataNotFoundInFile) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         read(file, [QueryData("bad_topoid")])
     assert "bad_topoid" in str(excinfo.value)
 
     # Bad reach name
-    with pytest.raises(DataNotFoundInFile) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         read(file, [QueryData("topoid1", "bad_reach_name")])
     assert "bad_reach_name" in str(excinfo.value)
 
     # Bad chainage
-    with pytest.raises(DataNotFoundInFile) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         read(file, [QueryData("topoid1", "reach1", 666)])
     assert "666" in str(excinfo.value)
 
