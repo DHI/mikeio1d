@@ -59,12 +59,26 @@ class ResultQuantityDerived:
         df_derived = self.derived_quantity.generate(df_source)
         return df_derived.droplevel("derived", axis=1)
 
-    def plot(self, **kwargs):
-        """Plot the time series data."""
+    def plot(self, ax=None, **kwargs):
+        """Plot the time series data.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes object to plot on.
+        **kwargs
+            Additional keyword arguments passed to pandas.DataFrame.plot.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            Axes object with the plot.
+        """
         df = self.read()
-        ax = df.plot(**kwargs)
+        ax = df.plot(ax=ax, **kwargs)
         ax.set_xlabel("Time")
         ax.set_ylabel(f"{self.derived_quantity.name}")
+        ax.grid(True)
         return ax
 
     def _create_source_dataframe(self) -> pd.DataFrame:

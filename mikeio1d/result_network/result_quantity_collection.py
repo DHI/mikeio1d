@@ -69,15 +69,28 @@ class ResultQuantityCollection(ResultQuantity):
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
         return self.res1d.read(timeseries_ids, column_mode=column_mode)
 
-    def plot(self, **kwargs):
-        """Plot the time series data."""
+    def plot(self, ax=None, **kwargs):
+        """Plot the time series data.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes object to plot on.
+        **kwargs
+            Additional keyword arguments passed to pandas.DataFrame.plot.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            Axes object with the plot.
+        """
         if len(self.result_quantities) <= 0:
             return
 
         # Taking the first data item is enough, because all of them have
         # the same quantity and for plotting.
         self.data_item = self.result_quantities[0].data_item
-        return ResultQuantity.plot(self, **kwargs)
+        return ResultQuantity.plot(self, ax=ax, **kwargs)
 
     def get_timeseries_ids(self) -> List[TimeSeriesId]:
         """Get TimeSeriesId objects corresponding to ResultQuantityCollection."""
