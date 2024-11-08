@@ -51,7 +51,7 @@ Check out the [official documentation for MIKE IO 1D](https://dhi.github.io/mike
 
 # Plot section with location id 'basin_right', chainage '238.800', and topo id '1'.
 >>>  xns = Xns11("mikep_cs_demo.xns11")
->>>  xns.xsections.['basin_right', '238.800', '1'].plot()
+>>>  xns.xsections['basin_right', '238.800', '1'].plot()
 ```
 ![Geometry](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/xns11_geometry.png)
 
