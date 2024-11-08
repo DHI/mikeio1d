@@ -125,12 +125,26 @@ class ResultQuantity:
         """
         return self.res1d.read(self.timeseries_id, column_mode=column_mode)
 
-    def plot(self, **kwargs):
-        """Plot the time series data."""
+    def plot(self, ax=None, **kwargs):
+        """Plot the time series data.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes object to plot on.
+        **kwargs
+            Additional keyword arguments passed to pandas.DataFrame.plot.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            Axes object with the plot.
+        """
         df = self.read()
-        ax = df.plot(**kwargs)
+        ax = df.plot(ax=ax, **kwargs)
         ax.set_xlabel("Time")
         ax.set_ylabel(ResultQuantity.prettify_quantity(self, latex_format=True))
+        ax.grid(True)
         return ax
 
     def to_dataframe(self):
