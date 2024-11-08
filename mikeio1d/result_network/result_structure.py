@@ -38,9 +38,9 @@ class ResultStructure(ResultLocation):
         self._group = TimeSeriesIdGroup.STRUCTURE
         self._name = structure_id
         self._tag = reach.Name
-        self.id = structure_id
+        self._id = structure_id
         self.reach = reach
-        self.chainage = None
+        self._chainage = None
 
         self.data_items_dict = {}
         for data_item in data_items:
@@ -82,10 +82,9 @@ class ResultStructure(ResultLocation):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        self._static_attributes = []
-        self.set_static_attribute("id", self.id)
-        self.set_static_attribute("type", self.reach.Name.split(":")[0])
-        self.set_static_attribute("chainage", self.chainage)
+        self.set_static_attribute("id")
+        self.set_static_attribute("type")
+        self.set_static_attribute("chainage")
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add structure result quantity to result quantity maps."""
@@ -105,11 +104,11 @@ class ResultStructure(ResultLocation):
             A MIKE 1D IDataItem object.
 
         """
-        if self.chainage is None:
+        if self._chainage is None:
             index_list = list(data_item.IndexList)
             gridpoint_index = index_list[0]
             gridpoints = list(self.reach.GridPoints)
-            self.chainage = gridpoints[gridpoint_index].Chainage
+            self._chainage = gridpoints[gridpoint_index].Chainage
 
         self.data_items.append(data_item)
         self.data_items_dict[data_item.Quantity.Id] = data_item
@@ -137,5 +136,20 @@ class ResultStructure(ResultLocation):
         """Get a QueryDataStructure for given data item."""
         quantity_id = data_item.Quantity.Id
         structure_id = self.id
-        query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self.chainage)
+        query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self._chainage)
         return query
+
+    @property
+    def id(self) -> str:
+        """Structure ID."""
+        return self._id
+
+    @property
+    def type(self) -> str:
+        """Type of the structure."""
+        return self.reach.Name.split(":")[0]
+
+    @property
+    def chainage(self) -> float:
+        """Chainage of the structure."""
+        return self._chainage

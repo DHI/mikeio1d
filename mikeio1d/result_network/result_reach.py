@@ -93,6 +93,8 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     def _get_total_length(self):
         total_length = 0
         for reach in self.reaches:
+            if not hasattr(reach, "Length"):
+                return None
             total_length += reach.Length
         return total_length
 
@@ -168,24 +170,15 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        self.set_static_attribute("name", self.reaches[0].Name)
-        self.try_set_static_attribute_length()
-        self.set_static_attribute("start_chainage", self.reaches[0].LocationSpan.StartChainage)
-        self.set_static_attribute("end_chainage", self.reaches[-1].LocationSpan.EndChainage)
-        self.set_static_attribute("n_gridpoints", self._get_total_gridpoints())
-        # For resx files, the start and end node indices are not available
-        if not self.res1d.file_path.endswith(".resx"):
-            self.set_static_attribute("start_node", self._get_start_node())
-            self.set_static_attribute("end_node", self._get_end_node())
-        self.set_static_attribute("height", self._get_height())
-        self.set_static_attribute("full_flow_discharge", self._get_full_flow_discharge())
-
-    def try_set_static_attribute_length(self):
-        """Try to set the length attribute. If it fails, ignore it."""
-        try:
-            self.set_static_attribute("length", self._get_total_length())
-        except Exception as _:
-            pass
+        self.set_static_attribute("name")
+        self.set_static_attribute("length")
+        self.set_static_attribute("start_chainage")
+        self.set_static_attribute("end_chainage")
+        self.set_static_attribute("n_gridpoints")
+        self.set_static_attribute("start_node")
+        self.set_static_attribute("end_node")
+        self.set_static_attribute("height")
+        self.set_static_attribute("full_flow_discharge")
 
     def add_res1d_reach(self, reach):
         """Add a IRes1DReach to ResultReach.
@@ -331,6 +324,57 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         from ..geometry import ReachGeometry
 
         return ReachGeometry.from_m1d_reaches(self.reaches)
+
+    @property
+    def name(self) -> str:
+        """Name of the reach."""
+        return self.reaches[0].Name
+
+    @property
+    def length(self) -> float | None:
+        """Length of the reach."""
+        return self._get_total_length()
+
+    @property
+    def start_chainage(self) -> float:
+        """Start chainage of the reach."""
+        return self.reaches[0].LocationSpan.StartChainage
+
+    @property
+    def end_chainage(self) -> float:
+        """End chainage of the reach."""
+        return self.reaches[-1].LocationSpan.EndChainage
+
+    @property
+    def n_gridpoints(self) -> int:
+        """Number of gridpoints in the reach."""
+        return self._get_total_gridpoints()
+
+    @property
+    def start_node(self) -> str | None:
+        """Start node of the reach."""
+        # For resx files, the start and end node indices are not available
+        if self.res1d.file_path.endswith(".resx"):
+            return None
+        return self._get_start_node()
+
+    @property
+    def end_node(self) -> str:
+        """End node of the reach."""
+        # For resx files, the start and end node indices are not available
+        if self.res1d.file_path.endswith(".resx"):
+            return None
+        return self._get_end_node()
+
+    @property
+    def height(self) -> float:
+        """Height of the reach."""
+        return self._get_height()
+
+    @property
+    def full_flow_discharge(self) -> float:
+        """Full flow discharge of the reach."""
+        return self._get_full_flow_discharge()
 
     def interpolate_reach_ground_level(self, chainage: float) -> float:
         """Interpolate the ground level at a given chainage by linear interpolation from the bounding node ground levels.

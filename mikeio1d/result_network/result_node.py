@@ -69,21 +69,14 @@ class ResultNode(ResultLocation):
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
-        self._static_attributes = []
-
-        node_type = self._node.GetType().Name[5:]  # Removes 'Res1D' from type name
-        self.set_static_attribute("id", self._node.Id)
-        self.set_static_attribute("type", node_type)
-        self.set_static_attribute("xcoord", self._node.XCoordinate)
-        self.set_static_attribute("ycoord", self._node.YCoordinate)
-
-        # Collect attributes depending on node type
-        if self.type in ["Basin", "Manhole", "SewerJunction"]:
-            self.set_static_attribute("ground_level", self._node.GroundLevel)
-            self.set_static_attribute("bottom_level", self._node.BottomLevel)
-            self.set_static_attribute("critical_level", self._node.CriticalLevel)
-        if self.type == "Manhole":
-            self.set_static_attribute("diameter", self._node.Diameter)
+        self.set_static_attribute("id")
+        self.set_static_attribute("type")
+        self.set_static_attribute("xcoord")
+        self.set_static_attribute("ycoord")
+        self.set_static_attribute("ground_level")
+        self.set_static_attribute("bottom_level")
+        self.set_static_attribute("critical_level")
+        self.set_static_attribute("diameter")
 
     def add_to_result_quantity_maps(self, quantity_id, result_quantity):
         """Add node result quantity to result quantity maps."""
@@ -108,3 +101,76 @@ class ResultNode(ResultLocation):
         from ..geometry import NodePoint
 
         return NodePoint.from_res1d_node(self._node)
+
+    @property
+    def id(self) -> str:
+        """Node ID."""
+        return self._node.ID
+
+    @property
+    def type(self) -> str:
+        """Node type."""
+        node_type = self._node.GetType().Name[5:]  # Removes 'Res1D' from type name
+        return node_type
+
+    @property
+    def xcoord(self) -> float:
+        """X coordinate of the node."""
+        return self._node.XCoordinate
+
+    @property
+    def ycoord(self) -> float:
+        """Y coordinate of the node."""
+        return self._node.YCoordinate
+
+    @property
+    def ground_level(self) -> float | None:
+        """Ground level of the node.
+
+        Returns
+        -------
+            float: Ground level of the node.
+            None: If the node does not have a ground level.
+        """
+        if hasattr(self._node, "GroundLevel"):
+            return self._node.GroundLevel
+        return None
+
+    @property
+    def bottom_level(self) -> float | None:
+        """Bottom level of the node.
+
+        Returns
+        -------
+            float: Bottom level of the node.
+            None: If the node does not have a bottom level.
+        """
+        if hasattr(self._node, "BottomLevel"):
+            return self._node.BottomLevel
+        return None
+
+    @property
+    def critical_level(self) -> float | None:
+        """Critical level of the node.
+
+        Returns
+        -------
+            float: Critical level of the node.
+            None: If the node does not have a critical level.
+        """
+        if hasattr(self._node, "CriticalLevel"):
+            return self._node.CriticalLevel
+        return None
+
+    @property
+    def diameter(self) -> float | None:
+        """Diameter of the node.
+
+        Returns
+        -------
+            float: Diameter of the node.
+            None: If the node does not have a diameter.
+        """
+        if hasattr(self._node, "Diameter"):
+            return self._node.Diameter
+        return None
