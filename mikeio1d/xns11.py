@@ -119,16 +119,6 @@ class Xns11:
 
         return file_path
 
-    def _load_file(self):
-        """Load the file."""
-
-    def _get_info(self) -> str:
-        info = []
-        info.append(f"# Cross sections: {str(len(self.xsections))}")
-        info.append(f"Interpolation type: {str(self.interpolation_type)}")
-        info = str.join("\n", info)
-        return info
-
     def _load_or_create_cross_section_data(self) -> None:
         """Initialize the CrossSectionData object."""
         if self.file_path:
@@ -149,6 +139,13 @@ class Xns11:
         """Print information about the result file."""
         info = self._get_info()
         print(info)
+
+    def _get_info(self) -> str:
+        info = []
+        info.append(f"# Cross sections: {str(len(self.xsections))}")
+        info.append(f"Interpolation type: {str(self.interpolation_type)}")
+        info = str.join("\n", info)
+        return info
 
     def add_xsection(self, cross_section: CrossSection):
         """Add a cross section to the file."""
@@ -173,10 +170,6 @@ class Xns11:
 
         if not self.file_path:
             self.file_path = file_path
-
-    def close(self):
-        """Close the file handle."""
-        self.__del__()
 
     @staticmethod
     def from_cross_section_collection(xsections: CrossSectionCollection) -> Xns11:
@@ -432,6 +425,11 @@ class Xns11:
     def __exit__(self, *excinfo):
         """Context manager exit method."""
         pass
+
+    def close(self):
+        """Close the file handle."""
+        warn("The 'close' method is deprecated. Files are automatically closed.")
+        self.__del__()
 
     # endregion
 
