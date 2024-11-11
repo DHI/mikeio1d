@@ -51,6 +51,7 @@ from .xns11 import Xns11
 from .various import allow_nested_autocompletion_for_ipython
 
 allow_nested_autocompletion_for_ipython(Res1D)
+allow_nested_autocompletion_for_ipython(Xns11)
 
 
 def open(file_name: str | Path, **kwargs) -> Res1D | Xns11:
