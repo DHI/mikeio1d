@@ -91,33 +91,16 @@ class Xns11:
     """
 
     def __init__(self, file_path: str | Path = None):
-        self.file_path = self._validate_file_path(file_path)
-        self._cross_section_data_factory = CrossSectionDataFactory()
         self._cross_section_data = None
         self._reach_names = None
         self.__reaches = None
         self._topoid_names = None
         self.__topoids = None
+        self._xsections = None
 
-        # Load the file on initialization
-        self._init_cross_section_data()
-
-        self.xsections = CrossSectionCollection()
-        """
-        A collection of CrossSection objects.
-
-        The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.
-
-        Examples
-        --------
-        >>> location_id, chainage, topo_id = 'location', '200.000', 'topo'
-
-        #### Get a specific cross section
-        >>> xns.xsections[location_id, chainage, topo_id]
-
-        #### Get all cross sections for a particular location and topo.
-        >>> xns.xsection[location_id, ..., topo_id]
-        """
+        self.file_path = self._validate_file_path(file_path)
+        self._cross_section_data_factory = CrossSectionDataFactory()
+        self._load_or_create_cross_section_data()
         self._init_xsections()
 
     def __repr__(self):
@@ -138,9 +121,6 @@ class Xns11:
 
     def _load_file(self):
         """Load the file."""
-        self._cross_section_data = self._cross_section_data_factory.Open(
-            Connection.Create(str(self.file_path)), Diagnostics("Error loading file.")
-        )
 
     def _get_info(self) -> str:
         info = []
@@ -157,15 +137,19 @@ class Xns11:
         """Context manager exit method."""
         pass
 
-    def _init_cross_section_data(self):
+    def _load_or_create_cross_section_data(self) -> None:
         """Initialize the CrossSectionData object."""
         if self.file_path:
-            return self._load_file()
-        self._cross_section_data = CrossSectionData()
+            self._cross_section_data = self._cross_section_data_factory.Open(
+                Connection.Create(str(self.file_path)), Diagnostics("Error loading file.")
+            )
+        else:
+            self._cross_section_data = CrossSectionData()
 
-    def _init_xsections(self):
+    def _init_xsections(self) -> None:
         """Initialize the cross sections."""
-        self.xsections.xns11 = self
+        self._xsections = CrossSectionCollection()
+        self._xsections.xns11 = self
         for xs in self._cross_section_data:
             self.xsections.add_xsection(CrossSection(xs))
 
@@ -216,6 +200,25 @@ class Xns11:
     def get_supported_file_extensions() -> set[str]:
         """Get supported file extensions for Xns11."""
         return {".xns11"}
+
+    @property
+    def xsections(self):
+        """
+        A collection of CrossSection objects.
+
+        The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.
+
+        Examples
+        --------
+        >>> location_id, chainage, topo_id = 'location', '200.000', 'topo'
+
+        #### Get a specific cross section
+        >>> xns.xsections[location_id, chainage, topo_id]
+
+        #### Get all cross sections for a particular location and topo.
+        >>> xns.xsection[location_id, ..., topo_id]
+        """
+        return self._xsections
 
     @property
     def file(self):
