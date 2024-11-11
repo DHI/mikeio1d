@@ -129,14 +129,6 @@ class Xns11:
         info = str.join("\n", info)
         return info
 
-    def __enter__(self):
-        """Context manager enter method."""
-        return self
-
-    def __exit__(self, *excinfo):
-        """Context manager exit method."""
-        pass
-
     def _load_or_create_cross_section_data(self) -> None:
         """Initialize the CrossSectionData object."""
         if self.file_path:
@@ -428,6 +420,20 @@ class Xns11:
         found_points = self._find_points(built_queries)
         df = self._get_data(found_points)
         return df
+
+    # region Deprecated methods
+    # These methods will be removed in the next major release.
+
+    def __enter__(self):
+        """Context manager enter method."""
+        warn("Using Xns11 as a context manager is deprecated. Files are automatically closed.")
+        return self
+
+    def __exit__(self, *excinfo):
+        """Context manager exit method."""
+        pass
+
+    # endregion
 
 
 class QueryData:
