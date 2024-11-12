@@ -94,7 +94,7 @@ class ResultLocations(Dict[str, ResultLocation]):
     @property
     def quantities(self) -> Dict[str, ResultQuantityCollection]:
         """A list of available quantities."""
-        return {k: getattr(self, k) for k in self.result_quantity_map}
+        return {k: getattr(self, make_proper_variable_name(k)) for k in self.result_quantity_map}
 
     @property
     def derived_quantities(self) -> List[str]:
