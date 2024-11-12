@@ -8,6 +8,16 @@
 
 ### Changed
 
+## [0.9.1] - 2024-11-12
+
+### Added
+
+### Fixed
+
+- Fixed bug where ResultLocations.quantities errored if the quantity id contained a space.
+
+### Changed
+
 ### [0.9.0] - 2024-11-06
 
 ### Added
