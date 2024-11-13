@@ -339,12 +339,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="df9c7b67" class="cell" data-execution_count="1">
+<div id="e5142c3c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="res1d" class="level2">
 <h2 class="anchored" data-anchor-id="res1d">Res1D</h2>
-<div id="84468e28" class="cell" data-execution_count="2">
+<div id="c68ed6be" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check contents</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/network.res1d"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -360,7 +360,7 @@ End time: 1994-08-07 18:35:00
 1 - Discharge (m^3/s)</code></pre>
 </div>
 </div>
-<div id="caa325c2" class="cell" data-execution_count="3">
+<div id="438d8d3e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract results to a pandas DataFrame</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -525,7 +525,7 @@ End time: 1994-08-07 18:35:00
 </div>
 <section id="reaches" class="level3">
 <h3 class="anchored" data-anchor-id="reaches">Reaches</h3>
-<div id="c9fa2d34" class="cell" data-execution_count="4">
+<div id="850b9e6b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to nodes</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -540,7 +540,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Names (118)</summary><ul><li>100l1</li><li>101l1</li><li>102l1</li><li>103l1</li><li>104l1</li><li>105l1</li><li>106l1</li><li>107l1</li><li>108l1</li><li>109l1</li><li>10l1</li><li>110l1</li><li>111l1</li><li>112l1</li><li>113l1</li><li>114l1</li><li>116l1</li><li>117l1</li><li>118l1</li><li>119l1</li><li>11l1</li><li>12l1</li><li>13l1</li><li>14l1</li><li>15l1</li><li>16l1</li><li>17l1</li><li>1l1</li><li>20l1</li><li>21l1</li><li>22l1</li><li>23l1</li><li>24l1</li><li>25l1</li><li>26l1</li><li>27l1</li><li>28l1</li><li>29l1</li><li>2l1</li><li>30l1</li><li>31l1</li><li>32l1</li><li>33l1</li><li>34l1</li><li>35l1</li><li>36l1</li><li>37l1</li><li>38l1</li><li>39l1</li><li>3l1</li><li>40l1</li><li>41l1</li><li>42l1</li><li>43l1</li><li>44l1</li><li>45l1</li><li>46l1</li><li>47l1</li><li>48l1</li><li>49l1</li><li>4l1</li><li>50l1</li><li>51l1</li><li>52l1</li><li>53l1</li><li>54l1</li><li>55l1</li><li>56l1</li><li>57l1</li><li>58l1</li><li>59l1</li><li>5l1</li><li>60l1</li><li>61l1</li><li>62l1</li><li>63l1</li><li>64l1</li><li>65l1</li><li>66l1</li><li>67l1</li><li>68l1</li><li>69l1</li><li>6l1</li><li>70l1</li><li>71l1</li><li>72l1</li><li>73l1</li><li>74l1</li><li>75l1</li><li>76l1</li><li>77l1</li><li>78l1</li><li>79l1</li><li>7l1</li><li>80l1</li><li>81l1</li><li>82l1</li><li>83l1</li><li>84l1</li><li>85l1</li><li>86l1</li><li>87l1</li><li>88l1</li><li>89l1</li><li>8l1</li><li>90l1</li><li>91l1</li><li>92l1</li><li>93l1</li><li>94l1</li><li>95l1</li><li>96l1</li><li>97l1</li><li>98l1</li><li>99l1</li><li>9l1</li><li>Weir:119w1</li><li>Pump:115p1</li></ul></details><details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
 </div>
 </div>
-<div id="c1b196ee" class="cell" data-execution_count="5">
+<div id="6d4f4aa0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get reach water levels</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_reaches <span class="op">=</span> res.reaches.WaterLevel.read()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df_reaches.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -703,7 +703,7 @@ End time: 1994-08-07 18:35:00
 </div>
 </div>
 </div>
-<div id="e218f8c4" class="cell" data-execution_count="6">
+<div id="872a7ba4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot water levels for a specific reach</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -714,7 +714,7 @@ End time: 1994-08-07 18:35:00
 </div>
 </div>
 </div>
-<div id="737153f1" class="cell" data-execution_count="7">
+<div id="e0d5e34f" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to a specific reach</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -732,7 +732,7 @@ End time: 1994-08-07 18:35:00
 </section>
 <section id="grid-points" class="level3">
 <h3 class="anchored" data-anchor-id="grid-points">Grid points</h3>
-<div id="45216d88" class="cell" data-execution_count="8">
+<div id="4cd83088" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See grid point info for a reach by chainage</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="st">'47.683'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -747,7 +747,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Attributes (5)</summary><ul><li>reach_name: 100l1</li><li>chainage: 47.6827148432828</li><li>xcoord: -687907.999206543</li><li>ycoord: -1056412.0</li><li>bottom_level: 194.66000366210938</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="5e7a9e1d" class="cell" data-execution_count="9">
+<div id="b2d28e71" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternatively, index grid points by index number (e.g. '0' for first, '-1' for last, etc.).</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="op">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -762,7 +762,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Attributes (5)</summary><ul><li>reach_name: 100l1</li><li>chainage: 47.6827148432828</li><li>xcoord: -687907.999206543</li><li>ycoord: -1056412.0</li><li>bottom_level: 194.66000366210938</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="08d91050" class="cell" data-execution_count="10">
+<div id="080fd649" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot water level at a gridpoint</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="dv">0</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -776,7 +776,7 @@ End time: 1994-08-07 18:35:00
 </section>
 <section id="nodes" class="level3">
 <h3 class="anchored" data-anchor-id="nodes">Nodes</h3>
-<div id="f8aa63c5" class="cell" data-execution_count="11">
+<div id="3621901a" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to nodes</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
@@ -791,7 +791,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Names (119)</summary><ul><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>10</li><li>11</li><li>13</li><li>14</li><li>15</li><li>17</li><li>20</li><li>21</li><li>22</li><li>23</li><li>24</li><li>25</li><li>26</li><li>27</li><li>28</li><li>29</li><li>30</li><li>31</li><li>32</li><li>33</li><li>34</li><li>35</li><li>36</li><li>37</li><li>38</li><li>39</li><li>40</li><li>41</li><li>42</li><li>43</li><li>44</li><li>45</li><li>47</li><li>48</li><li>49</li><li>50</li><li>51</li><li>52</li><li>53</li><li>54</li><li>56</li><li>57</li><li>59</li><li>60</li><li>61</li><li>62</li><li>63</li><li>64</li><li>65</li><li>66</li><li>67</li><li>68</li><li>69</li><li>70</li><li>71</li><li>72</li><li>73</li><li>74</li><li>75</li><li>76</li><li>77</li><li>78</li><li>79</li><li>80</li><li>81</li><li>82</li><li>83</li><li>84</li><li>85</li><li>86</li><li>87</li><li>88</li><li>89</li><li>90</li><li>91</li><li>92</li><li>93</li><li>94</li><li>95</li><li>96</li><li>97</li><li>98</li><li>99</li><li>100</li><li>101</li><li>102</li><li>103</li><li>104</li><li>105</li><li>106</li><li>107</li><li>108</li><li>109</li><li>110</li><li>111</li><li>112</li><li>113</li><li>114</li><li>12</li><li>16</li><li>46</li><li>55</li><li>58</li><li>116</li><li>117</li><li>118</li><li>115</li><li>119</li><li>120</li><li>Weir Outlet:119w1</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
 </div>
 </div>
-<div id="403f093f" class="cell" data-execution_count="12">
+<div id="47f2297b" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get node water levels</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_nodes <span class="op">=</span> res.nodes.WaterLevel.read()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>df_nodes.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -954,7 +954,7 @@ End time: 1994-08-07 18:35:00
 </div>
 </div>
 </div>
-<div id="cb7c5b29" class="cell" data-execution_count="13">
+<div id="5fdb0b4a" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot water level of specific node</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -965,7 +965,7 @@ End time: 1994-08-07 18:35:00
 </div>
 </div>
 </div>
-<div id="02293963" class="cell" data-execution_count="14">
+<div id="83a00c27" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to a specific node</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
@@ -983,7 +983,7 @@ End time: 1994-08-07 18:35:00
 </section>
 <section id="catchments" class="level3">
 <h3 class="anchored" data-anchor-id="catchments">Catchments</h3>
-<div id="9a3c5949" class="cell" data-execution_count="15">
+<div id="7d75543f" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to catchments</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/catchments.res1d"</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>res.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -999,7 +999,7 @@ End time: 1994-08-07 18:35:00
     <details><summary>Names (31)</summary><ul><li>100_16_16</li><li>105_1_1</li><li>10_22_22</li><li>113_21_21</li><li>118_30_30</li><li>119_32_32</li><li>14_20_20</li><li>20_2_2</li><li>22_8_8</li><li>25_26_26</li><li>28_6_6</li><li>29_4_4</li><li>32_19_19</li><li>33_24_24</li><li>34_23_23</li><li>40_29_29</li><li>43_11_11</li><li>48_13_13</li><li>51_14_14</li><li>57_17_17</li><li>5_31_31</li><li>64_12_12</li><li>67_18_18</li><li>6_25_25</li><li>76_7_7</li><li>79_10_10</li><li>82_27_27</li><li>84_15_15</li><li>90_28_28</li><li>94_9_9</li><li>9_3_3</li></ul></details><details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="2060b023" class="cell" data-execution_count="16">
+<div id="7e23de94" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract runoff to a pandas DataFrame</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.catchments.TotalRunOff.read()</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1162,7 +1162,7 @@ End time: 1994-08-07 18:35:00
 </div>
 </div>
 </div>
-<div id="a09a0af1" class="cell" data-execution_count="17">
+<div id="616eb243" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot runoff for a specific catchment</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.catchments[<span class="st">'20_2_2'</span>].TotalRunOff.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -1177,7 +1177,7 @@ End time: 1994-08-07 18:35:00
 </section>
 <section id="dynamic-selections" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-selections">Dynamic selections</h2>
-<div id="35ef3af4" class="cell" data-execution_count="18">
+<div id="219c5b4e" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dynamically select results to extract into a pandas DataFrame.</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/network.res1d"</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
