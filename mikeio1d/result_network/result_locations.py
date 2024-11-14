@@ -66,10 +66,9 @@ class ResultLocations(Dict[str, ResultLocation]):
 
     def __repr__(self) -> str:
         """Return a string representation of the object."""
-        return f"<{self.__class__.__name__}>"
+        return f"<{self.__class__.__name__}> ({len(self)})"
 
     def _repr_html_(self) -> str:
-        total_names = len(self)
         total_quantities = len(self.quantities)
         total_derived_quantities = len(self.derived_quantities)
         pretty_quantities = [
@@ -79,7 +78,6 @@ class ResultLocations(Dict[str, ResultLocation]):
         repr = build_html_repr_from_sections(
             self.__repr__(),
             [
-                (f"Names ({total_names})", self.names),
                 (f"Quantities ({total_quantities})", pretty_quantities),
                 (f"Derived Quantities ({total_derived_quantities})", self.derived_quantities),
             ],
