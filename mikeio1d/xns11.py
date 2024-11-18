@@ -206,12 +206,6 @@ class Xns11:
         return self._xsections
 
     @property
-    def file(self):
-        """Alias for CrossSectionData objected stored on the member '_cross_section_data'."""
-        warn("The 'file' property is deprecated. Use '_cross_section_data' instead.")
-        return self._cross_section_data
-
-    @property
     def interpolation_type(self):
         """Defines how an interpolated cross section are interpolated.
 
@@ -416,6 +410,12 @@ class Xns11:
 
     # region Deprecated methods
     # These methods will be removed in the next major release.
+
+    @property
+    def file(self):
+        """Alias for CrossSectionData objected stored on the member '_cross_section_data'."""
+        warn("The 'file' property is deprecated. Use '_cross_section_data' instead.")
+        return self._cross_section_data
 
     def __enter__(self):
         """Context manager enter method."""
