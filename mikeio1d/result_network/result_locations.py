@@ -22,6 +22,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import ResultData
     from DHI.Mike1D.ResultDataAccess import IDataItems
 
+from abc import ABC
+from abc import abstractmethod
 import pandas as pd
 
 from ..dotnet import pythonnet_implementation as impl
@@ -35,7 +37,7 @@ from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 
 
-class ResultLocations(Dict[str, ResultLocation]):
+class ResultLocations(ABC, Dict[str, ResultLocation]):
     """A base class for a network locations (nodes, reaches) or a catchments wrapper class."""
 
     def __init__(self):
@@ -120,7 +122,7 @@ class ResultLocations(Dict[str, ResultLocation]):
         return df
 
 
-class ResultLocationsCreator:
+class ResultLocationsCreator(ABC):
     """A base helper class for creating ResultLocations.
 
     Parameters
@@ -156,9 +158,10 @@ class ResultLocationsCreator:
         self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
         self.result_quantity_derived_map: Dict[str, List[ResultQuantityDerived]] = {}
 
+    @abstractmethod
     def create(self):
         """Perform ResultLocations creation steps."""
-        pass
+        ...
 
     def repr_html_(self) -> str:
         """HTML representation."""
