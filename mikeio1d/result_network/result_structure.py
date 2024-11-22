@@ -71,6 +71,21 @@ class ResultStructure(ResultLocation):
         )
         return self.id
 
+    @property
+    def id(self) -> str:
+        """Structure ID."""
+        return self._id
+
+    @property
+    def type(self) -> str:
+        """Type of the structure."""
+        return self.reach.Name.split(":")[0]
+
+    @property
+    def chainage(self) -> float:
+        """Chainage of the structure."""
+        return self._chainage
+
     def get_m1d_dataset(self, m1d_dataitem=None):
         """Get IRes1DDataSet object associated with ResultStructure.
 
@@ -96,21 +111,6 @@ class ResultStructure(ResultLocation):
         structure_id = self.id
         query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self._chainage)
         return query
-
-    @property
-    def id(self) -> str:
-        """Structure ID."""
-        return self._id
-
-    @property
-    def type(self) -> str:
-        """Type of the structure."""
-        return self.reach.Name.split(":")[0]
-
-    @property
-    def chainage(self) -> float:
-        """Chainage of the structure."""
-        return self._chainage
 
 
 class ResultStructureCreator(ResultLocationCreator):
