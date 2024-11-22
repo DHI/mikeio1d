@@ -33,7 +33,6 @@ import warnings
 
 from pathlib import Path
 
-
 from .dotnet import from_dotnet_datetime
 from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
