@@ -1,9 +1,12 @@
 """Module for ResultStructures class."""
 
-from .result_locations import ResultLocations
-from .result_structure import ResultStructure
-from .various import make_proper_variable_name
 from ..quantities import TimeSeriesIdGroup
+
+from .result_locations import ResultLocations
+from .result_locations import ResultLocationsCreator
+from .result_structure import ResultStructure
+from .result_structure import ResultStructureCreator
+from .various import make_proper_variable_name
 
 
 class ResultStructures(ResultLocations):
@@ -17,6 +20,28 @@ class ResultStructures(ResultLocations):
     res1d : Res1D
         Res1D object the structure data items belong to.
 
+    """
+
+    def __init__(self, res1d):
+        ResultLocations.__init__(self)
+
+        res1d.network.structures = self
+        self._group = TimeSeriesIdGroup.STRUCTURE
+
+        self._creator = ResultStructuresCreator(self, res1d)
+        self._creator.create()
+
+
+class ResultStructuresCreator(ResultLocationsCreator):
+    """A helper class for creating ResultStructures.
+
+    Parameters
+    ----------
+    result_locations : ResultStructures
+        Instance of ResultStructures, which the ResultStructuresCreator deals with.
+    res1d : Res1D
+        Res1D object the structures belong to.
+
     Attributes
     ----------
     structure_label : str
@@ -27,13 +52,13 @@ class ResultStructures(ResultLocations):
 
     """
 
-    def __init__(self, res1d):
-        ResultLocations.__init__(self, res1d)
-        self._group = TimeSeriesIdGroup.STRUCTURE
+    def __init__(self, result_locations, res1d):
+        ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.structure_label = "s_"
         self.result_structure_map = {}
 
-        res1d.network.structures = self
+    def create(self):
+        """Perform ResultStructures creation steps."""
         self.set_structures()
         self.set_quantity_collections()
 
@@ -42,6 +67,7 @@ class ResultStructures(ResultLocations):
         for reach in self.data.Reaches:
             if not self.res1d.reader.is_data_set_included(reach):
                 continue
+
             for data_item in reach.DataItems:
                 if not self.is_structure(reach, data_item):
                     continue
@@ -51,7 +77,7 @@ class ResultStructures(ResultLocations):
                 result_structure_attribute_string = make_proper_variable_name(
                     structure_id, self.structure_label
                 )
-                setattr(self, result_structure_attribute_string, result_structure)
+                setattr(self.result_locations, result_structure_attribute_string, result_structure)
 
     def is_structure(self, reach, data_item):
         """Check if a data item is a structure data item."""
@@ -77,12 +103,12 @@ class ResultStructures(ResultLocations):
         Also update a result_structure_map dict entry from structure ID
         to a ResultStructure object.
         """
-        structure_id = ResultStructure.get_structure_id(reach, data_item)
+        structure_id = ResultStructureCreator.get_structure_id(reach, data_item)
 
         result_structure_map = self.result_structure_map
         if structure_id in result_structure_map:
             result_structure = result_structure_map[structure_id]
-            result_structure.add_res1d_structure_data_item(data_item)
+            result_structure._creator.add_res1d_structure_data_item(data_item)
             return result_structure
 
         result_structure = ResultStructure(structure_id, reach, [data_item], self.res1d)

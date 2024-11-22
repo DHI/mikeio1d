@@ -385,4 +385,4 @@ def test_result_quantity_collection_methods(test_file):
 
 def test_calculate_total_reach_lengths(res1d_river_network):
     reach = res1d_river_network.reaches.river
-    assert reach._get_total_length() == pytest.approx(2024.22765)
+    assert reach._creator._get_total_length() == pytest.approx(2024.22765)

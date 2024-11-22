@@ -10,11 +10,13 @@ if TYPE_CHECKING:  # pragma: no cover
     from geopandas import GeoDataFrame
 
 from ..dotnet import pythonnet_implementation as impl
-from .result_locations import ResultLocations
-from .result_node import ResultNode
-from .various import make_proper_variable_name
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
+
+from .result_locations import ResultLocations
+from .result_locations import ResultLocationsCreator
+from .result_node import ResultNode
+from .various import make_proper_variable_name
 
 
 class ResultNodes(ResultLocations):
@@ -28,40 +30,17 @@ class ResultNodes(ResultLocations):
     res1d : Res1D
         Res1D object the nodes belong to.
 
-    Attributes
-    ----------
-    node_label : str
-        A label, which is appended if the node name starts
-        with a number. The value used is node_label = 'n_'
-
     """
 
     def __init__(self, res1d):
-        ResultLocations.__init__(self, res1d)
-        self._group = TimeSeriesIdGroup.NODE
-        self.node_label = "n_"
+        ResultLocations.__init__(self)
 
         res1d.network.nodes = self
-        self.set_nodes()
-        self.set_quantity_collections()
-
-        self._node_ids = None
+        self._group = TimeSeriesIdGroup.NODE
         self._geometries = None
 
-    def set_nodes(self):
-        """Set attributes to the current ResultNodes object based on the node ID."""
-        for node in self.data.Nodes:
-            if not self.res1d.reader.is_data_set_included(node):
-                continue
-            node = impl(node)
-            result_node = ResultNode(node, self.res1d)
-            self.set_res1d_node_to_dict(result_node)
-            result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
-            setattr(self, result_node_attribute_string, result_node)
-
-    def set_res1d_node_to_dict(self, result_node):
-        """Create a dict entry from node ID to ResultNode object."""
-        self[result_node.id] = result_node
+        self._creator = ResultNodesCreator(self, res1d)
+        self._creator.create()
 
     def to_geopandas(
         self,
@@ -120,3 +99,48 @@ class ResultNodes(ResultLocations):
         gdf = gdf.merge(df_quantities, left_on="name", right_index=True)
 
         return gdf
+
+
+class ResultNodesCreator(ResultLocationsCreator):
+    """A helper class for creating ResultNodes.
+
+    Parameters
+    ----------
+    result_locations : ResultNodes
+        Instance of ResultNodes, which the ResultNodesCreator deals with.
+    res1d : Res1D
+        Res1D object the nodes belong to.
+
+    Attributes
+    ----------
+    node_label : str
+        A label, which is appended if the node name starts
+        with a number. The value used is node_label = 'n_'
+
+    """
+
+    def __init__(self, result_locations, res1d):
+        ResultLocationsCreator.__init__(self, result_locations, res1d)
+        self.node_label = "n_"
+
+    def create(self):
+        """Perform ResultNodes creation steps."""
+        self.set_nodes()
+        self.set_quantity_collections()
+
+    def set_nodes(self):
+        """Set attributes to the current ResultNodes object based on the node ID."""
+        for node in self.data.Nodes:
+            # TODO: Figure out if we should we have res1d.reader dependency here?
+            if not self.res1d.reader.is_data_set_included(node):
+                continue
+
+            node = impl(node)
+            result_node = ResultNode(node, self.res1d)
+            self.set_res1d_node_to_dict(result_node)
+            result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
+            setattr(self.result_locations, result_node_attribute_string, result_node)
+
+    def set_res1d_node_to_dict(self, result_node):
+        """Create a dict entry from node ID to ResultNode object."""
+        self.result_locations[result_node.id] = result_node

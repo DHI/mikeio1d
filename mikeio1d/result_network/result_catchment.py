@@ -6,11 +6,14 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..geometry import CatchmentGeometry
+    from DHI.Mike1D.ResultDataAccess import IRes1DCatchment
 
 from ..query import QueryDataCatchment
-from .result_location import ResultLocation
 from ..various import try_import_shapely
 from ..quantities import TimeSeriesIdGroup
+
+from .result_location import ResultLocation
+from .result_location import ResultLocationCreator
 
 
 class ResultCatchment(ResultLocation):
@@ -22,16 +25,16 @@ class ResultCatchment(ResultLocation):
         MIKE 1D IRes1DCatchment object.
     res1d : Res1D
         Res1D object the catchment belongs to.
-
     """
 
     def __init__(self, catchment, res1d):
-        ResultLocation.__init__(self, catchment.DataItems, res1d)
+        ResultLocation.__init__(self)
+
         self._group = TimeSeriesIdGroup.CATCHMENT
         self._name = catchment.Id
-        self._catchment = catchment
-        self.set_quantities()
-        self.set_static_attributes()
+
+        self._creator = ResultCatchmentCreator(self, catchment, res1d)
+        self._creator.create()
 
     def __repr__(self) -> str:
         """Return a string representation of the ResultCatchment object."""
@@ -44,13 +47,13 @@ class ResultCatchment(ResultLocation):
             warn(
                 "Accessing IRes1DCatchment attribute via .catchment is deprecated. Use ._catchment."
             )
-            return self._catchment
+            return self.catchment
 
-        elif hasattr(self._catchment, name):
+        elif hasattr(self.catchment, name):
             warn(
                 f"Accessing IRes1DCatchment attribute {name} directly is deprecated. Use static attributes instead, or ._catchment.{name}."
             )
-            return getattr(self._catchment, name)
+            return getattr(self.catchment, name)
         else:
             object.__getattribute__(self, name)
 
@@ -68,7 +71,67 @@ class ResultCatchment(ResultLocation):
             IRes1DDataSet object associated with ResultCatchment.
 
         """
-        return self._catchment
+        return self.catchment
+
+    def get_query(self, data_item):
+        """Get a QueryDataCatchment for given data item."""
+        quantity_id = data_item.Quantity.Id
+        catchment_id = self.catchment.Id
+        query = QueryDataCatchment(quantity_id, catchment_id)
+        return query
+
+    @property
+    def catchment(self) -> IRes1DCatchment:
+        """IRes1DCatchment corresponding to this result location."""
+        # TODO: Consider to remove or rename this property to res1d_catchment for version 1.0.0
+        return self._creator.catchment
+
+    @property
+    def id(self) -> str:
+        """The ID of the catchment."""
+        return self.catchment.Id
+
+    @property
+    def area(self) -> float:
+        """The area of the catchment."""
+        return self.catchment.Area
+
+    @property
+    def type(self) -> str:
+        """The type of the catchment."""
+        return self.catchment.Type
+
+    @property
+    def geometry(self) -> CatchmentGeometry:
+        """A geometric representation of the catchment. Requires shapely."""
+        try_import_shapely()
+        from ..geometry import CatchmentGeometry
+
+        return CatchmentGeometry.from_res1d_catchment(self.catchment)
+
+
+class ResultCatchmentCreator(ResultLocationCreator):
+    """Helper class for creating ResultCatchment.
+
+    Parameters
+    ----------
+    result_location:
+        Instance of ResultCatchment, which the ResultCatchmentCreator deals with.
+    catchment: IRes1DCatchment
+        MIKE 1D IRes1DCatchment object.
+    res1d : Res1D
+        Res1D object the catchment belongs to.
+
+    """
+
+    def __init__(self, result_location, catchment, res1d):
+        ResultLocationCreator.__init__(self, result_location, catchment.DataItems, res1d)
+        self.catchment = catchment
+
+    def create(self):
+        """Perform ResultCatchment creation steps."""
+        self.set_quantities()
+        self.set_static_attributes()
 
     def set_static_attributes(self):
         """Set static attributes. These show up in the html repr."""
@@ -80,37 +143,7 @@ class ResultCatchment(ResultLocation):
         """Add catchment result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
-        catchment_result_quantity_map = self.res1d.network.catchments.result_quantity_map
+        catchment_result_quantity_map = self.res1d.network.catchments._creator.result_quantity_map
         self.add_to_result_quantity_map(quantity_id, result_quantity, catchment_result_quantity_map)
 
         self.add_to_network_result_quantity_map(result_quantity)
-
-    def get_query(self, data_item):
-        """Get a QueryDataCatchment for given data item."""
-        quantity_id = data_item.Quantity.Id
-        catchment_id = self._catchment.Id
-        query = QueryDataCatchment(quantity_id, catchment_id)
-        return query
-
-    @property
-    def id(self) -> str:
-        """The ID of the catchment."""
-        return self._catchment.Id
-
-    @property
-    def area(self) -> float:
-        """The area of the catchment."""
-        return self._catchment.Area
-
-    @property
-    def type(self) -> str:
-        """The type of the catchment."""
-        return self._catchment.Type
-
-    @property
-    def geometry(self) -> CatchmentGeometry:
-        """A geometric representation of the catchment. Requires shapely."""
-        try_import_shapely()
-        from ..geometry import CatchmentGeometry
-
-        return CatchmentGeometry.from_res1d_catchment(self._catchment)

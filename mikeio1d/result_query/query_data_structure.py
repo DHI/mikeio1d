@@ -55,7 +55,7 @@ class QueryDataStructure(QueryDataReach):
         result_structure = self._get_result_structure(res1d)
 
         self._check_invalid_structure_quantity(result_structure)
-        data_item = result_structure.get_data_item(self._quantity)
+        data_item = result_structure._creator.get_data_item(self._quantity)
 
         values = data_item.CreateTimeSeriesData(0)
 
@@ -107,7 +107,7 @@ class QueryDataStructure(QueryDataReach):
             raise InvalidStructure(str(self))
 
     def _check_invalid_structure_quantity(self, result_structure):
-        if self._quantity not in result_structure.data_items_dict:
+        if self._quantity not in result_structure._creator.data_items_dict:
             raise InvalidQuantity(str(self))
 
     def _update_location_info(self, result_structure):

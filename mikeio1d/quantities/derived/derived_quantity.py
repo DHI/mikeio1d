@@ -202,6 +202,6 @@ class DerivedQuantity(ABC):
         if self.source_quantity not in result_location.quantities:
             return []
 
-        result_quantities = result_location.result_quantity_map[self.source_quantity]
+        result_quantities = result_location._creator.result_quantity_map[self.source_quantity]
         tsids = [q.timeseries_id for q in result_quantities]
         return tsids
