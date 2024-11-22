@@ -50,33 +50,6 @@ class ResultGridPoint(ResultLocation):
         )
         self._creator.create()
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
-        """Get IRes1DDataSet object associated with ResultGridPoint.
-
-        This is the reach IRes1DDataSet object because grid points do not
-        have a corresponding IRes1DDataSet object.
-
-        Parameters
-        ----------
-        m1d_dataitem: IDataItem, optional
-            Ignored for ResultGridPoint.
-
-        Returns
-        -------
-        IRes1DDataSet
-            IRes1DDataSet object associated with ResultGridPoint.
-
-        """
-        return self.reach
-
-    def get_query(self, data_item):
-        """Get a QueryDataReach for given data item."""
-        quantity_id = data_item.Quantity.Id
-        reach_name = self.reach.Name
-        chainage = self.gridpoint.Chainage
-        query = QueryDataReach(quantity_id, reach_name, chainage)
-        return query
-
     @property
     def result_reach(self) -> ResultReach:
         """Instance of ResultReach that this ResultGridPoint belongs to."""
@@ -119,6 +92,33 @@ class ResultGridPoint(ResultLocation):
     def bottom_level(self):
         """Bottom level of the gridpoint."""
         return self.gridpoint.Z
+
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultGridPoint.
+
+        This is the reach IRes1DDataSet object because grid points do not
+        have a corresponding IRes1DDataSet object.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultGridPoint.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultGridPoint.
+
+        """
+        return self.reach
+
+    def get_query(self, data_item):
+        """Get a QueryDataReach for given data item."""
+        quantity_id = data_item.Quantity.Id
+        reach_name = self.reach.Name
+        chainage = self.gridpoint.Chainage
+        query = QueryDataReach(quantity_id, reach_name, chainage)
+        return query
 
 
 class ResultGridPointCreator(ResultLocationCreator):

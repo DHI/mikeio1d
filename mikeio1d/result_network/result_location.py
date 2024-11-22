@@ -42,25 +42,6 @@ class ResultLocation(ABC):
     def _repr_html_(self) -> str:
         return self._creator.repr_html()
 
-    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """Read the time series data for all quantities at this location into a DataFrame.
-
-        Parameters
-        ----------
-        column_mode : str | ColumnMode (optional)
-            Specifies the type of column index of returned DataFrame.
-            'all' - column MultiIndex with levels matching TimeSeriesId objects.
-            'compact' - same as 'all', but removes levels with default values.
-            'timeseries' - column index of TimeSeriesId objects
-
-        """
-        qlists = self._creator.result_quantity_map.values()
-        result_quantities = [q for qlist in qlists for q in qlist]
-        timesries_ids = [q.timeseries_id for q in result_quantities]
-        reader = self.res1d.reader
-        df = reader.read(timesries_ids, column_mode=column_mode)
-        return df
-
     @property
     def res1d(self) -> Res1D:
         """The Res1D instance that this location belongs to."""
@@ -99,15 +80,34 @@ class ResultLocation(ABC):
         """
         ...
 
+    @abstractmethod
+    def get_query(self, data_item):
+        """Create a query for given data item."""
+        ...
+
     def add_query(self, data_item):
         """Add a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
 
-    @abstractmethod
-    def get_query(self, data_item):
-        """Create a query for given data item."""
-        ...
+    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read the time series data for all quantities at this location into a DataFrame.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+
+        """
+        qlists = self._creator.result_quantity_map.values()
+        result_quantities = [q for qlist in qlists for q in qlist]
+        timesries_ids = [q.timeseries_id for q in result_quantities]
+        reader = self.res1d.reader
+        df = reader.read(timesries_ids, column_mode=column_mode)
+        return df
 
 
 class ResultLocationCreator(ABC):

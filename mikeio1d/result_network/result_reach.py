@@ -87,38 +87,6 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """List of gridpoints for the reach."""
         return list(self.values())
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
-        """Get IRes1DDataSet object associated with ResultReach.
-
-        A ResultReach may consist of several IRes1DDataSet objects. Therefore,
-        a IRes1DDataItem must be provided to identify the correct IRes1DDataSet.
-
-        Parameters
-        ----------
-        m1d_dataitem: IDataItem
-            The IRes1DDataItem associated with the returned IRes1DDataSet.
-
-        Returns
-        -------
-        IRes1DDataSet
-            IRes1DDataSet object associated with ResultReach.
-
-        """
-        if m1d_dataitem is None:
-            raise ValueError("m1d_dataitem must be provided for ResultReach.")
-
-        for m1d_reach in self.reaches:
-            if m1d_reach.DataItems.Contains(m1d_dataitem):
-                return m1d_reach
-        raise Exception(
-            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
-            m1d_dataitem,
-        )
-
-    def get_query(self, data_item):
-        """Get a query for a data item."""
-        raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
-
     @property
     def geometry(self) -> ReachGeometry:
         """A geometric representation of the reach. Requires shapely."""
@@ -177,6 +145,38 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     def full_flow_discharge(self) -> float:
         """Full flow discharge of the reach."""
         return self._creator._get_full_flow_discharge()
+
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultReach.
+
+        A ResultReach may consist of several IRes1DDataSet objects. Therefore,
+        a IRes1DDataItem must be provided to identify the correct IRes1DDataSet.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem
+            The IRes1DDataItem associated with the returned IRes1DDataSet.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultReach.
+
+        """
+        if m1d_dataitem is None:
+            raise ValueError("m1d_dataitem must be provided for ResultReach.")
+
+        for m1d_reach in self.reaches:
+            if m1d_reach.DataItems.Contains(m1d_dataitem):
+                return m1d_reach
+        raise Exception(
+            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
+            m1d_dataitem,
+        )
+
+    def get_query(self, data_item):
+        """Get a query for a data item."""
+        raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
 
     def interpolate_reach_ground_level(self, chainage: float) -> float:
         """Interpolate the ground level at a given chainage by linear interpolation from the bounding node ground levels.

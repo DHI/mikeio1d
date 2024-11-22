@@ -57,29 +57,6 @@ class ResultCatchment(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
-        """Get IRes1DDataSet object associated with ResultCatchment.
-
-        Parameters
-        ----------
-        m1d_dataitem: IDataItem, optional
-            Ignored for ResultCatchment.
-
-        Returns
-        -------
-        IRes1DDataSet
-            IRes1DDataSet object associated with ResultCatchment.
-
-        """
-        return self.catchment
-
-    def get_query(self, data_item):
-        """Get a QueryDataCatchment for given data item."""
-        quantity_id = data_item.Quantity.Id
-        catchment_id = self.catchment.Id
-        query = QueryDataCatchment(quantity_id, catchment_id)
-        return query
-
     @property
     def catchment(self) -> IRes1DCatchment:
         """IRes1DCatchment corresponding to this result location."""
@@ -108,6 +85,29 @@ class ResultCatchment(ResultLocation):
         from ..geometry import CatchmentGeometry
 
         return CatchmentGeometry.from_res1d_catchment(self.catchment)
+
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultCatchment.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultCatchment.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultCatchment.
+
+        """
+        return self.catchment
+
+    def get_query(self, data_item):
+        """Get a QueryDataCatchment for given data item."""
+        quantity_id = data_item.Quantity.Id
+        catchment_id = self.catchment.Id
+        query = QueryDataCatchment(quantity_id, catchment_id)
+        return query
 
 
 class ResultCatchmentCreator(ResultLocationCreator):

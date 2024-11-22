@@ -57,29 +57,6 @@ class ResultNode(ResultLocation):
         else:
             object.__getattribute__(self, name)
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
-        """Get IRes1DDataSet object associated with ResultNode.
-
-        Parameters
-        ----------
-        m1d_dataitem: IDataItem, optional
-            Ignored for ResultNode.
-
-        Returns
-        -------
-        IRes1DDataSet
-            IRes1DDataSet object associated with ResultNode.
-
-        """
-        return self.node
-
-    def get_query(self, data_item):
-        """Get a QueryDataNode for given data item."""
-        quantity_id = data_item.Quantity.Id
-        node_id = self.node.ID
-        query = QueryDataNode(quantity_id, node_id)
-        return query
-
     @property
     def node(self) -> IRes1DNode:
         """IRes1DNode corresponding to this result location."""
@@ -166,6 +143,29 @@ class ResultNode(ResultLocation):
         if hasattr(self.node, "Diameter"):
             return self.node.Diameter
         return None
+
+    def get_m1d_dataset(self, m1d_dataitem=None):
+        """Get IRes1DDataSet object associated with ResultNode.
+
+        Parameters
+        ----------
+        m1d_dataitem: IDataItem, optional
+            Ignored for ResultNode.
+
+        Returns
+        -------
+        IRes1DDataSet
+            IRes1DDataSet object associated with ResultNode.
+
+        """
+        return self.node
+
+    def get_query(self, data_item):
+        """Get a QueryDataNode for given data item."""
+        quantity_id = data_item.Quantity.Id
+        node_id = self.node.ID
+        query = QueryDataNode(quantity_id, node_id)
+        return query
 
 
 class ResultNodeCreator(ResultLocationCreator):
