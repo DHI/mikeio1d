@@ -9,6 +9,11 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict
     from geopandas import GeoDataFrame
 
+    from ..res1d import Res1D
+
+    from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+
 import pandas as pd
 
 from ..various import try_import_geopandas
@@ -72,10 +77,10 @@ class ResultNetwork:
 
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         self.res1d = res1d
-        self.data = res1d.data
-        self.data_items = res1d.data.DataItems
+        self.data: ResultData = res1d.data
+        self.data_items: List[IDataItem] = res1d.data.DataItems
 
         self.queue: List[TimeSeriesId] = []
 

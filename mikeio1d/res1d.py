@@ -24,6 +24,10 @@ if TYPE_CHECKING:  # pragma: no cover
     from .result_network import ResultStructures
     from .result_network import ResultGlobalDatas
 
+    from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import ResultDataSearcher
+    from DHI.Mike1D.ResultDataAccess import ResultDataQuery
+
 import os.path
 import warnings
 
@@ -527,7 +531,7 @@ class Res1D:
         return self.reader.file_path
 
     @property
-    def query(self):
+    def query(self) -> ResultDataQuery:
         """.NET object ResultDataQuery to use for querying the loaded res1d data.
 
         More information about ResultDataQuery class see:
@@ -536,7 +540,7 @@ class Res1D:
         return self.reader.query
 
     @property
-    def searcher(self):
+    def searcher(self) -> ResultDataSearcher:
         """.NET object ResultDataSearcher to use for searching res1d data items on network.
 
         More information about ResultDataSearcher class see:
@@ -545,7 +549,7 @@ class Res1D:
         return self.reader.searcher
 
     @property
-    def data(self):
+    def data(self) -> ResultData:
         """.NET object ResultData with the loaded res1d data.
 
         More information about ResultData class see:
@@ -554,7 +558,7 @@ class Res1D:
         return self.reader.data
 
     @property
-    def projection_string(self):
+    def projection_string(self) -> str:
         """Projection string of the result file."""
         return self.data.ProjectionString
 
