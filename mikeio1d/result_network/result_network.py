@@ -131,10 +131,10 @@ class ResultNetwork:
             Derived quantity to be added to the result network.
 
         """
-        self.nodes.add_derived_quantity(derived_quantity)
-        self.reaches.add_derived_quantity(derived_quantity)
-        self.catchments.add_derived_quantity(derived_quantity)
-        self.structures.add_derived_quantity(derived_quantity)
+        self.nodes._creator.add_derived_quantity(derived_quantity)
+        self.reaches._creator.add_derived_quantity(derived_quantity)
+        self.catchments._creator.add_derived_quantity(derived_quantity)
+        self.structures._creator.add_derived_quantity(derived_quantity)
 
     def remove_derived_quantity(self, derived_quantity: ResultQuantity | str):
         """Remove a derived quantity from the result network.
@@ -145,10 +145,10 @@ class ResultNetwork:
             Derived quantity to be removed from the result network. Either a ResultQuantity object or its name.
 
         """
-        self.nodes.remove_derived_quantity(derived_quantity)
-        self.reaches.remove_derived_quantity(derived_quantity)
-        self.catchments.remove_derived_quantity(derived_quantity)
-        self.structures.remove_derived_quantity(derived_quantity)
+        self.nodes._creator.remove_derived_quantity(derived_quantity)
+        self.reaches._creator.remove_derived_quantity(derived_quantity)
+        self.catchments._creator.remove_derived_quantity(derived_quantity)
+        self.structures._creator.remove_derived_quantity(derived_quantity)
 
     def to_geopandas(self) -> GeoDataFrame:
         """Convert ResultNetwork to a GeoDataFrame. Require geopandas to be installed."""

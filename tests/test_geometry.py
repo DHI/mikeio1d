@@ -130,7 +130,7 @@ class TestReachGeometry:
 
 
 def test_geometry_from_node(node):
-    node = NodePoint.from_res1d_node(node._node)
+    node = NodePoint.from_res1d_node(node.node)
     g = node.to_shapely()
     assert isinstance(g, shapely.Point)
     assert g.x == pytest.approx(-687934.6000976562)
@@ -139,7 +139,7 @@ def test_geometry_from_node(node):
 
 def test_geometry_from_catchment(many_catchments):
     for catchment in many_catchments:
-        catchment_geom = CatchmentGeometry.from_res1d_catchment(catchment._catchment)
+        catchment_geom = CatchmentGeometry.from_res1d_catchment(catchment.catchment)
         g = catchment_geom.to_shapely()
         assert isinstance(g, shapely.Polygon)
         assert (g.centroid.x, g.centroid.y) == pytest.approx(
@@ -149,7 +149,7 @@ def test_geometry_from_catchment(many_catchments):
 
 def test_geometry_from_nodes_runs(many_nodes):
     for node in many_nodes:
-        node = NodePoint.from_res1d_node(node._node)
+        node = NodePoint.from_res1d_node(node.node)
         g = node.to_shapely()
         assert isinstance(g, shapely.Point)
 
@@ -162,6 +162,6 @@ def test_geometry_from_reaches_runs(many_reaches):
 
 def test_geometry_from_catchments_runs(many_catchments):
     for catchment in many_catchments:
-        catchment = CatchmentGeometry.from_res1d_catchment(catchment._catchment)
+        catchment = CatchmentGeometry.from_res1d_catchment(catchment.catchment)
         g = catchment.to_shapely()
         assert isinstance(g, shapely.Polygon)

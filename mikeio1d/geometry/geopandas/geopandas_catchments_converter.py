@@ -35,7 +35,7 @@ class GeoPandasCatchmentsConverter(GeoPandasConverter):
         """Create a dictionary with the data needed to create a GeoDataFrame."""
         names = [catchment.id for catchment in catchments.values()]
         geometries = [
-            CatchmentGeometry.from_res1d_catchment(catchment._catchment).to_shapely()
+            CatchmentGeometry.from_res1d_catchment(catchment.catchment).to_shapely()
             for catchment in catchments.values()
         ]
         data = {

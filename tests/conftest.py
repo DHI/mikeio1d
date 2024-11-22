@@ -72,7 +72,9 @@ def node(res1d_network):
 @pytest.fixture
 def many_nodes(res1d_network):
     nodes = res1d_network.network.nodes
-    return [getattr(nodes, n) for n in nodes.__dict__.keys() if n.startswith(nodes.node_label)]
+    return [
+        getattr(nodes, n) for n in nodes.__dict__.keys() if n.startswith(nodes._creator.node_label)
+    ]
 
 
 @pytest.fixture
@@ -89,7 +91,9 @@ def river_reach(res1d_river_network):
 def many_reaches(res1d_network):
     reaches = res1d_network.network.reaches
     return [
-        getattr(reaches, r) for r in reaches.__dict__.keys() if r.startswith(reaches.reach_label)
+        getattr(reaches, r)
+        for r in reaches.__dict__.keys()
+        if r.startswith(reaches._creator.reach_label)
     ]
 
 
@@ -105,7 +109,7 @@ def many_catchments(res1d_catchments):
     return [
         getattr(catchments, c)
         for c in catchments.__dict__.keys()
-        if c.startswith(catchments.catchment_label)
+        if c.startswith(catchments._creator.catchment_label)
     ]
 
 
