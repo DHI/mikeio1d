@@ -8,16 +8,20 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict
     from typing import List
     from typing import Optional
-
     import pandas as pd
 
     from ..res1d import Res1D
     from ..result_reader_writer.result_reader import ColumnMode
+    from ..query import QueryData
+
+    from DHI.Mike1D.ResultDataAccess import IRes1DDataSet
+    from DHI.Mike1D.ResultDataAccess import IDataItem
 
 from abc import ABC
 from abc import abstractmethod
 
 from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 from ..quantities import DerivedQuantity
 
 from .result_quantity import ResultQuantity
@@ -30,9 +34,9 @@ class ResultLocation(ABC):
     """A base class for a network location (node, reach) or a catchment wrapper class."""
 
     def __init__(self):
-        self._group = ""
-        self._name = ""
-        self._tag = ""
+        self._group: TimeSeriesIdGroup = ""
+        self._name: str = ""
+        self._tag: str = ""
         self._creator: ResultLocationCreator = None
 
     def __repr__(self) -> str:
@@ -49,7 +53,7 @@ class ResultLocation(ABC):
         return self._creator.res1d
 
     @property
-    def group(self) -> List[str]:
+    def group(self) -> TimeSeriesIdGroup:
         """The TimeSeriesIdGroup assosciated with this location."""
         return self._group
 
@@ -64,7 +68,7 @@ class ResultLocation(ABC):
         return list(self._creator.result_quantity_derived_map.keys())
 
     @abstractmethod
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DDataSet:
         """Get IRes1DDataSet object associated with ResultLocation.
 
         Parameters
@@ -81,11 +85,11 @@ class ResultLocation(ABC):
         ...
 
     @abstractmethod
-    def get_query(self, data_item):
+    def get_query(self, data_item: IDataItem) -> QueryData:
         """Create a query for given data item."""
         ...
 
-    def add_query(self, data_item):
+    def add_query(self, data_item: IDataItem):
         """Add a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
@@ -140,7 +144,12 @@ class ResultLocationCreator(ABC):
 
     """
 
-    def __init__(self, result_location, data_items, res1d: Res1D):
+    def __init__(
+        self,
+        result_location: ResultLocation,
+        data_items: List[IDataItem],
+        res1d: Res1D,
+    ):
         self.result_location = result_location
         self.data_items = data_items
         self.res1d = res1d
@@ -148,8 +157,8 @@ class ResultLocationCreator(ABC):
         self.quantity_label = "q_"
         self.result_quantity_map: Dict[str, List[ResultQuantity]] = {}
         self.result_quantity_derived_map: Dict[str, ResultQuantityDerived] = {}
-        self.element_indices = None
-        self.static_attributes = []
+        self.element_indices: List[int] = None
+        self.static_attributes: List[str] = []
 
     @abstractmethod
     def create(self):
@@ -193,7 +202,12 @@ class ResultLocationCreator(ABC):
             element_index = element_indices[i] if element_indices is not None else 0
             self.set_quantity(self.result_location, data_item, element_index)
 
-    def set_quantity(self, obj, data_item, element_index=0):
+    def set_quantity(
+        self,
+        obj: ResultLocation,
+        data_item: IDataItem,
+        element_index: int = 0,
+    ):
         """Set a single quantity attribute on the obj."""
         m1d_dataset = self.result_location.get_m1d_dataset(data_item)
         result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)

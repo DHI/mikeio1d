@@ -1,13 +1,16 @@
 """ResultCatchments class."""
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict
     from typing import Callable
     from geopandas import GeoDataFrame
+
+    from ..res1d import Res1D
+
+    from DHI.Mike1D.ResultDataAccess import Res1DCatchment
 
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
@@ -32,12 +35,11 @@ class ResultCatchments(ResultLocations):
 
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         ResultLocations.__init__(self)
 
         res1d.network.catchments = self
         self._group = TimeSeriesIdGroup.CATCHMENT
-        self._geometries = None
 
         self._creator = ResultCatchmentsCreator(self, res1d)
         self._creator.create()
@@ -108,7 +110,7 @@ class ResultCatchmentsCreator(ResultLocationsCreator):
 
     """
 
-    def __init__(self, result_locations, res1d):
+    def __init__(self, result_locations: ResultCatchments, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.catchment_label = "c_"
 
@@ -120,7 +122,7 @@ class ResultCatchmentsCreator(ResultLocationsCreator):
     def set_catchments(self):
         """Set attributes to the current ResultCatchments object based on the catchment ID."""
         for catchment in self.data.Catchments:
-            catchment = impl(catchment)
+            catchment: Res1DCatchment = impl(catchment)
             # TODO: Figure out if we should we have res1d.reader dependency here?
             if not self.res1d.reader.is_data_set_included(catchment):
                 continue
@@ -132,6 +134,6 @@ class ResultCatchmentsCreator(ResultLocationsCreator):
             )
             setattr(self.result_locations, result_catchment_attribute_string, result_catchment)
 
-    def set_res1d_catchment_to_dict(self, catchment):
+    def set_res1d_catchment_to_dict(self, result_catchment: ResultCatchment):
         """Create a dict entry from catchment ID to ResultCatchment object."""
-        self.result_locations[catchment.id] = catchment
+        self.result_locations[result_catchment.id] = result_catchment

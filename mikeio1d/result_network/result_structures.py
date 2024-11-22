@@ -1,5 +1,19 @@
 """Module for ResultStructures class."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from typing import List
+    from typing import Dict
+
+    from ..res1d import Res1D
+    from .result_quantity import ResultQuantity
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
+
 from ..quantities import TimeSeriesIdGroup
 
 from .result_locations import ResultLocations
@@ -22,7 +36,7 @@ class ResultStructures(ResultLocations):
 
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         ResultLocations.__init__(self)
 
         res1d.network.structures = self
@@ -52,10 +66,10 @@ class ResultStructuresCreator(ResultLocationsCreator):
 
     """
 
-    def __init__(self, result_locations, res1d):
+    def __init__(self, result_locations: ResultStructures, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.structure_label = "s_"
-        self.result_structure_map = {}
+        self.result_structure_map: Dict[str, ResultStructure] = {}
 
     def create(self):
         """Perform ResultStructures creation steps."""
@@ -79,7 +93,7 @@ class ResultStructuresCreator(ResultLocationsCreator):
                 )
                 setattr(self.result_locations, result_structure_attribute_string, result_structure)
 
-    def is_structure(self, reach, data_item):
+    def is_structure(self, reach: IRes1DReach, data_item: IDataItem) -> bool:
         """Check if a data item is a structure data item."""
         # Data items on reaches with defined ItemId correspond to structure data items.
         if data_item.ItemId is not None:
@@ -97,7 +111,9 @@ class ResultStructuresCreator(ResultLocationsCreator):
 
         return False
 
-    def get_or_create_result_structure(self, reach, data_item):
+    def get_or_create_result_structure(
+        self, reach: IRes1DReach, data_item: IDataItem
+    ) -> ResultStructure:
         """Create or get already existing ResultStructure object.
 
         Also update a result_structure_map dict entry from structure ID

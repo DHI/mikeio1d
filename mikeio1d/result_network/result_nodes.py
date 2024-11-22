@@ -9,6 +9,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Callable
     from geopandas import GeoDataFrame
 
+    from ..res1d import Res1D
+
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
@@ -32,7 +34,7 @@ class ResultNodes(ResultLocations):
 
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         ResultLocations.__init__(self)
 
         res1d.network.nodes = self
@@ -119,7 +121,7 @@ class ResultNodesCreator(ResultLocationsCreator):
 
     """
 
-    def __init__(self, result_locations, res1d):
+    def __init__(self, result_locations: ResultNodes, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.node_label = "n_"
 
@@ -141,6 +143,6 @@ class ResultNodesCreator(ResultLocationsCreator):
             result_node_attribute_string = make_proper_variable_name(node.ID, self.node_label)
             setattr(self.result_locations, result_node_attribute_string, result_node)
 
-    def set_res1d_node_to_dict(self, result_node):
+    def set_res1d_node_to_dict(self, result_node: ResultNode):
         """Create a dict entry from node ID to ResultNode object."""
         self.result_locations[result_node.id] = result_node

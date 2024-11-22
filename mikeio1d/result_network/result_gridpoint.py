@@ -5,7 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from typing import List
+
+    from ..res1d import Res1D
     from .result_reach import ResultReach
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IDataItems
     from DHI.Mike1D.ResultDataAccess import IRes1DReach
     from DHI.Mike1D.ResultDataAccess import IRes1DGridPoint
 
@@ -37,7 +43,15 @@ class ResultGridPoint(ResultLocation):
 
     """
 
-    def __init__(self, reach, gridpoint, data_items, result_reach, res1d, tag=""):
+    def __init__(
+        self,
+        reach: IRes1DReach,
+        gridpoint: IRes1DGridPoint,
+        data_items: IDataItems,
+        result_reach: ResultReach,
+        res1d: Res1D,
+        tag: str = "",
+    ):
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.REACH
@@ -93,7 +107,7 @@ class ResultGridPoint(ResultLocation):
         """Bottom level of the gridpoint."""
         return self.gridpoint.Z
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DGridPoint:
         """Get IRes1DDataSet object associated with ResultGridPoint.
 
         This is the reach IRes1DDataSet object because grid points do not
@@ -112,7 +126,7 @@ class ResultGridPoint(ResultLocation):
         """
         return self.reach
 
-    def get_query(self, data_item):
+    def get_query(self, data_item: IDataItem) -> QueryDataReach:
         """Get a QueryDataReach for given data item."""
         quantity_id = data_item.Quantity.Id
         reach_name = self.reach.Name
@@ -148,8 +162,16 @@ class ResultGridPointCreator(ResultLocationCreator):
 
     """
 
-    def __init__(self, result_location, reach, gridpoint, data_items, result_reach, res1d):
-        empty_data_item_list = []
+    def __init__(
+        self,
+        result_location: ResultGridPoint,
+        reach: IRes1DReach,
+        gridpoint: IRes1DGridPoint,
+        data_items: IDataItems,
+        result_reach: ResultReach,
+        res1d: Res1D,
+    ):
+        empty_data_item_list: List[IDataItem] = []
         ResultLocationCreator.__init__(self, result_location, empty_data_item_list, res1d)
 
         self.reach = reach

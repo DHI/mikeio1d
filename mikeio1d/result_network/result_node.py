@@ -5,7 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from ..res1d import Res1D
     from ..geometry import NodePoint
+    from .result_quantity import ResultQuantity
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IRes1DNode
 
 from warnings import warn
@@ -144,7 +148,7 @@ class ResultNode(ResultLocation):
             return self.node.Diameter
         return None
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DNode:
         """Get IRes1DDataSet object associated with ResultNode.
 
         Parameters
@@ -160,7 +164,7 @@ class ResultNode(ResultLocation):
         """
         return self.node
 
-    def get_query(self, data_item):
+    def get_query(self, data_item: IDataItem) -> QueryDataNode:
         """Get a QueryDataNode for given data item."""
         quantity_id = data_item.Quantity.Id
         node_id = self.node.ID
@@ -182,7 +186,12 @@ class ResultNodeCreator(ResultLocationCreator):
 
     """
 
-    def __init__(self, result_location, node, res1d):
+    def __init__(
+        self,
+        result_location: ResultNode,
+        node: IRes1DNode,
+        res1d: Res1D,
+    ):
         ResultLocationCreator.__init__(self, result_location, node.DataItems, res1d)
         self.node = node
 
@@ -202,7 +211,7 @@ class ResultNodeCreator(ResultLocationCreator):
         self.set_static_attribute("critical_level")
         self.set_static_attribute("diameter")
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """Add node result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
