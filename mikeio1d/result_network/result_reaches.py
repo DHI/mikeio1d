@@ -6,8 +6,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Callable
+    from typing import List
     from typing import Dict
     from geopandas import GeoDataFrame
+
+    from ..res1d import Res1D
+
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
 
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
@@ -34,7 +39,7 @@ class ResultReaches(ResultLocations):
 
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         ResultLocations.__init__(self)
 
         res1d.network.reaches = self
@@ -137,10 +142,10 @@ class ResultReachesCreator(ResultLocationsCreator):
 
     """
 
-    def __init__(self, result_locations, res1d):
+    def __init__(self, result_locations: ResultReaches, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.reach_label = "r_"
-        self.result_reach_map = {}
+        self.result_reach_map: Dict[str : List[ResultReach]] = {}
 
     def create(self):
         """Perform ResultReaches creation steps."""
@@ -166,7 +171,7 @@ class ResultReachesCreator(ResultLocationsCreator):
             result_reach = self.result_locations[reach_name]
             ResultLocationsCreator.set_quantity_collections(result_reach._creator, result_reach)
 
-    def get_or_create_result_reach(self, reach):
+    def get_or_create_result_reach(self, reach: IRes1DReach) -> ResultReach:
         """Create or get already existing ResultReach object.
 
         There potentially could be just a single ResultReach object,

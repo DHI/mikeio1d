@@ -6,9 +6,15 @@ from typing import TYPE_CHECKING
 from typing import Dict
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..geometry import ReachGeometry
     from typing import List
+
+    from ..res1d import Res1D
+    from ..geometry import ReachGeometry
+    from .result_quantity import ResultQuantity
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IRes1DReach
+    from DHI.Mike1D.ResultDataAccess import IRes1DGridPoint
 
 import numpy as np
 
@@ -42,7 +48,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     """
 
-    def __init__(self, reaches, res1d):
+    def __init__(self, reaches: List[IRes1DReach], res1d: Res1D):
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.REACH
@@ -146,7 +152,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """Full flow discharge of the reach."""
         return self._creator._get_full_flow_discharge()
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None):
         """Get IRes1DDataSet object associated with ResultReach.
 
         A ResultReach may consist of several IRes1DDataSet objects. Therefore,
@@ -174,7 +180,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             m1d_dataitem,
         )
 
-    def get_query(self, data_item):
+    def get_query(self, data_item: IDataItem):
         """Get a query for a data item."""
         raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
 
@@ -239,16 +245,21 @@ class ResultReachCreator(ResultLocationCreator):
 
     """
 
-    def __init__(self, result_location, reaches, res1d):
+    def __init__(
+        self,
+        result_location: ResultReach,
+        reaches: List[IRes1DReach],
+        res1d: Res1D,
+    ):
         data_items = []
         ResultLocationCreator.__init__(self, result_location, data_items, res1d)
 
         self.reaches_initial = reaches
 
         self.chainage_label = "m_"
-        self.reaches = []
-        self.result_gridpoints = []
-        self.current_reach_result_gridpoints = None
+        self.reaches: List[IRes1DReach] = []
+        self.result_gridpoints: List[List[ResultGridPoint]] = []
+        self.current_reach_result_gridpoints: List[ResultGridPoint] = None
 
     def create(self):
         """Perform ResultReach creation steps."""
@@ -269,7 +280,7 @@ class ResultReachCreator(ResultLocationCreator):
         self.set_static_attribute("height")
         self.set_static_attribute("full_flow_discharge")
 
-    def add_res1d_reach(self, reach):
+    def add_res1d_reach(self, reach: IRes1DReach):
         """Add a IRes1DReach to ResultReach.
 
         Parameters
@@ -284,9 +295,8 @@ class ResultReachCreator(ResultLocationCreator):
         self.set_gridpoint_data_items(reach)
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint._creator.set_quantities()
-        self.dataset = self.reaches
 
-    def set_gridpoints(self, reach):
+    def set_gridpoints(self, reach: IRes1DReach):
         """Assign chainage attributes to a current ResultReach object from a data provided by IRes1DReach.
 
         Parameters
@@ -295,7 +305,7 @@ class ResultReachCreator(ResultLocationCreator):
             A MIKE 1D IRes1DReach object.
 
         """
-        current_reach_result_gridpoints = []
+        current_reach_result_gridpoints: List[ResultGridPoint] = []
         self.current_reach_result_gridpoints = current_reach_result_gridpoints
         self.result_gridpoints.append(current_reach_result_gridpoints)
 
@@ -306,13 +316,13 @@ class ResultReachCreator(ResultLocationCreator):
             gridpoint = Res1DGridPoint()
             self.set_gridpoint(reach, gridpoint)
 
-        gridpoints = list(reach.GridPoints)
+        gridpoints: List[IRes1DGridPoint] = list(reach.GridPoints)
         tag = self.create_reach_span_tag(gridpoints)
         for i in range(gridpoint_count):
             gridpoint = gridpoints[i]
             self.set_gridpoint(reach, gridpoint, tag)
 
-    def create_reach_span_tag(self, gridpoints):
+    def create_reach_span_tag(self, gridpoints: List[IRes1DGridPoint]):
         """Create reach span tag to be set on ResultGridPoint."""
         if len(gridpoints) == 0:
             return ""
@@ -322,7 +332,7 @@ class ResultReachCreator(ResultLocationCreator):
         tag = TimeSeriesId.create_reach_span_tag_from_gridpoints(start_gp, end_gp)
         return tag
 
-    def set_gridpoint(self, reach, gridpoint, tag=""):
+    def set_gridpoint(self, reach: IRes1DReach, gridpoint: IRes1DGridPoint, tag: str = ""):
         """Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.
 
         Parameters
@@ -349,7 +359,7 @@ class ResultReachCreator(ResultLocationCreator):
         chainage_str = f"{gridpoint.Chainage:.3f}"
         self.result_location[chainage_str] = result_gridpoint
 
-    def set_gridpoint_data_items(self, reach):
+    def set_gridpoint_data_items(self, reach: IRes1DReach):
         """Assign data items to ResultGridPoint object belonging to current ResultReach from IRes1DReach data items.
 
         Parameters
@@ -370,13 +380,13 @@ class ResultReachCreator(ResultLocationCreator):
                 else:
                     result_gridpoint._creator.add_structure_data_item(data_item)
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """Add a quantity to the result quantity maps."""
         raise NotImplementedError(
             "add_to_result_quantity_maps not implemented for ResultReachCreatpr. Use ResultGridPointCreator."
         )
 
-    def _get_total_length(self):
+    def _get_total_length(self) -> float:
         total_length = 0
         for reach in self.reaches:
             if not hasattr(reach, "Length"):
@@ -384,7 +394,7 @@ class ResultReachCreator(ResultLocationCreator):
             total_length += reach.Length
         return total_length
 
-    def _get_total_gridpoints(self):
+    def _get_total_gridpoints(self) -> int:
         return sum([len(gp_list) for gp_list in self.result_gridpoints])
 
     def _get_height(self) -> float:
@@ -406,7 +416,7 @@ class ResultReachCreator(ResultLocationCreator):
         else:
             return np.nan
 
-    def _get_reach_for_chainage(self, chainage: float):
+    def _get_reach_for_chainage(self, chainage: float) -> IRes1DReach:
         """Return the relevant .NET Res1DReach for the specified chainage."""
         for reach in self.reaches:
             start_chainage = reach.LocationSpan.StartChainage
@@ -416,11 +426,11 @@ class ResultReachCreator(ResultLocationCreator):
 
         raise ValueError(f"Invalid chainage of {chainage} for reach {self.name}")
 
-    def _get_start_node(self):
+    def _get_start_node(self) -> str:
         """Return the start node of the reach."""
         return self.res1d.data.Nodes[self.reaches[0].StartNodeIndex].Id
 
-    def _get_end_node(self):
+    def _get_end_node(self) -> str:
         """Return the end node of the reach."""
         return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
 

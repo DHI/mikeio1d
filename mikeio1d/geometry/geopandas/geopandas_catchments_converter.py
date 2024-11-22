@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from geopandas import GeoDataFrame
 
-    from result_network import ResultCatchments
+    from ...result_network import ResultCatchments
 
 from geopandas import GeoDataFrame
 

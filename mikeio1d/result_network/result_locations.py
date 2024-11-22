@@ -9,7 +9,6 @@ from typing import Dict
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
-
     import pandas as pd
 
     from ..res1d import Res1D
@@ -18,6 +17,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from .result_location import ResultLocation
     from .result_quantity import ResultQuantity
+    from .result_quantity_derived import ResultQuantityDerived
+
+    from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import IDataItems
 
 import pandas as pd
 
@@ -143,15 +146,15 @@ class ResultLocationsCreator:
 
     """
 
-    def __init__(self, result_locations, res1d: Res1D):
+    def __init__(self, result_locations: ResultLocations, res1d: Res1D):
         self.result_locations = result_locations
         self.res1d = res1d
 
         self.quantity_label = "q_"
-        self.data = res1d.data
-        self.data_items = res1d.data.DataItems
+        self.data: ResultData = res1d.data
+        self.data_items: IDataItems = res1d.data.DataItems
         self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
-        self.result_quantity_derived_map = {}
+        self.result_quantity_derived_map: Dict[str, List[ResultQuantityDerived]] = {}
 
     def create(self):
         """Perform ResultLocations creation steps."""
@@ -173,7 +176,7 @@ class ResultLocationsCreator:
         repr = build_html_repr_from_sections(header, sections)
         return repr
 
-    def set_quantity_collections(self, result_locations=None):
+    def set_quantity_collections(self, result_locations: ResultLocations = None):
         """Set all quantity collection attributes."""
         result_locations = self.result_locations if result_locations is None else result_locations
 
@@ -246,7 +249,7 @@ class ResultLocationsCreator:
         )
         setattr(self.result_locations, result_quantity_attribute_string, result_quantity_derived)
 
-    def set_res1d_object_to_dict(self, dict_key, obj):
+    def set_res1d_object_to_dict(self, dict_key: str, obj):
         """Create a dict entry from a key name to an object or a list of objects."""
         obj = impl(obj)
         result_locations = self.result_locations

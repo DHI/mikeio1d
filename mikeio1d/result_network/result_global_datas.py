@@ -1,5 +1,15 @@
 """ResultGlobalDatas class."""
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from typing import List
+
+    from ..res1d import Res1D
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+
 from ..dotnet import pythonnet_implementation as impl
 from ..quantities import TimeSeriesIdGroup
 
@@ -22,7 +32,7 @@ class ResultGlobalDatas(ResultLocations):
 
     """
 
-    def __init__(self, res1d):
+    def __init__(self, res1d: Res1D):
         ResultLocations.__init__(self)
         self._group = TimeSeriesIdGroup.GLOBAL
 
@@ -48,9 +58,9 @@ class ResultGlobalDatasCreator(ResultLocationsCreator):
 
     """
 
-    def __init__(self, result_locations, res1d):
+    def __init__(self, result_locations: ResultGlobalDatas, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
-        self.result_global_data_list = []
+        self.result_global_data_list: List[ResultGlobalData] = []
 
     def create(self):
         """Perform ResultCatchments creation steps."""
@@ -63,7 +73,7 @@ class ResultGlobalDatasCreator(ResultLocationsCreator):
             result_global_data = ResultGlobalData(data_item, self.result_locations, self.res1d)
             self.result_global_data_list.append(result_global_data)
 
-    def set_res1d_global_data_to_dict(self, data_item):
+    def set_res1d_global_data_to_dict(self, data_item: IDataItem):
         """Create a dict entry from data item quantity ID to IDatItem object."""
         data_item = impl(data_item)
         self.result_locations[data_item.Quantity.Id] = data_item

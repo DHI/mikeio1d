@@ -5,7 +5,11 @@ from warnings import warn
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from ..res1d import Res1D
     from ..geometry import CatchmentGeometry
+    from .result_quantity import ResultQuantity
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IRes1DCatchment
 
 from ..query import QueryDataCatchment
@@ -27,7 +31,7 @@ class ResultCatchment(ResultLocation):
         Res1D object the catchment belongs to.
     """
 
-    def __init__(self, catchment, res1d):
+    def __init__(self, catchment: IRes1DCatchment, res1d: Res1D):
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.CATCHMENT
@@ -86,7 +90,7 @@ class ResultCatchment(ResultLocation):
 
         return CatchmentGeometry.from_res1d_catchment(self.catchment)
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DCatchment:
         """Get IRes1DDataSet object associated with ResultCatchment.
 
         Parameters
@@ -102,7 +106,7 @@ class ResultCatchment(ResultLocation):
         """
         return self.catchment
 
-    def get_query(self, data_item):
+    def get_query(self, data_item: IDataItem) -> QueryDataCatchment:
         """Get a QueryDataCatchment for given data item."""
         quantity_id = data_item.Quantity.Id
         catchment_id = self.catchment.Id
@@ -124,9 +128,14 @@ class ResultCatchmentCreator(ResultLocationCreator):
 
     """
 
-    def __init__(self, result_location, catchment, res1d):
+    def __init__(
+        self,
+        result_location: ResultCatchment,
+        catchment: IRes1DCatchment,
+        res1d: Res1D,
+    ):
         ResultLocationCreator.__init__(self, result_location, catchment.DataItems, res1d)
-        self.catchment = catchment
+        self.catchment: IRes1DCatchment = catchment
 
     def create(self):
         """Perform ResultCatchment creation steps."""
@@ -139,7 +148,7 @@ class ResultCatchmentCreator(ResultLocationCreator):
         self.set_static_attribute("area")
         self.set_static_attribute("type")
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """Add catchment result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 

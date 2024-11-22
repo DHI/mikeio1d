@@ -5,6 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from typing import List
+    from typing import Dict
+
+    from ..res1d import Res1D
+    from .result_quantity import ResultQuantity
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IRes1DReach
 
 from warnings import warn
@@ -26,13 +33,13 @@ class ResultStructure(ResultLocation):
         Structure ID.
     reach: IRes1DReach
         Reach where the structure belongs to.
+    data_items : list of IDataItem objects.
+        A list of MIKE 1D IDataItem objects corresponding to a given structure.
     res1d : Res1D
         Res1D object the reach belongs to.
 
     Attributes
     ----------
-    data_items : list of IDataItems objects.
-        A list of MIKE 1D IDataItems objects corresponding to a given structure.
     data_items_dict : dict
         A dictionary from quantity id to a data item.
     chainage : float
@@ -40,14 +47,20 @@ class ResultStructure(ResultLocation):
 
     """
 
-    def __init__(self, structure_id, reach, data_items, res1d):
+    def __init__(
+        self,
+        structure_id: str,
+        reach: IRes1DReach,
+        data_items: List[IDataItem],
+        res1d: Res1D,
+    ):
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.STRUCTURE
         self._name = structure_id
         self._tag = reach.Name
         self._id = structure_id
-        self._chainage = None
+        self._chainage: float = None
 
         self._creator = ResultStructureCreator(self, reach, data_items, res1d)
         self._creator.create()
@@ -140,13 +153,19 @@ class ResultStructureCreator(ResultLocationCreator):
 
     """
 
-    def __init__(self, result_location, reach, data_items, res1d):
-        empty_data_item_list = []
+    def __init__(
+        self,
+        result_location: ResultStructure,
+        reach: IRes1DReach,
+        data_items: List[IDataItem],
+        res1d: Res1D,
+    ):
+        empty_data_item_list: List[IDataItem] = []
         ResultLocationCreator.__init__(self, result_location, empty_data_item_list, res1d)
 
         self.data_items_intial = data_items
         self.reach = reach
-        self.data_items_dict = {}
+        self.data_items_dict: Dict[str, IDataItem] = {}
 
     def create(self):
         """Perform ResultGridPoint creation steps."""
@@ -161,7 +180,7 @@ class ResultStructureCreator(ResultLocationCreator):
         self.set_static_attribute("type")
         self.set_static_attribute("chainage")
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
         """Add structure result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
@@ -170,7 +189,7 @@ class ResultStructureCreator(ResultLocationCreator):
 
         self.add_to_network_result_quantity_map(result_quantity)
 
-    def add_res1d_structure_data_item(self, data_item):
+    def add_res1d_structure_data_item(self, data_item: IDataItem):
         """Add a IDataItem to ResultStructure.
 
         Parameters
@@ -190,7 +209,7 @@ class ResultStructureCreator(ResultLocationCreator):
         self.set_quantity(self.result_location, data_item)
 
     @staticmethod
-    def get_structure_id(reach, data_item):
+    def get_structure_id(reach, data_item: IDataItem) -> str | None:
         """Get structure ID either from IDataItem.ItemId or for structure reaches from actual Res1DStructureGridPoint structure."""
         if data_item.ItemId is not None:
             return data_item.ItemId
@@ -203,6 +222,6 @@ class ResultStructureCreator(ResultLocationCreator):
 
         return None
 
-    def get_data_item(self, quantity_id):
+    def get_data_item(self, quantity_id: str) -> IDataItem:
         """Retrieve a data item for given quantity id."""
         return self.data_items_dict[quantity_id]
