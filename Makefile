@@ -22,7 +22,7 @@ typecheck:
 # To generate a terminal coverage report, use: 
 #     make coverage REPORT=term
 coverage:
-	@pytest --cov-report $${REPORT:-html} --cov=$(LIB) tests/
+	@pytest -c .pytest-ci.ini --disable-warnings --cov-report $${REPORT:-html} --cov=$(LIB) tests/
 
 docs: FORCE
 	cd docs && quarto add --no-prompt .
