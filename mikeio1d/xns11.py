@@ -13,51 +13,6 @@ from DHI.Mike1D.Generic import Connection, Diagnostics, Location
 from .cross_sections import CrossSection, CrossSectionCollection
 
 
-def read(file_path: str | Path, queries: QueryData | list[QueryData]) -> pd.DataFrame:
-    """Read the requested data from the xns11 file and return a Pandas DataFrame.
-
-    Parameters
-    ----------
-    file_path: str
-        full path and file name to the xns11 file.
-    queries: a single query or a list of queries
-        `QueryData` objects that define the requested data.
-
-    Returns
-    -------
-    pd.DataFrame
-
-    """
-    queries = queries if isinstance(queries, list) else [queries]
-    with open(file_path) as xns11:
-        return xns11.read(queries)
-
-
-def open(file_path: str | Path) -> Xns11:
-    """Open a xns11 file as a Xns11 object.
-
-    Has convenient methods to extract specific data from the file.
-    It is recommended to use it as a context manager.
-
-    Parameters
-    ----------
-    file_path: str
-        full path and file name to the xns11 file.
-
-    Returns
-    -------
-    Xns11
-
-    Examples
-    --------
-    >>> with open("file.xns11") as x11:
-    >>>     print(x11.topoid_names)
-    ['topoid1', 'topoid2']
-
-    """
-    return Xns11(file_path)
-
-
 class Xns11:
     """A class to read and write xns11 files.
 
@@ -196,28 +151,6 @@ class Xns11:
         """
         return self._cross_section_data.XSInterpolationType
 
-    @property
-    def _topoids(self):
-        return list(self._cross_section_data.GetReachTopoIdEnumerable())
-
-    @property
-    def topoid_names(self):
-        """A list of the topo-id names."""
-        return [topoid.TopoId for topoid in self._topoids]
-
-    @property
-    def _reaches(self):
-        return list(self._cross_section_data.GetReachTopoIdEnumerable())
-
-    @property
-    def reach_names(self):
-        """A list of the reach names."""
-        return [reach.ReachId for reach in self._topoids]
-
-    def add_xsection(self, cross_section: CrossSection):
-        """Add a cross section to the file."""
-        self.xsections.add_xsection(cross_section)
-
     def write(self, file_path: str | Path = None):
         """Write data to the file."""
         file_path = file_path if file_path else self.file_path
@@ -238,9 +171,60 @@ class Xns11:
         if not self.file_path:
             self.file_path = file_path
 
+    # region Deprecated methods and attributes of Xns11.
+    # These methods will be removed in the next major release.
+
+    @property
+    def file(self):
+        """Alias for CrossSectionData objected stored on the member '_cross_section_data'."""
+        warn("The 'file' property is deprecated. Use '_cross_section_data' instead.")
+        return self._cross_section_data
+
+    def __enter__(self):
+        """Context manager enter method."""
+        warn("Using Xns11 as a context manager is deprecated. Files are automatically closed.")
+        return self
+
+    def __exit__(self, *excinfo):
+        """Context manager exit method."""
+        pass
+
+    def close(self):
+        """Close the file handle."""
+        warn("The 'close' method is deprecated. Files are automatically closed.")
+        self.__del__()
+
+    @property
+    def _topoids(self):
+        warn("The '_topoids' method is deprecated. Use '.xsections' instead.")
+        return list(self._cross_section_data.GetReachTopoIdEnumerable())
+
+    @property
+    def topoid_names(self):
+        """A list of the topo-id names."""
+        warn("The 'topoid_names' method is deprecated. Use '.xsections.topo_ids' instead.")
+        return [topoid.TopoId for topoid in self._topoids]
+
+    @property
+    def _reaches(self):
+        warn("The '_reaches' method is deprecated. Use '.xsections' instead.")
+        return list(self._cross_section_data.GetReachTopoIdEnumerable())
+
+    @property
+    def reach_names(self):
+        """A list of the reach names."""
+        warn("The 'reach_names' method is deprecated. Use '.xsections.location_ids' instead.")
+        return [reach.ReachId for reach in self._topoids]
+
+    def add_xsection(self, cross_section: CrossSection):
+        """Add a cross section to the file."""
+        warn("The 'add_xsection' method is deprecated. Use '.xsections.add_xsection' instead.")
+        self.xsections.add_xsection(cross_section)
+
     @staticmethod
     def _topoid_in_reach(self, reach):
         """List topo-IDs contained in a reach."""
+        warn("The '_topoid_in_reach' method is deprecated.")
         return [
             r.TopoId
             for r in list(self.file.GetReachTopoIdEnumerable())
@@ -250,9 +234,11 @@ class Xns11:
     @staticmethod
     def _chainages(reach):
         """List chainages of a reach topo-ID combination."""
+        warn("The '_chainages' method is deprecated.")
         return [r.Key for r in list(reach.GetChainageSortedCrossSections())]
 
     def _get_values(self, points):
+        warn("The '_get_values' method is deprecated. Use '.xsections' instead.")
         df = pd.DataFrame()
         p = zip(points["chainage"], points["reach"], points["topoid"])
         for chainage, reach, topoid in p:
@@ -274,11 +260,13 @@ class Xns11:
         return df
 
     def _get_data(self, points):
+        warn("The '_get_data' method is deprecated. Use '.xsections' instead.")
         df = self._get_values(points)
         return df
 
     def _validate_queries(self, queries, chainage_tolerance=0.1):
         """Check whether the queries point to existing data in the file."""
+        warn("The '_validate_queries' method is deprecated. Use '.xsections' instead.")
         for q in queries:
             if q.topoid_name not in self.topoid_names:
                 raise ValueError(f"Topo-id '{q.topoid_name}' was not found.")
@@ -320,6 +308,7 @@ class Xns11:
                     )
 
     def _build_queries(self, queries):
+        warn("The '_build_queries' method is deprecated. Use '.xsections' instead.")
         built_queries = []
         for q in queries:
             # e.g. QueryData("topoid1", "reach1", 58.68)
@@ -347,6 +336,7 @@ class Xns11:
         return built_queries
 
     def _find_points(self, queries, chainage_tolerance=0.1):
+        warn("The '_find_points' method is deprecated. Use '.xsections' instead.")
         PointInfo = namedtuple("PointInfo", ["index", "value"])
 
         found_points = defaultdict(list)
@@ -390,36 +380,65 @@ class Xns11:
         pd.DataFrame
 
         """
+        warn("The 'read' method is deprecated. See documentation for new API.")
         self._validate_queries(queries)
         built_queries = self._build_queries(queries)
         found_points = self._find_points(built_queries)
         df = self._get_data(found_points)
         return df
 
-    # region Deprecated methods
-    # These methods will be removed in the next major release.
-
-    @property
-    def file(self):
-        """Alias for CrossSectionData objected stored on the member '_cross_section_data'."""
-        warn("The 'file' property is deprecated. Use '_cross_section_data' instead.")
-        return self._cross_section_data
-
-    def __enter__(self):
-        """Context manager enter method."""
-        warn("Using Xns11 as a context manager is deprecated. Files are automatically closed.")
-        return self
-
-    def __exit__(self, *excinfo):
-        """Context manager exit method."""
-        pass
-
-    def close(self):
-        """Close the file handle."""
-        warn("The 'close' method is deprecated. Files are automatically closed.")
-        self.__del__()
-
     # endregion
+
+
+# region Deprecated functions and classes in xns11 module.
+# The following methods are not part of Xns11 class.
+
+
+def open(file_path: str | Path) -> Xns11:
+    """Open a xns11 file as a Xns11 object.
+
+    Has convenient methods to extract specific data from the file.
+    It is recommended to use it as a context manager.
+
+    Parameters
+    ----------
+    file_path: str
+        full path and file name to the xns11 file.
+
+    Returns
+    -------
+    Xns11
+
+    Examples
+    --------
+    >>> with open("file.xns11") as x11:
+    >>>     print(x11.topoid_names)
+    ['topoid1', 'topoid2']
+
+    """
+    warn("The 'xns11.open' method is deprecated. Use 'mikeio1d.open' instead.")
+    return Xns11(file_path)
+
+
+def read(file_path: str | Path, queries: QueryData | list[QueryData]) -> pd.DataFrame:
+    """Read the requested data from the xns11 file and return a Pandas DataFrame.
+
+    Parameters
+    ----------
+    file_path: str
+        full path and file name to the xns11 file.
+    queries: a single query or a list of queries
+        `QueryData` objects that define the requested data.
+
+    Returns
+    -------
+    pd.DataFrame
+
+    """
+    warn("The 'xns11.read' method is deprecated. See documentation for new API.")
+    queries = queries if isinstance(queries, list) else [queries]
+    with open(file_path) as xns11:
+        return xns11.read(queries)
 
 
 class QueryData:
@@ -443,6 +462,7 @@ class QueryData:
     """
 
     def __init__(self, topoid_name, reach_name=None, chainage=None):
+        warn("The 'QueryData' class is deprecated. See documentation for new API.")
         self._topoid_name = topoid_name
         self._reach_name = reach_name
         self._chainage = chainage
@@ -483,6 +503,8 @@ class QueryData:
             f"reach_name='{self.reach_name}', "
             f"chainage={self.chainage})"
         )
+
+    # endregion
 
 
 __all__ = ["Xns11"]
