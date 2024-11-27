@@ -92,14 +92,10 @@ class Xns11:
 
     def __init__(self, file_path: str | Path = None):
         self._cross_section_data = None
-        self._reach_names = None
-        self.__reaches = None
-        self._topoid_names = None
-        self.__topoids = None
+        self._cross_section_data_factory = CrossSectionDataFactory()
         self._xsections = None
 
         self.file_path = self._validate_file_path(file_path)
-        self._cross_section_data_factory = CrossSectionDataFactory()
         self._load_or_create_cross_section_data()
         self._init_xsections()
 
@@ -135,41 +131,10 @@ class Xns11:
         for xs in self._cross_section_data:
             self.xsections.add_xsection(CrossSection(xs))
 
-    def info(self):
-        """Print information about the result file."""
-        info = self._get_info()
-        print(info)
-
-    def _get_info(self) -> str:
-        info = []
-        info.append(f"# Cross sections: {str(len(self.xsections))}")
-        info.append(f"Interpolation type: {str(self.interpolation_type)}")
-        info = str.join("\n", info)
-        return info
-
-    def add_xsection(self, cross_section: CrossSection):
-        """Add a cross section to the file."""
-        self.xsections.add_xsection(cross_section)
-
-    def write(self, file_path: str | Path = None):
-        """Write data to the file."""
-        file_path = file_path if file_path else self.file_path
-
-        if not file_path:
-            raise ValueError("A file path must be provided.")
-
-        file_path = Path(file_path)
-        if not file_path.suffix == ".xns11":
-            raise ValueError("The file extension must be .xns11.")
-
-        current_con_path = Path(self._cross_section_data.Connection.FilePath.Path)
-        if not file_path.exists() or not current_con_path.resolve().samefile(file_path.resolve()):
-            self._cross_section_data.Connection = Connection.Create(str(file_path))
-
-        self._cross_section_data_factory.Save(self._cross_section_data)
-
-        if not self.file_path:
-            self.file_path = file_path
+    @staticmethod
+    def get_supported_file_extensions() -> set[str]:
+        """Get supported file extensions for Xns11."""
+        return {".xns11"}
 
     @staticmethod
     def from_cross_section_collection(xsections: CrossSectionCollection) -> Xns11:
@@ -181,10 +146,17 @@ class Xns11:
 
         return xns
 
-    @staticmethod
-    def get_supported_file_extensions() -> set[str]:
-        """Get supported file extensions for Xns11."""
-        return {".xns11"}
+    def info(self):
+        """Print information about the result file."""
+        info = self._get_info()
+        print(info)
+
+    def _get_info(self) -> str:
+        info = []
+        info.append(f"# Cross sections: {str(len(self.xsections))}")
+        info.append(f"Interpolation type: {str(self.interpolation_type)}")
+        info = str.join("\n", info)
+        return info
 
     @property
     def xsections(self):
@@ -226,29 +198,45 @@ class Xns11:
 
     @property
     def _topoids(self):
-        if self.__topoids:
-            return self.__topoids
         return list(self._cross_section_data.GetReachTopoIdEnumerable())
 
     @property
     def topoid_names(self):
         """A list of the topo-id names."""
-        if self._topoid_names:
-            return self._topoid_names
         return [topoid.TopoId for topoid in self._topoids]
 
     @property
     def _reaches(self):
-        if self.__reaches:
-            return self.__reaches
         return list(self._cross_section_data.GetReachTopoIdEnumerable())
 
     @property
     def reach_names(self):
         """A list of the reach names."""
-        if self._reach_names:
-            return self._reachs_names
         return [reach.ReachId for reach in self._topoids]
+
+    def add_xsection(self, cross_section: CrossSection):
+        """Add a cross section to the file."""
+        self.xsections.add_xsection(cross_section)
+
+    def write(self, file_path: str | Path = None):
+        """Write data to the file."""
+        file_path = file_path if file_path else self.file_path
+
+        if not file_path:
+            raise ValueError("A file path must be provided.")
+
+        file_path = Path(file_path)
+        if not file_path.suffix == ".xns11":
+            raise ValueError("The file extension must be .xns11.")
+
+        current_con_path = Path(self._cross_section_data.Connection.FilePath.Path)
+        if not file_path.exists() or not current_con_path.resolve().samefile(file_path.resolve()):
+            self._cross_section_data.Connection = Connection.Create(str(file_path))
+
+        self._cross_section_data_factory.Save(self._cross_section_data)
+
+        if not self.file_path:
+            self.file_path = file_path
 
     @staticmethod
     def _topoid_in_reach(self, reach):
