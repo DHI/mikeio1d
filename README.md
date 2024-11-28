@@ -1,9 +1,16 @@
 ![logo](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png)
 # MIKE IO 1D: Read MIKE 1D in python
+ ![Python version](https://img.shields.io/pypi/pyversions/mikeio1d.svg)
+ [![Full test](https://github.com/DHI/mikeio1d/actions/workflows/full_test.yml/badge.svg)](https://github.com/DHI/mikeio1d/actions/workflows/full_test.yml)
+[![PyPI version](https://badge.fury.io/py/mikeio1d.svg)](https://badge.fury.io/py/mikeio1d)
+![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Linux-blue)
+![Downloads](https://img.shields.io/pypi/dm/mikeio1d)
 
 Read, manipulate, and analyze res1d, res, resx, out, and xns11 files.
 
 For other MIKE files (Dfs0, Dfs1, Dfs2, Dfsu,...) use the related package [MIKE IO](https://github.com/DHI/mikeio)
+
+Most users of MIKE IO 1D will also find [MIKE+Py](https://github.com/DHI/mikepluspy) of interest.
 
 ## Requirements
 * Windows, Linux (experimental)
