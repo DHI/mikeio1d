@@ -52,6 +52,7 @@ dependencies = [
 dev = [
     "hatch",
     "pytest",
+    "pytest-cov",
     "ruff",
     "matplotlib",
     "jupyterlab",
@@ -74,6 +75,7 @@ docs = [
 ]
 test = [
     "pytest",
+    "pytest-cov",
     "matplotlib",
     "pyarrow",
     "nbformat",
