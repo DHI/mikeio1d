@@ -351,10 +351,10 @@ Tip
 <p>MIKE IO 1D treats SWMM and Res1D results in the same way, so you may also refer to Res1D examples.</p>
 </div>
 </div>
-<div id="e8b61f77" class="cell" data-execution_count="1">
+<div id="14b60cdb" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="b0273c0d" class="cell" data-execution_count="2">
+<div id="ea571d7d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/swmm.out"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -406,7 +406,7 @@ End time: 1998-01-02 12:00:00.001000
 </section>
 <section id="plot-network" class="level2">
 <h2 class="anchored" data-anchor-id="plot-network">Plot network</h2>
-<div id="99b5809c" class="cell" data-execution_count="3">
+<div id="31fc8d6e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> res.reaches.to_geopandas().plot()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>res.nodes.to_geopandas().plot(ax<span class="op">=</span>ax)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>res.catchments.to_geopandas().plot(ax<span class="op">=</span>ax, alpha<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -421,7 +421,7 @@ End time: 1998-01-02 12:00:00.001000
 </section>
 <section id="explore-network" class="level2">
 <h2 class="anchored" data-anchor-id="explore-network">Explore network</h2>
-<div id="c8285880" class="cell" data-execution_count="4">
+<div id="aa8b9449" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 &lt;ResultReaches&gt; (13)
@@ -435,7 +435,7 @@ End time: 1998-01-02 12:00:00.001000
     <details><summary>Quantities (6)</summary><ul><li>Discharge (ft^3/s)</li><li>Water Depth (ft)</li><li>Velocity (ft/s)</li><li>Volume (())</li><li>Capacity (())</li><li>TSS concentration (mu-g/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="c9fc41ea" class="cell" data-execution_count="5">
+<div id="22d6c58f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 &lt;ResultNodes&gt; (14)
@@ -449,7 +449,7 @@ End time: 1998-01-02 12:00:00.001000
     <details><summary>Quantities (7)</summary><ul><li>Water depth (ft)</li><li>Hydraulic head (ft)</li><li>Volume stored &amp; ponded (ft^3)</li><li>Lateral inflow rate (ft^3/s)</li><li>Total inflow rate (ft^3/s)</li><li>Overflow rate (ft^3/s)</li><li>TSS concentration (mu-g/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="654c83c6" class="cell" data-execution_count="6">
+<div id="034ab44e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 &lt;ResultCatchments&gt; (8)
@@ -466,7 +466,7 @@ End time: 1998-01-02 12:00:00.001000
 </section>
 <section id="extract-results-to-a-dataframe" class="level2">
 <h2 class="anchored" data-anchor-id="extract-results-to-a-dataframe">Extract results to a DataFrame</h2>
-<div id="862eb250" class="cell" data-execution_count="7">
+<div id="ee945093" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -628,7 +628,7 @@ End time: 1998-01-02 12:00:00.001000
 </div>
 </div>
 </div>
-<div id="69ea6433" class="cell" data-execution_count="8">
+<div id="0ea8a8d1" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.read()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -672,7 +672,7 @@ End time: 1998-01-02 12:00:00.001000
 </section>
 <section id="plot-results" class="level2">
 <h2 class="anchored" data-anchor-id="plot-results">Plot results</h2>
-<div id="ea6d59d8" class="cell" data-execution_count="9">
+<div id="391abc61" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -682,7 +682,7 @@ End time: 1998-01-02 12:00:00.001000
 </div>
 </div>
 </div>
-<div id="257f7f11" class="cell" data-execution_count="10">
+<div id="ae202cba" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>)</span>
