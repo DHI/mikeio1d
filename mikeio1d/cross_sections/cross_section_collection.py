@@ -185,8 +185,18 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         df = df.set_index(["location_id", "chainage", "topo_id"])
         return df
 
-    def to_geopandas(self) -> gpd.GeoDataFrame:
+    def to_geopandas(self, mode="sections") -> gpd.GeoDataFrame:
         """Convert the collection to a GeoDataFrame.
+
+        Parameters
+        ----------
+        mode : str, optional
+            Mode of conversion. Options are "sections" and "markers". Default is "sections".
+
+        Returns
+        -------
+        gpd.GeoDataFrame
+            GeoDataFrame with the cross sections or markers.
 
         Note:
         ----
@@ -194,6 +204,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         Cross sections must have defined coordinates.
 
         """
+        if mode == "sections":
+            return self._to_geopandas_sections()
+        elif mode == "markers":
+            return self._to_geopandas_markers()
+        else:
+            raise ValueError(f"Unknown mode: {mode}. Options are 'sections' and 'markers'.")
+
+    def _to_geopandas_sections(self) -> gpd.GeoDataFrame:
         try_import_geopandas()
         import geopandas as gpd
 
@@ -209,7 +227,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         gdf = gpd.GeoDataFrame(data=data)
         return gdf
 
-    def to_geopandas_markers(self) -> gpd.GeoDataFrame:
+    def _to_geopandas_markers(self) -> gpd.GeoDataFrame:
         """Convert the collection to a GeoDataFrame of the markers as points."""
         try_import_geopandas()
         import geopandas as gpd
