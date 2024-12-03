@@ -255,7 +255,7 @@ class TestCrossSectionCollectionUnits:
 
         csc = CrossSectionCollection(many_real_cross_sections)
         csc = csc.sel(location_id="river")
-        gdf = csc.to_geopandas_markers()
+        gdf = csc.to_geopandas(mode="markers")
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert len(gdf) == sum([len(cs.markers) for cs in csc.values()])
         expected_columns = {
