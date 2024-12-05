@@ -221,6 +221,11 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         else:
             super().__or__(other)
 
+    @property
+    def cross_section_data(self) -> CrossSectionData:
+        """The DHI.Mike1D.CrossSectionModule.CrossSectionData object."""
+        return self._cross_section_data
+
     def add_xsection(self, xsection: CrossSection):
         """Add a cross section to the collection."""
         location_id = xsection.location_id
