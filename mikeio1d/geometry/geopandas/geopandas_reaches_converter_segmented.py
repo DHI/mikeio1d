@@ -43,11 +43,11 @@ class GeoPandasReachesConverterSegmented(GeoPandasConverter):
             "geometry": [],
         }
         for reach in reaches.values():
-            for m1d_reach in reach.reaches:
+            for res1d_reach in reach.reaches:
                 data["group"].append(TimeSeriesIdGroup.REACH)
                 data["name"].append(reach.name)
-                data["tag"].append(TimeSeriesId.create_reach_span_tag(m1d_reach))
-                data["geometry"].append(ReachGeometry.from_m1d_reaches(m1d_reach).to_shapely())
+                data["tag"].append(TimeSeriesId.create_reach_span_tag(res1d_reach))
+                data["geometry"].append(ReachGeometry.from_res1d_reaches(res1d_reach).to_shapely())
         return data
 
     def to_geopandas(self, reaches: ResultReaches) -> GeoDataFrame:

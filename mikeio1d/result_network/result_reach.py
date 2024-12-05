@@ -98,7 +98,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         try_import_shapely()
         from ..geometry import ReachGeometry
 
-        return ReachGeometry.from_m1d_reaches(self.res1d_reaches)
+        return ReachGeometry.from_res1d_reaches(self.res1d_reaches)
 
     @property
     def name(self) -> str:
@@ -171,9 +171,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         if m1d_dataitem is None:
             raise ValueError("m1d_dataitem must be provided for ResultReach.")
 
-        for m1d_reach in self.res1d_reaches:
-            if m1d_reach.DataItems.Contains(m1d_dataitem):
-                return m1d_reach
+        for res1d_reach in self.res1d_reaches:
+            if res1d_reach.DataItems.Contains(m1d_dataitem):
+                return res1d_reach
         raise Exception(
             "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
             m1d_dataitem,

@@ -36,7 +36,7 @@ class GeoPandasReachesConverter(GeoPandasConverter):
         super().__init__()
 
     def _reach_to_geometry(self, reach: ResultReach) -> ReachGeometry:
-        return ReachGeometry.from_m1d_reaches(reach.res1d_reaches)
+        return ReachGeometry.from_res1d_reaches(reach.res1d_reaches)
 
     def _reach_to_shapely(self, reach: ResultReach) -> BaseGeometry:
         return self._reach_to_geometry(reach).to_shapely()
