@@ -7,19 +7,23 @@ from pathlib import Path
 from warnings import warn
 
 import pandas as pd
-from DHI.Mike1D.CrossSectionModule import CrossSectionData, CrossSectionDataFactory
-from DHI.Mike1D.Generic import Connection, Diagnostics, Location
+from DHI.Mike1D.Generic import Location
 
-from .cross_sections import CrossSection, CrossSectionCollection
+from .cross_sections import CrossSectionCollection
 
 
-class Xns11:
+class Xns11(CrossSectionCollection):
     """A class to read and write xns11 files.
 
     Parameters
     ----------
     file_path: str or Path, optional
         full path and file name to the xns11 file.
+
+    Notes
+    -----
+    The Xns11 class is a subclass of CrossSectionCollection. The main difference is that Xns11 has a file_path property
+    to track where the file was last loaded from or saved to.
 
     Examples
     --------
@@ -28,10 +32,10 @@ class Xns11:
     >>> xns = Xns11("file.xns11")
 
     # Overview of the cross sections
-    >>> xns.xsections.to_dataframe()
+    >>> xns.to_dataframe()
 
     # Read a specific cross section
-    >>> xs = xns.xsections.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
+    >>> xs = xns.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
 
     # Plot a cross section
     >>> xs.plot()
@@ -45,46 +49,24 @@ class Xns11:
 
     """
 
-    def __init__(self, file_path: str | Path = None):
-        self._cross_section_data = None
-        self._cross_section_data_factory = CrossSectionDataFactory()
-        self._xsections = None
+    def __init__(self, file_path: str | Path = None, *args, **kwargs):
+        if file_path and not isinstance(file_path, (str, Path)):
+            self._file_path = None
+            first_arg = file_path
+            args = (first_arg, *args)
+        elif file_path:
+            self._file_path = Path(file_path)
+        else:
+            self._file_path = None
 
-        self.file_path = self._validate_file_path(file_path)
-        self._load_or_create_cross_section_data()
-        self._init_xsections()
+        super().__init__(*args, **kwargs)
+
+        if self._file_path:
+            self.initialize_from_xns11(self._file_path)
 
     def __repr__(self):
         """Return a string representation of the object."""
         return "<mikeio1d.Xns11>"
-
-    def _validate_file_path(self, file_path: str | Path | None) -> Path | None:
-        """Validate user supplied file path, return a Path object if valid."""
-        # file path is not strictly required (e.g. creating a new xns11 file)
-        if not file_path:
-            return None
-
-        file_path = Path(file_path)
-        if not file_path.exists():
-            raise FileNotFoundError(f"File not found: {file_path}")
-
-        return file_path
-
-    def _load_or_create_cross_section_data(self) -> None:
-        """Initialize the CrossSectionData object."""
-        if self.file_path:
-            self._cross_section_data = self._cross_section_data_factory.Open(
-                Connection.Create(str(self.file_path)), Diagnostics("Error loading file.")
-            )
-        else:
-            self._cross_section_data = CrossSectionData()
-
-    def _init_xsections(self) -> None:
-        """Initialize the cross sections."""
-        self._xsections = CrossSectionCollection()
-        self._xsections.xns11 = self
-        for xs in self._cross_section_data:
-            self.xsections.add_xsection(CrossSection(xs))
 
     @staticmethod
     def get_supported_file_extensions() -> set[str]:
@@ -95,14 +77,17 @@ class Xns11:
     def from_cross_section_collection(xsections: CrossSectionCollection) -> Xns11:
         """Create a Xns11 object from a CrossSectionCollection."""
         xns = Xns11()
-        for key in xsections:
-            xs = xsections[key]
-            xns.add_xsection(xs)
-
+        xns.initialize_from_cross_section_data(xsections._cross_section_data)
         return xns
 
+    @property
+    def file_path(self) -> Path | None:
+        """Full path and file name to the xns11 file."""
+        return self._file_path
+
     def info(self):
-        """Print information about the result file."""
+        """Print information about the file."""
+        warn("The 'info' method is deprecated. Use 'print(xns)' instead.")
         info = self._get_info()
         print(info)
 
@@ -112,6 +97,27 @@ class Xns11:
         info.append(f"Interpolation type: {str(self.interpolation_type)}")
         info = str.join("\n", info)
         return info
+
+    def write(self, file_path: str | Path = None) -> None:
+        """Write cross section data to an xns11 file.
+
+        Parameters
+        ----------
+        file_path: str or Path, optional
+            Full file path of the xns11 file to be written. Default is the file_path used to open the file.
+        """
+        if file_path:
+            self._file_path = Path(file_path)
+
+        if not self._file_path:
+            raise ValueError(
+                "No 'file_path' to write to. Set 'file_path' or pass it as an argument."
+            )
+
+        self.to_xns11(self._file_path)
+
+    # region Deprecated methods and attributes of Xns11.
+    # These methods will be removed in the next major release.
 
     @property
     def xsections(self):
@@ -130,49 +136,8 @@ class Xns11:
         #### Get all cross sections for a particular location and topo.
         >>> xns.xsection[location_id, ..., topo_id]
         """
-        return self._xsections
-
-    @property
-    def interpolation_type(self):
-        """Defines how an interpolated cross section are interpolated.
-
-        Returns
-        -------
-        DHI.Mike1D.CrossSectionModule.XSInterpolationType
-
-            Possible values:
-            - ProcessedTopDown: 0
-                Interpolates the processed data. Raw data will not be available.
-            - Raw: 1
-                Interpolates the raw data and calculates processed data from the new raw data.
-            - Middling: 2
-                Interpolation happens during runtime by requesting values at neighbour cross sections and interpolate between those.
-
-        """
-        return self._cross_section_data.XSInterpolationType
-
-    def write(self, file_path: str | Path = None):
-        """Write data to the file."""
-        file_path = file_path if file_path else self.file_path
-
-        if not file_path:
-            raise ValueError("A file path must be provided.")
-
-        file_path = Path(file_path)
-        if not file_path.suffix == ".xns11":
-            raise ValueError("The file extension must be .xns11.")
-
-        current_con_path = Path(self._cross_section_data.Connection.FilePath.Path)
-        if not file_path.exists() or not current_con_path.resolve().samefile(file_path.resolve()):
-            self._cross_section_data.Connection = Connection.Create(str(file_path))
-
-        self._cross_section_data_factory.Save(self._cross_section_data)
-
-        if not self.file_path:
-            self.file_path = file_path
-
-    # region Deprecated methods and attributes of Xns11.
-    # These methods will be removed in the next major release.
+        warn("The 'xsections' property is deprecated. You can now use Xns11 directly.")
+        return self
 
     @property
     def file(self):
@@ -215,11 +180,6 @@ class Xns11:
         """A list of the reach names."""
         warn("The 'reach_names' method is deprecated. Use '.xsections.location_ids' instead.")
         return [reach.ReachId for reach in self._topoids]
-
-    def add_xsection(self, cross_section: CrossSection):
-        """Add a cross section to the file."""
-        warn("The 'add_xsection' method is deprecated. Use '.xsections.add_xsection' instead.")
-        self.xsections.add_xsection(cross_section)
 
     @staticmethod
     def _topoid_in_reach(self, reach):
