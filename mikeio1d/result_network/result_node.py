@@ -52,19 +52,18 @@ class ResultNode(ResultLocation):
         # TODO: Remove this in 1.0.0
         if name == "node":
             warn("Accessing IRes1DNode attribute via .node is deprecated. Use ._node.")
-            return self.node
-        elif hasattr(self.node, name):
+            return self.res1d_node
+        elif hasattr(self.res1d_node, name):
             warn(
                 f"Accessing IRes1DNode attribute {name} directly is deprecated. Use static attributes instead, or ._node.{name}."
             )
-            return getattr(self.node, name)
+            return getattr(self.res1d_node, name)
         else:
             object.__getattribute__(self, name)
 
     @property
-    def node(self) -> IRes1DNode:
-        """IRes1DNode corresponding to this result location."""
-        # TODO: Consider to remove or rename this property to res1d_node for version 1.0.0
+    def res1d_node(self) -> IRes1DNode:
+        """DHI.Mike1D.ResultDataAccess.IRes1DNode corresponding to this result location."""
         return self._creator.node
 
     @property
@@ -73,28 +72,28 @@ class ResultNode(ResultLocation):
         try_import_shapely()
         from ..geometry import NodePoint
 
-        return NodePoint.from_res1d_node(self.node)
+        return NodePoint.from_res1d_node(self.res1d_node)
 
     @property
     def id(self) -> str:
         """Node ID."""
-        return self.node.ID
+        return self.res1d_node.ID
 
     @property
     def type(self) -> str:
         """Node type."""
-        node_type = self.node.GetType().Name[5:]  # Removes 'Res1D' from type name
+        node_type = self.res1d_node.GetType().Name[5:]  # Removes 'Res1D' from type name
         return node_type
 
     @property
     def xcoord(self) -> float:
         """X coordinate of the node."""
-        return self.node.XCoordinate
+        return self.res1d_node.XCoordinate
 
     @property
     def ycoord(self) -> float:
         """Y coordinate of the node."""
-        return self.node.YCoordinate
+        return self.res1d_node.YCoordinate
 
     @property
     def ground_level(self) -> float | None:
@@ -105,8 +104,8 @@ class ResultNode(ResultLocation):
             float: Ground level of the node.
             None: If the node does not have a ground level.
         """
-        if hasattr(self.node, "GroundLevel"):
-            return self.node.GroundLevel
+        if hasattr(self.res1d_node, "GroundLevel"):
+            return self.res1d_node.GroundLevel
         return None
 
     @property
@@ -118,8 +117,8 @@ class ResultNode(ResultLocation):
             float: Bottom level of the node.
             None: If the node does not have a bottom level.
         """
-        if hasattr(self.node, "BottomLevel"):
-            return self.node.BottomLevel
+        if hasattr(self.res1d_node, "BottomLevel"):
+            return self.res1d_node.BottomLevel
         return None
 
     @property
@@ -131,8 +130,8 @@ class ResultNode(ResultLocation):
             float: Critical level of the node.
             None: If the node does not have a critical level.
         """
-        if hasattr(self.node, "CriticalLevel"):
-            return self.node.CriticalLevel
+        if hasattr(self.res1d_node, "CriticalLevel"):
+            return self.res1d_node.CriticalLevel
         return None
 
     @property
@@ -144,8 +143,8 @@ class ResultNode(ResultLocation):
             float: Diameter of the node.
             None: If the node does not have a diameter.
         """
-        if hasattr(self.node, "Diameter"):
-            return self.node.Diameter
+        if hasattr(self.res1d_node, "Diameter"):
+            return self.res1d_node.Diameter
         return None
 
     def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DNode:
@@ -162,12 +161,12 @@ class ResultNode(ResultLocation):
             IRes1DDataSet object associated with ResultNode.
 
         """
-        return self.node
+        return self.res1d_node
 
     def get_query(self, data_item: IDataItem) -> QueryDataNode:
         """Get a QueryDataNode for given data item."""
         quantity_id = data_item.Quantity.Id
-        node_id = self.node.ID
+        node_id = self.res1d_node.ID
         query = QueryDataNode(quantity_id, node_id)
         return query
 
