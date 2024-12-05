@@ -84,12 +84,12 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
                 raise ValueError(f"Topo ID mismatch: {key[2]} != {cross_section.topo_id}")
 
     @staticmethod
-    def from_cross_section_data(m1d_cross_section_data: CrossSectionData) -> CrossSectionCollection:
+    def from_cross_section_data(cross_section_data: CrossSectionData) -> CrossSectionCollection:
         """Create a collection of cross sections from a .NET CrossSectionData object.
 
         Parameters
         ----------
-        m1d_cross_section_data : CrossSectionData
+        cross_section_data : CrossSectionData
             An instance of the .NET object DHI.Mike1D.CrossSectionModule.CrossSectionData
 
         Returns
@@ -98,14 +98,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
             Collection of cross sections.
         """
         csc = CrossSectionCollection()
-        csc.initialize_from_cross_section_data(m1d_cross_section_data)
+        csc.initialize_from_cross_section_data(cross_section_data)
         return csc
 
-    def initialize_from_cross_section_data(self, m1d_cross_section_data: CrossSectionData):
+    def initialize_from_cross_section_data(self, cross_section_data: CrossSectionData):
         """Initialize the collection from a .NET CrossSectionData object."""
-        self._cross_section_data = m1d_cross_section_data
-        for m1d_xs in m1d_cross_section_data:
-            xs = CrossSection(m1d_xs)
+        self._cross_section_data = cross_section_data
+        for xs in cross_section_data:
+            xs = CrossSection(xs)
             self.add_xsection(xs)
 
     @staticmethod
