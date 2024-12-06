@@ -62,8 +62,7 @@ def open(file_name: str | Path, **kwargs) -> Res1D | Xns11:
     file_name : str or Path
         Path to the file to read.
     **kwargs
-        Additional keyword arguments to pass to the constructor of
-        either Res1D or Xns11.
+        Additional keyword arguments to pass to the relevant constructor.
 
     See Also
     --------
@@ -81,8 +80,8 @@ def open(file_name: str | Path, **kwargs) -> Res1D | Xns11:
     >>> res = mikeio1d.open("results.res1d")
     >>> res.nodes.read()
 
-    >>> xns = mikeio1d.open("cross_section.xns11")
-    >>> xns.xsections
+    >>> xs = mikeio1d.open("cross_section.xns11")
+    >>> xs
     """
     if isinstance(file_name, str):
         file_name = Path(file_name)
