@@ -63,11 +63,11 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     def __getattr__(self, name: str):
         """Get attributes, warnings of deprecated attributes."""
         # TODO: Remove this in 1.0.0
-        if hasattr(self.reaches[0], name):
+        if hasattr(self.res1d_reaches[0], name):
             warnings.warn(
                 f"Accessing IRes1DReach attribute {name} like this is deprecated. Use static attributes instead, or .reaches[0].{name}."
             )
-            return getattr(self.reaches[0], name)
+            return getattr(self.res1d_reaches[0], name)
         else:
             object.__getattribute__(self, name)
 
@@ -78,9 +78,8 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         return super().__getitem__(key)
 
     @property
-    def reaches(self) -> List[IRes1DReach]:
-        """List of IRes1DReach corresponding to this result location."""
-        # TODO: Consider to remove or rename this property to res1d_reaches for version 1.0.0
+    def res1d_reaches(self) -> List[IRes1DReach]:
+        """List of DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result location."""
         return self._creator.reaches
 
     @property
@@ -99,12 +98,12 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         try_import_shapely()
         from ..geometry import ReachGeometry
 
-        return ReachGeometry.from_m1d_reaches(self.reaches)
+        return ReachGeometry.from_res1d_reaches(self.res1d_reaches)
 
     @property
     def name(self) -> str:
         """Name of the reach."""
-        return self.reaches[0].Name
+        return self.res1d_reaches[0].Name
 
     @property
     def length(self) -> float | None:
@@ -114,12 +113,12 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     @property
     def start_chainage(self) -> float:
         """Start chainage of the reach."""
-        return self.reaches[0].LocationSpan.StartChainage
+        return self.res1d_reaches[0].LocationSpan.StartChainage
 
     @property
     def end_chainage(self) -> float:
         """End chainage of the reach."""
-        return self.reaches[-1].LocationSpan.EndChainage
+        return self.res1d_reaches[-1].LocationSpan.EndChainage
 
     @property
     def n_gridpoints(self) -> int:
@@ -172,9 +171,9 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         if m1d_dataitem is None:
             raise ValueError("m1d_dataitem must be provided for ResultReach.")
 
-        for m1d_reach in self.reaches:
-            if m1d_reach.DataItems.Contains(m1d_dataitem):
-                return m1d_reach
+        for res1d_reach in self.res1d_reaches:
+            if res1d_reach.DataItems.Contains(m1d_dataitem):
+                return res1d_reach
         raise Exception(
             "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
             m1d_dataitem,
@@ -215,6 +214,16 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
         """
         return self._creator._interpolate_reach_critical_level(chainage)
+
+    # region Deprecated methods and attributes of ResultReach.
+
+    @property
+    def reaches(self) -> List[IRes1DReach]:
+        """List of IRes1DReach corresponding to this result location."""
+        warnings.warn("The 'reaches' property is deprecated. Use 'm1d_reaches' instead.")
+        return self.res1d_reaches
+
+    # endregion
 
 
 class ResultReachCreator(ResultLocationCreator):

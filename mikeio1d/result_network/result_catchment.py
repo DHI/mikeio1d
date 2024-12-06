@@ -51,36 +51,35 @@ class ResultCatchment(ResultLocation):
             warn(
                 "Accessing IRes1DCatchment attribute via .catchment is deprecated. Use ._catchment."
             )
-            return self.catchment
+            return self.res1d_catchment
 
-        elif hasattr(self.catchment, name):
+        elif hasattr(self.res1d_catchment, name):
             warn(
                 f"Accessing IRes1DCatchment attribute {name} directly is deprecated. Use static attributes instead, or ._catchment.{name}."
             )
-            return getattr(self.catchment, name)
+            return getattr(self.res1d_catchment, name)
         else:
             object.__getattribute__(self, name)
 
     @property
-    def catchment(self) -> IRes1DCatchment:
-        """IRes1DCatchment corresponding to this result location."""
-        # TODO: Consider to remove or rename this property to res1d_catchment for version 1.0.0
+    def res1d_catchment(self) -> IRes1DCatchment:
+        """DHI.Mike1D.ResultDataAccess.IRes1DCatchment corresponding to this result location."""
         return self._creator.catchment
 
     @property
     def id(self) -> str:
         """The ID of the catchment."""
-        return self.catchment.Id
+        return self.res1d_catchment.Id
 
     @property
     def area(self) -> float:
         """The area of the catchment."""
-        return self.catchment.Area
+        return self.res1d_catchment.Area
 
     @property
     def type(self) -> str:
         """The type of the catchment."""
-        return self.catchment.Type
+        return self.res1d_catchment.Type
 
     @property
     def geometry(self) -> CatchmentGeometry:
@@ -88,7 +87,7 @@ class ResultCatchment(ResultLocation):
         try_import_shapely()
         from ..geometry import CatchmentGeometry
 
-        return CatchmentGeometry.from_res1d_catchment(self.catchment)
+        return CatchmentGeometry.from_res1d_catchment(self.res1d_catchment)
 
     def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DCatchment:
         """Get IRes1DDataSet object associated with ResultCatchment.
@@ -104,12 +103,12 @@ class ResultCatchment(ResultLocation):
             IRes1DDataSet object associated with ResultCatchment.
 
         """
-        return self.catchment
+        return self.res1d_catchment
 
     def get_query(self, data_item: IDataItem) -> QueryDataCatchment:
         """Get a QueryDataCatchment for given data item."""
         quantity_id = data_item.Quantity.Id
-        catchment_id = self.catchment.Id
+        catchment_id = self.res1d_catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
         return query
 
