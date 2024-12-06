@@ -112,5 +112,13 @@ def test_pretty_quantity_formatting(result_quantity, latex_format, expected_str)
     assert ResultQuantity.prettify_quantity(result_quantity, latex_format) == expected_str
     assert ResultQuantity.prettify_quantity(m1d_quantity, latex_format) == expected_str
 
+
 def test_result_quantity_formatting(result_quantity):
     assert result_quantity.__repr__() == "<Quantity: Water level (m)>"
+
+
+def test_result_locations_html_repr_header_line(res1d_network):
+    assert res1d_network.nodes._repr_html_()
+    assert res1d_network.reaches._repr_html_()
+    assert res1d_network.catchments._repr_html_()
+    assert res1d_network.structures._repr_html_()

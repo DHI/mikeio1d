@@ -59,8 +59,6 @@ website:
           - examples/swmm_basic.qmd
           - examples/epanet_basic.qmd
           - examples/xns11_basic.qmd
-      - text: Design philosophy
-        href: design.qmd
       - text: API Reference
         href: api/index.qmd 
 
