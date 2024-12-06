@@ -95,10 +95,6 @@ Refer to the [Quantities](quantities.qmd) page for more information on how to re
 Each location has a set of static attributes.
 
 ```{python}
-res.nodes['1']._static_attributes
-```
-
-```{python}
 res.nodes['1'].ground_level
 ```
 
