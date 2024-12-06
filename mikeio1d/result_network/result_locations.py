@@ -163,18 +163,19 @@ class ResultLocationsCreator(ABC):
         """Perform ResultLocations creation steps."""
         ...
 
-    def repr_html_(self) -> str:
+    def repr_html(self) -> str:
         """HTML representation."""
-        total_quantities = len(self.quantities)
-        total_derived_quantities = len(self.derived_quantities)
+        locations = self.result_locations
+        total_quantities = len(locations.quantities)
+        total_derived_quantities = len(locations.derived_quantities)
         pretty_quantities = [
             ResultQuantity.prettify_quantity(self.result_quantity_map[qid][0])
             for qid in self.result_quantity_map
         ]
-        header = self.__repr__()
+        header = locations.__repr__()
         sections = [
             (f"Quantities ({total_quantities})", pretty_quantities),
-            (f"Derived Quantities ({total_derived_quantities})", self.derived_quantities),
+            (f"Derived Quantities ({total_derived_quantities})", locations.derived_quantities),
         ]
         repr = build_html_repr_from_sections(header, sections)
         return repr
