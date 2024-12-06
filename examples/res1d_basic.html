@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Extract res1d results for a collection system or river to a pandas DataFrame.">
 
-<title>Quantities – MIKE IO 1D</title>
+<title>Res1D - basic – MIKE IO 1D</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +65,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/xns11.html" rel="next">
-<link href="../user-guide/locations.html" rel="prev">
+<link href="../examples/res1d_export_to_shapefile.html" rel="next">
+<link href="../examples/index.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -165,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Quantities</h1>
+          <h1 class="quarto-secondary-nav-title">Res1D - basic</h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -219,7 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/quantities.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/quantities.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Quantities</span></a>
   </div>
 </li>
@@ -242,7 +243,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../examples/res1d_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/res1d_basic.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Res1D - basic</span></a>
   </div>
 </li>
@@ -294,26 +295,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-structures" id="toc-data-structures" class="nav-link active" data-scroll-target="#data-structures">Data structures</a>
+  <li><a href="#res1d" id="toc-res1d" class="nav-link active" data-scroll-target="#res1d">Res1D</a>
   <ul class="collapse">
-  <li><a href="#quantity" id="toc-quantity" class="nav-link" data-scroll-target="#quantity">Quantity</a></li>
-  <li><a href="#quantity-collection" id="toc-quantity-collection" class="nav-link" data-scroll-target="#quantity-collection">Quantity Collection</a></li>
+  <li><a href="#reaches" id="toc-reaches" class="nav-link" data-scroll-target="#reaches">Reaches</a></li>
+  <li><a href="#grid-points" id="toc-grid-points" class="nav-link" data-scroll-target="#grid-points">Grid points</a></li>
+  <li><a href="#nodes" id="toc-nodes" class="nav-link" data-scroll-target="#nodes">Nodes</a></li>
+  <li><a href="#catchments" id="toc-catchments" class="nav-link" data-scroll-target="#catchments">Catchments</a></li>
   </ul></li>
-  <li><a href="#reading-data" id="toc-reading-data" class="nav-link" data-scroll-target="#reading-data">Reading data</a></li>
-  <li><a href="#plotting-data" id="toc-plotting-data" class="nav-link" data-scroll-target="#plotting-data">Plotting data</a></li>
   <li><a href="#dynamic-selections" id="toc-dynamic-selections" class="nav-link" data-scroll-target="#dynamic-selections">Dynamic selections</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/quantities.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/examples/res1d_basic.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Quantities</h1>
+<h1 class="title d-none d-lg-block">Res1D - basic</h1>
 </div>
 
+<div>
+  <div class="description">
+    Extract res1d results for a collection system or river to a pandas DataFrame.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -328,45 +333,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="hidden">
-<div id="4ae11830" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res_catchments <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="10280d17" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="res1d" class="level2">
+<h2 class="anchored" data-anchor-id="res1d">Res1D</h2>
+<div id="84c489e9" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check contents</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/network.res1d"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start time: 1994-08-07 16:35:00
+End time: 1994-08-07 18:35:00
+# Timesteps: 110
+# Catchments: 0
+# Nodes: 119
+# Reaches: 118
+# Globals: 0
+0 - Water level (m)
+1 - Discharge (m^3/s)</code></pre>
 </div>
 </div>
-<p>Quantities are the actual model results, which can be read into a pandas DataFrame or plotted directly.</p>
-<section id="data-structures" class="level2">
-<h2 class="anchored" data-anchor-id="data-structures">Data structures</h2>
-<p>Two main quantity structures exist: quantities and quantity collections.</p>
-<section id="quantity" class="level3">
-<h3 class="anchored" data-anchor-id="quantity">Quantity</h3>
-<p>A quantity is a single quantity at a specific location. Quantities are accessed from a location object.</p>
-<div id="1a90a863" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel <span class="co"># single quantity (i.e. water level) at a single location (i.e. node 101)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>&lt;Quantity: Water level (m)&gt;</code></pre>
-</div>
-</div>
-</section>
-<section id="quantity-collection" class="level3">
-<h3 class="anchored" data-anchor-id="quantity-collection">Quantity Collection</h3>
-<p>A quantity collection is a single quantity at multiple locations. Quantity collections are accessed from a location collection.</p>
-<div id="3c231223" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel <span class="co"># single quantity (i.e. water level) at multiple locations (i.e. all nodes)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d74c9540" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract results to a pandas DataFrame</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>&lt;QuantityCollection (119): Water level (m)&gt;</code></pre>
-</div>
-</div>
-</section>
-</section>
-<section id="reading-data" class="level2">
-<h2 class="anchored" data-anchor-id="reading-data">Reading data</h2>
-<p>Quantities and quantity collections can be read into a pandas DataFrame with their <code>read</code> method.</p>
-<div id="33a7411b" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
 
@@ -374,40 +366,430 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:101</th>
+<th data-quarto-table-cell-role="th">WaterLevel:1</th>
+<th data-quarto-table-cell-role="th">WaterLevel:2</th>
+<th data-quarto-table-cell-role="th">WaterLevel:3</th>
+<th data-quarto-table-cell-role="th">WaterLevel:4</th>
+<th data-quarto-table-cell-role="th">WaterLevel:5</th>
+<th data-quarto-table-cell-role="th">WaterLevel:6</th>
+<th data-quarto-table-cell-role="th">WaterLevel:7</th>
+<th data-quarto-table-cell-role="th">WaterLevel:8</th>
+<th data-quarto-table-cell-role="th">WaterLevel:9</th>
+<th data-quarto-table-cell-role="th">WaterLevel:10</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Discharge:99l1:22.2508</th>
+<th data-quarto-table-cell-role="th">WaterLevel:9l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:9l1:10</th>
+<th data-quarto-table-cell-role="th">Discharge:9l1:5</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:1</th>
+<th data-quarto-table-cell-role="th">Discharge:Weir:119w1:0.5</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:82.4281</th>
+<th data-quarto-table-cell-role="th">Discharge:Pump:115p1:41.214</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.931503</td>
+<td>195.052994</td>
+<td>195.821503</td>
+<td>195.8815</td>
+<td>193.604996</td>
+<td>193.615005</td>
+<td>193.625000</td>
+<td>193.675003</td>
+<td>193.764999</td>
+<td>193.774994</td>
+<td>193.804993</td>
+<td>...</td>
+<td>0.000002</td>
+<td>193.774994</td>
+<td>193.764999</td>
+<td>0.000031</td>
+<td>193.550003</td>
+<td>188.479996</td>
+<td>0.0</td>
+<td>193.304993</td>
+<td>195.005005</td>
+<td>0.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.931595</td>
+<td>195.052994</td>
+<td>195.821701</td>
+<td>195.8815</td>
+<td>193.604996</td>
+<td>193.615005</td>
+<td>193.625320</td>
+<td>193.675110</td>
+<td>193.765060</td>
+<td>193.775116</td>
+<td>193.804993</td>
+<td>...</td>
+<td>0.000002</td>
+<td>193.775070</td>
+<td>193.765060</td>
+<td>0.000031</td>
+<td>193.550003</td>
+<td>188.479996</td>
+<td>0.0</td>
+<td>193.306061</td>
+<td>195.005005</td>
+<td>0.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.931625</td>
+<td>195.052994</td>
+<td>195.821640</td>
+<td>195.8815</td>
+<td>193.604996</td>
+<td>193.615005</td>
+<td>193.625671</td>
+<td>193.675369</td>
+<td>193.765106</td>
+<td>193.775513</td>
+<td>193.804993</td>
+<td>...</td>
+<td>0.000002</td>
+<td>193.775391</td>
+<td>193.765106</td>
+<td>0.000033</td>
+<td>193.550034</td>
+<td>188.479996</td>
+<td>0.0</td>
+<td>193.307144</td>
+<td>195.005005</td>
+<td>0.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.931656</td>
+<td>195.052994</td>
+<td>195.821503</td>
+<td>195.8815</td>
+<td>193.604996</td>
+<td>193.615005</td>
+<td>193.626236</td>
+<td>193.675751</td>
+<td>193.765228</td>
+<td>193.776077</td>
+<td>193.804993</td>
+<td>...</td>
+<td>0.000002</td>
+<td>193.775894</td>
+<td>193.765228</td>
+<td>0.000037</td>
+<td>193.550079</td>
+<td>188.479996</td>
+<td>0.0</td>
+<td>193.308884</td>
+<td>195.005005</td>
+<td>0.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.931656</td>
+<td>195.052994</td>
+<td>195.821503</td>
+<td>195.8815</td>
+<td>193.604996</td>
+<td>193.615005</td>
+<td>193.626556</td>
+<td>193.675949</td>
+<td>193.765335</td>
+<td>193.776352</td>
+<td>193.804993</td>
+<td>...</td>
+<td>0.000002</td>
+<td>193.776154</td>
+<td>193.765335</td>
+<td>0.000039</td>
+<td>193.550095</td>
+<td>188.479996</td>
+<td>0.0</td>
+<td>193.309860</td>
+<td>195.005005</td>
+<td>0.0</td>
 </tr>
 </tbody>
 </table>
 
+<p>5 rows × 495 columns</p>
 </div>
 </div>
 </div>
-<div id="6522883e" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes.WaterLevel.read()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="reaches" class="level3">
+<h3 class="anchored" data-anchor-id="reaches">Reaches</h3>
+<div id="10ae101f" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to nodes</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+&lt;ResultReaches&gt; (118)
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
+</div>
+</div>
+<div id="eae9a5ba" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get reach water levels</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_reaches <span class="op">=</span> res.reaches.WaterLevel.read()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df_reaches.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">WaterLevel:100l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:100l1:47.6827</th>
+<th data-quarto-table-cell-role="th">WaterLevel:101l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:101l1:66.4361</th>
+<th data-quarto-table-cell-role="th">WaterLevel:102l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:102l1:10.9366</th>
+<th data-quarto-table-cell-role="th">WaterLevel:103l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:103l1:26.0653</th>
+<th data-quarto-table-cell-role="th">WaterLevel:104l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:104l1:34.4131</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">WaterLevel:98l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:98l1:16.0098</th>
+<th data-quarto-table-cell-role="th">WaterLevel:99l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:99l1:44.5016</th>
+<th data-quarto-table-cell-role="th">WaterLevel:9l1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:9l1:10</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:1</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:0</th>
+<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:82.4281</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
+<td>195.441498</td>
+<td>194.661499</td>
+<td>195.931503</td>
+<td>195.441498</td>
+<td>193.550003</td>
+<td>193.550003</td>
+<td>195.801498</td>
+<td>195.701508</td>
+<td>197.072006</td>
+<td>196.962006</td>
+<td>...</td>
+<td>194.581497</td>
+<td>194.511505</td>
+<td>194.661499</td>
+<td>194.581497</td>
+<td>193.774994</td>
+<td>193.764999</td>
+<td>193.550003</td>
+<td>188.479996</td>
+<td>193.304993</td>
+<td>195.005005</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
+<td>195.441498</td>
+<td>194.661621</td>
+<td>195.931503</td>
+<td>195.441605</td>
+<td>193.550140</td>
+<td>193.550064</td>
+<td>195.801498</td>
+<td>195.703171</td>
+<td>197.072006</td>
+<td>196.962051</td>
+<td>...</td>
+<td>194.581497</td>
+<td>194.511841</td>
+<td>194.661575</td>
+<td>194.581497</td>
+<td>193.775070</td>
+<td>193.765060</td>
+<td>193.550003</td>
+<td>188.479996</td>
+<td>193.306061</td>
+<td>195.005005</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
+<td>195.441498</td>
+<td>194.661728</td>
+<td>195.931503</td>
+<td>195.441620</td>
+<td>193.550232</td>
+<td>193.550156</td>
+<td>195.801498</td>
+<td>195.703400</td>
+<td>197.072006</td>
+<td>196.962082</td>
+<td>...</td>
+<td>194.581497</td>
+<td>194.511795</td>
+<td>194.661667</td>
+<td>194.581497</td>
+<td>193.775391</td>
+<td>193.765106</td>
+<td>193.550034</td>
+<td>188.479996</td>
+<td>193.307144</td>
+<td>195.005005</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
+<td>195.441498</td>
+<td>194.661804</td>
+<td>195.931503</td>
+<td>195.441605</td>
+<td>193.550369</td>
+<td>193.550308</td>
+<td>195.801498</td>
+<td>195.703690</td>
+<td>197.072006</td>
+<td>196.962112</td>
+<td>...</td>
+<td>194.581497</td>
+<td>194.511581</td>
+<td>194.661865</td>
+<td>194.581497</td>
+<td>193.775894</td>
+<td>193.765228</td>
+<td>193.550079</td>
+<td>188.479996</td>
+<td>193.308884</td>
+<td>195.005005</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
+<td>195.441498</td>
+<td>194.661972</td>
+<td>195.931503</td>
+<td>195.441605</td>
+<td>193.550430</td>
+<td>193.550369</td>
+<td>195.801498</td>
+<td>195.703827</td>
+<td>197.072006</td>
+<td>196.962128</td>
+<td>...</td>
+<td>194.581497</td>
+<td>194.511505</td>
+<td>194.661911</td>
+<td>194.581497</td>
+<td>193.776154</td>
+<td>193.765335</td>
+<td>193.550095</td>
+<td>188.479996</td>
+<td>193.309860</td>
+<td>195.005005</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 247 columns</p>
+</div>
+</div>
+</div>
+<div id="dcfffeb2" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot water levels for a specific reach</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="res1d_basic_files/figure-html/cell-7-output-1.png" width="607" height="414" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="2b1e9ac2" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to a specific reach</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+&lt;Reach: 100l1&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Attributes (9)</summary><ul><li>name: 100l1</li><li>length: 47.6827148432828</li><li>start_chainage: 0.0</li><li>end_chainage: 47.6827148432828</li><li>n_gridpoints: 3</li><li>start_node: 100</li><li>end_node: 99</li><li>height: 0.30000001192092896</li><li>full_flow_discharge: 0.12058743359507902</li></ul></details><details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
+</div>
+</div>
+</section>
+<section id="grid-points" class="level3">
+<h3 class="anchored" data-anchor-id="grid-points">Grid points</h3>
+<div id="7e00717e" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See grid point info for a reach by chainage</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="st">'47.683'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+&lt;ResultGridPoint&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Attributes (5)</summary><ul><li>reach_name: 100l1</li><li>chainage: 47.6827148432828</li><li>xcoord: -687907.999206543</li><li>ycoord: -1056412.0</li><li>bottom_level: 194.66000366210938</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
+</div>
+</div>
+<div id="6bf205e4" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternatively, index grid points by index number (e.g. '0' for first, '-1' for last, etc.).</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="op">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+&lt;ResultGridPoint&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Attributes (5)</summary><ul><li>reach_name: 100l1</li><li>chainage: 47.6827148432828</li><li>xcoord: -687907.999206543</li><li>ycoord: -1056412.0</li><li>bottom_level: 194.66000366210938</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
+</div>
+</div>
+<div id="14cfc702" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot water level at a gridpoint</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="dv">0</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="res1d_basic_files/figure-html/cell-11-output-1.png" width="607" height="414" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nodes" class="level3">
+<h3 class="anchored" data-anchor-id="nodes">Nodes</h3>
+<div id="3e9a1dd8" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to nodes</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+&lt;ResultNodes&gt; (119)
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
+</div>
+</div>
+<div id="fdd62874" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get node water levels</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_nodes <span class="op">=</span> res.nodes.WaterLevel.read()</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>df_nodes.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 
@@ -566,40 +948,239 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<div id="dc1d8563" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot water level of specific node</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="res1d_basic_files/figure-html/cell-14-output-1.png" width="607" height="414" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="da9af3cb" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to a specific node</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+&lt;Manhole: 1&gt;
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
+</div>
+</div>
 </section>
-<section id="plotting-data" class="level2">
-<h2 class="anchored" data-anchor-id="plotting-data">Plotting data</h2>
-<p>Quantities and quantity collections can be plotted directly with their <code>plot</code> method.</p>
-<div id="c3683acc" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="catchments" class="level3">
+<h3 class="anchored" data-anchor-id="catchments">Catchments</h3>
+<div id="19849120" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># See info related to catchments</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/catchments.res1d"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>res.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+&lt;ResultCatchments&gt; (31)
+    <style>
+        ul {
+            margin: 0px;
+            padding: 0px;
+            padding-left: 2em;
+        }
+    </style>
+    <details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
+</div>
+</div>
+<div id="31fe98cd" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract runoff to a pandas DataFrame</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.catchments.TotalRunOff.read()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">TotalRunOff:100_16_16</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:105_1_1</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:10_22_22</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:113_21_21</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:118_30_30</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:119_32_32</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:14_20_20</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:20_2_2</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:22_8_8</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:25_26_26</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:64_12_12</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:67_18_18</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:6_25_25</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:76_7_7</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:79_10_10</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:82_27_27</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:84_15_15</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:90_28_28</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:94_9_9</th>
+<th data-quarto-table-cell-role="th">TotalRunOff:9_3_3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1994-08-07 16:35:00</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1994-08-07 16:36:00</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1994-08-07 16:37:00</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1994-08-07 16:38:00</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1994-08-07 16:39:00</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 31 columns</p>
+</div>
+</div>
+</div>
+<div id="5b86fecd" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot runoff for a specific catchment</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.catchments[<span class="st">'20_2_2'</span>].TotalRunOff.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="quantities_files/figure-html/cell-7-output-1.png" width="607" height="414" class="figure-img"></p>
+<p><img src="res1d_basic_files/figure-html/cell-18-output-1.png" width="601" height="414" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="82d75184" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.plot(legend<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="quantities_files/figure-html/cell-8-output-1.png" width="594" height="414" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
+</section>
 </section>
 <section id="dynamic-selections" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-selections">Dynamic selections</h2>
-<p>Quantities or quantity collections can be conveniently combined into a single DataFrame with the ‘add’ method.</p>
-<div id="bd988cfa" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.add()</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'100'</span>].WaterLevel.add()</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="21ef36c8" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dynamically select results to extract into a pandas DataFrame.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/network.res1d"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>].Discharge.add()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'101l1'</span>].Discharge.add()</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].WaterLevel.add()</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
 <div>
 
 
@@ -607,236 +1188,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:101</th>
-<th data-quarto-table-cell-role="th">WaterLevel:100</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.931503</td>
-<td>195.441498</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.931595</td>
-<td>195.441605</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.931625</td>
-<td>195.441620</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.931656</td>
-<td>195.441605</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.931656</td>
-<td>195.441605</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div id="650a6c28" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.add()</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res.reaches.WaterLevel.add()</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Discharge:100l1:23.8414</th>
+<th data-quarto-table-cell-role="th">Discharge:101l1:33.218</th>
 <th data-quarto-table-cell-role="th">WaterLevel:1</th>
-<th data-quarto-table-cell-role="th">WaterLevel:2</th>
-<th data-quarto-table-cell-role="th">WaterLevel:3</th>
-<th data-quarto-table-cell-role="th">WaterLevel:4</th>
-<th data-quarto-table-cell-role="th">WaterLevel:5</th>
-<th data-quarto-table-cell-role="th">WaterLevel:6</th>
-<th data-quarto-table-cell-role="th">WaterLevel:7</th>
-<th data-quarto-table-cell-role="th">WaterLevel:8</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9</th>
-<th data-quarto-table-cell-role="th">WaterLevel:10</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">WaterLevel:98l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:98l1:16.0098</th>
-<th data-quarto-table-cell-role="th">WaterLevel:99l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:99l1:44.5016</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:9l1:10</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Weir:119w1:1</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:Pump:115p1:82.4281</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
+<td>0.000006</td>
+<td>0.000004</td>
 <td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625000</td>
-<td>193.675003</td>
-<td>193.764999</td>
-<td>193.774994</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.581497</td>
-<td>194.511505</td>
-<td>194.661499</td>
-<td>194.581497</td>
-<td>193.774994</td>
-<td>193.764999</td>
-<td>193.550003</td>
-<td>188.479996</td>
-<td>193.304993</td>
-<td>195.005005</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
+<td>0.000006</td>
+<td>0.000004</td>
 <td>195.052994</td>
-<td>195.821701</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625320</td>
-<td>193.675110</td>
-<td>193.765060</td>
-<td>193.775116</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.581497</td>
-<td>194.511841</td>
-<td>194.661575</td>
-<td>194.581497</td>
-<td>193.775070</td>
-<td>193.765060</td>
-<td>193.550003</td>
-<td>188.479996</td>
-<td>193.306061</td>
-<td>195.005005</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
+<td>0.000006</td>
+<td>0.000004</td>
 <td>195.052994</td>
-<td>195.821640</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.625671</td>
-<td>193.675369</td>
-<td>193.765106</td>
-<td>193.775513</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.581497</td>
-<td>194.511795</td>
-<td>194.661667</td>
-<td>194.581497</td>
-<td>193.775391</td>
-<td>193.765106</td>
-<td>193.550034</td>
-<td>188.479996</td>
-<td>193.307144</td>
-<td>195.005005</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
+<td>0.000006</td>
+<td>0.000004</td>
 <td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626236</td>
-<td>193.675751</td>
-<td>193.765228</td>
-<td>193.776077</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.581497</td>
-<td>194.511581</td>
-<td>194.661865</td>
-<td>194.581497</td>
-<td>193.775894</td>
-<td>193.765228</td>
-<td>193.550079</td>
-<td>188.479996</td>
-<td>193.308884</td>
-<td>195.005005</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
+<td>0.000006</td>
+<td>0.000004</td>
 <td>195.052994</td>
-<td>195.821503</td>
-<td>195.8815</td>
-<td>193.604996</td>
-<td>193.615005</td>
-<td>193.626556</td>
-<td>193.675949</td>
-<td>193.765335</td>
-<td>193.776352</td>
-<td>193.804993</td>
-<td>...</td>
-<td>194.581497</td>
-<td>194.511505</td>
-<td>194.661911</td>
-<td>194.581497</td>
-<td>193.776154</td>
-<td>193.765335</td>
-<td>193.550095</td>
-<td>188.479996</td>
-<td>193.309860</td>
-<td>195.005005</td>
 </tr>
 </tbody>
 </table>
 
-<p>5 rows × 366 columns</p>
 </div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The name ‘add’ indicates the quantity is added to a list of quantities to be read. The ‘read’ method reads all quantities in the list.</p>
-</div>
-</div>
-</section>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<ul>
-<li><a href="../examples/res1d_basic.html">Res1D Basics</a></li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>There are also several notebook examples available on our <a href="">GitHub repository</a>https://github.com/DHI/mikeio1d/tree/main/notebooks.</p>
 </div>
 </div>
 
@@ -1263,13 +1654,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../user-guide/locations.html" class="pagination-link" aria-label="Locations">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Locations</span>
+      <a href="../examples/index.html" class="pagination-link" aria-label="Examples">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Examples</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../user-guide/xns11.html" class="pagination-link" aria-label="Xns11">
-        <span class="nav-page-text">Xns11</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../examples/res1d_export_to_shapefile.html" class="pagination-link" aria-label="Res1D - export to shapefile">
+        <span class="nav-page-text">Res1D - export to shapefile</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1281,7 +1672,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/quantities.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/examples/res1d_basic.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
