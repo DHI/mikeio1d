@@ -46,14 +46,17 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
 
     Examples
     --------
+    # Create a collection of two cross sections
     >>> from mikeio1d.cross_sections import CrossSectionCollection, CrossSection
     >>> x = [0, 1, 2, 3, 4, 5]
     >>> z = [0, 1, 2, 3, 4, 5]
     >>> xs1 = CrossSection.from_xz(x, z, location_id="loc1", chainage=100, topo_id="topo1")
     >>> xs2 = CrossSection.from_xz(x, z, location_id="loc2", chainage=200, topo_id="topo1")
     >>> csc = CrossSectionCollection([xs1, xs2])
-    # csc is a collection of two cross sections
 
+    # Access a cross section with indexing, or explicitly with sel()
+    >>> csc['loc1', '100.000', 'topo1']
+    >>> csc.sel(location_id='loc1', chainage=100, topo_id='topo1')
     """
 
     def __init__(self, *args, **kwargs):
