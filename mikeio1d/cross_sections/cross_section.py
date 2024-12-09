@@ -30,6 +30,7 @@ from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
 from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
+from DHI.Mike1D.Generic import ZLocation
 
 
 class CrossSection:
@@ -122,6 +123,11 @@ class CrossSection:
     def chainage(self) -> float:
         """Chainage of the cross section."""
         return self._m1d_cross_section.Location.Chainage
+
+    @property
+    def location(self) -> ZLocation:
+        """Location of the cross section (DHI.Mike1D.Generic.ZLocation object)."""
+        return self._m1d_cross_section.Location
 
     @property
     def bottom_level(self) -> float:

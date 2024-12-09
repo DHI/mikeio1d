@@ -98,27 +98,27 @@ class TestCrossSectionCollectionUnits:
 
         sliced = csc["loc0", slice_char, slice_char]
         assert len(csc["loc0", slice_char, slice_char]) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.location_id == "loc0"
 
         sliced = csc[slice_char, slice_char, "topo2"]
         assert len(sliced) == 10
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.topo_id == "topo2"
 
         sliced = csc[slice_char, "50.000", slice_char]
         assert len(sliced) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.chainage == 50
 
         sliced = csc["loc0"]
         assert len(sliced) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.location_id == "loc0"
 
         sliced = csc["loc50", "50.000"]
         assert len(sliced) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.location_id == "loc50"
             assert xs.chainage == 50
 
@@ -165,6 +165,7 @@ class TestCrossSectionCollectionUnits:
         csc2 = CrossSectionCollection(many_dummy_cross_sections[10:])
         csc = csc1 | csc2
         assert len(csc) == 20
+        assert csc.cross_section_data.Count == 20
 
     def test_location_ids(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)
@@ -232,7 +233,7 @@ class TestCrossSectionCollectionUnits:
         import geopandas as gpd
 
         csc = CrossSectionCollection(many_real_cross_sections)
-        csc = csc.sel(location_id="tributary")
+        csc = CrossSectionCollection(csc.sel(location_id="tributary"))
         gdf = csc.to_geopandas()
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert len(gdf) == len(csc)
@@ -254,7 +255,7 @@ class TestCrossSectionCollectionUnits:
         import geopandas as gpd
 
         csc = CrossSectionCollection(many_real_cross_sections)
-        csc = csc.sel(location_id="river")
+        csc = CrossSectionCollection(csc.sel(location_id="river"))
         gdf = csc.to_geopandas(mode="markers")
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert len(gdf) == sum([len(cs.markers) for cs in csc.values()])
