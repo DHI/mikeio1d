@@ -12,10 +12,9 @@ from typing import Set
 if TYPE_CHECKING:
     import geopandas as gpd
 
-    from ..xns11 import Xns11
-
 from warnings import warn
 
+from collections.abc import MutableMapping
 from pathlib import Path
 
 import pandas as pd
@@ -35,7 +34,7 @@ Chainage = str
 TopoId = str
 
 
-class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSection]):
+class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId], CrossSection]):
     """A collection of CrossSection objects.
 
     The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.
@@ -58,13 +57,14 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
     """
 
     def __init__(self, *args, **kwargs):
+        self._cross_section_map: dict[tuple[LocationId, Chainage, TopoId], CrossSection] = {}
         self._cross_section_data = CrossSectionData()
         self._cross_section_data_factory = CrossSectionDataFactory()
 
         if args and isinstance(args[0], list):
             self._handle_args(*args)
         else:
-            super().__init__(*args, **kwargs)
+            self._cross_section_map.update(*args, **kwargs)
 
         self._validate()
 
@@ -180,7 +180,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
 
     def __getitem__(
         self, key: Tuple[LocationId, Chainage, TopoId]
-    ) -> CrossSection | CrossSectionCollection:
+    ) -> CrossSection | list[CrossSection]:
         """Get a cross section or a collection of cross sections."""
         if isinstance(key, str):
             return self.__getitem__((key, ..., ...))
@@ -191,35 +191,50 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
         if ... in key or slice(None) in key:
             return self._slice_collection(key)
         else:
-            return super().__getitem__(key)
+            return self._cross_section_map.__getitem__(key)
+
+    def _slice_collection(self, key: Tuple[LocationId, Chainage, TopoId]) -> list[CrossSection]:
+        return [
+            xs
+            for k, xs in self._cross_section_map.items()
+            if all(
+                k_i == key_i or key_i is ... or key_i == slice(None) for k_i, key_i in zip(k, key)
+            )
+        ]
 
     def __setitem__(self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection):
         """Set a cross section in the collection."""
         if not isinstance(value, CrossSection):
             raise ValueError("Value must be a CrossSection object.")
-
         self._cross_section_data.Add(value._m1d_cross_section)
+        return self._cross_section_map.__setitem__(key, value)
 
-        return super().__setitem__(key, value)
+    def __delitem__(self, key: Tuple[LocationId, Chainage, TopoId]):
+        """Delete a cross section from the collection."""
+        xs = self.get(key)
+        if xs is not None:
+            self._cross_section_data.RemoveCrossSection(xs.location, xs.topo_id)
+        return self._cross_section_map.__delitem__(key)
 
-    def _slice_collection(self, key: Tuple[LocationId, Chainage, TopoId]) -> CrossSectionCollection:
-        return CrossSectionCollection(
-            {
-                k: xs
-                for k, xs in self.items()
-                if all(
-                    k_i == key_i or key_i is ... or key_i == slice(None)
-                    for k_i, key_i in zip(k, key)
-                )
-            }
-        )
+    def __iter__(self):
+        """Iterate over the collection."""
+        return iter(self._cross_section_map)
+
+    def __len__(self):
+        """Return the length of the collection."""
+        return len(self._cross_section_map)
 
     def __or__(self, other) -> CrossSectionCollection:
         """Merge two collections."""
         if isinstance(other, CrossSectionCollection):
-            return CrossSectionCollection({**self, **other})
+            self.update(other)
+            return self
         else:
-            super().__or__(other)
+            raise ValueError("Can only merge with another CrossSectionCollection.")
+
+    def _ipython_key_completions_(self):
+        """Enable key completions in IPython."""
+        return self.keys()
 
     @property
     def cross_section_data(self) -> CrossSectionData:
@@ -250,7 +265,7 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
 
     def sel(
         self, location_id: str = ..., chainage: str | float = ..., topo_id: str = ...
-    ) -> CrossSection | CrossSectionCollection:
+    ) -> CrossSection | list[CrossSection]:
         """Select cross sections from the collection.
 
         Parameters
@@ -264,9 +279,9 @@ class CrossSectionCollection(Dict[Tuple[LocationId, Chainage, TopoId], CrossSect
 
         Returns
         -------
-        CrossSection or CrossSectionCollection
+        CrossSection or list[CrossSection]
             Providing all arguments will return a CrossSection.
-            Provinding partial arguments will always return a CrossSectionCollection, even if it only includes one CrossSection.
+            Provinding partial arguments will always return a list, even if it only includes one CrossSection.
 
         """
         if isinstance(chainage, int) or isinstance(chainage, float):
