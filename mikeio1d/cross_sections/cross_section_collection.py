@@ -98,7 +98,10 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         self._cross_section_data = cross_section_data
         for xs in cross_section_data:
             xs = CrossSection(xs)
-            self.add_xsection(xs)
+            location_id = xs.location_id
+            chainage = self._convert_chainage_to_str(xs.chainage)
+            topo_id = xs.topo_id
+            self._cross_section_map[(location_id, chainage, topo_id)] = xs
 
     def _init_from_xns11(self, file_name: str | Path):
         """Initialize the collection from an Xns11 file."""
@@ -156,10 +159,26 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         if len(key) == 2:
             return self.__getitem__((key[0], key[1], ...))
 
+        key = self._validate_key(key)
+
         if ... in key or slice(None) in key:
             return self._slice_collection(key)
         else:
             return self._cross_section_map.__getitem__(key)
+
+    def _validate_key(
+        self, key: Tuple[LocationId, Chainage, TopoId]
+    ) -> Tuple[LocationId, Chainage, TopoId]:
+        """Validate a key."""
+        if len(key) != 3:
+            raise ValueError("Key must be a tuple of Location ID, Chainage and Topo ID.")
+
+        location_id, chainage, topo_id = key
+
+        if chainage is not ... and chainage != slice(None):
+            chainage = self._convert_chainage_to_str(chainage)
+
+        return (location_id, chainage, topo_id)
 
     def _slice_collection(self, key: Tuple[LocationId, Chainage, TopoId]) -> list[CrossSection]:
         return [
@@ -173,6 +192,8 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
     def __setitem__(self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection):
         """Set a cross section in the collection."""
         key = self._validate_key_value_pair(key, value)
+        if key in self._cross_section_map:
+            del self[key]
         self._cross_section_data.Add(value._m1d_cross_section)
         return self._cross_section_map.__setitem__(key, value)
 
@@ -180,14 +201,13 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection
     ) -> Tuple[LocationId, Chainage, TopoId]:
         """Validate a key and CrossSection pair."""
-        location_id, chainage, topo_id = key
+        location_id, chainage, topo_id = self._validate_key(key)
         if not isinstance(value, CrossSection):
             raise ValueError("Value must be a CrossSection object.")
         if location_id != value.location_id:
             raise ValueError(
                 f"Location ID of key does not match Location ID of CrossSection ({location_id} != {value.location_id})"
             )
-        chainage = self._convert_chainage_to_str(chainage)
         xs_chainage = self._convert_chainage_to_str(value.chainage)
         if chainage != xs_chainage:
             raise ValueError(
@@ -205,9 +225,12 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
 
     def __delitem__(self, key: Tuple[LocationId, Chainage, TopoId]):
         """Delete a cross section from the collection."""
+        key = self._validate_key(key)
         xs = self.get(key)
         if xs is not None:
-            self._cross_section_data.RemoveCrossSection(xs.location, xs.topo_id)
+            deleted = self._cross_section_data.RemoveCrossSection(xs.location, xs.topo_id)
+            if not deleted:
+                raise ValueError(f"Cross section not found: {key}")
         return self._cross_section_map.__delitem__(key)
 
     def __iter__(self):
@@ -238,7 +261,7 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
     def add_xsection(self, xsection: CrossSection):
         """Add a cross section to the collection."""
         location_id = xsection.location_id
-        chainage = f"{xsection.chainage:.3f}"
+        chainage = self._convert_chainage_to_str(xsection.chainage)
         topo_id = xsection.topo_id
         self[location_id, chainage, topo_id] = xsection
 

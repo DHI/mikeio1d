@@ -54,8 +54,8 @@ def many_dummy_cross_sections() -> List[CrossSection]:
 
 @pytest.fixture
 def many_real_cross_sections() -> List[CrossSection]:
-    xns = Xns11(testdata.mikep_xns11)
-    return list(xns.xsections.values())
+    xns = CrossSectionCollection(testdata.mikep_xns11)
+    return list(xns.values())
 
 
 class TestCrossSectionCollectionUnits:
@@ -188,6 +188,12 @@ class TestCrossSectionCollectionUnits:
             "90.000",
         }
 
+    def test_get_chainage(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert csc["loc0", "0.000"][0].chainage == 0
+        assert csc["loc0", 0.000][0].chainage == 0
+        assert csc["loc0", 0][0].chainage == 0
+
     def test_topo_ids(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)
         assert csc.topo_ids == {"topo", "topo2"}
@@ -277,3 +283,30 @@ class TestCrossSectionCollectionUnits:
             )
             == added_xs
         )
+
+    def test_consistency_with_cross_section_data(
+        self, many_dummy_cross_sections, many_real_cross_sections
+    ):
+        # Test intitialization
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert len(csc) == csc.cross_section_data.Count
+
+        csc = CrossSectionCollection(many_real_cross_sections)
+        assert len(csc) == csc.cross_section_data.Count
+
+        csc = CrossSectionCollection(testdata.mikep_xns11)
+        assert len(csc) == csc.cross_section_data.Count
+
+        # Test removing one cross section
+        initial_count = len(csc)
+        xs = list(csc.values())[0]
+        del csc[xs.location_id, xs.chainage, xs.topo_id]
+        assert len(csc) == initial_count - 1
+        assert csc.cross_section_data.Count == initial_count - 1
+
+        # Test reassigning one cross section
+        xs = list(csc.values())[0]
+        initial_count = len(csc)
+        csc[xs.location_id, xs.chainage, xs.topo_id] = xs
+        assert len(csc) == initial_count
+        assert csc.cross_section_data.Count == initial_count
