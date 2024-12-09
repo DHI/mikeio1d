@@ -53,6 +53,8 @@ from .various import allow_nested_autocompletion_for_ipython
 allow_nested_autocompletion_for_ipython(Res1D)
 allow_nested_autocompletion_for_ipython(Xns11)
 
+from .various import open as open_impl
+
 
 def open(file_name: str | Path, **kwargs) -> Res1D | Xns11:
     """Open a file type supported by MIKE IO 1D file.
@@ -83,19 +85,7 @@ def open(file_name: str | Path, **kwargs) -> Res1D | Xns11:
     >>> xs = mikeio1d.open("cross_section.xns11")
     >>> xs
     """
-    if isinstance(file_name, str):
-        file_name = Path(file_name)
-
-    if not file_name.exists():
-        raise FileNotFoundError(f"File not found: {file_name}")
-
-    suffix = file_name.suffix.lower()
-    file_name = str(file_name)
-
-    if suffix in Res1D.get_supported_file_extensions():
-        return Res1D(file_name, **kwargs)
-    elif suffix in Xns11.get_supported_file_extensions():
-        return Xns11(file_name, **kwargs)
+    return open_impl(file_name, **kwargs)
 
 
 __all__ = ["Res1D", "Xns11"]

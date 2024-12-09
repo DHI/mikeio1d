@@ -6,15 +6,19 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Type
+    from mikeio1d import Res1D
+    from mikeio1d import Xns11
 
 import clr
 import warnings
 import sys
 
 from collections.abc import Iterable
+from pathlib import Path
 
 from System import Enum
 from DHI.Mike1D.Generic import PredefinedQuantity
+
 
 NAME_DELIMITER = ":"
 DELETE_VALUE = -1e-30
@@ -99,3 +103,24 @@ def allow_nested_autocompletion_for_ipython(cls: Type):
     from IPython.core import guarded_eval
 
     guarded_eval.EVALUATION_POLICIES["limited"].allowed_getattr.add(cls)
+
+
+def open(file_name: str | Path, **kwargs) -> Res1D | Xns11:
+    """Open a file type supported by MIKE IO 1D file."""
+    # import here to avoid circular imports
+    from mikeio1d.res1d import Res1D
+    from mikeio1d.xns11 import Xns11
+
+    if isinstance(file_name, str):
+        file_name = Path(file_name)
+
+    if not file_name.exists():
+        raise FileNotFoundError(f"File not found: {file_name}")
+
+    suffix = file_name.suffix.lower()
+    file_name = str(file_name)
+
+    if suffix in Res1D.get_supported_file_extensions():
+        return Res1D(file_name, **kwargs)
+    elif suffix in Xns11.get_supported_file_extensions():
+        return Xns11(file_name, **kwargs)
