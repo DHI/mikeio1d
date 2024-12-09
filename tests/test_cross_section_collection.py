@@ -72,20 +72,11 @@ class TestCrossSectionCollectionUnits:
         assert len(csc) == 20
 
     def test_create_collection_from_dict(self, dummy_cross_section):
-        csc = CrossSectionCollection(
-            {
-                ("loc1", "100.000", "topo1"): dummy_cross_section,
-            }
-        )
+        csc = CrossSectionCollection([dummy_cross_section])
         assert len(csc) == 1
 
         with pytest.raises(ValueError):
-            csc = CrossSectionCollection(
-                {
-                    ("loc1", "100.000", "topo1"): dummy_cross_section,
-                    ("not_matching_xs", "100.000", "topo1"): dummy_cross_section,
-                }
-            )
+            csc["not_matching_xs", "100.000", "topo1"] = dummy_cross_section
 
     def test_get_item(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)

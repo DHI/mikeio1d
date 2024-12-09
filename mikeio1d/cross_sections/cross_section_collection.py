@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 from warnings import warn
 
 from collections.abc import MutableMapping
+from collections.abc import Collection
 from pathlib import Path
 
 import pandas as pd
@@ -41,12 +42,15 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
 
     Parameters
     ----------
-    args : list of CrossSection, optional
-        A list of CrossSection objects.
+    cross_sections: Collection[CrossSection] or CrossSectionData or Path or str, optional
+        If Collection[CrossSection], the collection will be initialized from the list of CrossSection objects.
+        If CrossSectionData, the collection will be initialized from a .NET DHI.Mike1D.CrossSectionModule.CrossSectionData object.
+        If Path or str, the collection will be initialized from an xns11 file.
+
 
     Examples
     --------
-    # Create a collection of two cross sections
+    # Create a collection from a list of cross sections
     >>> from mikeio1d.cross_sections import CrossSectionCollection, CrossSection
     >>> x = [0, 1, 2, 3, 4, 5]
     >>> z = [0, 1, 2, 3, 4, 5]
@@ -57,94 +61,55 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
     # Access a cross section with indexing, or explicitly with sel()
     >>> csc['loc1', '100.000', 'topo1']
     >>> csc.sel(location_id='loc1', chainage=100, topo_id='topo1')
+
+    # Create a collection from an xns11 file
+    >>> csc = CrossSectionCollection("cross_sections.xns11")
+
+    # Save the collection to an xns11 file
+    >>> csc.to_xns11("cross_sections.xns11")
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self, cross_sections: Collection[CrossSection] | CrossSectionData | Path | str = None
+    ):
         self._cross_section_map: dict[tuple[LocationId, Chainage, TopoId], CrossSection] = {}
         self._cross_section_data = CrossSectionData()
         self._cross_section_data_factory = CrossSectionDataFactory()
 
-        if args and isinstance(args[0], list):
-            self._handle_args(*args)
+        if cross_sections is None:
+            return
+
+        if isinstance(cross_sections, CrossSectionData):
+            self._init_from_cross_section_data(cross_sections)
+        elif isinstance(cross_sections, Path) or isinstance(cross_sections, str):
+            self._init_from_xns11(cross_sections)
+        elif isinstance(cross_sections, Collection):
+            self._init_from_cross_section_list(cross_sections)
         else:
-            self._cross_section_map.update(*args, **kwargs)
+            raise ValueError("Invalid parameter for 'cross_sections'.")
 
-        self._validate()
+    def _init_from_cross_section_list(self, cross_sections: Collection[CrossSection]):
+        """Initialize the collection from a list of CrossSection objects."""
+        for xs in cross_sections:
+            self.add_xsection(xs)
 
-    def _handle_args(self, *args):
-        if not isinstance(args[0][0], CrossSection):
-            raise ValueError("Input must be a list of CrossSection objects")
-        for xs in args[0]:
-            self[xs.location_id, f"{xs.chainage:.3f}", xs.topo_id] = xs
-
-    def _validate(self):
-        for key, cross_section in self.items():
-            if key[0] != cross_section.location_id:
-                raise ValueError(f"Location ID mismatch: {key[0]} != {cross_section.location_id}")
-            if key[1] != f"{cross_section.chainage:.3f}":
-                raise ValueError(f"Chainage mismatch: {key[1]} != {cross_section.chainage:.3f}")
-            if key[2] != cross_section.topo_id:
-                raise ValueError(f"Topo ID mismatch: {key[2]} != {cross_section.topo_id}")
-
-    @staticmethod
-    def from_cross_section_data(cross_section_data: CrossSectionData) -> CrossSectionCollection:
-        """Create a collection of cross sections from a .NET CrossSectionData object.
-
-        Parameters
-        ----------
-        cross_section_data : CrossSectionData
-            An instance of the .NET object DHI.Mike1D.CrossSectionModule.CrossSectionData
-
-        Returns
-        -------
-        CrossSectionCollection
-            Collection of cross sections.
-        """
-        csc = CrossSectionCollection()
-        csc.initialize_from_cross_section_data(cross_section_data)
-        return csc
-
-    def initialize_from_cross_section_data(self, cross_section_data: CrossSectionData):
+    def _init_from_cross_section_data(self, cross_section_data: CrossSectionData):
         """Initialize the collection from a .NET CrossSectionData object."""
         self._cross_section_data = cross_section_data
         for xs in cross_section_data:
             xs = CrossSection(xs)
             self.add_xsection(xs)
 
-    @staticmethod
-    def from_xns11(file_name: str | Path) -> CrossSectionCollection:
-        """Load a collection of cross sections from an Xns11 file.
-
-        Parameters
-        ----------
-        file_name : str or Path
-            Path to the file to load.
-
-        Returns
-        -------
-        CrossSectionCollection
-            Collection of cross sections.
-
-        Examples
-        --------
-        >>> from mikeio1d.cross_sections import CrossSectionCollection
-        >>> csc = CrossSectionCollection.from_xns11("cross_sections.xns11")
-        """
-        csc = CrossSectionCollection()
-        connection = Connection.Create(str(file_name))
-        cross_section_data_factory = CrossSectionDataFactory()
-        csc._cross_section_data = cross_section_data_factory.Open(
-            connection, Diagnostics("Loading xns11 file.")
-        )
-        return CrossSectionCollection.from_cross_section_data(csc._cross_section_data)
-
-    def initialize_from_xns11(self, file_name: str | Path):
+    def _init_from_xns11(self, file_name: str | Path):
         """Initialize the collection from an Xns11 file."""
+        file_name = self._validate_file_name(file_name)
+        if not file_name.exists():
+            raise FileNotFoundError(f"File not found: {file_name}")
         connection = Connection.Create(str(file_name))
         self._cross_section_data = self._cross_section_data_factory.Open(
             connection, Diagnostics("Loading xns11 file.")
         )
-        self.initialize_from_cross_section_data(self._cross_section_data)
+        self._init_from_cross_section_data(self._cross_section_data)
 
     def to_xns11(self, file_name: str | Path, **kwargs):
         """Save the collection to an Xns11 file.
@@ -207,10 +172,36 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
 
     def __setitem__(self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection):
         """Set a cross section in the collection."""
-        if not isinstance(value, CrossSection):
-            raise ValueError("Value must be a CrossSection object.")
+        key = self._validate_key_value_pair(key, value)
         self._cross_section_data.Add(value._m1d_cross_section)
         return self._cross_section_map.__setitem__(key, value)
+
+    def _validate_key_value_pair(
+        self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection
+    ) -> Tuple[LocationId, Chainage, TopoId]:
+        """Validate a key and CrossSection pair."""
+        location_id, chainage, topo_id = key
+        if not isinstance(value, CrossSection):
+            raise ValueError("Value must be a CrossSection object.")
+        if location_id != value.location_id:
+            raise ValueError(
+                f"Location ID of key does not match Location ID of CrossSection ({location_id} != {value.location_id})"
+            )
+        chainage = self._convert_chainage_to_str(chainage)
+        xs_chainage = self._convert_chainage_to_str(value.chainage)
+        if chainage != xs_chainage:
+            raise ValueError(
+                f"Chainage of key does not match Chainage of CrossSection ({chainage} != {xs_chainage})"
+            )
+        if topo_id != value.topo_id:
+            raise ValueError(
+                f"Topo ID of key does not match Topo ID of CrossSection ({topo_id} != {value.topo_id})"
+            )
+        return (location_id, chainage, topo_id)
+
+    def _convert_chainage_to_str(self, chainage: float | int) -> str:
+        """Convert a chainage to a string with 3 decimals."""
+        return f"{float(chainage):.3f}"
 
     def __delitem__(self, key: Tuple[LocationId, Chainage, TopoId]):
         """Delete a cross section from the collection."""
