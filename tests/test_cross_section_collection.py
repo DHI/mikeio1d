@@ -54,8 +54,8 @@ def many_dummy_cross_sections() -> List[CrossSection]:
 
 @pytest.fixture
 def many_real_cross_sections() -> List[CrossSection]:
-    xns = Xns11(testdata.mikep_xns11)
-    return list(xns.xsections.values())
+    xns = CrossSectionCollection(testdata.mikep_xns11)
+    return list(xns.values())
 
 
 class TestCrossSectionCollectionUnits:
@@ -72,20 +72,11 @@ class TestCrossSectionCollectionUnits:
         assert len(csc) == 20
 
     def test_create_collection_from_dict(self, dummy_cross_section):
-        csc = CrossSectionCollection(
-            {
-                ("loc1", "100.000", "topo1"): dummy_cross_section,
-            }
-        )
+        csc = CrossSectionCollection([dummy_cross_section])
         assert len(csc) == 1
 
         with pytest.raises(ValueError):
-            csc = CrossSectionCollection(
-                {
-                    ("loc1", "100.000", "topo1"): dummy_cross_section,
-                    ("not_matching_xs", "100.000", "topo1"): dummy_cross_section,
-                }
-            )
+            csc["not_matching_xs", "100.000", "topo1"] = dummy_cross_section
 
     def test_get_item(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)
@@ -98,27 +89,27 @@ class TestCrossSectionCollectionUnits:
 
         sliced = csc["loc0", slice_char, slice_char]
         assert len(csc["loc0", slice_char, slice_char]) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.location_id == "loc0"
 
         sliced = csc[slice_char, slice_char, "topo2"]
         assert len(sliced) == 10
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.topo_id == "topo2"
 
         sliced = csc[slice_char, "50.000", slice_char]
         assert len(sliced) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.chainage == 50
 
         sliced = csc["loc0"]
         assert len(sliced) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.location_id == "loc0"
 
         sliced = csc["loc50", "50.000"]
         assert len(sliced) == 2
-        for xs in sliced.values():
+        for xs in sliced:
             assert xs.location_id == "loc50"
             assert xs.chainage == 50
 
@@ -165,6 +156,7 @@ class TestCrossSectionCollectionUnits:
         csc2 = CrossSectionCollection(many_dummy_cross_sections[10:])
         csc = csc1 | csc2
         assert len(csc) == 20
+        assert csc.cross_section_data.Count == 20
 
     def test_location_ids(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)
@@ -195,6 +187,12 @@ class TestCrossSectionCollectionUnits:
             "80.000",
             "90.000",
         }
+
+    def test_get_chainage(self, many_dummy_cross_sections):
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert csc["loc0", "0.000"][0].chainage == 0
+        assert csc["loc0", 0.000][0].chainage == 0
+        assert csc["loc0", 0][0].chainage == 0
 
     def test_topo_ids(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections)
@@ -232,7 +230,7 @@ class TestCrossSectionCollectionUnits:
         import geopandas as gpd
 
         csc = CrossSectionCollection(many_real_cross_sections)
-        csc = csc.sel(location_id="tributary")
+        csc = CrossSectionCollection(csc.sel(location_id="tributary"))
         gdf = csc.to_geopandas()
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert len(gdf) == len(csc)
@@ -254,8 +252,8 @@ class TestCrossSectionCollectionUnits:
         import geopandas as gpd
 
         csc = CrossSectionCollection(many_real_cross_sections)
-        csc = csc.sel(location_id="river")
-        gdf = csc.to_geopandas_markers()
+        csc = CrossSectionCollection(csc.sel(location_id="river"))
+        gdf = csc.to_geopandas(mode="markers")
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert len(gdf) == sum([len(cs.markers) for cs in csc.values()])
         expected_columns = {
@@ -285,3 +283,30 @@ class TestCrossSectionCollectionUnits:
             )
             == added_xs
         )
+
+    def test_consistency_with_cross_section_data(
+        self, many_dummy_cross_sections, many_real_cross_sections
+    ):
+        # Test intitialization
+        csc = CrossSectionCollection(many_dummy_cross_sections)
+        assert len(csc) == csc.cross_section_data.Count
+
+        csc = CrossSectionCollection(many_real_cross_sections)
+        assert len(csc) == csc.cross_section_data.Count
+
+        csc = CrossSectionCollection(testdata.mikep_xns11)
+        assert len(csc) == csc.cross_section_data.Count
+
+        # Test removing one cross section
+        initial_count = len(csc)
+        xs = list(csc.values())[0]
+        del csc[xs.location_id, xs.chainage, xs.topo_id]
+        assert len(csc) == initial_count - 1
+        assert csc.cross_section_data.Count == initial_count - 1
+
+        # Test reassigning one cross section
+        xs = list(csc.values())[0]
+        initial_count = len(csc)
+        csc[xs.location_id, xs.chainage, xs.topo_id] = xs
+        assert len(csc) == initial_count
+        assert csc.cross_section_data.Count == initial_count
