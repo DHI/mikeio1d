@@ -62,11 +62,7 @@ class Xns11(CrossSectionCollection):
         super().__init__(*args, **kwargs)
 
         if self._file_path:
-            self.initialize_from_xns11(self._file_path)
-
-    def __repr__(self):
-        """Return a string representation of the object."""
-        return "<mikeio1d.Xns11>"
+            self._init_from_xns11(self._file_path)
 
     @staticmethod
     def get_supported_file_extensions() -> set[str]:
@@ -77,7 +73,7 @@ class Xns11(CrossSectionCollection):
     def from_cross_section_collection(xsections: CrossSectionCollection) -> Xns11:
         """Create a Xns11 object from a CrossSectionCollection."""
         xns = Xns11()
-        xns.initialize_from_cross_section_data(xsections._cross_section_data)
+        xns._init_from_cross_section_data(xsections._cross_section_data)
         return xns
 
     @property
