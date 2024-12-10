@@ -91,7 +91,7 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
     def _init_from_cross_section_list(self, cross_sections: Collection[CrossSection]):
         """Initialize the collection from a list of CrossSection objects."""
         for xs in cross_sections:
-            self.add_xsection(xs)
+            self.add(xs)
 
     def _init_from_cross_section_data(self, cross_section_data: CrossSectionData):
         """Initialize the collection from a .NET CrossSectionData object."""
@@ -236,12 +236,31 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         """The DHI.Mike1D.CrossSectionModule.CrossSectionData object."""
         return self._cross_section_data
 
-    def add_xsection(self, xsection: CrossSection):
-        """Add a cross section to the collection."""
-        location_id = xsection.location_id
-        chainage = self._convert_chainage_to_str(xsection.chainage)
-        topo_id = xsection.topo_id
-        self[location_id, chainage, topo_id] = xsection
+    def add(self, cross_section: CrossSection):
+        """Add a cross section to the collection.
+
+        Parameters
+        ----------
+        cross_section : CrossSection
+            Cross section to add.
+        """
+        location_id = cross_section.location_id
+        chainage = self._convert_chainage_to_str(cross_section.chainage)
+        topo_id = cross_section.topo_id
+        self[location_id, chainage, topo_id] = cross_section
+
+    def remove(self, cross_section: CrossSection):
+        """Remove a cross section from the collection.
+
+        Parameters
+        ----------
+        cross_section : CrossSection
+            Cross section to remove.
+        """
+        location_id = cross_section.location_id
+        chainage = self._convert_chainage_to_str(cross_section.chainage)
+        topo_id = cross_section.topo_id
+        del self[location_id, chainage, topo_id]
 
     @property
     def location_ids(self) -> Set[str]:
@@ -431,5 +450,10 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
     def xns11(self, value):
         warn("Xns11 is deprecated. Use CrossSectionCollection instead.")
         self._xns11 = value
+
+    def add_xsection(self, xsection: CrossSection):
+        """Add a cross section to the collection."""
+        warn("add_xsection is deprecated. Use 'add' instead.")
+        return self.add(xsection)
 
     # endregion
