@@ -32,6 +32,8 @@ from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribut
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
 from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
 from DHI.Mike1D.Generic import ZLocation
+from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate
+from DHI.Mike1D.Generic.Spatial.Geometry import CoordinateList
 
 
 class CrossSection:
@@ -182,7 +184,7 @@ class CrossSection:
 
     @property
     def geometry(self) -> CrossSectionGeometry:
-        """The geometry of the cross section."""
+        """The geographical geometry of the cross section line."""
         try_import_shapely()
         from ..geometry import CrossSectionGeometry
 
@@ -190,7 +192,9 @@ class CrossSection:
 
     @property
     def coords(self) -> Tuple[Tuple[float, float]]:
-        """Get the coordinates of the cross section.
+        """Get the geographical coordinates of the cross section line.
+
+        If the cross section has no coordinates, an empty tuple will be returned.
 
         Returns
         -------
@@ -201,6 +205,21 @@ class CrossSection:
         if self._m1d_cross_section.Coordinates is None:
             return tuple()
         return tuple((p.X, p.Y) for p in self._m1d_cross_section.Coordinates)
+
+    @coords.setter
+    def coords(self, coords: List[Tuple[float, float]]):
+        """Set the geographical coordinates of the cross section line.
+
+        Parameters
+        ----------
+        coords : List[Tuple[float, float]]
+            A list of (x, y) coordinates.
+
+        """
+        coord_list = CoordinateList()
+        for x, y in coords:
+            coord_list.Add(Coordinate.CreateXY(x, y))
+        self._m1d_cross_section.Coordinates = coord_list
 
     @property
     def resistance_type(self) -> ResistanceType:
