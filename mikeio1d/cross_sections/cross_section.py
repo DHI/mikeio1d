@@ -26,6 +26,7 @@ from ..various import try_import_shapely
 
 import System
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.CrossSectionModule import ICrossSection
 from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
@@ -63,7 +64,7 @@ class CrossSection:
 
     """
 
-    def __init__(self, m1d_cross_section):
+    def __init__(self, m1d_cross_section: ICrossSection):
         if hasattr(m1d_cross_section, "__implementation__"):
             m1d_cross_section = m1d_cross_section.__implementation__
 
@@ -108,6 +109,11 @@ class CrossSection:
     def __repr__(self) -> str:
         """Return a string representation of the cross section."""
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
+
+    @property
+    def m1d_cross_section(self) -> ICrossSection:
+        """The DHI.Mike1D.CrossSectionModule.ICrossSection object that CrossSection wraps."""
+        return self._m1d_cross_section
 
     @property
     def topo_id(self) -> str:
