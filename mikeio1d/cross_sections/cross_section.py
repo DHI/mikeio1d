@@ -26,10 +26,14 @@ from ..various import try_import_shapely
 
 import System
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.CrossSectionModule import ICrossSection
 from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
 from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
+from DHI.Mike1D.Generic import ZLocation
+from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate
+from DHI.Mike1D.Generic.Spatial.Geometry import CoordinateList
 
 
 class CrossSection:
@@ -62,7 +66,7 @@ class CrossSection:
 
     """
 
-    def __init__(self, m1d_cross_section):
+    def __init__(self, m1d_cross_section: ICrossSection):
         if hasattr(m1d_cross_section, "__implementation__"):
             m1d_cross_section = m1d_cross_section.__implementation__
 
@@ -109,6 +113,11 @@ class CrossSection:
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
 
     @property
+    def m1d_cross_section(self) -> ICrossSection:
+        """The DHI.Mike1D.CrossSectionModule.ICrossSection object that CrossSection wraps."""
+        return self._m1d_cross_section
+
+    @property
     def topo_id(self) -> str:
         """Topo ID of the cross section."""
         return self._m1d_cross_section.TopoID
@@ -122,6 +131,11 @@ class CrossSection:
     def chainage(self) -> float:
         """Chainage of the cross section."""
         return self._m1d_cross_section.Location.Chainage
+
+    @property
+    def location(self) -> ZLocation:
+        """Location of the cross section (DHI.Mike1D.Generic.ZLocation object)."""
+        return self._m1d_cross_section.Location
 
     @property
     def bottom_level(self) -> float:
@@ -170,7 +184,7 @@ class CrossSection:
 
     @property
     def geometry(self) -> CrossSectionGeometry:
-        """The geometry of the cross section."""
+        """The geographical geometry of the cross section line."""
         try_import_shapely()
         from ..geometry import CrossSectionGeometry
 
@@ -178,7 +192,9 @@ class CrossSection:
 
     @property
     def coords(self) -> Tuple[Tuple[float, float]]:
-        """Get the coordinates of the cross section.
+        """Get the geographical coordinates of the cross section line.
+
+        If the cross section has no coordinates, an empty tuple will be returned.
 
         Returns
         -------
@@ -189,6 +205,21 @@ class CrossSection:
         if self._m1d_cross_section.Coordinates is None:
             return tuple()
         return tuple((p.X, p.Y) for p in self._m1d_cross_section.Coordinates)
+
+    @coords.setter
+    def coords(self, coords: List[Tuple[float, float]]):
+        """Set the geographical coordinates of the cross section line.
+
+        Parameters
+        ----------
+        coords : List[Tuple[float, float]]
+            A list of (x, y) coordinates.
+
+        """
+        coord_list = CoordinateList()
+        for x, y in coords:
+            coord_list.Add(Coordinate.CreateXY(x, y))
+        self._m1d_cross_section.Coordinates = coord_list
 
     @property
     def resistance_type(self) -> ResistanceType:

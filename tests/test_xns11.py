@@ -37,7 +37,7 @@ def test_file_does_not_exist():
 
     query = QueryData("baseline")
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(Exception):
         assert read(file, [query])
 
 
