@@ -91,6 +91,8 @@ class Res1D:
         Catchment IDs to include when pre-loading dynamic results. None includes all.
     time: slice | tuple[str] | list[str] | None
         Start and end time of the data to read. Using None will read all data.
+    step_every : int | None
+        Number specifying the time step frequency to output. None outputs all time steps.
     derived_quantities : list[str] | None
         Derived quantities to include when pre-loading dynamic results. None includes all.
 
@@ -116,6 +118,9 @@ class Res1D:
     >>> res1d = Res1D('MyRes1D.res1d', nodes=nodes, reaches=reaches, time=times)
     >>> res1d.read()
 
+    Only read every second time step:
+    >>> res1d = Res1D('MyRes1D.res1d', step_every=2)
+    >>> res1d.read()
     """
 
     def __init__(
@@ -125,6 +130,7 @@ class Res1D:
         nodes: Optional[list[str]] = None,
         catchments: Optional[list[str]] = None,
         time: Union[tuple[str], list[str], slice, None] = None,
+        step_every: Optional[int] = None,
         derived_quantities: Optional[list[str]] = None,
         **kwargs,
     ):
@@ -153,6 +159,7 @@ class Res1D:
             col_name_delimiter,
             put_chainage_in_col_name,
             time=time,
+            step_every=step_every,
         )
 
         self.network = ResultNetwork(self)

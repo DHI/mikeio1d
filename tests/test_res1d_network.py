@@ -296,6 +296,18 @@ def test_res1d_filter_time(test_file_path, time, expected_len, expected_start, e
     assert res1d.time_index[-1] == expected_end
 
 
+@pytest.mark.parametrize("step_every", [1, 2, 3])
+def test_res1d_filter_step_every(test_file_path, step_every):
+    res1d = Res1D(test_file_path, step_every=step_every)
+
+    start_time_step = 0
+    max_time_step = 110
+    expected_steps = len(range(start_time_step, max_time_step, step_every))
+
+    res1d.reader.load_dynamic_data()
+    assert res1d.data.NumberOfTimeSteps == expected_steps
+
+
 def test_node_attributes(test_file):
     res1d = test_file
     nodes = res1d.nodes

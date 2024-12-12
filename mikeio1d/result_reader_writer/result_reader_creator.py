@@ -37,6 +37,7 @@ class ResultReaderCreator:
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
         time=None,
+        step_every=None,
     ) -> ResultReader:
         """Create a ResultReader object based on the provided type."""
         reasult_readers: Dict[ResultReaderType, ResultReader] = {
@@ -57,4 +58,5 @@ class ResultReaderCreator:
             col_name_delimiter,
             put_chainage_in_col_name,
             time=time,
+            step_every=step_every,
         )

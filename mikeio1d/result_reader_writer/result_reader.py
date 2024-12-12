@@ -24,6 +24,7 @@ from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 from ..quantities import TimeSeriesId
 from .time_filter import TimeFilter
+from .step_every_filter import StepEverFilter
 from ..result_network import ResultNetwork
 
 from DHI.Mike1D.ResultDataAccess import ResultData
@@ -90,6 +91,7 @@ class ResultReader(ABC):
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
         time=None,
+        step_every=None,
     ):
         self.res1d: Res1D = res1d
 
@@ -102,8 +104,9 @@ class ResultReader(ABC):
         self._nodes = nodes if nodes else []
         self._catchments = catchments if catchments else []
         self._time = time
+        self._step_every = step_every
 
-        self.use_filter = any([reaches, nodes, catchments, time])
+        self.use_filter = any([reaches, nodes, catchments, time, step_every])
 
         self._loaded = False
 
@@ -175,6 +178,8 @@ class ResultReader(ABC):
         self.data_filter = Filter()
         self.time_filter = TimeFilter(self.data_filter)
         self.time_filter.setup_from_user_params(time=self._time)
+        self.step_every_filter = StepEverFilter(self.data_filter)
+        self.step_every_filter.setup_from_user_params(step_every=self._step_every)
         self.data_subfilter = DataItemFilterName(self.data)
         self.data_filter.AddDataItemFilter(self.data_subfilter)
 

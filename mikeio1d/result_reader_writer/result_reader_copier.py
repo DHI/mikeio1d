@@ -41,6 +41,7 @@ class ResultReaderCopier(ResultReader):
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
         time=None,
+        step_every=None,
     ):
         ResultReader.__init__(
             self,
@@ -54,6 +55,7 @@ class ResultReaderCopier(ResultReader):
             col_name_delimiter,
             put_chainage_in_col_name,
             time=time,
+            step_every=step_every,
         )
 
         self.result_data_copier = ResultDataCopier(self.data)
