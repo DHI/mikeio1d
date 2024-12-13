@@ -40,6 +40,10 @@ def test_mike1d_quantities():
     assert "WaterLevel" in quantities
 
 
+def test_mike1d_result_type(test_file):
+    assert test_file.result_type == "HDRR"
+
+
 def test_quantities(test_file):
     quantities = test_file.quantities
     assert len(quantities) == 2
