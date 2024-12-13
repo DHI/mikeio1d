@@ -9,6 +9,9 @@ mpl.use("Agg")
 from mikeio1d.res1d import Res1D
 from mikeio1d.query import QueryDataStructure
 from mikeio1d.query import QueryDataGlobal
+from mikeio1d.result_network import ResultNode
+from mikeio1d.result_network import ResultReach
+from mikeio1d.result_network import ResultStructure
 from mikeio1d.result_reader_writer.result_reader import ColumnMode
 
 
@@ -386,3 +389,17 @@ def test_result_quantity_collection_methods(test_file):
 def test_calculate_total_reach_lengths(res1d_river_network):
     reach = res1d_river_network.reaches.river
     assert reach._creator._get_total_length() == pytest.approx(2024.22765)
+
+
+def test_result_location_res1d_properties(test_file):
+    res1d = test_file
+
+    node: ResultNode = res1d.nodes.basin_right_10
+    assert node.res1d_node.ID == "'basin_right', -10"
+
+    reach: ResultReach = res1d.reaches.basin_right
+    assert reach.res1d_reaches[0].Name == "basin_right"
+    assert reach.res1d_reaches[1].Name == "basin_right"
+
+    structure: ResultStructure = res1d.structures.W_right
+    assert structure.res1d_reach.Name == "link_basin_right"

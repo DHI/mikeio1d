@@ -230,3 +230,10 @@ def test_res1d_merging(test_file_path_for_merging):
 
     df_merged = pd.concat([df_a, df_b])
     pd.testing.assert_frame_equal(df_merged, df_c)
+
+
+def test_result_catchment_res1d_property(test_file):
+    res1d = test_file
+
+    catchment: ResultCatchment = res1d.catchments.c_100_16_16
+    assert catchment.res1d_catchment.Id == "100_16_16"

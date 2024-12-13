@@ -14,6 +14,8 @@ from .result_global_data import ResultGlobalData
 from .result_global_datas import ResultGlobalDatas
 from .result_reach import ResultReach
 from .result_reaches import ResultReaches
+from .result_structure import ResultStructure
+from .result_structures import ResultStructures
 from .various import make_proper_variable_name
 
 __all__ = [
@@ -23,6 +25,8 @@ __all__ = [
     "ResultNodes",
     "ResultReach",
     "ResultReaches",
+    "ResultStructure",
+    "ResultStructures",
     "ResultGridPoint",
     "ResultGlobalData",
     "ResultGlobalDatas",

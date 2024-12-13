@@ -70,9 +70,8 @@ class ResultStructure(ResultLocation):
         return f"<{self.type}: {self.id}>"
 
     @property
-    def reach(self) -> IRes1DReach:
-        """IRes1DReach corresponding to this result structure."""
-        # TODO: Consider to remove or rename this property to res1d_reach for version 1.0.0
+    def res1d_reach(self) -> IRes1DReach:
+        """DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result structure."""
         return self._creator.reach
 
     @property
@@ -92,7 +91,7 @@ class ResultStructure(ResultLocation):
     @property
     def type(self) -> str:
         """Type of the structure."""
-        return self.reach.Name.split(":")[0]
+        return self.res1d_reach.Name.split(":")[0]
 
     @property
     def chainage(self) -> float:
@@ -116,14 +115,23 @@ class ResultStructure(ResultLocation):
             IRes1DDataSet object associated with ResultStructure.
 
         """
-        return self.reach
+        return self.res1d_reach
 
     def get_query(self, data_item):
         """Get a QueryDataStructure for given data item."""
         quantity_id = data_item.Quantity.Id
         structure_id = self.id
-        query = QueryDataStructure(quantity_id, structure_id, self.reach.Name, self._chainage)
+        query = QueryDataStructure(quantity_id, structure_id, self.res1d_reach.Name, self._chainage)
         return query
+
+    # region Deprecated methods and attributes of ResultStructure.
+
+    @property
+    def reach(self) -> IRes1DReach:
+        """IRes1DReach corresponding to this result structure."""
+        return self.res1d_reach
+
+    # endregion
 
 
 class ResultStructureCreator(ResultLocationCreator):

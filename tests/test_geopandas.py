@@ -115,7 +115,7 @@ def test_geopandas_reaches_converter_segmented(res1d_river_network):
     geometry = gdf.query(f"name == '{sample_reach_name}' and tag == '{sample_reach_tag}'").iloc[0][
         "geometry"
     ]
-    expected_geometry = ReachGeometry.from_m1d_reaches(sample_reach).to_shapely()
+    expected_geometry = ReachGeometry.from_res1d_reaches(sample_reach).to_shapely()
     assert expected_geometry == geometry
 
 
