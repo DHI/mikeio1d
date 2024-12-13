@@ -130,20 +130,7 @@ class Res1D:
     ):
         # region deprecation
 
-        def warn_deprecation(name: str, hint: str = ""):
-            if name in kwargs:
-                warnings.warn(
-                    f"The '{name}' parameter will be deprecated in 1.0. {hint}", FutureWarning
-                )
-
-        warn_deprecation("lazy_load")
-        warn_deprecation("col_name_delimiter")
-        warn_deprecation("put_chainage_in_col_name")
-        warn_deprecation("clear_queue_after_reading")
-        warn_deprecation(
-            "header_load", "Dynamic data is read lazily, so header_load is not needed."
-        )
-        warn_deprecation("result_reader_type", "Use res1d.result_reader_type instead.")
+        self._issue_deprecation_warnings(kwargs)
 
         lazy_load = kwargs.get("lazy_load", False)
         col_name_delimiter = kwargs.get("col_name_delimiter", NAME_DELIMITER)
@@ -178,6 +165,22 @@ class Res1D:
     def __repr__(self):
         """Return string representation of the Res1D object."""
         return "<mikeio1d.Res1D>"
+
+    def _issue_deprecation_warnings(self, kwargs):
+        def warn_deprecation(name: str, hint: str = ""):
+            if name in kwargs:
+                warnings.warn(
+                    f"The '{name}' parameter will be deprecated in 1.0. {hint}", FutureWarning
+                )
+
+        warn_deprecation("lazy_load")
+        warn_deprecation("col_name_delimiter")
+        warn_deprecation("put_chainage_in_col_name")
+        warn_deprecation("clear_queue_after_reading")
+        warn_deprecation(
+            "header_load", "Dynamic data is read lazily, so header_load is not needed."
+        )
+        warn_deprecation("result_reader_type", "Use res1d.result_reader_type instead.")
 
     def _init_derived_quantities(
         self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
