@@ -9,6 +9,7 @@ from warnings import warn
 import pandas as pd
 from DHI.Mike1D.Generic import Location
 
+from .cross_sections import CrossSection
 from .cross_sections import CrossSectionCollection
 
 
