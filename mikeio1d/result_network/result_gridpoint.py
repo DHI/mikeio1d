@@ -65,21 +65,18 @@ class ResultGridPoint(ResultLocation):
         self._creator.create()
 
     @property
-    def result_reach(self) -> ResultReach:
+    def reach(self) -> ResultReach:
         """Instance of ResultReach that this ResultGridPoint belongs to."""
-        # TODO: Remove or rename to reach in 1.0.0
         return self._creator.result_reach
 
     @property
-    def reach(self) -> IRes1DReach:
-        """IRes1DReach corresponding to this result location."""
-        # TODO: Consider to remove or rename this property to res1d_reach for version 1.0.0
+    def res1d_reach(self) -> IRes1DReach:
+        """DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result location."""
         return self._creator.reach
 
     @property
-    def gridpoint(self) -> IRes1DGridPoint:
-        """IRes1DGridPoint corresponding to this result location."""
-        # TODO: Consider to remove or rename this property to res1d_gridpoint for version 1.0.0
+    def res1d_gridpoint(self) -> IRes1DGridPoint:
+        """DHI.Mike1D.ResultDataAccess.IRes1DGridPoint corresponding to this result location."""
         return self._creator.gridpoint
 
     @property
@@ -90,22 +87,22 @@ class ResultGridPoint(ResultLocation):
     @property
     def chainage(self):
         """Chainage of the gridpoint."""
-        return self.gridpoint.Chainage
+        return self.res1d_gridpoint.Chainage
 
     @property
     def xcoord(self):
         """X coordinate of the gridpoint."""
-        return self.gridpoint.X
+        return self.res1d_gridpoint.X
 
     @property
     def ycoord(self):
         """Y coordinate of the gridpoint."""
-        return self.gridpoint.Y
+        return self.res1d_gridpoint.Y
 
     @property
     def bottom_level(self):
         """Bottom level of the gridpoint."""
-        return self.gridpoint.Z
+        return self.res1d_gridpoint.Z
 
     def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DGridPoint:
         """Get IRes1DDataSet object associated with ResultGridPoint.
@@ -130,9 +127,23 @@ class ResultGridPoint(ResultLocation):
         """Get a QueryDataReach for given data item."""
         quantity_id = data_item.Quantity.Id
         reach_name = self.reach.Name
-        chainage = self.gridpoint.Chainage
+        chainage = self.res1d_gridpoint.Chainage
         query = QueryDataReach(quantity_id, reach_name, chainage)
         return query
+
+    # region Deprecated methods and attributes of ResultReach.
+
+    @property
+    def result_reach(self) -> ResultReach:
+        """Instance of ResultReach that this ResultGridPoint belongs to."""
+        return self.reach
+
+    @property
+    def gridpoint(self) -> IRes1DGridPoint:
+        """IRes1DGridPoint corresponding to this result location."""
+        return self._creator.gridpoint
+
+    # endregion
 
 
 class ResultGridPointCreator(ResultLocationCreator):

@@ -365,7 +365,7 @@ def test_time_series_id_from_multiindex_compact():
 
 
 def test_time_series_id_from_dataset_dataitem_and_element(reach: ResultReach):
-    m1d_data_set = reach.reaches[0]
+    m1d_data_set = reach.res1d_reaches[0]
     m1d_data_item = m1d_data_set.DataItems[0]
     element_index = 0
     time_series_id = TimeSeriesId.from_dataset_dataitem_and_element(
@@ -394,6 +394,6 @@ def test_time_series_id_from_result_quantity(res1d_river_network: Res1D):
 
 
 def test_time_series_id_get_dataset_name(reach: ResultReach):
-    m1d_data_set = reach.reaches[0]
+    m1d_data_set = reach.res1d_reaches[0]
     name = TimeSeriesId.get_dataset_name(m1d_data_set, "ItemId")
     assert name == "ItemId:100l1"
