@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Extract SWMM results for a collection system to a pandas DataFrame.">
 
-<title>Locations – MIKE IO 1D</title>
+<title>SWMM - basic – MIKE IO 1D</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +65,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/quantities.html" rel="next">
-<link href="../user-guide/res1d.html" rel="prev">
+<link href="../examples/epanet_basic.html" rel="next">
+<link href="../examples/res1d_LTS.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -165,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Locations</h1>
+          <h1 class="quarto-secondary-nav-title">SWMM - basic</h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -213,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/locations.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/locations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Locations</span></a>
   </div>
 </li>
@@ -260,7 +261,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../examples/swmm_basic.html" class="sidebar-item-text sidebar-link">
+  <a href="../examples/swmm_basic.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">SWMM - basic</span></a>
   </div>
 </li>
@@ -294,27 +295,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-structures" id="toc-data-structures" class="nav-link active" data-scroll-target="#data-structures">Data structures</a>
-  <ul class="collapse">
-  <li><a href="#location-collections" id="toc-location-collections" class="nav-link" data-scroll-target="#location-collections">Location collections</a></li>
-  <li><a href="#single-locations" id="toc-single-locations" class="nav-link" data-scroll-target="#single-locations">Single locations</a></li>
-  </ul></li>
-  <li><a href="#quantities" id="toc-quantities" class="nav-link" data-scroll-target="#quantities">Quantities</a></li>
-  <li><a href="#static-attributes" id="toc-static-attributes" class="nav-link" data-scroll-target="#static-attributes">Static attributes</a></li>
-  <li><a href="#reading-data" id="toc-reading-data" class="nav-link" data-scroll-target="#reading-data">Reading data</a></li>
-  <li><a href="#geodataframes" id="toc-geodataframes" class="nav-link" data-scroll-target="#geodataframes">GeoDataFrames</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#plot-network" id="toc-plot-network" class="nav-link" data-scroll-target="#plot-network">Plot network</a></li>
+  <li><a href="#explore-network" id="toc-explore-network" class="nav-link" data-scroll-target="#explore-network">Explore network</a></li>
+  <li><a href="#extract-results-to-a-dataframe" id="toc-extract-results-to-a-dataframe" class="nav-link" data-scroll-target="#extract-results-to-a-dataframe">Extract results to a DataFrame</a></li>
+  <li><a href="#plot-results" id="toc-plot-results" class="nav-link" data-scroll-target="#plot-results">Plot results</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/locations.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/examples/swmm_basic.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Locations</h1>
+<h1 class="title d-none d-lg-block">SWMM - basic</h1>
 </div>
 
+<div>
+  <div class="description">
+    Extract SWMM results for a collection system to a pandas DataFrame.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -329,52 +330,95 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Locations are where model results exist in the <a href="../user-guide/network.html">Network</a>. The main location types are nodes, reaches, gridpoints, and catchments.</p>
-<div class="hidden">
-<div id="215113f2" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res_catchments <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
 </div>
 </div>
-<section id="data-structures" class="level2">
-<h2 class="anchored" data-anchor-id="data-structures">Data structures</h2>
-<p>There are two main data structures for locations: location collections and single locations.</p>
-<section id="location-collections" class="level3">
-<h3 class="anchored" data-anchor-id="location-collections">Location collections</h3>
-<p>Access location collections from a <a href="../user-guide/res1d.html">Res1D</a> object. Each collection shows available quantities and location IDs.</p>
-<div id="316257cc" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-&lt;ResultNodes&gt; (119)
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
+<div class="callout-body-container callout-body">
+<p>MIKE IO 1D treats SWMM and Res1D results in the same way, so you may also refer to Res1D examples.</p>
 </div>
 </div>
-<div id="323a1411" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-&lt;ResultReaches&gt; (118)
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
+<div id="3126510f" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="7026291a" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">"../data/swmm.out"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start time: 1998-01-01 01:00:00.001000
+End time: 1998-01-02 12:00:00.001000
+# Timesteps: 36
+# Catchments: 8
+# Nodes: 14
+# Reaches: 13
+# Globals: 15
+0 - Water depth (ft)
+1 - Hydraulic head (ft)
+2 - Volume stored &amp; ponded (ft^3)
+3 - Lateral inflow rate (ft^3/s)
+4 - Total inflow rate (ft^3/s)
+5 - Overflow rate (ft^3/s)
+6 - TSS concentration (mu-g/l)
+7 - Discharge (ft^3/s)
+8 - Water Depth (ft)
+9 - Velocity (ft/s)
+10 - Volume (())
+11 - Capacity (())
+12 - TSS concentration (mu-g/l)
+13 - Rainfall intensity (in/h)
+14 - Snow depth (in)
+15 - Evap loss (in)
+16 - Infil loss (in/h)
+17 - Runoff flow (ft^3/s)
+18 - Groundwater flow (ft^3/s)
+19 - Elevation of saturated gw table (ft)
+20 - Soil moisture (())
+21 - TSS Washoff (mu-g/l)
+22 - Air temperature (deg F)
+23 - Rainfall intensity (in/h)
+24 - Snow depth (in)
+25 - Infil (in/h)
+26 - Runoff flow (ft^3/s)
+27 - Dry weather inflow (ft^3/s)
+28 - Ground water inflow (ft^3/s)
+29 - RDII inflow (ft^3/s)
+30 - External inflow (ft^3/s)
+31 - Flooding outflow (ft^3/s)
+32 - Outfall outflow (ft^3/s)
+33 - Storage volume (ft^3)
+34 - Evaporation (-)
+35 - Potential ET (-)</code></pre>
 </div>
 </div>
-<div id="cb95176b" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res_catchments.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="plot-network" class="level2">
+<h2 class="anchored" data-anchor-id="plot-network">Plot network</h2>
+<div id="50341728" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> res.reaches.to_geopandas().plot()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>res.nodes.to_geopandas().plot(ax<span class="op">=</span>ax)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>res.catchments.to_geopandas().plot(ax<span class="op">=</span>ax, alpha<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="swmm_basic_files/figure-html/cell-4-output-1.png" width="417" height="411" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="explore-network" class="level2">
+<h2 class="anchored" data-anchor-id="explore-network">Explore network</h2>
+<div id="a06d5ea6" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
-&lt;ResultCatchments&gt; (31)
+&lt;ResultReaches&gt; (13)
     <style>
         ul {
             margin: 0px;
@@ -382,30 +426,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             padding-left: 2em;
         }
     </style>
-    <details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
+    <details><summary>Quantities (6)</summary><ul><li>Discharge (ft^3/s)</li><li>Water Depth (ft)</li><li>Velocity (ft/s)</li><li>Volume (())</li><li>Capacity (())</li><li>TSS concentration (mu-g/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Gridpoints only exist as single locations on a reach, and have no collection.</p>
-</div>
-</div>
-</section>
-<section id="single-locations" class="level3">
-<h3 class="anchored" data-anchor-id="single-locations">Single locations</h3>
-<p>Access a single location by indexing its respective collection with its unique ID. Each location shows available quantities and static properties.</p>
-<div id="069e1311" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cbf6280c" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-&lt;Manhole: 1&gt;
+&lt;ResultNodes&gt; (14)
     <style>
         ul {
             margin: 0px;
@@ -413,13 +440,13 @@ Note
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
+    <details><summary>Quantities (7)</summary><ul><li>Water depth (ft)</li><li>Hydraulic head (ft)</li><li>Volume stored &amp; ponded (ft^3)</li><li>Lateral inflow rate (ft^3/s)</li><li>Total inflow rate (ft^3/s)</li><li>Overflow rate (ft^3/s)</li><li>TSS concentration (mu-g/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="bba5fbfc" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="21b1f69f" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
-&lt;Reach: 100l1&gt;
+&lt;ResultCatchments&gt; (8)
     <style>
         ul {
             margin: 0px;
@@ -427,149 +454,16 @@ Note
             padding-left: 2em;
         }
     </style>
-    <details><summary>Attributes (9)</summary><ul><li>name: 100l1</li><li>length: 47.6827148432828</li><li>start_chainage: 0.0</li><li>end_chainage: 47.6827148432828</li><li>n_gridpoints: 3</li><li>start_node: 100</li><li>end_node: 99</li><li>height: 0.30000001192092896</li><li>full_flow_discharge: 0.12058743359507902</li></ul></details><details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
+    <details><summary>Quantities (9)</summary><ul><li>Rainfall intensity (in/h)</li><li>Snow depth (in)</li><li>Evap loss (in)</li><li>Infil loss (in/h)</li><li>Runoff flow (ft^3/s)</li><li>Groundwater flow (ft^3/s)</li><li>Elevation of saturated gw table (ft)</li><li>Soil moisture (())</li><li>TSS Washoff (mu-g/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
 </div>
 </div>
-<div id="f0f4bdc0" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># gridpoint on reach 100l1 at chainage 23.841</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="st">'23.841'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="extract-results-to-a-dataframe" class="level2">
+<h2 class="anchored" data-anchor-id="extract-results-to-a-dataframe">Extract results to a DataFrame</h2>
+<div id="898fbc22" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-&lt;ResultGridPoint&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (5)</summary><ul><li>reach_name: 100l1</li><li>chainage: 23.8413574216414</li><li>xcoord: -687897.8000488281</li><li>ycoord: -1056390.4503479004</li><li>bottom_level: 195.0500030517578</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Gridpoints can also be indexed by number instead of chainage. For example:</p>
-<div id="77150722" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="dv">0</span>]  <span class="co"># first gridpoint</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="op">-</span><span class="dv">1</span>] <span class="co"># last gridpoint</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-<div id="cc3dafba" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res_catchments.catchments[<span class="st">'100_16_16'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-&lt;Catchment: 100_16_16&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (3)</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
-</div>
-</div>
-</section>
-</section>
-<section id="quantities" class="level2">
-<h2 class="anchored" data-anchor-id="quantities">Quantities</h2>
-<p><a href="../user-guide/quantities.html">Quantities</a> are the actual model results. Each single location or location collection has associated quantities.</p>
-<div id="167bcb77" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
-<pre><code>&lt;QuantityCollection (119): Water level (m)&gt;</code></pre>
-</div>
-</div>
-<div id="1b1cf5ba" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].WaterLevel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
-<pre><code>&lt;Quantity: Water level (m)&gt;</code></pre>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Can't find a which location a quantity belongs to?">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Can’t find a which location a quantity belongs to?
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>The <a href="../user-guide/network.html">Network</a> structure is generic and applies across different domains (e.g.&nbsp;collection systems, water distribution, rivers). Sometimes this can be challenging to find a particular result. Here are some examples of result types mapped onto this structure.</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Location</th>
-<th>Example quantities</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Nodes</td>
-<td>Water level (e.g.&nbsp;manhole, basin, outlet, junction)</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Pump discharge in structure</td>
-</tr>
-<tr class="odd">
-<td>Reaches</td>
-<td>Discharge (e.g.&nbsp;pipes, pumps, weirs)</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Water level (e.g.&nbsp;at specific chainges)</td>
-</tr>
-<tr class="odd">
-<td>Catchments</td>
-<td>Catchment discharge</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Total runoff</td>
-</tr>
-<tr class="odd">
-<td>Global</td>
-<td>Water balance</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>User defined variable types</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<p>Refer to the <a href="../user-guide/quantities.html">Quantities</a> page for more information on how to read and plot the returned quantities.</p>
-</section>
-<section id="static-attributes" class="level2">
-<h2 class="anchored" data-anchor-id="static-attributes">Static attributes</h2>
-<p>Each location has a set of static attributes.</p>
-<div id="fb83104f" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].ground_level</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
-<pre><code>197.07000732421875</code></pre>
-</div>
-</div>
-</section>
-<section id="reading-data" class="level2">
-<h2 class="anchored" data-anchor-id="reading-data">Reading data</h2>
-<p>All result data for a single location or location collection can be read into a pandas DataFrame.</p>
-<div id="e685c038" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'100l1'</span>].read()</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
 <div>
 
 
@@ -577,254 +471,225 @@ Can’t find a which location a quantity belongs to?
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:47.6827</th>
-<th data-quarto-table-cell-role="th">Discharge:100l1:23.8414</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.441498</td>
-<td>194.661499</td>
-<td>0.000006</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.441498</td>
-<td>194.661621</td>
-<td>0.000006</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.441498</td>
-<td>194.661728</td>
-<td>0.000006</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.441498</td>
-<td>194.661804</td>
-<td>0.000006</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.441498</td>
-<td>194.661972</td>
-<td>0.000006</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div id="937478b9" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches.read()</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:47.6827</th>
-<th data-quarto-table-cell-role="th">WaterLevel:101l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:101l1:66.4361</th>
-<th data-quarto-table-cell-role="th">WaterLevel:102l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:102l1:10.9366</th>
-<th data-quarto-table-cell-role="th">WaterLevel:103l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:103l1:26.0653</th>
-<th data-quarto-table-cell-role="th">WaterLevel:104l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:104l1:34.4131</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_DEPTH:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_HEAD:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_VOLUME:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_LATFLOW:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_INFLOW:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_OVERFLOW:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_QUAL:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_QUAL:9</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_DEPTH:10</th>
+<th data-quarto-table-cell-role="th">SWMM_NODE_HEAD:10</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">Discharge:93l1:24.5832</th>
-<th data-quarto-table-cell-role="th">Discharge:94l1:21.2852</th>
-<th data-quarto-table-cell-role="th">Discharge:95l1:21.9487</th>
-<th data-quarto-table-cell-role="th">Discharge:96l1:14.9257</th>
-<th data-quarto-table-cell-role="th">Discharge:97l1:5.71207</th>
-<th data-quarto-table-cell-role="th">Discharge:98l1:8.00489</th>
-<th data-quarto-table-cell-role="th">Discharge:99l1:22.2508</th>
-<th data-quarto-table-cell-role="th">Discharge:9l1:5</th>
-<th data-quarto-table-cell-role="th">Discharge:Weir:119w1:0.5</th>
-<th data-quarto-table-cell-role="th">Discharge:Pump:115p1:41.214</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_DWFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_GWFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_INFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_EXFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_INFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_FLOODING</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_OUTFLOW</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_STORAGE</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_EVAP</th>
+<th data-quarto-table-cell-role="th">SWMM_SYS_PET</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.441498</td>
-<td>194.661499</td>
-<td>195.931503</td>
-<td>195.441498</td>
-<td>193.550003</td>
-<td>193.550003</td>
-<td>195.801498</td>
-<td>195.701508</td>
-<td>197.072006</td>
-<td>196.962006</td>
+<td data-quarto-table-cell-role="th">1998-01-01 01:00:00.001</td>
+<td>0.000000</td>
+<td>1000.000000</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>995.000000</td>
 <td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000013</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000031</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
 <td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.441498</td>
-<td>194.661621</td>
-<td>195.931503</td>
-<td>195.441605</td>
-<td>193.550140</td>
-<td>193.550064</td>
-<td>195.801498</td>
-<td>195.703171</td>
-<td>197.072006</td>
-<td>196.962051</td>
+<td data-quarto-table-cell-role="th">1998-01-01 02:00:00.001</td>
+<td>0.288774</td>
+<td>1000.288757</td>
+<td>0.0</td>
+<td>1.239633</td>
+<td>1.239633</td>
+<td>0.0</td>
+<td>15.720075</td>
+<td>3.144015</td>
+<td>0.520309</td>
+<td>995.520325</td>
 <td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000010</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000031</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>6.216826</td>
+<td>0.000000</td>
+<td>6.128909</td>
+<td>1656.397217</td>
 <td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.441498</td>
-<td>194.661728</td>
-<td>195.931503</td>
-<td>195.441620</td>
-<td>193.550232</td>
-<td>193.550156</td>
-<td>195.801498</td>
-<td>195.703400</td>
-<td>197.072006</td>
-<td>196.962082</td>
+<td data-quarto-table-cell-role="th">1998-01-01 03:00:00.001</td>
+<td>0.418453</td>
+<td>1000.418457</td>
+<td>0.0</td>
+<td>2.595429</td>
+<td>2.595429</td>
+<td>0.0</td>
+<td>15.389509</td>
+<td>3.077902</td>
+<td>3.000000</td>
+<td>998.000000</td>
 <td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000010</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000033</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>13.030855</td>
+<td>0.521967</td>
+<td>12.470544</td>
+<td>2796.561035</td>
 <td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.441498</td>
-<td>194.661804</td>
-<td>195.931503</td>
-<td>195.441605</td>
-<td>193.550369</td>
-<td>193.550308</td>
-<td>195.801498</td>
-<td>195.703690</td>
-<td>197.072006</td>
-<td>196.962112</td>
+<td data-quarto-table-cell-role="th">1998-01-01 04:00:00.001</td>
+<td>0.567633</td>
+<td>1000.567627</td>
+<td>0.0</td>
+<td>4.645479</td>
+<td>4.645479</td>
+<td>0.0</td>
+<td>14.810841</td>
+<td>2.962168</td>
+<td>3.000000</td>
+<td>998.000000</td>
 <td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000009</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000037</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>24.252975</td>
+<td>4.511855</td>
+<td>19.521162</td>
+<td>3780.683594</td>
 <td>0.0</td>
 <td>0.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.441498</td>
-<td>194.661972</td>
-<td>195.931503</td>
-<td>195.441605</td>
-<td>193.550430</td>
-<td>193.550369</td>
-<td>195.801498</td>
-<td>195.703827</td>
-<td>197.072006</td>
-<td>196.962128</td>
+<td data-quarto-table-cell-role="th">1998-01-01 05:00:00.001</td>
+<td>0.425047</td>
+<td>1000.425049</td>
+<td>0.0</td>
+<td>2.675368</td>
+<td>2.675368</td>
+<td>0.0</td>
+<td>14.338782</td>
+<td>2.867756</td>
+<td>3.000000</td>
+<td>998.000000</td>
 <td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000009</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000039</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>14.172027</td>
+<td>0.555154</td>
+<td>13.623661</td>
+<td>2913.430420</td>
 <td>0.0</td>
 <td>0.0</td>
 </tr>
 </tbody>
 </table>
 
-<p>5 rows × 376 columns</p>
+<p>5 rows × 298 columns</p>
+</div>
+</div>
+</div>
+<div id="a9885d39" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.read()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">SWMM_LINK_FLOW:1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01 01:00:00.001</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1998-01-01 02:00:00.001</td>
+<td>1.235769</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01 03:00:00.001</td>
+<td>2.593548</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1998-01-01 04:00:00.001</td>
+<td>4.638623</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01 05:00:00.001</td>
+<td>2.675184</td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 </div>
 </section>
-<section id="geodataframes" class="level2">
-<h2 class="anchored" data-anchor-id="geodataframes">GeoDataFrames</h2>
-<p>Locations collections can be extracted into a GeoDataFrame, both with and without quantities.</p>
-<div id="fa2ab060" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> res.reaches.to_geopandas()</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>gdf.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="plot-results" class="level2">
+<h2 class="anchored" data-anchor-id="plot-results">Plot results</h2>
+<div id="737a05af" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="locations_files/figure-html/cell-16-output-1.png" width="416" height="425" class="figure-img"></p>
+<p><img src="swmm_basic_files/figure-html/cell-10-output-1.png" width="588" height="414" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="15f70fa4" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> res.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'max'</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>gdf.plot(column<span class="op">=</span><span class="st">'max_Discharge'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, cmap<span class="op">=</span><span class="st">'RdYlGn_r'</span>, legend<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8c8dbdba" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'1'</span>].SWMM_LINK_FLOW.plot(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>res.catchments[<span class="st">'2'</span>].SWMM_SUBCATCH_RUNOFF.plot(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="locations_files/figure-html/cell-17-output-1.png" width="491" height="425" class="figure-img"></p>
+<p><img src="swmm_basic_files/figure-html/cell-11-output-1.png" width="661" height="470" class="figure-img"></p>
 </figure>
 </div>
-</div>
-</div>
-</section>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<ul>
-<li><a href="../examples/res1d_basic.html">Res1D Basics</a></li>
-<li><a href="../examples/res1d_export_to_shapefile.html">Res1D Export to shapefile</a></li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>There are also several notebook examples available on our <a href="">GitHub repository</a>https://github.com/DHI/mikeio1d/tree/main/notebooks.</p>
 </div>
 </div>
 
@@ -1251,13 +1116,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../user-guide/res1d.html" class="pagination-link" aria-label="Res1D">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Res1D</span>
+      <a href="../examples/res1d_LTS.html" class="pagination-link" aria-label="Res1D - long term statistics (LTS)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Res1D - long term statistics (LTS)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../user-guide/quantities.html" class="pagination-link" aria-label="Quantities">
-        <span class="nav-page-text">Quantities</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../examples/epanet_basic.html" class="pagination-link" aria-label="EPANET - basic">
+        <span class="nav-page-text">EPANET - basic</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1269,7 +1134,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/locations.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/examples/swmm_basic.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>

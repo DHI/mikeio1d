@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Locations – MIKE IO 1D</title>
+<title>result_network.resultnodes – MIKE IO 1D</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,15 +57,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/quantities.html" rel="next">
-<link href="../user-guide/res1d.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -102,9 +100,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -165,7 +160,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Locations</h1>
+          <h1 class="quarto-secondary-nav-title"></h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -213,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/locations.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/locations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Locations</span></a>
   </div>
 </li>
@@ -294,539 +289,221 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-structures" id="toc-data-structures" class="nav-link active" data-scroll-target="#data-structures">Data structures</a>
+  <li><a href="#mikeio1d.result_network.ResultNodes" id="toc-mikeio1d.result_network.ResultNodes" class="nav-link active" data-scroll-target="#mikeio1d.result_network.ResultNodes">result_network.ResultNodes</a>
   <ul class="collapse">
-  <li><a href="#location-collections" id="toc-location-collections" class="nav-link" data-scroll-target="#location-collections">Location collections</a></li>
-  <li><a href="#single-locations" id="toc-single-locations" class="nav-link" data-scroll-target="#single-locations">Single locations</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#mikeio1d.result_network.ResultNodes.read" id="toc-mikeio1d.result_network.ResultNodes.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNodes.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultNodes.to_geopandas" id="toc-mikeio1d.result_network.ResultNodes.to_geopandas" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultNodes.to_geopandas">to_geopandas</a></li>
   </ul></li>
-  <li><a href="#quantities" id="toc-quantities" class="nav-link" data-scroll-target="#quantities">Quantities</a></li>
-  <li><a href="#static-attributes" id="toc-static-attributes" class="nav-link" data-scroll-target="#static-attributes">Static attributes</a></li>
-  <li><a href="#reading-data" id="toc-reading-data" class="nav-link" data-scroll-target="#reading-data">Reading data</a></li>
-  <li><a href="#geodataframes" id="toc-geodataframes" class="nav-link" data-scroll-target="#geodataframes">GeoDataFrames</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul></li>
+  <li><a href="#convert-nodes-to-a-geodataframe-without-quantities" id="toc-convert-nodes-to-a-geodataframe-without-quantities" class="nav-link" data-scroll-target="#convert-nodes-to-a-geodataframe-without-quantities">Convert nodes to a GeoDataFrame (without quantities)</a></li>
+  <li><a href="#convert-nodes-to-a-geodataframe-with-quantities" id="toc-convert-nodes-to-a-geodataframe-with-quantities" class="nav-link" data-scroll-target="#convert-nodes-to-a-geodataframe-with-quantities">Convert nodes to a GeoDataFrame (with quantities)</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/locations.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+</nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title d-none d-lg-block">Locations</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p>Locations are where model results exist in the <a href="../user-guide/network.html">Network</a>. The main location types are nodes, reaches, gridpoints, and catchments.</p>
-<div class="hidden">
-<div id="215113f2" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res_catchments <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<section id="data-structures" class="level2">
-<h2 class="anchored" data-anchor-id="data-structures">Data structures</h2>
-<p>There are two main data structures for locations: location collections and single locations.</p>
-<section id="location-collections" class="level3">
-<h3 class="anchored" data-anchor-id="location-collections">Location collections</h3>
-<p>Access location collections from a <a href="../user-guide/res1d.html">Res1D</a> object. Each collection shows available quantities and location IDs.</p>
-<div id="316257cc" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-&lt;ResultNodes&gt; (119)
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
-</div>
-</div>
-<div id="323a1411" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-&lt;ResultReaches&gt; (118)
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
-</div>
-</div>
-<div id="cb95176b" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res_catchments.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-&lt;ResultCatchments&gt; (31)
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Gridpoints only exist as single locations on a reach, and have no collection.</p>
-</div>
-</div>
-</section>
-<section id="single-locations" class="level3">
-<h3 class="anchored" data-anchor-id="single-locations">Single locations</h3>
-<p>Access a single location by indexing its respective collection with its unique ID. Each location shows available quantities and static properties.</p>
-<div id="069e1311" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-&lt;Manhole: 1&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
-</div>
-</div>
-<div id="bba5fbfc" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
-&lt;Reach: 100l1&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (9)</summary><ul><li>name: 100l1</li><li>length: 47.6827148432828</li><li>start_chainage: 0.0</li><li>end_chainage: 47.6827148432828</li><li>n_gridpoints: 3</li><li>start_node: 100</li><li>end_node: 99</li><li>height: 0.30000001192092896</li><li>full_flow_discharge: 0.12058743359507902</li></ul></details><details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
-</div>
-</div>
-<div id="f0f4bdc0" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># gridpoint on reach 100l1 at chainage 23.841</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="st">'23.841'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
-&lt;ResultGridPoint&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (5)</summary><ul><li>reach_name: 100l1</li><li>chainage: 23.8413574216414</li><li>xcoord: -687897.8000488281</li><li>ycoord: -1056390.4503479004</li><li>bottom_level: 195.0500030517578</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Gridpoints can also be indexed by number instead of chainage. For example:</p>
-<div id="77150722" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="dv">0</span>]  <span class="co"># first gridpoint</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="op">-</span><span class="dv">1</span>] <span class="co"># last gridpoint</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-<div id="cc3dafba" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res_catchments.catchments[<span class="st">'100_16_16'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-&lt;Catchment: 100_16_16&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (3)</summary><ul><li>id: 100_16_16</li><li>area: 22800.0</li><li>type: Kinematic Wave</li></ul></details><details><summary>Quantities (5)</summary><ul><li>Total Runoff (m^3/s)</li><li>Actual Rainfall (m/s)</li><li>Zink, Load, RR (kg/s)</li><li>Zink, Mass, Accumulated, RR (kg)</li><li>Zink, RR (mg/l)</li></ul></details><details><summary>Derived Quantities (0)</summary><ul></ul></details>
-</div>
-</div>
-</section>
-</section>
-<section id="quantities" class="level2">
-<h2 class="anchored" data-anchor-id="quantities">Quantities</h2>
-<p><a href="../user-guide/quantities.html">Quantities</a> are the actual model results. Each single location or location collection has associated quantities.</p>
-<div id="167bcb77" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
-<pre><code>&lt;QuantityCollection (119): Water level (m)&gt;</code></pre>
-</div>
-</div>
-<div id="1b1cf5ba" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].WaterLevel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
-<pre><code>&lt;Quantity: Water level (m)&gt;</code></pre>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Can't find a which location a quantity belongs to?">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Can’t find a which location a quantity belongs to?
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>The <a href="../user-guide/network.html">Network</a> structure is generic and applies across different domains (e.g.&nbsp;collection systems, water distribution, rivers). Sometimes this can be challenging to find a particular result. Here are some examples of result types mapped onto this structure.</p>
+<section id="mikeio1d.result_network.ResultNodes" class="level1">
+<h1>result_network.ResultNodes</h1>
+<p><code>result_network.ResultNodes(self, res1d)</code></p>
+<p>Class for wrapping ResultData nodes.</p>
+<p>By itself it is also a dict, which contains mapping between node ID and IRes1DNode object.</p>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <thead>
 <tr class="header">
-<th>Location</th>
-<th>Example quantities</th>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Nodes</td>
-<td>Water level (e.g.&nbsp;manhole, basin, outlet, junction)</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Pump discharge in structure</td>
-</tr>
-<tr class="odd">
-<td>Reaches</td>
-<td>Discharge (e.g.&nbsp;pipes, pumps, weirs)</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Water level (e.g.&nbsp;at specific chainges)</td>
-</tr>
-<tr class="odd">
-<td>Catchments</td>
-<td>Catchment discharge</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Total runoff</td>
-</tr>
-<tr class="odd">
-<td>Global</td>
-<td>Water balance</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>User defined variable types</td>
+<td><code>res1d</code></td>
+<td>Res1D</td>
+<td>Res1D object the nodes belong to.</td>
+<td><em>required</em></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
-<p>Refer to the <a href="../user-guide/quantities.html">Quantities</a> page for more information on how to read and plot the returned quantities.</p>
 </section>
-<section id="static-attributes" class="level2">
-<h2 class="anchored" data-anchor-id="static-attributes">Static attributes</h2>
-<p>Each location has a set of static attributes.</p>
-<div id="fb83104f" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].ground_level</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
-<pre><code>197.07000732421875</code></pre>
-</div>
-</div>
-</section>
-<section id="reading-data" class="level2">
-<h2 class="anchored" data-anchor-id="reading-data">Reading data</h2>
-<p>All result data for a single location or location collection can be read into a pandas DataFrame.</p>
-<div id="e685c038" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'100l1'</span>].read()</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<section id="attributes" class="level2">
+<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:47.6827</th>
-<th data-quarto-table-cell-role="th">Discharge:100l1:23.8414</th>
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.441498</td>
-<td>194.661499</td>
-<td>0.000006</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.derived_quantities">derived_quantities</a></td>
+<td>A list of available derived quantities.</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.441498</td>
-<td>194.661621</td>
-<td>0.000006</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.group">group</a></td>
+<td>The TimeSeriesIdGroup associated with these locations.</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.441498</td>
-<td>194.661728</td>
-<td>0.000006</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.locations">locations</a></td>
+<td>A list of location objects (e.g.&nbsp;<resultnode>).</resultnode></td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.441498</td>
-<td>194.661804</td>
-<td>0.000006</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.names">names</a></td>
+<td>A list of location names (e.g.&nbsp;MUIDs).</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.441498</td>
-<td>194.661972</td>
-<td>0.000006</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.quantities">quantities</a></td>
+<td>A list of available quantities.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.result_network.ResultNodes.res1d">res1d</a></td>
+<td>The Res1D instance that these locations belong to.</td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
-<div id="937478b9" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches.read()</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:100l1:47.6827</th>
-<th data-quarto-table-cell-role="th">WaterLevel:101l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:101l1:66.4361</th>
-<th data-quarto-table-cell-role="th">WaterLevel:102l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:102l1:10.9366</th>
-<th data-quarto-table-cell-role="th">WaterLevel:103l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:103l1:26.0653</th>
-<th data-quarto-table-cell-role="th">WaterLevel:104l1:0</th>
-<th data-quarto-table-cell-role="th">WaterLevel:104l1:34.4131</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">Discharge:93l1:24.5832</th>
-<th data-quarto-table-cell-role="th">Discharge:94l1:21.2852</th>
-<th data-quarto-table-cell-role="th">Discharge:95l1:21.9487</th>
-<th data-quarto-table-cell-role="th">Discharge:96l1:14.9257</th>
-<th data-quarto-table-cell-role="th">Discharge:97l1:5.71207</th>
-<th data-quarto-table-cell-role="th">Discharge:98l1:8.00489</th>
-<th data-quarto-table-cell-role="th">Discharge:99l1:22.2508</th>
-<th data-quarto-table-cell-role="th">Discharge:9l1:5</th>
-<th data-quarto-table-cell-role="th">Discharge:Weir:119w1:0.5</th>
-<th data-quarto-table-cell-role="th">Discharge:Pump:115p1:41.214</th>
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</td>
-<td>195.441498</td>
-<td>194.661499</td>
-<td>195.931503</td>
-<td>195.441498</td>
-<td>193.550003</td>
-<td>193.550003</td>
-<td>195.801498</td>
-<td>195.701508</td>
-<td>197.072006</td>
-<td>196.962006</td>
-<td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000013</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000031</td>
-<td>0.0</td>
-<td>0.0</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.read">read</a></td>
+<td>Read the time series data for all quantities at these locations into a DataFrame.</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</td>
-<td>195.441498</td>
-<td>194.661621</td>
-<td>195.931503</td>
-<td>195.441605</td>
-<td>193.550140</td>
-<td>193.550064</td>
-<td>195.801498</td>
-<td>195.703171</td>
-<td>197.072006</td>
-<td>196.962051</td>
-<td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000010</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000031</td>
-<td>0.0</td>
-<td>0.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</td>
-<td>195.441498</td>
-<td>194.661728</td>
-<td>195.931503</td>
-<td>195.441620</td>
-<td>193.550232</td>
-<td>193.550156</td>
-<td>195.801498</td>
-<td>195.703400</td>
-<td>197.072006</td>
-<td>196.962082</td>
-<td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000010</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000033</td>
-<td>0.0</td>
-<td>0.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</td>
-<td>195.441498</td>
-<td>194.661804</td>
-<td>195.931503</td>
-<td>195.441605</td>
-<td>193.550369</td>
-<td>193.550308</td>
-<td>195.801498</td>
-<td>195.703690</td>
-<td>197.072006</td>
-<td>196.962112</td>
-<td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000009</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000037</td>
-<td>0.0</td>
-<td>0.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</td>
-<td>195.441498</td>
-<td>194.661972</td>
-<td>195.931503</td>
-<td>195.441605</td>
-<td>193.550430</td>
-<td>193.550369</td>
-<td>195.801498</td>
-<td>195.703827</td>
-<td>197.072006</td>
-<td>196.962128</td>
-<td>...</td>
-<td>0.000004</td>
-<td>0.000003</td>
-<td>0.000001</td>
-<td>0.000005</td>
-<td>0.000009</td>
-<td>0.000003</td>
-<td>0.000002</td>
-<td>0.000039</td>
-<td>0.0</td>
-<td>0.0</td>
+<td><a href="#mikeio1d.result_network.ResultNodes.to_geopandas">to_geopandas</a></td>
+<td>Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.</td>
 </tr>
 </tbody>
 </table>
-
-<p>5 rows × 376 columns</p>
-</div>
-</div>
-</div>
+<section id="mikeio1d.result_network.ResultNodes.read" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNodes.read">read</h3>
+<p><code>result_network.ResultNodes.read(column_mode=None, include_derived=False)</code></p>
+<p>Read the time series data for all quantities at these locations into a DataFrame.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 80%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>column_mode</code></td>
+<td>str | ColumnMode(optional)</td>
+<td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>include_derived</code></td>
+<td>bool</td>
+<td>Include derived quantities.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="geodataframes" class="level2">
-<h2 class="anchored" data-anchor-id="geodataframes">GeoDataFrames</h2>
-<p>Locations collections can be extracted into a GeoDataFrame, both with and without quantities.</p>
-<div id="fa2ab060" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> res.reaches.to_geopandas()</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>gdf.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="locations_files/figure-html/cell-16-output-1.png" width="416" height="425" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="15f70fa4" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> res.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'max'</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>gdf.plot(column<span class="op">=</span><span class="st">'max_Discharge'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, cmap<span class="op">=</span><span class="st">'RdYlGn_r'</span>, legend<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="locations_files/figure-html/cell-17-output-1.png" width="491" height="425" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
 </section>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<ul>
-<li><a href="../examples/res1d_basic.html">Res1D Basics</a></li>
-<li><a href="../examples/res1d_export_to_shapefile.html">Res1D Export to shapefile</a></li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>There are also several notebook examples available on our <a href="">GitHub repository</a>https://github.com/DHI/mikeio1d/tree/main/notebooks.</p>
-</div>
-</div>
+<section id="mikeio1d.result_network.ResultNodes.to_geopandas" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultNodes.to_geopandas">to_geopandas</h3>
+<p><code>result_network.ResultNodes.to_geopandas(agg=None, agg_kwargs={}, include_derived=False)</code></p>
+<p>Convert nodes to a geopandas.GeoDataFrame, optionally with quantities.</p>
+<p>By default, quantities are not included. To include quantities, use the <code>agg</code> and <code>agg_kwargs</code> parameters.</p>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 10%">
+<col style="width: 78%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>agg</code></td>
+<td>str or callable</td>
+<td>Defines how to aggregate the quantities in time and space. Accepts any str or callable that is accepted by pandas.DataFrame.agg.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples" class="level4">
+<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<pre><code>- 'mean'  : mean value of all quantities
+- 'max'   : maximum value of all quantities
+-  np.max : maximum value of all quantities</code></pre>
+<p>agg_kwargs : dict, default {} Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}). include_derived: bool, default False Include derived quantities.</p>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>geopandas.GeoDataFrame</td>
+<td>A GeoDataFrame object with nodes as Point geometries.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-1" class="level4">
+<h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
+</section>
+</section>
+</section>
+</section>
+<section id="convert-nodes-to-a-geodataframe-without-quantities" class="level1">
+<h1>Convert nodes to a GeoDataFrame (without quantities)</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.nodes.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="convert-nodes-to-a-geodataframe-with-quantities" class="level1">
+<h1>Convert nodes to a GeoDataFrame (with quantities)</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.nodes.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
@@ -1249,18 +926,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../user-guide/res1d.html" class="pagination-link" aria-label="Res1D">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Res1D</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../user-guide/quantities.html" class="pagination-link" aria-label="Quantities">
-        <span class="nav-page-text">Quantities</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -1269,7 +934,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/locations.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+</div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
