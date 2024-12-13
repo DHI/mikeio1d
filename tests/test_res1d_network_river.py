@@ -236,7 +236,7 @@ def test_res1d_modification(test_file, column_mode, expected_exception):
     # Test the modification of ResultData and
     # saving the modified data to a new res1d file.
     df2 = df.multiply(2.0)
-    file_path = res1d.data.Connection.FilePath.Path
+    file_path = res1d.result_data.Connection.FilePath.Path
     file_path = file_path.replace("network_river.res1d", "network_river.mod.res1d")
 
     if expected_exception is not None:
@@ -322,7 +322,7 @@ def test_extraction_to_csv_dfs0_txt(test_file):
     res1d.reaches.WaterLevel.add()
     res1d.nodes.WaterLevel.add()
 
-    file_path = res1d.data.Connection.FilePath.Path
+    file_path = res1d.result_data.Connection.FilePath.Path
 
     file_path_csv = file_path.replace("network_river.res1d", "network_river.extract.csv")
     res1d.to_csv(file_path_csv, time_step_skipping_number=10)
@@ -342,7 +342,7 @@ def test_extraction_to_csv_dfs0_txt(test_file):
 
 def test_result_quantity_methods(test_file):
     res1d = test_file
-    file_path = res1d.data.Connection.FilePath.Path
+    file_path = res1d.result_data.Connection.FilePath.Path
     discharge_in_structure = res1d.structures.W_right.DischargeInStructure
 
     df = discharge_in_structure.to_dataframe()
@@ -364,7 +364,7 @@ def test_result_quantity_methods(test_file):
 
 def test_result_quantity_collection_methods(test_file):
     res1d = test_file
-    file_path = res1d.data.Connection.FilePath.Path
+    file_path = res1d.result_data.Connection.FilePath.Path
     discharge_in_structure = res1d.structures.DischargeInStructure
 
     df = discharge_in_structure.to_dataframe()

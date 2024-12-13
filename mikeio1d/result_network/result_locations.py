@@ -153,8 +153,8 @@ class ResultLocationsCreator(ABC):
         self.res1d = res1d
 
         self.quantity_label = "q_"
-        self.data: ResultData = res1d.data
-        self.data_items: IDataItems = res1d.data.DataItems
+        self.data: ResultData = res1d.result_data
+        self.data_items: IDataItems = res1d.result_data.DataItems
         self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
         self.result_quantity_derived_map: Dict[str, List[ResultQuantityDerived]] = {}
 

@@ -117,8 +117,8 @@ def test_get_catchment_values(test_file):
 def test_dotnet_methods(test_file):
     res1d = test_file
     # Just try to access the properties and methods in .net
-    res1d.data.ResultSpecs
-    res1d.data.Catchments
+    res1d.result_data.ResultSpecs
+    res1d.result_data.Catchments
     res1d.query.GetCatchmentValues("20_2_2", "TotalRunOff")
 
 

@@ -175,11 +175,11 @@ def test_get_reach_value(test_file):
 def test_dotnet_methods(test_file):
     res1d = test_file
     # Just try to access the properties and methods in .net
-    res1d.data.ResultSpecs
-    res1d.data.Nodes
+    res1d.result_data.ResultSpecs
+    res1d.result_data.Nodes
     res1d.query.GetNodeValues("1", "WaterLevel")
     res1d.query.GetReachValue(
-        "9l1", 5, "WaterLevel", res1d.data.StartTime
+        "9l1", 5, "WaterLevel", res1d.result_data.StartTime
     )  # must be dotnet datetime
     res1d.query.GetReachValues("9l1", 5, "WaterLevel")
     res1d.query.GetReachEndValues("9l1", "WaterLevel")  # avoid specifying chainage
@@ -291,7 +291,7 @@ def test_res1d_filter_time(test_file_path, time, expected_len, expected_start, e
     res1d = Res1D(test_file_path, time=time)
 
     res1d.reader.load_dynamic_data()
-    assert res1d.data.NumberOfTimeSteps == expected_len
+    assert res1d.result_data.NumberOfTimeSteps == expected_len
     assert res1d.time_index[0] == expected_start
     assert res1d.time_index[-1] == expected_end
 

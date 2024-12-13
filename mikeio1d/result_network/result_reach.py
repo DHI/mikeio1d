@@ -437,18 +437,18 @@ class ResultReachCreator(ResultLocationCreator):
 
     def _get_start_node(self) -> str:
         """Return the start node of the reach."""
-        return self.res1d.data.Nodes[self.reaches[0].StartNodeIndex].Id
+        return self.res1d.result_data.Nodes[self.reaches[0].StartNodeIndex].Id
 
     def _get_end_node(self) -> str:
         """Return the end node of the reach."""
-        return self.res1d.data.Nodes[self.reaches[-1].EndNodeIndex].Id
+        return self.res1d.result_data.Nodes[self.reaches[-1].EndNodeIndex].Id
 
     def _get_full_flow_discharge(self) -> float:
         """Return the full flow discharge of the reach."""
         ffd_quantity_type = Quantity.Create(PredefinedQuantity.FullReachDischarge)
 
         ffd_network_data = None
-        for nd in self.res1d.data.NetworkDatas:
+        for nd in self.res1d.result_data.NetworkDatas:
             if Quantity.ComparerDescription().Equals(nd.Quantity, ffd_quantity_type):
                 ffd_network_data = nd
                 break
@@ -467,8 +467,8 @@ class ResultReachCreator(ResultLocationCreator):
         reach = self._get_reach_for_chainage(chainage)
         start_chainage = reach.LocationSpan.StartChainage
         end_chainage = reach.LocationSpan.EndChainage
-        start_node = impl(self.res1d.data.Nodes[reach.StartNodeIndex])
-        end_node = impl(self.res1d.data.Nodes[reach.EndNodeIndex])
+        start_node = impl(self.res1d.result_data.Nodes[reach.StartNodeIndex])
+        end_node = impl(self.res1d.result_data.Nodes[reach.EndNodeIndex])
         start_ground_level = start_node.GroundLevel
         end_ground_level = end_node.GroundLevel
 
@@ -482,8 +482,8 @@ class ResultReachCreator(ResultLocationCreator):
         reach = self._get_reach_for_chainage(chainage)
         start_chainage = reach.LocationSpan.StartChainage
         end_chainage = reach.LocationSpan.EndChainage
-        start_node = impl(self.res1d.data.Nodes[reach.StartNodeIndex])
-        end_node = impl(self.res1d.data.Nodes[reach.EndNodeIndex])
+        start_node = impl(self.res1d.result_data.Nodes[reach.StartNodeIndex])
+        end_node = impl(self.res1d.result_data.Nodes[reach.EndNodeIndex])
         start_critical_level = getattr(start_node, "CriticalLevel", None)
         end_critical_level = getattr(end_node, "CriticalLevel", None)
 
