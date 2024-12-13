@@ -4,7 +4,7 @@
     "href": "index.html#requirements",
     "title": "MIKE IO 1D: input/output of MIKE 1D files in Python",
     "section": "Requirements",
-    "text": "Requirements\n\nWindows, Linux (experimental)\nPython x64 3.9 - 3.12\n(Windows) VC++ redistributables (already installed if you have MIKE)\n(Linux) .NET Runtime (not installed by default)"
+    "text": "Requirements\n\nWindows, Linux (experimental)\nPython x64 3.9 - 3.13\n(Windows) VC++ redistributables (already installed if you have MIKE)\n(Linux) .NET Runtime (not installed by default)"
   },
   {
     "objectID": "index.html#installation",
