@@ -25,9 +25,14 @@ coverage:
 	@pytest -c .pytest-ci.ini --disable-warnings --cov-report $${REPORT:-html} --cov=$(LIB) tests/
 
 docs: FORCE
-	cd docs && quarto add --no-prompt .
-	cd docs && quartodoc build
-	cd docs && quartodoc interlinks
-	quarto render docs
+	set -e; \
+	cd docs; \
+	quartodoc build; \
+	quarto render; \
+	if [ ! -f _site/index.html ]; then \
+        echo "Error: index.html not found. Quarto render failed."; \
+        exit 1; \
+    fi; \
+    cd -
 
 FORCE:
