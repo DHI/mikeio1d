@@ -43,21 +43,15 @@ def test_access_available_derived_quantities(res1d_network):
     assert isinstance(dq[0], str)
 
 
-def test_access_available_derived_quantities_nodes(
-    res1d_network, node_derived_quantity_id
-):
+def test_access_available_derived_quantities_nodes(res1d_network, node_derived_quantity_id):
     assert node_derived_quantity_id in res1d_network.derived_quantities
 
 
-def test_access_available_derived_quantities_reaches(
-    res1d_network, reach_derived_quantity_id
-):
+def test_access_available_derived_quantities_reaches(res1d_network, reach_derived_quantity_id):
     assert reach_derived_quantity_id in res1d_network.derived_quantities
 
 
-def test_available_derived_quantities_by_locations_nodes(
-    res1d_network, node_derived_quantity_id
-):
+def test_available_derived_quantities_by_locations_nodes(res1d_network, node_derived_quantity_id):
     assert node_derived_quantity_id in res1d_network.nodes.derived_quantities
     assert node_derived_quantity_id not in res1d_network.reaches.derived_quantities
 
@@ -73,24 +67,17 @@ def test_available_derived_quantities_by_single_location_node(
     res1d_network, node_derived_quantity_id
 ):
     assert node_derived_quantity_id in res1d_network.nodes["1"].derived_quantities
-    assert (
-        node_derived_quantity_id
-        not in res1d_network.reaches["100l1"].derived_quantities
-    )
+    assert node_derived_quantity_id not in res1d_network.reaches["100l1"].derived_quantities
 
 
 def test_available_Derived_quantities_by_single_location_reach(
     res1d_network, reach_derived_quantity_id
 ):
-    assert (
-        reach_derived_quantity_id in res1d_network.reaches["100l1"].derived_quantities
-    )
+    assert reach_derived_quantity_id in res1d_network.reaches["100l1"].derived_quantities
     assert reach_derived_quantity_id not in res1d_network.nodes["1"].derived_quantities
 
 
-def test_read_all_with_derived_quantities_nodes(
-    res1d_network, node_derived_quantity_id
-):
+def test_read_all_with_derived_quantities_nodes(res1d_network, node_derived_quantity_id):
     df = res1d_network.nodes.read(include_derived=True)
     assert isinstance(df, pd.DataFrame)
     assert len(df) > 0
@@ -98,9 +85,7 @@ def test_read_all_with_derived_quantities_nodes(
     assert node_derived_quantity_id in quantities
 
 
-def test_read_all_with_derived_quantities_reaches(
-    res1d_network, reach_derived_quantity_id
-):
+def test_read_all_with_derived_quantities_reaches(res1d_network, reach_derived_quantity_id):
     df = res1d_network.reaches.read(include_derived=True)
     assert isinstance(df, pd.DataFrame)
     assert len(df) > 0
@@ -108,9 +93,7 @@ def test_read_all_with_derived_quantities_reaches(
     assert reach_derived_quantity_id in quantities
 
 
-def test_read_derived_quantities_locations_nodes(
-    res1d_network, node_derived_quantity_id
-):
+def test_read_derived_quantities_locations_nodes(res1d_network, node_derived_quantity_id):
     derived_result_quantity = getattr(res1d_network.nodes, node_derived_quantity_id)
     df = derived_result_quantity.read()
     assert df is not None
@@ -119,9 +102,7 @@ def test_read_derived_quantities_locations_nodes(
     assert (df.columns.get_level_values("quantity") == node_derived_quantity_id).all()
 
 
-def test_read_derived_quantities_locations_reaches(
-    res1d_network, reach_derived_quantity_id
-):
+def test_read_derived_quantities_locations_reaches(res1d_network, reach_derived_quantity_id):
     derived_result_quantity = getattr(res1d_network.reaches, reach_derived_quantity_id)
     df = derived_result_quantity.read()
     assert df is not None
@@ -130,12 +111,8 @@ def test_read_derived_quantities_locations_reaches(
     assert (df.columns.get_level_values("quantity") == reach_derived_quantity_id).all()
 
 
-def test_read_derived_quantities_single_location_node(
-    res1d_network, node_derived_quantity_id
-):
-    derived_result_quantity = getattr(
-        res1d_network.nodes["1"], node_derived_quantity_id
-    )
+def test_read_derived_quantities_single_location_node(res1d_network, node_derived_quantity_id):
+    derived_result_quantity = getattr(res1d_network.nodes["1"], node_derived_quantity_id)
     df = derived_result_quantity.read()
     assert df is not None
     assert len(df) > 0
@@ -143,12 +120,8 @@ def test_read_derived_quantities_single_location_node(
     assert (df.columns.get_level_values("quantity") == node_derived_quantity_id).all()
 
 
-def test_read_derived_quantities_single_location_reach(
-    res1d_network, reach_derived_quantity_id
-):
-    derived_result_quantity = getattr(
-        res1d_network.reaches["100l1"], reach_derived_quantity_id
-    )
+def test_read_derived_quantities_single_location_reach(res1d_network, reach_derived_quantity_id):
+    derived_result_quantity = getattr(res1d_network.reaches["100l1"], reach_derived_quantity_id)
     df = derived_result_quantity.read()
     assert df is not None
     assert len(df) > 0
@@ -241,9 +214,7 @@ def test_custom_derived_quantity_example(res1d_network):
     assert_frame_equal(df_nodes, df_nodes_expected)
 
     df_reaches = res1d_network.reaches.WaterLevelPlusOne.read()
-    df_reaches_expected = (
-        res1d_network.reaches.WaterLevel.read(column_mode="compact") + 1
-    )
+    df_reaches_expected = res1d_network.reaches.WaterLevel.read(column_mode="compact") + 1
     df_reaches_expected = set_multiindex_level_values(
         df_reaches_expected, "quantity", "WaterLevelPlusOne"
     )

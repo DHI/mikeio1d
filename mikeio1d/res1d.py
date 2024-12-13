@@ -45,6 +45,10 @@ from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
+from .result_reader_writer.filter import Filter
+from .result_reader_writer.filter import TimeFilter
+from .result_reader_writer.filter import NameFilter
+from .result_reader_writer.filter import StepEveryFilter
 
 from .query import QueryDataCatchment  # noqa: F401
 from .query import QueryDataNode  # noqa: F401
@@ -138,28 +142,28 @@ class Res1D:
 
         self._issue_deprecation_warnings(kwargs)
 
-        lazy_load = kwargs.get("lazy_load", False)
         col_name_delimiter = kwargs.get("col_name_delimiter", NAME_DELIMITER)
         put_chainage_in_col_name = kwargs.get("put_chainage_in_col_name", True)
         clear_queue_after_reading = kwargs.get("clear_queue_after_reading", True)
-        header_load = kwargs.get("header_load", False)
         result_reader_type = kwargs.get("result_reader_type", ResultReaderType.COPIER)
 
         # endregion deprecation
 
+        self.filter = Filter(
+            [
+                NameFilter(reaches, nodes, catchments),
+                TimeFilter(time),
+                StepEveryFilter(step_every),
+            ]
+        )
+
         self.reader = ResultReaderCreator.create(
-            result_reader_type,
-            self,
-            file_path,
-            lazy_load,
-            header_load,
-            reaches,
-            nodes,
-            catchments,
-            col_name_delimiter,
-            put_chainage_in_col_name,
-            time=time,
-            step_every=step_every,
+            result_reader_type=result_reader_type,
+            res1d=self,
+            file_path=file_path,
+            col_name_delimiter=col_name_delimiter,
+            put_chainage_in_col_name=put_chainage_in_col_name,
+            filter=self.filter,
         )
 
         self.network = ResultNetwork(self)

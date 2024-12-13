@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Union
+    from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import Filter
 
 from datetime import datetime
 
@@ -14,22 +15,27 @@ import pandas as pd
 from System import DateTime
 from DHI.Mike1D.ResultDataAccess import Period
 
-from ..dotnet import to_dotnet_datetime
+from .filter import SubFilter
+from ...dotnet import to_dotnet_datetime
 
 
-class TimeFilter:
+class TimeFilter(SubFilter):
     """Wrapper class for applying time filters to a Filter object."""
 
-    def __init__(self, filter):
-        self._filter = filter
+    def __init__(self, time: None | slice | tuple | list):
+        self._time = time
 
-    def setup_from_user_params(self, *, time: Union[None, slice, tuple, list]):
-        """Set up the filter using a user supplied parameters."""
-        if time is None:
+    def use_filter(self) -> bool:
+        """Check if the filter should be used."""
+        return self._time is not None
+
+    def apply(self, filter: Filter, result_data: ResultData | None = None):
+        """Apply the filter to the provided Filter object."""
+        if not self.use_filter():
             return
 
+        time = self._time
         start, end = None, None
-
         if isinstance(time, slice):
             start = time.start
             end = time.stop
@@ -44,21 +50,17 @@ class TimeFilter:
         if end is not None:
             end = pd.to_datetime(end)
 
-        self.add_period(start, end)
+        period = self.create_period(start, end)
+        filter.Periods.Add(period)
 
-    def add_period(self, start: Union[None, datetime], end: Union[None, datetime]):
-        """Add a period to the filter."""
-        if start is None and end is None:
-            raise ValueError("Either start or end must be provided")
-
+    def create_period(self, start: None | datetime, end: None | datetime) -> Period:
+        """Create a DHI.Mike1D.ResultDataAccess.Period object."""
         start = to_dotnet_datetime(start) if start else DateTime.MinValue
         end = to_dotnet_datetime(end) if end else DateTime.MaxValue
 
         start, end = self._adjust_start_and_end(start, end)
 
-        period = Period(start, end)
-
-        self._filter.Periods.Add(period)
+        return Period(start, end)
 
     def _adjust_start_and_end(self, start, end):
         """Adjust start and end times to conservatively ensure they are inclusive."""
