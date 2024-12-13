@@ -559,6 +559,21 @@ class Res1D:
         return self.reader.data
 
     @property
+    def result_type(self) -> str:
+        """Specifies what type of result file Res1D is.
+
+        Possible values:
+        - Unknown
+        - HD
+        - RR
+        - HDRR
+        - LTSEvents
+        - LTSAnnual
+        - LTSMonthly
+        """
+        return self.result_data.ResultType.ToString()
+
+    @property
     def projection_string(self) -> str:
         """Projection string of the result file."""
         return self.data.ProjectionString
