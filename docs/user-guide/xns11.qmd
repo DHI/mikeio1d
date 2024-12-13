@@ -12,26 +12,30 @@ xns
 ```
 
 ## Cross section collections
-Each Xns11 object contains a collection of cross sections via the `xsections` attribute.
+Each Xns11 object is a collection of cross sections (CrossSectionCollection) with a file path.
 ```{python}
-xns.xsections
+from mikeio1d.cross_sections import CrossSectionCollection
+
+print(xns.file_path)
+
+isinstance(xns, CrossSectionCollection)
 ```
 
 ### Overview
 An overview of a cross section collection can be obtained by calling the 'to_dataframe' method.
 ```{python}
-xns.xsections.to_dataframe()
+xns.to_dataframe()
 ```
 
 ### Indexing
 Cross section collections are dict-like and can be indexed by a tuple of location ID, chainage, and topo ID.
 
 ```{python}
-xns.xsections['basin_left1', '122.042', '1']
+xns['basin_left1', '122.042', '1']
 ```
 Alternatively, the location ID, chainage, and topo ID can be explicitly expressed with the `sel` method.
 ```{python}
-xns.xsections.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
+xns.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
 ```
 
 ### Slicing
@@ -39,29 +43,30 @@ xns.xsections.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
 Cross section collections can be sliced by location ID, chainage, or topo ID.
 
 ```{python}
-xns.xsections['basin_left1'] # all cross sections at location 'basin_left1'
+xns['basin_left1'] # all cross sections at location 'basin_left1'
 ```
 
 ```{python}
-xns.xsections[:, '122.042'] # all cross sections at chainage '122.042'
+xns[:, '122.042'] # all cross sections at chainage '122.042'
 ```
 
 ```{python}
-xns.xsections[:,:,'1'] # all cross sections with topo ID '1'
+xns[:,:,'1'] # all cross sections with topo ID '1'
 ```
 
 ### Combining
 Cross section collections can be combined into a new collection.
 ```{python}
-new_collection = xns.xsections['basin_left1', '2.004'] | xns.xsections['basin_left1', '210.212']
+sections = [*xns['basin_left1', '2.004'], *xns['basin_left1', '210.212']]
+new_collection = Xns11(sections)
 new_collection.to_dataframe()
 ```
 
 ### Adding a cross section
-A new cross section can be added to a collection with the `add_xsection` method.
+A new cross section can be added to a collection with the `add` method.
 ```{python}
-xs_to_add = xns.xsections.sel(location_id='basin_left1', chainage='33.774', topo_id='1')
-new_collection.add_xsection(xs_to_add)
+xs_to_add = xns.sel(location_id='basin_left1', chainage='33.774', topo_id='1')
+new_collection.add(xs_to_add)
 new_collection.to_dataframe()
 ```
 
@@ -135,7 +140,7 @@ xs.processed.head()
 
 Cross section collections can be extracted into a GeoDataFrame.
 ```{python}
-gdf = xns.xsections.to_geopandas()
+gdf = xns.to_geopandas()
 gdf.head()
 ```
 
@@ -145,13 +150,13 @@ gdf.plot(column='location_id', cmap='tab20', legend=True)
 It is also possible to extract cross section markers as GeoDataFrames.
 
 ```{python}
-gdf = xns.xsections.to_geopandas_markers()
+gdf = xns.to_geopandas(mode='markers')
 gdf.head()
 ```
 
 ```{python}
-ax = xns.xsections.to_geopandas().plot()
-xns.xsections.to_geopandas_markers().plot(ax=ax, column='marker', markersize=9, legend=True)
+ax = xns.to_geopandas().plot()
+xns.to_geopandas(mode='markers').plot(ax=ax, column='marker', markersize=9, legend=True)
 ```
 
 ## Examples
