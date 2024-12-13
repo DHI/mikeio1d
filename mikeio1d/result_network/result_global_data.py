@@ -62,7 +62,7 @@ class ResultGlobalData(ResultLocation):
             IRes1DDataSet object associated with ResultGlobalData.
 
         """
-        return self.res1d.data.GlobalData
+        return self.res1d.result_data.GlobalData
 
     def get_query(self, data_item: IDataItem) -> QueryDataGlobal:
         """Get a QueryDataGlobal for given data item."""

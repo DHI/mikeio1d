@@ -54,7 +54,7 @@ class ResultGlobalDatasCreator(ResultLocationsCreator):
     ----------
     result_global_data_list : list of ResultGlobalData objects
         list of all ResultGlobalData objects corresponding to
-        all res1d.data.GlobalData.DataItems.
+        all res1d.result_data.GlobalData.DataItems.
 
     """
 

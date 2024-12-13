@@ -200,12 +200,12 @@ class Res1D:
             info.append(f"Start time: {str(self.start_time)}")
             info.append(f"End time: {str(self.end_time)}")
             info.append(f"# Timesteps: {str(self.reader.number_of_time_steps)}")
-            info.append(f"# Catchments: {self.data.Catchments.get_Count()}")
-            info.append(f"# Nodes: {self.data.Nodes.get_Count()}")
-            info.append(f"# Reaches: {self.data.Reaches.get_Count()}")
+            info.append(f"# Catchments: {self.result_data.Catchments.get_Count()}")
+            info.append(f"# Nodes: {self.result_data.Nodes.get_Count()}")
+            info.append(f"# Reaches: {self.result_data.Reaches.get_Count()}")
 
-            info.append(f"# Globals: {self.data.GlobalData.DataItems.Count}")
-            for i, quantity in enumerate(self.data.Quantities):
+            info.append(f"# Globals: {self.result_data.GlobalData.DataItems.Count}")
+            for i, quantity in enumerate(self.result_data.Quantities):
                 info.append(f"{i} - {ResultQuantity.prettify_quantity(quantity)}")
 
         info = str.join("\n", info)
@@ -331,10 +331,10 @@ class Res1D:
 
         """
         self.reader.load_dynamic_data()
-        connection_original = self.data.Connection
-        self.data.Connection = Connection.Create(file_path)
-        self.data.Save()
-        self.data.Connection = connection_original
+        connection_original = self.result_data.Connection
+        self.result_data.Connection = Connection.Create(file_path)
+        self.result_data.Save()
+        self.result_data.Connection = connection_original
 
     def extract(
         self,
@@ -372,7 +372,7 @@ class Res1D:
         data_entries = [t.to_data_entry(self) for t in timeseries_ids]
 
         extractor = ExtractorCreator.create(
-            ext, file_path, data_entries, self.data, time_step_skipping_number
+            ext, file_path, data_entries, self.result_data, time_step_skipping_number
         )
         extractor.export()
 
@@ -498,12 +498,12 @@ class Res1D:
     @property
     def start_time(self) -> datetime:
         """Start time of the result file."""
-        return from_dotnet_datetime(self.data.StartTime)
+        return from_dotnet_datetime(self.result_data.StartTime)
 
     @property
     def end_time(self) -> datetime:
         """End time of the result file."""
-        return from_dotnet_datetime(self.data.EndTime)
+        return from_dotnet_datetime(self.result_data.EndTime)
 
     @property
     def number_of_time_steps(self) -> int:
@@ -576,7 +576,7 @@ class Res1D:
     @property
     def projection_string(self) -> str:
         """Projection string of the result file."""
-        return self.data.ProjectionString
+        return self.result_data.ProjectionString
 
     # region deprecation
 
