@@ -180,7 +180,6 @@ class Res1D:
         warn_deprecation(
             "header_load", "Dynamic data is read lazily, so header_load is not needed."
         )
-        warn_deprecation("result_reader_type", "Use res1d.result_reader_type instead.")
 
     def _init_derived_quantities(
         self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
