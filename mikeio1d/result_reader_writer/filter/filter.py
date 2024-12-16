@@ -27,6 +27,8 @@ class Filter:
 
     def apply(self, result_data: ResultData):
         """Apply filter."""
+        if not self.use_filter():
+            return
         for sub_filter in self.sub_filters:
             sub_filter.apply(self._filter, result_data)
         result_data.Parameters.Filter = self._filter

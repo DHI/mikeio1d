@@ -49,6 +49,7 @@ from .result_reader_writer.filter import Filter
 from .result_reader_writer.filter import TimeFilter
 from .result_reader_writer.filter import NameFilter
 from .result_reader_writer.filter import StepEveryFilter
+from .result_reader_writer.filter import QuantityFilter
 
 from .query import QueryDataCatchment  # noqa: F401
 from .query import QueryDataNode  # noqa: F401
@@ -97,6 +98,8 @@ class Res1D:
         Start and end time of the data to read. Using None will read all data.
     step_every : int | None
         Number specifying the time step frequency to output. None outputs all time steps.
+    quantities : list[str] | None
+        Quantities to filter by (e.g. 'WaterLevel', 'Discharge'). None includes all.
     derived_quantities : list[str] | None
         Derived quantities to include when pre-loading dynamic results. None includes all.
 
@@ -135,6 +138,7 @@ class Res1D:
         catchments: Optional[list[str]] = None,
         time: Union[tuple[str], list[str], slice, None] = None,
         step_every: Optional[int] = None,
+        quantities: Optional[list[str]] = None,
         derived_quantities: Optional[list[str]] = None,
         **kwargs,
     ):
@@ -154,6 +158,7 @@ class Res1D:
                 NameFilter(reaches, nodes, catchments),
                 TimeFilter(time),
                 StepEveryFilter(step_every),
+                QuantityFilter(quantities),
             ]
         )
 
