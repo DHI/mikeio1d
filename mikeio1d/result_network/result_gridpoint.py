@@ -82,7 +82,7 @@ class ResultGridPoint(ResultLocation):
     @property
     def reach_name(self):
         """Name of reach the gridpoint is on."""
-        return self.reach.Name
+        return self._creator.reach.Name
 
     @property
     def chainage(self):
