@@ -308,6 +308,23 @@ def test_res1d_filter_step_every(test_file_path, step_every):
     assert res1d.data.NumberOfTimeSteps == expected_steps
 
 
+def test_res1d_filter_quantity_invalid_id(test_file_path):
+    with pytest.raises(ValueError):
+        Res1D(test_file_path, quantities=["InvalidQuantity"])
+
+
+@pytest.mark.parametrize("quantities", [["WaterLevel"], ["WaterLevel", "Discharge"]])
+def test_res1d_filter_quantity(test_file_path, quantities):
+    res = Res1D(test_file_path, quantities=quantities)
+
+    quantities = set(quantities)
+    assert quantities.issuperset(set(res.nodes.quantities))
+    assert quantities.issuperset(set(res.catchments.quantities))
+    assert quantities.issuperset(set(res.structures.quantities))
+    assert quantities.issuperset(set(res.reaches.quantities.keys()))
+    assert quantities.issuperset(set(res.reaches[res.reaches.names[0]].quantities))
+
+
 def test_node_attributes(test_file):
     res1d = test_file
     nodes = res1d.nodes
