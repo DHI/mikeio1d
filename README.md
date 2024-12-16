@@ -44,8 +44,8 @@ Check out the [official documentation for MIKE IO 1D](https://dhi.github.io/mike
 
 ### Read network results into a DataFrame
 ```python
->>>  from mikeio1d import Res1D
->>>  res = Res1D('my_results.res1d')
+>>>  import mikeio1d
+>>>  res = mikeio1d.read('my_results.res1d')
 >>>  df = res.read()
 
 >>>  df_reach = res.reaches['my_reach'].Discharge.read()
@@ -54,11 +54,11 @@ Check out the [official documentation for MIKE IO 1D](https://dhi.github.io/mike
 
 ### Read Xns11 file and plot a cross section
 ```python
->>>  from mikeio1d import Xns11
+>>>  import mikeio1d
 
 # Plot section with location id 'basin_right', chainage '238.800', and topo id '1'.
->>>  xns = Xns11("mikep_cs_demo.xns11")
->>>  xns.xsections['basin_right', '238.800', '1'].plot()
+>>>  xns = mikeio1d.read("mikep_cs_demo.xns11")
+>>>  xns['basin_right', '238.800', '1'].plot()
 ```
 ![Geometry](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/xns11_geometry.png)
 
