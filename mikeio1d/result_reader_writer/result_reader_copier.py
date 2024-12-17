@@ -142,10 +142,10 @@ class ResultReaderCopier(ResultReader):
         timeseries_ids_set = set()
         for data_set in self.data.DataSets:
             data_set = impl(data_set)
-            if not self.is_data_set_included(data_set):
-                continue
 
             for data_item in data_set.DataItems:
+                if not self.res1d.filter.is_data_item_included(data_item):
+                    continue
                 data_item = impl(data_item)
                 for i in range(data_item.NumberOfElements):
                     data_entry = DataEntryNet(data_item, i)
