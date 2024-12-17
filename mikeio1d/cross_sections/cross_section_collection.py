@@ -236,6 +236,14 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         """The DHI.Mike1D.CrossSectionModule.CrossSectionData object."""
         return self._cross_section_data
 
+    @property
+    def data(self) -> CrossSectionData:
+        """The DHI.Mike1D.CrossSectionModule.CrossSectionData object.
+
+        Alias for 'cross_section_data' property.
+        """
+        return self._cross_section_data
+
     def add(self, cross_section: CrossSection):
         """Add a cross section to the collection.
 

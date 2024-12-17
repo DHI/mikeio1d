@@ -559,6 +559,14 @@ class Res1D:
         return self.reader.data
 
     @property
+    def data(self) -> ResultData:
+        """.NET object ResultData with the loaded res1d data.
+
+        Alias for 'result_data' property.
+        """
+        return self.reader.data
+
+    @property
     def result_type(self) -> str:
         """Specifies what type of result file Res1D is.
 
@@ -579,15 +587,6 @@ class Res1D:
         return self.result_data.ProjectionString
 
     # region deprecation
-
-    @property
-    def data(self) -> ResultData:
-        """Deprecated. Use 'result_data' instead."""
-        warnings.warn(
-            "The 'data' parameter will be deprecated in 1.0. Use 'result_data' instead.",
-            FutureWarning,
-        )
-        return self.reader.data
 
     def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
         """Read all data from res1d file to dataframe. Deprecated, use read() instead."""
