@@ -209,6 +209,9 @@ class ResultLocationCreator(ABC):
         element_index: int = 0,
     ):
         """Set a single quantity attribute on the obj."""
+        if not self.res1d.filter.is_data_item_included(data_item):
+            return
+
         m1d_dataset = self.result_location.get_m1d_dataset(data_item)
         result_quantity = ResultQuantity(obj, data_item, self.res1d, m1d_dataset, element_index)
         self.res1d.network._add_result_quantity_to_map(result_quantity)

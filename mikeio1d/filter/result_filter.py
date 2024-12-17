@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import IDataItem
 
 from DHI.Mike1D.ResultDataAccess import Filter
 
@@ -32,6 +33,10 @@ class ResultFilter:
         for sub_filter in self.sub_filters:
             sub_filter.apply(self._filter, result_data)
         result_data.Parameters.Filter = self._filter
+
+    def is_data_item_included(self, data_item: IDataItem) -> bool:
+        """Check if a data item is included in the filter."""
+        return self._filter.Include(data_item)
 
     @property
     def res1d_filter(self) -> Filter:

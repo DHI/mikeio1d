@@ -131,10 +131,11 @@ class ResultReader(ABC):
         else:
             self.data.LoadHeader(self.diagnostics)
 
-    def _load_file(self):
-        if self.filter.use_filter():
-            self.filter.apply(self.data)
+        # IMPORTANT: The filter must be applied after the header is loaded. Applying the filter before loading the header
+        #            causes unexpected results due to a bug in MIKE 1D.
+        self.filter.apply(self.data)
 
+    def _load_file(self):
         if self.file_extension.lower() in [".resx", ".crf", ".prf", ".xrf"]:
             self.data.Load(self.diagnostics)
             # required since ResultData.Load() creates new network objects, invalidating ResultNetwork references
