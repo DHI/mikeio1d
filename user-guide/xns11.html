@@ -340,7 +340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Xns11 is the main interface for accessing cross section data.</p>
 <section id="opening-files" class="level2">
 <h2 class="anchored" data-anchor-id="opening-files">Opening files</h2>
-<div id="480e334d" class="cell" data-execution_count="1">
+<div id="a7ac81b6" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Xns11</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>xns <span class="op">=</span> Xns11(<span class="st">'../data/mikep_cs_demo.xns11'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>xns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -352,7 +352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="cross-section-collections" class="level2">
 <h2 class="anchored" data-anchor-id="cross-section-collections">Cross section collections</h2>
 <p>Each Xns11 object is a collection of cross sections (CrossSectionCollection) with a file path.</p>
-<div id="102636dd" class="cell" data-execution_count="2">
+<div id="a02658dc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d.cross_sections <span class="im">import</span> CrossSectionCollection</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(xns.file_path)</span>
@@ -368,7 +368,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="overview" class="level3">
 <h3 class="anchored" data-anchor-id="overview">Overview</h3>
 <p>An overview of a cross section collection can be obtained by calling the ‘to_dataframe’ method.</p>
-<div id="76c07295" class="cell" data-execution_count="3">
+<div id="937ed29a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>xns.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
@@ -459,14 +459,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="indexing" class="level3">
 <h3 class="anchored" data-anchor-id="indexing">Indexing</h3>
 <p>Cross section collections are dict-like and can be indexed by a tuple of location ID, chainage, and topo ID.</p>
-<div id="022d7353" class="cell" data-execution_count="4">
+<div id="b82185fd" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>xns[<span class="st">'basin_left1'</span>, <span class="st">'122.042'</span>, <span class="st">'1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>&lt;CrossSection: basin_left1, 122.042, 1&gt;</code></pre>
 </div>
 </div>
 <p>Alternatively, the location ID, chainage, and topo ID can be explicitly expressed with the <code>sel</code> method.</p>
-<div id="07030805" class="cell" data-execution_count="5">
+<div id="ec61df3d" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>xns.sel(location_id<span class="op">=</span><span class="st">'basin_left1'</span>, chainage<span class="op">=</span><span class="st">'122.042'</span>, topo_id<span class="op">=</span><span class="st">'1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>&lt;CrossSection: basin_left1, 122.042, 1&gt;</code></pre>
@@ -476,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="slicing" class="level3">
 <h3 class="anchored" data-anchor-id="slicing">Slicing</h3>
 <p>Cross section collections can be sliced by location ID, chainage, or topo ID.</p>
-<div id="cbf28a9a" class="cell" data-execution_count="6">
+<div id="47c71184" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>xns[<span class="st">'basin_left1'</span>] <span class="co"># all cross sections at location 'basin_left1'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>[&lt;CrossSection: basin_left1, 2.004, 1&gt;,
@@ -493,13 +493,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  &lt;CrossSection: basin_left1, 481.451, 1&gt;]</code></pre>
 </div>
 </div>
-<div id="6f3679eb" class="cell" data-execution_count="7">
+<div id="93c24adc" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>xns[:, <span class="st">'122.042'</span>] <span class="co"># all cross sections at chainage '122.042'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>[&lt;CrossSection: basin_left1, 122.042, 1&gt;]</code></pre>
 </div>
 </div>
-<div id="e855f3e3" class="cell" data-execution_count="8">
+<div id="a75080c2" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>xns[:,:,<span class="st">'1'</span>] <span class="co"># all cross sections with topo ID '1'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>[&lt;CrossSection: basin_left1, 2.004, 1&gt;,
@@ -552,7 +552,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="combining" class="level3">
 <h3 class="anchored" data-anchor-id="combining">Combining</h3>
 <p>Cross section collections can be combined into a new collection.</p>
-<div id="61338654" class="cell" data-execution_count="9">
+<div id="c01c0fd0" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sections <span class="op">=</span> [<span class="op">*</span>xns[<span class="st">'basin_left1'</span>, <span class="st">'2.004'</span>], <span class="op">*</span>xns[<span class="st">'basin_left1'</span>, <span class="st">'210.212'</span>]]</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>new_collection <span class="op">=</span> Xns11(sections)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>new_collection.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -597,7 +597,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="adding-a-cross-section" class="level3">
 <h3 class="anchored" data-anchor-id="adding-a-cross-section">Adding a cross section</h3>
 <p>A new cross section can be added to a collection with the <code>add</code> method.</p>
-<div id="56805a09" class="cell" data-execution_count="10">
+<div id="209ac1c4" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>xs_to_add <span class="op">=</span> xns.sel(location_id<span class="op">=</span><span class="st">'basin_left1'</span>, chainage<span class="op">=</span><span class="st">'33.774'</span>, topo_id<span class="op">=</span><span class="st">'1'</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>new_collection.add(xs_to_add)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>new_collection.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -648,7 +648,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="cross-sections" class="level2">
 <h2 class="anchored" data-anchor-id="cross-sections">Cross sections</h2>
 <p>A cross section is uniquely identified by its location ID, chainage, and topo ID.</p>
-<div id="bd5992b0" class="cell" data-execution_count="11">
+<div id="2a49c599" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> xns.xsections[<span class="st">'basin_left1'</span>, <span class="st">'122.042'</span>, <span class="st">'1'</span>]</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>xs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
@@ -658,7 +658,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="plotting" class="level3">
 <h3 class="anchored" data-anchor-id="plotting">Plotting</h3>
 <p>Cross sections can be plotted directly with the <code>plot</code> method.</p>
-<div id="47abb3fd" class="cell" data-execution_count="12">
+<div id="6fa8a197" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>xs.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -672,7 +672,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="raw-data" class="level3">
 <h3 class="anchored" data-anchor-id="raw-data">Raw data</h3>
 <p>The raw data of a cross section can be accessed via the <code>raw</code> attribute.</p>
-<div id="18fc4d5c" class="cell" data-execution_count="13">
+<div id="29a9689d" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> xs.raw</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
@@ -738,7 +738,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Raw data is modifiable by setting the ‘raw’ attribute with a new DataFrame of the same column names.</p>
-<div id="c84f440c" class="cell" data-execution_count="14">
+<div id="66eaed87" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_modified <span class="op">=</span> xs.raw</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>df_modified[<span class="st">'z'</span>] <span class="op">=</span> df_modified[<span class="st">'z'</span>] <span class="op">+</span> <span class="dv">1000</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>xs.raw <span class="op">=</span> df_modified</span>
@@ -755,7 +755,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="markers" class="level3">
 <h3 class="anchored" data-anchor-id="markers">Markers</h3>
 <p>Markers can be viewed with the <code>markers</code> attribute.</p>
-<div id="d49aa4b7" class="cell" data-execution_count="15">
+<div id="4bb71bbf" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>xs.markers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div>
@@ -814,7 +814,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Set and unset markers with the <code>set_marker</code> and <code>unset_marker</code> methods. Alternatively, reassign a modified marker DataFrame like is done for raw data.</p>
-<div id="c2a89d0d" class="cell" data-execution_count="16">
+<div id="d13d1e45" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>xs.set_marker(<span class="dv">42</span>, <span class="dv">50</span>) <span class="co"># set a user-defined marker '42' at the closest point to x=50</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>xs.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -825,7 +825,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="be7c494e" class="cell" data-execution_count="17">
+<div id="69384408" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>xs.unset_marker(<span class="dv">42</span>) <span class="co"># unset the user-defined marker '42'</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>xs.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -840,7 +840,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="processed-data" class="level3">
 <h3 class="anchored" data-anchor-id="processed-data">Processed data</h3>
 <p>Processed data is accessible via the <code>processed</code> attribute.</p>
-<div id="66332f89" class="cell" data-execution_count="18">
+<div id="31607745" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> xs.processed</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
@@ -918,7 +918,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Processed data is modifiable by setting the ‘processed’ attribute with a new DataFrame of the same column names.</p>
-<div id="e0ea41db" class="cell" data-execution_count="19">
+<div id="a09e1c35" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df_modified <span class="op">=</span> xs.processed</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>df_modified[<span class="st">'level'</span>] <span class="op">=</span> df_modified[<span class="st">'level'</span>] <span class="op">-</span><span class="dv">500</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>xs.processed <span class="op">=</span> df_modified</span>
@@ -998,7 +998,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>To recalculate processed datd based on the raw data, call the <code>recompute_processed</code> method.</p>
-<div id="58ae2954" class="cell" data-execution_count="20">
+<div id="a0e2eb0b" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>xs.processed_allow_recompute <span class="op">=</span> <span class="va">True</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>xs.recompute_processed()</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>xs.processed.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1081,7 +1081,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="geodataframes" class="level2">
 <h2 class="anchored" data-anchor-id="geodataframes">GeoDataFrames</h2>
 <p>Cross section collections can be extracted into a GeoDataFrame.</p>
-<div id="fff63882" class="cell" data-execution_count="21">
+<div id="7ce059ff" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> xns.to_geopandas()</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>gdf.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
@@ -1140,7 +1140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="62c871c8" class="cell" data-execution_count="22">
+<div id="49627572" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>gdf.plot(column<span class="op">=</span><span class="st">'location_id'</span>, cmap<span class="op">=</span><span class="st">'tab20'</span>, legend<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -1151,7 +1151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>It is also possible to extract cross section markers as GeoDataFrames.</p>
-<div id="49a155dd" class="cell" data-execution_count="23">
+<div id="1c1abd4b" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> xns.to_geopandas(mode<span class="op">=</span><span class="st">'markers'</span>)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>gdf.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="23">
@@ -1222,7 +1222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cb1d1c4b" class="cell" data-execution_count="24">
+<div id="b56f63f7" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> xns.to_geopandas().plot()</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>xns.to_geopandas(mode<span class="op">=</span><span class="st">'markers'</span>).plot(ax<span class="op">=</span>ax, column<span class="op">=</span><span class="st">'marker'</span>, markersize<span class="op">=</span><span class="dv">9</span>, legend<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
