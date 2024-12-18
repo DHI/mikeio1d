@@ -15,11 +15,11 @@ import pandas as pd
 from System import DateTime
 from DHI.Mike1D.ResultDataAccess import Period
 
-from .filter import SubFilter
-from ...dotnet import to_dotnet_datetime
+from . import ResultSubFilter
+from ..dotnet import to_dotnet_datetime
 
 
-class TimeFilter(SubFilter):
+class TimeFilter(ResultSubFilter):
     """Wrapper class for applying time filters to a Filter object."""
 
     def __init__(self, time: None | slice | tuple | list):

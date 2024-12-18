@@ -9,7 +9,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import Filter
 
 
-from .filter import SubFilter
+from . import ResultSubFilter
 
 from DHI.Mike1D.ResultDataAccess import DataItemFilterQuantity
 from DHI.Mike1D.Generic import Quantity
@@ -17,7 +17,7 @@ from DHI.Mike1D.Generic import PredefinedQuantity
 from DHI.Mike1D.Generic import PredefinedQuantityTable
 
 
-class QuantityFilter(SubFilter):
+class QuantityFilter(ResultSubFilter):
     """Wrapper class for applying time filters to a Filter object."""
 
     def __init__(
@@ -36,10 +36,10 @@ class QuantityFilter(SubFilter):
         if not self.use_filter():
             return
 
-        data_item_filter = self.create_data_item_filter(result_data)
+        data_item_filter = self.create_data_item_filter()
         filter.AddDataItemFilter(data_item_filter)
 
-    def create_data_item_filter(self, result_data: ResultData) -> DataItemFilterQuantity:
+    def create_data_item_filter(self) -> DataItemFilterQuantity:
         """Create DataItemFilterName object."""
         data_item_filter = DataItemFilterQuantity()
 

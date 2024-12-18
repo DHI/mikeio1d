@@ -8,7 +8,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
     from ..res1d import Res1D
-    from .filter import Filter
+    from ..filter import ResultFilter
 
 import warnings
 
@@ -83,7 +83,7 @@ class ResultReader(ABC):
         file_path=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        filter: Filter = None,
+        filter: ResultFilter = None,
     ):
         self.res1d: Res1D = res1d
 
@@ -194,7 +194,7 @@ class ResultReader(ABC):
         if not self.filter.use_filter():
             return True
 
-        m1d_filter = self.filter.m1d_filter
+        m1d_filter = self.filter.res1d_filter
         for data_item in data_set.DataItems:
             if m1d_filter.Include(data_item):
                 return True

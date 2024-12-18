@@ -8,17 +8,17 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import ResultData
 
-from DHI.Mike1D.ResultDataAccess import Filter as Mike1DFilter
+from DHI.Mike1D.ResultDataAccess import Filter
 
 
-class Filter:
+class ResultFilter:
     """Wrapper class for applying subfilters to a Filter object."""
 
     def __init__(
         self,
-        sub_filters: list[SubFilter],
+        sub_filters: list[ResultSubFilter],
     ):
-        self._filter = Mike1DFilter()
+        self._filter = Filter()
         self.sub_filters = sub_filters
 
     def use_filter(self) -> bool:
@@ -34,17 +34,12 @@ class Filter:
         result_data.Parameters.Filter = self._filter
 
     @property
-    def m1d_filter(self) -> Filter:
+    def res1d_filter(self) -> Filter:
         """.NET DHI.Mike1D.ResultDataAccess.Filter object."""
         return self._filter
 
-    @property
-    def filtered_reaches(self) -> list[str]:
-        """List of filtered reach names."""
-        return self._filter.FilteredReaches
 
-
-class SubFilter(Protocol):
+class ResultSubFilter(Protocol):
     """Class for configuring Filter objects."""
 
     def apply(self, filter: Filter, result_data: ResultData | None) -> None:

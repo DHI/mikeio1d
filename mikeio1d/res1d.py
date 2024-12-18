@@ -45,11 +45,11 @@ from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
-from .result_reader_writer.filter import Filter
-from .result_reader_writer.filter import TimeFilter
-from .result_reader_writer.filter import NameFilter
-from .result_reader_writer.filter import StepEveryFilter
-from .result_reader_writer.filter import QuantityFilter
+from .filter import ResultFilter
+from .filter import TimeFilter
+from .filter import NameFilter
+from .filter import StepEveryFilter
+from .filter import QuantityFilter
 
 from .query import QueryDataCatchment  # noqa: F401
 from .query import QueryDataNode  # noqa: F401
@@ -153,7 +153,7 @@ class Res1D:
 
         # endregion deprecation
 
-        self.filter = Filter(
+        self.filter = ResultFilter(
             [
                 NameFilter(reaches, nodes, catchments),
                 TimeFilter(time),

@@ -9,12 +9,12 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import Filter
 
 
-from .filter import SubFilter
+from . import ResultSubFilter
 
 from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 
 
-class NameFilter(SubFilter):
+class NameFilter(ResultSubFilter):
     """Wrapper class for applying time filters to a Filter object."""
 
     def __init__(
