@@ -331,7 +331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>Locations are where model results exist in the <a href="../user-guide/network.html">Network</a>. The main location types are nodes, reaches, gridpoints, and catchments.</p>
 <div class="hidden">
-<div id="6ce06594" class="cell" data-execution_count="1">
+<div id="d0a5f241" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res_catchments <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -343,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="location-collections" class="level3">
 <h3 class="anchored" data-anchor-id="location-collections">Location collections</h3>
 <p>Access location collections from a <a href="../user-guide/res1d.html">Res1D</a> object. Each collection shows available quantities and location IDs.</p>
-<div id="1751bb69" class="cell" data-execution_count="2">
+<div id="5e820ba4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 &lt;ResultNodes&gt; (119)
@@ -357,7 +357,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
 </div>
 </div>
-<div id="36ba5050" class="cell" data-execution_count="3">
+<div id="5ba8b43f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.reaches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 &lt;ResultReaches&gt; (118)
@@ -371,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
 </div>
 </div>
-<div id="0f34e1ce" class="cell" data-execution_count="4">
+<div id="d1529ca6" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res_catchments.catchments</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 &lt;ResultCatchments&gt; (31)
@@ -402,7 +402,7 @@ Note
 <section id="single-locations" class="level3">
 <h3 class="anchored" data-anchor-id="single-locations">Single locations</h3>
 <p>Access a single location by indexing its respective collection with its unique ID. Each location shows available quantities and static properties.</p>
-<div id="a4ac1806" class="cell" data-execution_count="5">
+<div id="db0890d9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 &lt;Manhole: 1&gt;
@@ -416,7 +416,7 @@ Note
     <details><summary>Attributes (8)</summary><ul><li>id: 1</li><li>type: Manhole</li><li>xcoord: -687934.6000976562</li><li>ycoord: -1056500.69921875</li><li>ground_level: 197.07000732421875</li><li>bottom_level: 195.0500030517578</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
 </div>
 </div>
-<div id="6e4d4a38" class="cell" data-execution_count="6">
+<div id="08514e0d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 &lt;Reach: 100l1&gt;
@@ -430,7 +430,7 @@ Note
     <details><summary>Attributes (9)</summary><ul><li>name: 100l1</li><li>length: 47.6827148432828</li><li>start_chainage: 0.0</li><li>end_chainage: 47.6827148432828</li><li>n_gridpoints: 3</li><li>start_node: 100</li><li>end_node: 99</li><li>height: 0.30000001192092896</li><li>full_flow_discharge: 0.12058743359507902</li></ul></details><details><summary>Quantities (2)</summary><ul><li>Water level (m)</li><li>Discharge (m^3/s)</li></ul></details><details><summary>Derived Quantities (6)</summary><ul><li>ReachAbsoluteDischarge</li><li>ReachFilling</li><li>ReachFlooding</li><li>ReachQQManning</li><li>ReachWaterDepth</li><li>ReachWaterLevelAboveCritical</li></ul></details>
 </div>
 </div>
-<div id="be215cc2" class="cell" data-execution_count="7">
+<div id="e4d48801" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># gridpoint on reach 100l1 at chainage 23.841</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="st">'23.841'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -456,13 +456,13 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p>Gridpoints can also be indexed by number instead of chainage. For example:</p>
-<div id="fe8ff749" class="cell" data-execution_count="8">
+<div id="5452ca82" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="dv">0</span>]  <span class="co"># first gridpoint</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>res.reaches[<span class="st">'100l1'</span>][<span class="op">-</span><span class="dv">1</span>] <span class="co"># last gridpoint</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
-<div id="b851d3fa" class="cell" data-execution_count="9">
+<div id="775ce330" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res_catchments.catchments[<span class="st">'100_16_16'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 &lt;Catchment: 100_16_16&gt;
@@ -481,13 +481,13 @@ Tip
 <section id="quantities" class="level2">
 <h2 class="anchored" data-anchor-id="quantities">Quantities</h2>
 <p><a href="../user-guide/quantities.html">Quantities</a> are the actual model results. Each single location or location collection has associated quantities.</p>
-<div id="aa84ec24" class="cell" data-execution_count="10">
+<div id="4634e8d1" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>&lt;QuantityCollection (119): Water level (m)&gt;</code></pre>
 </div>
 </div>
-<div id="0d138c13" class="cell" data-execution_count="11">
+<div id="cc0e5dc8" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].WaterLevel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>&lt;Quantity: Water level (m)&gt;</code></pre>
@@ -556,7 +556,7 @@ Can’t find a which location a quantity belongs to?
 <section id="static-attributes" class="level2">
 <h2 class="anchored" data-anchor-id="static-attributes">Static attributes</h2>
 <p>Each location has a set of static attributes.</p>
-<div id="68b2edb8" class="cell" data-execution_count="12">
+<div id="9a356a89" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'1'</span>].ground_level</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>197.07000732421875</code></pre>
@@ -566,7 +566,7 @@ Can’t find a which location a quantity belongs to?
 <section id="reading-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-data">Reading data</h2>
 <p>All result data for a single location or location collection can be read into a pandas DataFrame.</p>
-<div id="98b3518a" class="cell" data-execution_count="13">
+<div id="bba7fc0e" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'100l1'</span>].read()</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
@@ -619,7 +619,7 @@ Can’t find a which location a quantity belongs to?
 </div>
 </div>
 </div>
-<div id="7b056191" class="cell" data-execution_count="14">
+<div id="47ac7e9f" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches.read()</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
@@ -785,7 +785,7 @@ Can’t find a which location a quantity belongs to?
 <section id="geodataframes" class="level2">
 <h2 class="anchored" data-anchor-id="geodataframes">GeoDataFrames</h2>
 <p>Locations collections can be extracted into a GeoDataFrame, both with and without quantities.</p>
-<div id="b86c1bff" class="cell" data-execution_count="15">
+<div id="e78f60be" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> res.reaches.to_geopandas()</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>gdf.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -796,7 +796,7 @@ Can’t find a which location a quantity belongs to?
 </div>
 </div>
 </div>
-<div id="221f7045" class="cell" data-execution_count="16">
+<div id="37f57ac5" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> res.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'max'</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>gdf.plot(column<span class="op">=</span><span class="st">'max_Discharge'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, cmap<span class="op">=</span><span class="st">'RdYlGn_r'</span>, legend<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">

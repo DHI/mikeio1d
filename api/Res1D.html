@@ -330,7 +330,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mikeio1d.Res1D" class="level1">
 <h1>Res1D</h1>
-<p><code>Res1D(self, file_path=None, reaches=None, nodes=None, catchments=None, time=None, derived_quantities=None, **kwargs)</code></p>
+<p><code>Res1D(self, file_path=None, reaches=None, nodes=None, catchments=None, time=None, step_every=None, quantities=None, derived_quantities=None, **kwargs)</code></p>
 <p>Class for reading data from 1D network result files.</p>
 <p>Currently supported formats are:</p>
 <ul>
@@ -389,6 +389,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>None</code></td>
 </tr>
 <tr class="even">
+<td><code>step_every</code></td>
+<td>int | None</td>
+<td>Number specifying the time step frequency to output. None outputs all time steps.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td><code>quantities</code></td>
+<td>list[str] | None</td>
+<td>Quantities to filter by (e.g.&nbsp;‘WaterLevel’, ‘Discharge’). None includes all.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
 <td><code>derived_quantities</code></td>
 <td>list[str] | None</td>
 <td>Derived quantities to include when pre-loading dynamic results. None includes all.</td>
@@ -414,6 +426,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> times <span class="op">=</span> <span class="bu">slice</span>(<span class="st">'2020-01-01'</span>, <span class="st">'2020-01-02'</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res1d <span class="op">=</span> Res1D(<span class="st">'MyRes1D.res1d'</span>, nodes<span class="op">=</span>nodes, reaches<span class="op">=</span>reaches, time<span class="op">=</span>times)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res1d.read()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Only read every second time step:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res1d <span class="op">=</span> Res1D(<span class="st">'MyRes1D.res1d'</span>, step_every<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res1d.read()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="attributes" class="level2">
 <h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
@@ -872,8 +887,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-1" class="level4">
 <h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res <span class="op">=</span> Res1D(<span class="st">'results.res1d'</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res1d.read()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res <span class="op">=</span> Res1D(<span class="st">'results.res1d'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res1d.read()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="mikeio1d.Res1D.read_all" class="level3">
@@ -947,8 +962,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-2" class="level4">
 <h4 class="anchored" data-anchor-id="examples-2">Examples</h4>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res11_data <span class="op">=</span> Res1D(<span class="st">'results.res11'</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res11_data.save(<span class="st">'results.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res11_data <span class="op">=</span> Res1D(<span class="st">'results.res11'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res11_data.save(<span class="st">'results.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="mikeio1d.Res1D.to_csv" class="level3">
