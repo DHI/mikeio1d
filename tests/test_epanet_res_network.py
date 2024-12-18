@@ -159,7 +159,7 @@ def test_dotnet_methods(test_file):
 
 def test_epanet_res_filter(test_file_path, helpers):
     nodes = ["10", "11"]
-    reaches = ["11"]
+    reaches = ["10"]
     epanet_res = Res1D(test_file_path, nodes=nodes, reaches=reaches)
 
     df_flow_10 = epanet_res.read(QueryDataReach("Flow", "10"))

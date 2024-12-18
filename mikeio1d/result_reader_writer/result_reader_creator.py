@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict
     from .result_reader import ResultReader
+    from ..filter import ResultFilter
 
 from ..various import NAME_DELIMITER
 
@@ -29,14 +30,9 @@ class ResultReaderCreator:
         result_reader_type,
         res1d,
         file_path=None,
-        lazy_load=False,
-        header_load=False,
-        reaches=None,
-        nodes=None,
-        catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        time=None,
+        filter: ResultFilter = None,
     ) -> ResultReader:
         """Create a ResultReader object based on the provided type."""
         reasult_readers: Dict[ResultReaderType, ResultReader] = {
@@ -47,14 +43,9 @@ class ResultReaderCreator:
         reader = reasult_readers.get(result_reader_type, None)
 
         return reader(
-            res1d,
-            file_path,
-            lazy_load,
-            header_load,
-            reaches,
-            nodes,
-            catchments,
-            col_name_delimiter,
-            put_chainage_in_col_name,
-            time=time,
+            res1d=res1d,
+            file_path=file_path,
+            col_name_delimiter=col_name_delimiter,
+            put_chainage_in_col_name=put_chainage_in_col_name,
+            filter=filter,
         )

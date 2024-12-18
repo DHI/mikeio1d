@@ -45,6 +45,11 @@ from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
+from .filter import ResultFilter
+from .filter import TimeFilter
+from .filter import NameFilter
+from .filter import StepEveryFilter
+from .filter import QuantityFilter
 
 from .query import QueryDataCatchment  # noqa: F401
 from .query import QueryDataNode  # noqa: F401
@@ -91,6 +96,10 @@ class Res1D:
         Catchment IDs to include when pre-loading dynamic results. None includes all.
     time: slice | tuple[str] | list[str] | None
         Start and end time of the data to read. Using None will read all data.
+    step_every : int | None
+        Number specifying the time step frequency to output. None outputs all time steps.
+    quantities : list[str] | None
+        Quantities to filter by (e.g. 'WaterLevel', 'Discharge'). None includes all.
     derived_quantities : list[str] | None
         Derived quantities to include when pre-loading dynamic results. None includes all.
 
@@ -116,6 +125,9 @@ class Res1D:
     >>> res1d = Res1D('MyRes1D.res1d', nodes=nodes, reaches=reaches, time=times)
     >>> res1d.read()
 
+    Only read every second time step:
+    >>> res1d = Res1D('MyRes1D.res1d', step_every=2)
+    >>> res1d.read()
     """
 
     def __init__(
@@ -125,6 +137,8 @@ class Res1D:
         nodes: Optional[list[str]] = None,
         catchments: Optional[list[str]] = None,
         time: Union[tuple[str], list[str], slice, None] = None,
+        step_every: Optional[int] = None,
+        quantities: Optional[list[str]] = None,
         derived_quantities: Optional[list[str]] = None,
         **kwargs,
     ):
@@ -132,27 +146,29 @@ class Res1D:
 
         self._issue_deprecation_warnings(kwargs)
 
-        lazy_load = kwargs.get("lazy_load", False)
         col_name_delimiter = kwargs.get("col_name_delimiter", NAME_DELIMITER)
         put_chainage_in_col_name = kwargs.get("put_chainage_in_col_name", True)
         clear_queue_after_reading = kwargs.get("clear_queue_after_reading", True)
-        header_load = kwargs.get("header_load", False)
         result_reader_type = kwargs.get("result_reader_type", ResultReaderType.COPIER)
 
         # endregion deprecation
 
+        self.filter = ResultFilter(
+            [
+                NameFilter(reaches, nodes, catchments),
+                TimeFilter(time),
+                StepEveryFilter(step_every),
+                QuantityFilter(quantities),
+            ]
+        )
+
         self.reader = ResultReaderCreator.create(
-            result_reader_type,
-            self,
-            file_path,
-            lazy_load,
-            header_load,
-            reaches,
-            nodes,
-            catchments,
-            col_name_delimiter,
-            put_chainage_in_col_name,
-            time=time,
+            result_reader_type=result_reader_type,
+            res1d=self,
+            file_path=file_path,
+            col_name_delimiter=col_name_delimiter,
+            put_chainage_in_col_name=put_chainage_in_col_name,
+            filter=self.filter,
         )
 
         self.network = ResultNetwork(self)

@@ -33,27 +33,17 @@ class ResultReaderCopier(ResultReader):
         self,
         res1d,
         file_path=None,
-        lazy_load=False,
-        header_load=False,
-        reaches=None,
-        nodes=None,
-        catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        time=None,
+        filter=None,
     ):
         ResultReader.__init__(
             self,
-            res1d,
-            file_path,
-            lazy_load,
-            header_load,
-            reaches,
-            nodes,
-            catchments,
-            col_name_delimiter,
-            put_chainage_in_col_name,
-            time=time,
+            res1d=res1d,
+            file_path=file_path,
+            col_name_delimiter=col_name_delimiter,
+            put_chainage_in_col_name=put_chainage_in_col_name,
+            filter=filter,
         )
 
         self.result_data_copier = ResultDataCopier(self.data)
@@ -152,10 +142,10 @@ class ResultReaderCopier(ResultReader):
         timeseries_ids_set = set()
         for data_set in self.data.DataSets:
             data_set = impl(data_set)
-            if not self.is_data_set_included(data_set):
-                continue
 
             for data_item in data_set.DataItems:
+                if not self.res1d.filter.is_data_item_included(data_item):
+                    continue
                 data_item = impl(data_item)
                 for i in range(data_item.NumberOfElements):
                     data_entry = DataEntryNet(data_item, i)

@@ -8,6 +8,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
     from ..res1d import Res1D
+    from ..filter import ResultFilter
 
 import warnings
 
@@ -23,13 +24,11 @@ from ..dotnet import from_dotnet_datetime
 from ..dotnet import pythonnet_implementation as impl
 from ..various import NAME_DELIMITER
 from ..quantities import TimeSeriesId
-from .time_filter import TimeFilter
 from ..result_network import ResultNetwork
 
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
 from DHI.Mike1D.ResultDataAccess import ResultDataSearch
-from DHI.Mike1D.ResultDataAccess import Filter
 from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 from DHI.Mike1D.ResultDataAccess import ResultTypes
 
@@ -82,29 +81,18 @@ class ResultReader(ABC):
         self,
         res1d,
         file_path=None,
-        lazy_load=False,
-        header_load=False,
-        reaches=None,
-        nodes=None,
-        catchments=None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        time=None,
+        filter: ResultFilter = None,
     ):
         self.res1d: Res1D = res1d
 
         self.file_path = file_path
         self.file_extension = os.path.splitext(file_path)[-1]
 
-        self.lazy_load = lazy_load
+        self.lazy_load = False
 
-        self._reaches = reaches if reaches else []
-        self._nodes = nodes if nodes else []
-        self._catchments = catchments if catchments else []
-        self._time = time
-
-        self.use_filter = any([reaches, nodes, catchments, time])
-
+        self.filter = filter
         self._loaded = False
 
         self._load_header()
@@ -138,22 +126,16 @@ class ResultReader(ABC):
         if self.lazy_load:
             self.data.Connection.BridgeName = "res1dlazy"
 
-        if self.use_filter:
+        if self.filter.use_filter():
             self.data.LoadHeader(True, self.diagnostics)
         else:
             self.data.LoadHeader(self.diagnostics)
 
+        # IMPORTANT: The filter must be applied after the header is loaded. Applying the filter before loading the header
+        #            causes unexpected results due to a bug in MIKE 1D.
+        self.filter.apply(self.data)
+
     def _load_file(self):
-        if self.use_filter:
-            self._setup_filter()
-
-            for reach in self._reaches:
-                self._add_reach(reach)
-            for node in self._nodes:
-                self._add_node(node)
-            for catchment in self._catchments:
-                self._add_catchment(catchment)
-
         if self.file_extension.lower() in [".resx", ".crf", ".prf", ".xrf"]:
             self.data.Load(self.diagnostics)
             # required since ResultData.Load() creates new network objects, invalidating ResultNetwork references
@@ -166,28 +148,6 @@ class ResultReader(ABC):
         if not self._loaded:
             self._load_file()
             self._loaded = True
-
-    def _setup_filter(self):
-        """Set up the filter for result data object."""
-        if not self.use_filter:
-            return
-
-        self.data_filter = Filter()
-        self.time_filter = TimeFilter(self.data_filter)
-        self.time_filter.setup_from_user_params(time=self._time)
-        self.data_subfilter = DataItemFilterName(self.data)
-        self.data_filter.AddDataItemFilter(self.data_subfilter)
-
-        self.data.Parameters.Filter = self.data_filter
-
-    def _add_reach(self, reach_id):
-        self.data_subfilter.Reaches.Add(reach_id)
-
-    def _add_node(self, node_id):
-        self.data_subfilter.Nodes.Add(node_id)
-
-    def _add_catchment(self, catchment_id):
-        self.data_subfilter.Catchments.Add(catchment_id)
 
     # endregion File loading
 
@@ -232,10 +192,14 @@ class ResultReader(ABC):
 
     def is_data_set_included(self, data_set):
         """Skip filtered data sets."""
-        name = self.get_data_set_name(data_set)
-        if self.use_filter and name not in self._catchments + self._reaches + self._nodes:
-            return False
-        return True
+        if not self.filter.use_filter():
+            return True
+
+        m1d_filter = self.filter.res1d_filter
+        for data_item in data_set.DataItems:
+            if m1d_filter.Include(data_item):
+                return True
+        return False
 
     @property
     def query(self):
