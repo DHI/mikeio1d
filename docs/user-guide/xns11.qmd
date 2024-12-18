@@ -2,7 +2,7 @@
 title: Xns11
 ---
 
-Xns11 is the main interface for accessing cross section data.
+[](`~mikeio1d.Xns11`) is the main interface for accessing cross section data.
 
 ## Opening files
 ```{python}
@@ -12,7 +12,7 @@ xns
 ```
 
 ## Cross section collections
-Each Xns11 object is a collection of cross sections (CrossSectionCollection) with a file path.
+Each [](`~mikeio1d.Xns11`) object is a collection of cross sections ([](`~mikeio1d.cross_sections.CrossSectionCollection`)) with a file path.
 ```{python}
 from mikeio1d.cross_sections import CrossSectionCollection
 
@@ -22,25 +22,25 @@ isinstance(xns, CrossSectionCollection)
 ```
 
 ### Overview
-An overview of a cross section collection can be obtained by calling the 'to_dataframe' method.
+An overview of a cross section collection can be obtained by calling the [](`~mikeio1d.Xns11.to_dataframe`) method.
 ```{python}
 xns.to_dataframe()
 ```
 
 ### Indexing
-Cross section collections are dict-like and can be indexed by a tuple of location ID, chainage, and topo ID.
+Cross section collections are dict-like and can be indexed by a tuple of location ID, chainage, and topo ID. The values are [](`~mikeio1d.cross_sections.CrossSection`) objects.
 
 ```{python}
 xns['basin_left1', '122.042', '1']
 ```
-Alternatively, the location ID, chainage, and topo ID can be explicitly expressed with the `sel` method.
+Alternatively, the location ID, chainage, and topo ID can be explicitly expressed with the [](`~mikeio1d.Xns11.sel`) method.
 ```{python}
 xns.sel(location_id='basin_left1', chainage='122.042', topo_id='1')
 ```
 
 ### Slicing
 
-Cross section collections can be sliced by location ID, chainage, or topo ID.
+Cross section collections can be sliced by location ID, chainage, or topo ID. This returns a list of [](`~mikeio1d.cross_sections.CrossSection`) objects.
 
 ```{python}
 xns['basin_left1'] # all cross sections at location 'basin_left1'
@@ -63,7 +63,7 @@ new_collection.to_dataframe()
 ```
 
 ### Adding a cross section
-A new cross section can be added to a collection with the `add` method.
+A new cross section can be added to a collection with the [](`~mikeio1d.Xns11.add`) method.
 ```{python}
 xs_to_add = xns.sel(location_id='basin_left1', chainage='33.774', topo_id='1')
 new_collection.add(xs_to_add)
@@ -78,19 +78,19 @@ xs
 ```
 
 ### Plotting
-Cross sections can be plotted directly with the `plot` method.
+Cross sections can be plotted directly with the [](`~mikeio1d.cross_sections.CrossSection.plot`) method.
 ```{python}
 xs.plot()
 ```
 
 ### Raw data
-The raw data of a cross section can be accessed via the `raw` attribute.
+The raw data of a cross section can be accessed via the [](`~mikeio1d.cross_sections.CrossSection.raw`) attribute.
 ```{python}
 df = xs.raw
 df.head()
 ```
 
-Raw data is modifiable by setting the 'raw' attribute with a new DataFrame of the same column names.
+Raw data is modifiable by setting the [](`~mikeio1d.cross_sections.CrossSection.raw`) attribute with a new DataFrame of the same column names.
 ```{python}
 df_modified = xs.raw
 df_modified['z'] = df_modified['z'] + 1000
@@ -99,12 +99,12 @@ xs.plot()
 ```
 
 ### Markers
-Markers can be viewed with the `markers` attribute.
+Markers can be viewed with the [](`~mikeio1d.cross_sections.CrossSection.markers`) attribute.
 ```{python}
 xs.markers
 ```
 
-Set and unset markers with the `set_marker` and `unset_marker` methods. Alternatively, reassign a modified marker DataFrame like is done for raw data.
+Set and unset markers with the [](`~mikeio1d.cross_sections.CrossSection.set_marker`) and [](`~mikeio1d.cross_sections.CrossSection.unset_marker`) methods. Alternatively, reassign a modified marker DataFrame like is done for raw data.
 ```{python}
 xs.set_marker(42, 50) # set a user-defined marker '42' at the closest point to x=50
 xs.plot()
@@ -116,20 +116,20 @@ xs.plot()
 ```
 
 ### Processed data
-Processed data is accessible via the `processed` attribute.
+Processed data is accessible via the [](`~mikeio1d.cross_sections.CrossSection.processed`) attribute.
 ```{python}
 df = xs.processed
 df.head()
 ```
 
-Processed data is modifiable by setting the 'processed' attribute with a new DataFrame of the same column names.
+Processed data is modifiable by setting the [](`~mikeio1d.cross_sections.CrossSection.processed`) attribute with a new DataFrame of the same column names.
 ```{python}
 df_modified = xs.processed
 df_modified['level'] = df_modified['level'] -500
 xs.processed = df_modified
 xs.processed.head()
 ```
-To recalculate processed datd based on the raw data, call the `recompute_processed` method.
+To recalculate processed datd based on the raw data, call the [](`~mikeio1d.cross_sections.CrossSection.recompute_processed`) method.
 ```{python}
 xs.processed_allow_recompute = True
 xs.recompute_processed()
@@ -138,7 +138,7 @@ xs.processed.head()
 
 ## GeoDataFrames
 
-Cross section collections can be extracted into a GeoDataFrame.
+Cross section collections can be extracted into a GeoDataFrame with [](`~mikeio1d.Xns11.to_geopandas`).
 ```{python}
 gdf = xns.to_geopandas()
 gdf.head()

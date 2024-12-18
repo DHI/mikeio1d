@@ -36,10 +36,10 @@ website:
     search: true
     contents: 
       - section: "User Guide"
-        href: user-guide/getting-started.qmd
+        href: user-guide/overview.qmd
         contents:
-          - text: Getting Started
-            href: user-guide/getting-started.qmd
+          - text: Overview
+            href: user-guide/overview.qmd
           - text: Network
             href: user-guide/network.qmd
           - text: Res1D
@@ -78,6 +78,9 @@ interlinks:
         url: https://pandas.pydata.org/docs/
       scipy: 
         url: https://docs.scipy.org/doc/scipy/
+      quartodoc-test:
+        url: https://machow.github.io/quartodoc/
+        inv: objects-test.txt
 
 quartodoc:
   style: pkgdown
@@ -95,32 +98,38 @@ quartodoc:
   - title: Main
     desc: ''
     contents:
-    - name: Res1D
-    - name: Xns11
+    - open
+    - Res1D
+    - Xns11
   - title: Locations
     desc: ''
     contents:
-    - name: result_network.ResultNode
-    - name: result_network.ResultNodes
-    - name: result_network.ResultReach
-    - name: result_network.ResultReaches
-    - name: result_network.ResultGridPoint
-    - name: result_network.ResultCatchment
-    - name: result_network.ResultCatchments
-    - name: result_network.ResultGlobalData
-    - name: result_network.ResultGlobalDatas
+    - result_network.ResultLocation
+    - result_network.ResultLocations
+    - result_network.ResultNode
+    - result_network.ResultNodes
+    - result_network.ResultReach
+    - result_network.ResultReaches
+    - result_network.ResultGridPoint
+    - result_network.ResultCatchment
+    - result_network.ResultCatchments
+    - result_network.ResultGlobalData
+    - result_network.ResultGlobalDatas
   - title: Quantities
     desc: ''
     contents:
-    - name: result_network.ResultQuantity
-    - name: result_network.ResultQuantityCollection
+    - result_network.ResultQuantity
+    - result_network.ResultQuantityCollection
   - title: Cross sections
     desc: ''
     contents:
-    - name: cross_sections.CrossSection
-    - name: cross_sections.CrossSectionCollection
+    - cross_sections.CrossSection
+    - cross_sections.CrossSectionCollection
     
 format:
   html:
+    theme: cosmo
+    toc: true
+  ipynb: 
     theme: cosmo
     toc: true

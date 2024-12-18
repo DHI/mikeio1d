@@ -11,11 +11,11 @@ MIKE IO 1D treats SWMM and Res1D results in the same way, so you may also refer 
 :::
 
 ```{python}	
-from mikeio1d import Res1D
+import mikeio1d
 ```
 
 ```{python}	
-res = Res1D("../data/swmm.out")
+res = mikeio1d.open("../data/swmm.out")
 res.info()
 ```
 
