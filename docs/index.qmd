@@ -1,29 +1,32 @@
 ![](images/logo/MIKE-IO-1D-Logo-Pos-RGB-nomargin.png)
 
 # MIKE IO 1D: input/output of MIKE 1D files in Python
-
-![Python version](https://img.shields.io/pypi/pyversions/mikeio1d.svg) [![PyPI version](https://badge.fury.io/py/mikeio1d.svg)](https://badge.fury.io/py/mikeio1d)
+ ![Python version](https://img.shields.io/pypi/pyversions/mikeio1d.svg)
+ [![Full test](https://github.com/DHI/mikeio1d/actions/workflows/full_test.yml/badge.svg)](https://github.com/DHI/mikeio1d/actions/workflows/full_test.yml)
+[![PyPI version](https://badge.fury.io/py/mikeio1d.svg)](https://badge.fury.io/py/mikeio1d)
+![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Linux-blue)
+![Downloads](https://img.shields.io/pypi/dm/mikeio1d)
 
 Read, manipulate, and analyze res1d, res, resx, out, and xns11 files.
 
-For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files), refer to [MIKE IO](https://github.com/DHI/mikeio)
+> For other MIKE files (dfs0, dfs1, dfs2, dfsu, and mesh files), refer to [MIKE IO](https://github.com/DHI/mikeio)
+> 
+> Most users of MIKE IO 1D will also find [MIKE+Py](https://github.com/DHI/mikepluspy) of interest.
 
-::: callout-warning
-MIKE IO 1D is under development and could be subject to changes.
-:::
+## Getting started
 
-## Requirements
-
--   Windows, Linux (experimental)
--   Python x64 3.9 - 3.13
--   (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads%3E) (already installed if you have MIKE)
--   (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
-
-## Installation
+### Installation
 
 ```bash
 pip install mikeio1d
 ```
+
+::: {.callout-note collapse="true" title="Requirements"}
+-   Windows, Linux
+-   Python x64 3.9 - 3.13
+-   (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads%3E) (already installed if you have MIKE)
+-   (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
+:::
 
 ::: {.callout-tip collapse="true" title="Using MIKE IO 1D with Linux?"}
 Linux users will need to install .NET runtime. If you're on the development branch, you need .NET SDK. Ubuntu users can install these dependencies as follows:
@@ -37,17 +40,55 @@ sudo apt install dotnet-sdk-8.0
 ```
 :::
 
-## Getting started
+### Read network results
+
+Use [](`mikeio1d.open`) to create a [Res1D](user-guide/res1d.qmd) object, then [](`~mikeio1d.Res1D.read`) its content into a [](`~pandas.DataFrame`).
 
 ```{python}
-from mikeio1d import Res1D
+import mikeio1d
 
-res = Res1D("data/network.res1d")
+res = mikeio1d.open("data/network.res1d")
 df = res.read()
 df.head()
 ```
 
-Read more in the [getting started guide](user-guide/getting-started.qmd).
+Request more specific data by using the [Res1D](user-guide/res1d.qmd) object to select specific [Locations](user-guide/locations.qmd).
+
+```{python}
+df = res.reaches['100l1'].read()
+df.head()
+```
+
+Similarly, select a specific [Quantity](user-guide/quantities.qmd) that you can both [](`~mikeio1d.result_network.ResultQuantity.read`) and [](`~mikeio1d.result_network.ResultQuantity.plot`).
+
+```{python}
+res.nodes['100'].WaterLevel.plot()
+```
+
+### Read cross section data
+
+Use [](`mikeio1d.open`) to create an [Xns11](user-guide/xns11.qmd) object, then get a [](`~pandas.DataFrame`) overview of its content.
+
+```{python}
+xns = mikeio1d.open("data/mikep_cs_demo.xns11")
+xns.to_dataframe()
+```
+
+Select a specific [](`~mikeio1d.cross_sections.CrossSection`) using [](`~mikeio1d.Xns11.sel`), then plot it with [](`~mikeio1d.cross_sections.CrossSection.plot`).
+
+```{python}
+xs = xns.sel(location_id="basin_left1", chainage=122.042, topo_id='1')
+xs.plot()
+```
+
+## Learn more
+
+Continue your learning journey with any of these resources:
+
+1. [User Guide](user-guide/overview.qmd): covers fundamentals with short code examples.
+2. [Examples](examples/index.qmd): various notebook examples.
+
+We recommend starting with the User Guide, however, feel free to also hop directly into the examples.
 
 ## Where can I get help?
 

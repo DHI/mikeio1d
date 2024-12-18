@@ -44,15 +44,6 @@ class CrossSection:
     m1d_cross_section: ICrossSection
         The MIKE 1D cross section object.
 
-    Attributes
-    ----------
-    location_id : str (required)
-        Location ID of the cross section.
-    chainage : float (required)
-        Chainage of the cross section.
-    topo_id : str (required)
-        Topo ID of the cross section.
-
     Notes
     -----
     Support is currently limited to open cross sections with raw data.
@@ -63,7 +54,6 @@ class CrossSection:
     >>> x = [0, 10, 20, 30, 40, 50]
     >>> z = [0, 2, 3, 4, 3, 0]
     >>> cs = CrossSection.from_xz(x, z, location_id="loc1", chainage=100, topo_id="topo1")
-
     """
 
     def __init__(self, m1d_cross_section: ICrossSection):
@@ -223,33 +213,15 @@ class CrossSection:
 
     @property
     def resistance_type(self) -> ResistanceType:
-        """The type of resistance used by the cross section.
+        """int, ResistanceType: The type of resistance used by the cross section.
 
-        Parameters
-        ----------
-        resistance_type: int | ResistanceType
-            The type of resistance used in the cross section:
-
-            0 - Relative
-
-            1 - Manning's n
-
-            2 - Manning's M
-
-            3 - Chezy number
-
-            4 - Darcy-Weisbach
-
-            5 - Colebrook White
-
-            6 - Hazen Williams
-
-
-        Returns
-        -------
-        ResistanceType
-            The type of resistance used in the cross section.
-
+        0 - Relative
+        1 - Manning's n
+        2 - Manning's M
+        3 - Chezy number
+        4 - Darcy-Weisbach
+        5 - Colebrook White
+        6 - Hazen Williams
         """
         return ResistanceType(
             int(self._m1d_cross_section.BaseCrossSection.FlowResistance.Formulation)
@@ -263,28 +235,13 @@ class CrossSection:
 
     @property
     def resistance_distribution(self) -> ResistanceDistribution:
-        """The distribution of resistance used in the cross section.
-
-        Parameters
-        ----------
-        The resistance distribution is represented by an integer value:
+        """int, ResistanceDistribution: The distribution of resistance used in the cross section.
 
         0 - Uniform
-
         1 - Zones
-
         2 - Distributed
-
         3 - Constant
-
         4 - ExponentVarying
-
-
-        Returns
-        -------
-        ResistanceDistribution
-            The distribution of resistance used in the cross section.
-
         """
         return ResistanceDistribution(
             int(self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceDistribution)
@@ -306,21 +263,11 @@ class CrossSection:
 
     @property
     def resistance_left_high_flow(self) -> float:
-        """Resistance for the left high flow zone.
-
-        Parameters
-        ----------
-        resistance_left_high_flow: float
-            Resistance for the left high flow zone.
+        """float: Resistance for the left high flow zone.
 
         Notes
         -----
         This property is only relevant if the resistance distribution is set to zones.
-
-        Returns
-        -------
-        float
-
         """
         self._warn_if_resistance_distribution_is_not_zones()
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLeftHighFlow
@@ -331,22 +278,12 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLeftHighFlow = value
 
     @property
-    def resistance_low_flow(self):
-        """Resistance for the low flow zone.
-
-        Parameters
-        ----------
-        resistance_low_flow: float
-            Resistance for the low flow zone.
+    def resistance_low_flow(self) -> float:
+        """float: Resistance for the low flow zone.
 
         Notes
         -----
         This property is only relevant if the resistance distribution is set to zones.
-
-        Returns
-        -------
-        float
-
         """
         self._warn_if_resistance_distribution_is_not_zones()
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLowFlow
@@ -357,22 +294,12 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceLowFlow = value
 
     @property
-    def resistance_right_high_flow(self):
-        """Resistance for the right high flow zone.
-
-        Parameters
-        ----------
-        resistance_right_high_flow: float
-            Resistance for the right high flow zone.
+    def resistance_right_high_flow(self) -> float:
+        """float: Resistance for the right high flow zone.
 
         Notes
         -----
         This property is only relevant if the resistance distribution is set to zones.
-
-        Returns
-        -------
-        float
-
         """
         self._warn_if_resistance_distribution_is_not_zones()
         return self._m1d_cross_section.BaseCrossSection.FlowResistance.ResistanceRightHighFlow
@@ -384,24 +311,11 @@ class CrossSection:
 
     @property
     def radius_type(self) -> RadiusType:
-        """The type of hydraulic radius used in the cross section.
+        """int, RadiusType: The type of hydraulic radius used in the cross section.
 
-        Parameters
-        ----------
-        radius_type: int | RadiusType
-            The type of hydraulic radius used in the cross section:
-
-            0 - Resistance radius
-
-            1 - Hydraulic radius, effective area
-
-            2 - Hydraulic radius, total area
-
-        Returns
-        -------
-        RadiusType
-            The type of hydraulic radius used in the cross section.
-
+        0 - Resistance radius
+        1 - Hydraulic radius, effective area
+        2 - Hydraulic radius, total area
         """
         return RadiusType(int(self._m1d_cross_section.BaseCrossSection.RadiusType))
 
@@ -411,7 +325,7 @@ class CrossSection:
 
     @property
     def number_of_processing_levels(self) -> int:
-        """The number of levels used in the processed data.
+        """int: The number of levels used in the processed data.
 
         Notes
         -----
@@ -433,13 +347,12 @@ class CrossSection:
 
     @property
     def processing_levels(self) -> Tuple[float]:
-        """A tuple of the level elevations used in the processed data.
+        """tuple[float]: A tuple of the level elevations used in the processed data.
 
         Notes
         -----
         Setting this will recalculate the processed data using only the specified levels.
         The minimum and maximum levels will be automatically added if not already present.
-
         """
         return tuple(self._m1d_cross_section.BaseCrossSection.ProcessedLevels)
 
@@ -452,20 +365,11 @@ class CrossSection:
 
     @property
     def processing_levels_method(self) -> ProcessLevelsMethod:
-        """The method used to generate processing levels.
+        """int, ProcessLevelMethod: The method used to generate processing levels.
 
-        Parameters
-        ----------
-        processing_level_method: int | ProcessLevelsMethod
-            0 - Automatic
-            1 - Equidistant
-            2 - User defined
-
-        Returns
-        -------
-        ProcessLevelsMethod
-            The method used to generate processing levels.
-
+        0 - Automatic
+        1 - Equidistant
+        2 - User defined
         """
         return ProcessLevelsMethod(
             int(self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs.Option)
@@ -480,7 +384,7 @@ class CrossSection:
 
     @property
     def processed_allow_recompute(self) -> bool:
-        """Whether the processed data can be recomputed (e.g. if the raw data has changed).
+        """bool: Whether the processed data can be recomputed (e.g. if the raw data has changed).
 
         Setting this to False will freeze the processed data values in their current state.
 
@@ -495,6 +399,8 @@ class CrossSection:
     def recompute_processed(self):
         """Recompute the processed data.
 
+        Notes
+        -----
         In most cases this is not necessary as it will be done automatically when the raw data changes.
         If processed_allow_recompute is set to False, then this will do nothing.
         """
@@ -515,16 +421,7 @@ class CrossSection:
 
     @property
     def processed(self) -> pd.DataFrame:
-        """The processed cross section data as a pandas DataFrame.
-
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            A DataFrame containing the processed cross sectiond data to be updated.
-
-        Returns
-        -------
-        df : pandas.DataFrame
+        """pandas.DataFrame: The processed cross section data as a pandas DataFrame.
 
         Examples
         --------
@@ -586,17 +483,7 @@ class CrossSection:
 
     @property
     def raw(self) -> pd.DataFrame:
-        """The raw cross section data as a pandas DataFrame.
-
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            A DataFrame containing the raw cross section data to be updated.
-
-        Returns
-        -------
-        df : pandas.DataFrame
-            A DataFrame containing the raw cross section data.
+        """pandas.DataFrame: The raw cross section data as a pandas DataFrame.
 
         Notes
         -----
@@ -619,7 +506,6 @@ class CrossSection:
         >>> df.loc[0, "markers"] += ",99"
         >>> cs.raw = df
         # Adds a user-defined marker (99) to the first point
-
         """
         self.recompute_processed()
 
@@ -693,22 +579,12 @@ class CrossSection:
 
     @property
     def markers(self) -> pd.DataFrame:
-        """The markers of the cross section as a pandas DataFrame.
-
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            A DataFrame containing the marker data to be updated.
+        """pandas.DataFrame: The markers of the cross section as a pandas DataFrame.
 
         Notes
         -----
         Updating markers is more easily done using the 'set_marker' and 'unset_marker' methods.
         The 'marker_label' column is for convenience and does not need to be set.
-
-        Returns
-        -------
-        df : pandas.DataFrame
-            A DataFrame with columns 'x', 'z', 'marker', and 'marker_label'.
 
         Examples
         --------
@@ -720,7 +596,6 @@ class CrossSection:
         >>> df = df.head(1)
         >>> cs.markers = df
         # The markers of the cross section have been updated to only include the first marker.
-
         """
         base_xs = self._m1d_cross_section.BaseCrossSection
         markers, marker_indices = base_xs.GetMarkerSequence()

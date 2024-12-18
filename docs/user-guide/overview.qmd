@@ -1,0 +1,75 @@
+---
+title: Overview
+---
+
+## {{< fa circle-nodes >}} Res1D
+
+[Res1D](res1d.qmd) is the main interface for accessing data on a [Network](network.qmd).
+
+```{python}
+import mikeio1d
+res = mikeio1d.open('../data/network.res1d')
+res
+```
+
+## {{< fa map-pin >}} Locations
+
+[Locations](locations.qmd) are where model results exist in the network. The main location types are [nodes](`mikeio1d.result_network.ResultNodes`), [reaches](`mikeio1d.result_network.ResultReaches`), and [catchments](`mikeio1d.result_network.ResultCatchments`). Each of these location types are accessible via a [](`~mikeio1d.Res1D`) object.
+
+```{python}
+res.nodes
+```
+
+Specific [locations](`mikeio1d.result_network.ResultLocation`) are accessible via their unique ID.
+```{python}	
+res.nodes['101']
+```
+
+## {{< fa chart-line >}} Quantities
+
+[Quantities](quantities.qmd) are the actual model results, which can be read into a [](`~pandas.DataFrame`) or plotted directly.
+
+```{python}
+df = res.nodes['101'].WaterLevel.read()
+df.head()
+```
+
+```{python}
+res.nodes['101'].WaterLevel.plot()
+```
+
+[Quantity collections](`~mikeio1d.result_network.ResultQuantityCollection`) enable reading a specific quantity for many locations at once.
+
+```{python}
+df = res.reaches.Discharge.read()
+df.describe().T.head()
+```
+
+## {{< fa bridge-water >}} Xns11
+
+[Xns11](xns11.qmd) is the main interface for accessing cross section data.
+
+```{python}
+xns = mikeio1d.open('../data/mikep_cs_demo.xns11')
+xns['basin_left1','122.042','1'].plot(with_marker_labels=False)
+```
+
+Access a cross section's [](`~mikeio1d.cross_sections.CrossSection.raw`) info as a [](`~pandas.DataFrame`).
+
+```{python}
+df = xns['basin_left1','122.042','1'].raw
+df.head()
+``` 
+
+Access a cross section's [](`~mikeio1d.cross_sections.CrossSection.processed`) info as a [](`~pandas.DataFrame`).
+
+```{python}
+df = xns['basin_left1','122.042','1'].processed
+df.head()
+``` 
+
+## {{< fa book >}} Additional resources
+
+-   [Example notebooks](https://nbviewer.jupyter.org/github/DHI/mikeio1d/tree/main/notebooks/)
+-   [Unit tests](https://github.com/DHI/mikeio1d/tree/main/tests)
+-   [MIKE 1D API](http://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)

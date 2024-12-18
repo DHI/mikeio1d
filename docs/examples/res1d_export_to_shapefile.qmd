@@ -5,16 +5,16 @@ jupyter: python3
 ---
 ## Export to GeoDataFrame
 ```	{python}
-from mikeio1d import Res1D
+import mikeio1d
 ```
 
 ```	{python}
-res = Res1D("../data/network.res1d")
+res = mikeio1d.open("../data/network.res1d")
 gdf = res.network.to_geopandas()
 gdf.plot()
 ```
 ```	{python}
-res = Res1D("../data/network.res1d")
+res = mikeio1d.open("../data/network.res1d")
 gdf = res.network.to_geopandas()
 gdf.head()
 ```
@@ -31,7 +31,7 @@ df_nodes.plot(ax=ax, column='max_WaterLevel', legend=True)
 ```
 
 ```	{python}
-res = Res1D("../data/catchments.res1d")
+res = mikeio1d.open("../data/catchments.res1d")
 df_catchments = res.catchments.to_geopandas('max')
 df_catchments.plot(column='max_TotalRunOff', cmap='Blues', legend=True, alpha=0.75)
 ```

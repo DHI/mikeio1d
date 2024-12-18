@@ -28,6 +28,7 @@ docs: FORCE
 	set -e; \
 	cd docs; \
 	quartodoc build; \
+	quartodoc interlinks; \
 	quarto render; \
 	if [ ! -f _site/index.html ]; then \
         echo "Error: index.html not found. Quarto render failed."; \

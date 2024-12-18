@@ -166,5 +166,4 @@ tests/testdata/catchment_merge_c.res1d
 tests/testdata/network_cali.res1d
 tests/testdata/NetworkFactorTwo.res1d
 tests/testdata/NetworkNodeWaterLevel.dfs0
-tests/testdata/mikep_cs_demo.xns11
 

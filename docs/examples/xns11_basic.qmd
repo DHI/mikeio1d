@@ -6,8 +6,8 @@ jupyter: python3
 
 ## Overview
 ```{python}
-from mikeio1d import Xns11
-xns = Xns11("../data/mikep_cs_demo.xns11")
+import mikeio1d
+xns = mikeio1d.open("../data/mikep_cs_demo.xns11")
 xns
 ```
 
@@ -57,6 +57,8 @@ xns.sel(location_id='basin_left1')
 
 ```{python}
 # Combine multiple cross sections into one plot.
+from mikeio1d import Xns11
+
 cross_sections = [*xns['basin_left1','481.451', ...], *xns['basin_left1','166.107', ...]]
 cross_sections = Xns11(cross_sections)
 cross_sections.plot()
