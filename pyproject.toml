@@ -71,8 +71,8 @@ notebooks = [
     "mapclassify",
 ]
 docs = [
-    "quarto-cli==0.9.1",
-    "quartodoc==1.6.37",
+    "quarto-cli==1.6.37",
+    "quartodoc==0.9.1",
 ]
 test = [
     "pytest",
