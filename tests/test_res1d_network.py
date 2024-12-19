@@ -451,21 +451,6 @@ def test_structure_reach_maintains_backweards_compatibility(res1d_network):
         assert structures.s_119w1.structure_id == structures.s_119w1.id
 
 
-def test_nodes_dict_access_maintains_backwards_compatibility(res1d_network):
-    with pytest.warns(UserWarning):
-        node = res1d_network.nodes["1"]
-        assert node.GroundLevel == pytest.approx(197.07000732421875)
-        assert node.BottomLevel == pytest.approx(195.0500030517578)
-        assert node.XCoordinate == pytest.approx(-687934.6000976562)
-
-
-def test_node_node_property_maintains_backwards_compatibility(res1d_network):
-    node = res1d_network.nodes.n_1
-    assert node.node.GroundLevel == pytest.approx(197.07000732421875)
-    assert node.node.BottomLevel == pytest.approx(195.0500030517578)
-    assert node.node.XCoordinate == pytest.approx(-687934.6000976562)
-
-
 def test_reaches_dict_access_maintains_backwards_compatibility(res1d_network, res1d_river_network):
     with pytest.warns(UserWarning):
         # Indexing reaches could return a single dotnet reach

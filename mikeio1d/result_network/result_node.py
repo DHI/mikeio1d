@@ -47,20 +47,6 @@ class ResultNode(ResultLocation):
         """Return a string representation of the object."""
         return f"<{self.type}: {self.id}>"
 
-    def __getattr__(self, name: str):
-        """Warn if accessing deprecated attributes."""
-        # TODO: Remove this in 1.0.0
-        if name == "node":
-            warn("Accessing IRes1DNode attribute via .node is deprecated. Use ._node.")
-            return self.res1d_node
-        elif hasattr(self.res1d_node, name):
-            warn(
-                f"Accessing IRes1DNode attribute {name} directly is deprecated. Use static attributes instead, or ._node.{name}."
-            )
-            return getattr(self.res1d_node, name)
-        else:
-            object.__getattribute__(self, name)
-
     @property
     def res1d_node(self) -> IRes1DNode:
         """DHI.Mike1D.ResultDataAccess.IRes1DNode corresponding to this result location."""
