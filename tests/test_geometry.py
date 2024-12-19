@@ -81,28 +81,28 @@ class TestReachGeometry:
         assert reach_geometry.chainage_from_geometric_distance((1**2 + 1**2) ** 0.5) == 10
 
     def test_from_res1d_reaches(self, river_reach):
-        g = ReachGeometry.from_res1d_reaches(river_reach.reaches)
-        expected_n_gridpoints = sum([reach.GridPoints.Count for reach in river_reach.reaches])
+        g = ReachGeometry.from_res1d_reaches(river_reach.res1d_reaches)
+        expected_n_gridpoints = sum([reach.GridPoints.Count for reach in river_reach.res1d_reaches])
         assert len(g.gridpoints) == expected_n_gridpoints
-        expected_n_digipoints = sum([reach.DigiPoints.Count for reach in river_reach.reaches])
+        expected_n_digipoints = sum([reach.DigiPoints.Count for reach in river_reach.res1d_reaches])
         assert len(g.digipoints) == expected_n_digipoints
         assert len(g.points) == expected_n_gridpoints + expected_n_digipoints
-        gp_start = river_reach.reaches[0].GridPoints[0]
+        gp_start = river_reach.res1d_reaches[0].GridPoints[0]
         assert g.gridpoints[0].x == pytest.approx(gp_start.X)
         assert g.gridpoints[0].y == pytest.approx(gp_start.Y)
         assert g.gridpoints[0].z == pytest.approx(gp_start.Z)
         assert g.gridpoints[0].chainage == pytest.approx(gp_start.Chainage)
-        dp_start = river_reach.reaches[0].DigiPoints[0]
+        dp_start = river_reach.res1d_reaches[0].DigiPoints[0]
         assert g.digipoints[0].x == pytest.approx(dp_start.X)
         assert g.digipoints[0].y == pytest.approx(dp_start.Y)
         assert g.digipoints[0].z == pytest.approx(dp_start.Z)
         assert g.digipoints[0].chainage == pytest.approx(dp_start.M)
-        gp_end = list(river_reach.reaches[-1].GridPoints)[-1]
+        gp_end = list(river_reach.res1d_reaches[-1].GridPoints)[-1]
         assert g.gridpoints[-1].x == pytest.approx(gp_end.X)
         assert g.gridpoints[-1].y == pytest.approx(gp_end.Y)
         assert g.gridpoints[-1].z == pytest.approx(gp_end.Z)
         assert g.gridpoints[-1].chainage == pytest.approx(gp_end.Chainage)
-        dp_end = list(river_reach.reaches[-1].DigiPoints)[-1]
+        dp_end = list(river_reach.res1d_reaches[-1].DigiPoints)[-1]
         assert g.digipoints[-1].x == pytest.approx(dp_end.X)
         assert g.digipoints[-1].y == pytest.approx(dp_end.Y)
         assert g.digipoints[-1].z == pytest.approx(dp_end.Z)
@@ -114,7 +114,7 @@ class TestReachGeometry:
         assert g.length == pytest.approx(2024.2276598819008)
 
     def test_reaches_point_interpolation_matches_mikeplus(self, river_reach):
-        g = ReachGeometry.from_res1d_reaches(river_reach.reaches)
+        g = ReachGeometry.from_res1d_reaches(river_reach.res1d_reaches)
         shape = g.to_shapely()
         # from MIKE+ chainage_points
         expected_coords = {
@@ -156,7 +156,7 @@ def test_geometry_from_nodes_runs(many_nodes):
 
 def test_geometry_from_reaches_runs(many_reaches):
     for reach in many_reaches:
-        g = ReachGeometry.from_res1d_reaches(reach.reaches).to_shapely()
+        g = ReachGeometry.from_res1d_reaches(reach.res1d_reaches).to_shapely()
         assert isinstance(g, shapely.LineString)
 
 

@@ -449,11 +449,3 @@ def test_structure_reach_maintains_backweards_compatibility(res1d_network):
 
     with pytest.warns(UserWarning):
         assert structures.s_119w1.structure_id == structures.s_119w1.id
-
-
-def test_reaches_dict_access_maintains_backwards_compatibility(res1d_network, res1d_river_network):
-    with pytest.warns(UserWarning):
-        # Indexing reaches could return a single dotnet reach
-        reach = res1d_network.reaches["100l1"]
-        assert reach.Name == "100l1"
-        assert reach.Length == pytest.approx(47.6827148432828)

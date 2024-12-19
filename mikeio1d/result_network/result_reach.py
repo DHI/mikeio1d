@@ -60,17 +60,6 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """Return a string representation of ResultReach."""
         return f"<Reach: {self.name}>"
 
-    def __getattr__(self, name: str):
-        """Get attributes, warnings of deprecated attributes."""
-        # TODO: Remove this in 1.0.0
-        if hasattr(self.res1d_reaches[0], name):
-            warnings.warn(
-                f"Accessing IRes1DReach attribute {name} like this is deprecated. Use static attributes instead, or .reaches[0].{name}."
-            )
-            return getattr(self.res1d_reaches[0], name)
-        else:
-            object.__getattribute__(self, name)
-
     def __getitem__(self, key: str | int) -> ResultGridPoint:
         """Get a ResultGridPoint object by chainage."""
         if isinstance(key, int):
@@ -214,16 +203,6 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
         """
         return self._creator._interpolate_reach_critical_level(chainage)
-
-    # region Deprecated methods and attributes of ResultReach.
-
-    @property
-    def reaches(self) -> List[IRes1DReach]:
-        """List of IRes1DReach corresponding to this result location."""
-        warnings.warn("The 'reaches' property is deprecated. Use 'res1d_reaches' instead.")
-        return self.res1d_reaches
-
-    # endregion
 
 
 class ResultReachCreator(ResultLocationCreator):
