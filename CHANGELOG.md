@@ -8,6 +8,12 @@
 
 ### Changed
 
+## [1.0.0]  - 2024-12-19
+
+### Changed
+
+- Removed all code marked for deprecation in versions < 1.0
+
 ## [0.10.0] - 2024-12-19
 
 ### Added
@@ -234,7 +240,13 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.0
+[0.10.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.10.0
+[0.9.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.9.1
+[0.9.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.9.0
+[0.8.2]: https://github.com/DHI/mikeio1d/releases/tag/v0.8.2
+[0.8.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.8.1
 [0.8.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.8.0
 [0.7.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.7.0
 [0.6.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.6.1
