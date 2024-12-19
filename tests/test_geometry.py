@@ -130,7 +130,7 @@ class TestReachGeometry:
 
 
 def test_geometry_from_node(node):
-    node = NodePoint.from_res1d_node(node.node)
+    node = NodePoint.from_res1d_node(node.res1d_node)
     g = node.to_shapely()
     assert isinstance(g, shapely.Point)
     assert g.x == pytest.approx(-687934.6000976562)
@@ -149,7 +149,7 @@ def test_geometry_from_catchment(many_catchments):
 
 def test_geometry_from_nodes_runs(many_nodes):
     for node in many_nodes:
-        node = NodePoint.from_res1d_node(node.node)
+        node = NodePoint.from_res1d_node(node.res1d_node)
         g = node.to_shapely()
         assert isinstance(g, shapely.Point)
 

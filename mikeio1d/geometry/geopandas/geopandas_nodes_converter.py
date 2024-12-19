@@ -34,7 +34,9 @@ class GeoPandasNodesConverter(GeoPandasConverter):
     def _create_dataframe_data_dict(self, nodes: ResultNodes) -> dict[str, tuple]:
         """Create a dictionary with the data needed to create a GeoDataFrame."""
         names = [node.id for node in nodes.values()]
-        geometries = [NodePoint.from_res1d_node(node.node).to_shapely() for node in nodes.values()]
+        geometries = [
+            NodePoint.from_res1d_node(node.res1d_node).to_shapely() for node in nodes.values()
+        ]
         data = {
             "group": TimeSeriesIdGroup.NODE,
             "name": names,
