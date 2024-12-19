@@ -44,23 +44,6 @@ class ResultCatchment(ResultLocation):
         """Return a string representation of the ResultCatchment object."""
         return f"<Catchment: {self.id}>"
 
-    def __getattr__(self, name: str):
-        """Warn if accessing deprecated attributes."""
-        # TODO: Remove this in 1.0.0
-        if name == "catchment":
-            warn(
-                "Accessing IRes1DCatchment attribute via .catchment is deprecated. Use ._catchment."
-            )
-            return self.res1d_catchment
-
-        elif hasattr(self.res1d_catchment, name):
-            warn(
-                f"Accessing IRes1DCatchment attribute {name} directly is deprecated. Use static attributes instead, or ._catchment.{name}."
-            )
-            return getattr(self.res1d_catchment, name)
-        else:
-            object.__getattribute__(self, name)
-
     @property
     def res1d_catchment(self) -> IRes1DCatchment:
         """DHI.Mike1D.ResultDataAccess.IRes1DCatchment corresponding to this result location."""
