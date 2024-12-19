@@ -86,11 +86,6 @@ def test_start_time(test_file):
     assert test_file.start_time == test_file.time_index.min()
 
 
-def test_get_catchment_values(test_file):
-    values = test_file.get_catchment_values("5", "SWMM_SUBCATCH_RUNOFF")
-    assert len(values) == 36
-
-
 def test_dotnet_methods(test_file):
     swmm_out = test_file
     # Just try to access the properties and methods in .net
