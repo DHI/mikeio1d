@@ -303,7 +303,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#mikeio1d.cross_sections.CrossSectionCollection.add" id="toc-mikeio1d.cross_sections.CrossSectionCollection.add" class="nav-link" data-scroll-target="#mikeio1d.cross_sections.CrossSectionCollection.add">add</a></li>
-  <li><a href="#mikeio1d.cross_sections.CrossSectionCollection.add_xsection" id="toc-mikeio1d.cross_sections.CrossSectionCollection.add_xsection" class="nav-link" data-scroll-target="#mikeio1d.cross_sections.CrossSectionCollection.add_xsection">add_xsection</a></li>
   <li><a href="#mikeio1d.cross_sections.CrossSectionCollection.plot" id="toc-mikeio1d.cross_sections.CrossSectionCollection.plot" class="nav-link" data-scroll-target="#mikeio1d.cross_sections.CrossSectionCollection.plot">plot</a></li>
   <li><a href="#mikeio1d.cross_sections.CrossSectionCollection.remove" id="toc-mikeio1d.cross_sections.CrossSectionCollection.remove" class="nav-link" data-scroll-target="#mikeio1d.cross_sections.CrossSectionCollection.remove">remove</a></li>
   <li><a href="#mikeio1d.cross_sections.CrossSectionCollection.sel" id="toc-mikeio1d.cross_sections.CrossSectionCollection.sel" class="nav-link" data-scroll-target="#mikeio1d.cross_sections.CrossSectionCollection.sel">sel</a></li>
@@ -412,10 +411,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.topo_ids">topo_ids</a></td>
 <td>Unique topo IDs in the collection.</td>
 </tr>
-<tr class="odd">
-<td><a href="#mikeio1d.cross_sections.CrossSectionCollection.xns11">xns11</a></td>
-<td>Deprecated. Only use CrossSectionCollection instead.</td>
-</tr>
 </tbody>
 </table>
 </section>
@@ -434,30 +429,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Add a cross section to the collection.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.cross_sections.CrossSectionCollection.add_xsection">add_xsection</a></td>
-<td>Add a cross section to the collection.</td>
-</tr>
-<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.plot">plot</a></td>
 <td>Plot all cross sections in the collection.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.remove">remove</a></td>
 <td>Remove a cross section from the collection.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.sel">sel</a></td>
 <td>Select cross sections from the collection.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.to_dataframe">to_dataframe</a></td>
 <td>Convert the collection to a DataFrame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.to_geopandas">to_geopandas</a></td>
 <td>Convert the collection to a GeoDataFrame.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSectionCollection.to_xns11">to_xns11</a></td>
 <td>Save the collection to an Xns11 file.</td>
 </tr>
@@ -489,19 +480,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </section>
 </section>
-<section id="mikeio1d.cross_sections.CrossSectionCollection.add_xsection" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.add_xsection">add_xsection</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.add_xsection(xsection)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Add a cross section to the collection.</p>
-</section>
 <section id="mikeio1d.cross_sections.CrossSectionCollection.plot" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.plot">plot</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.plot(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.plot(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot all cross sections in the collection.</p>
 </section>
 <section id="mikeio1d.cross_sections.CrossSectionCollection.remove" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.remove">remove</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.remove(cross_section)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.remove(cross_section)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Remove a cross section from the collection.</p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
@@ -527,11 +513,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.cross_sections.CrossSectionCollection.sel" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.sel">sel</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.sel(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    location_id<span class="op">=</span>...,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    chainage<span class="op">=</span>...,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    topo_id<span class="op">=</span>...,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.sel(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    location_id<span class="op">=</span>...,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    chainage<span class="op">=</span>...,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    topo_id<span class="op">=</span>...,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Select cross sections from the collection.</p>
 <section id="parameters-3" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
@@ -599,12 +585,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.cross_sections.CrossSectionCollection.to_dataframe" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.to_dataframe">to_dataframe</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Convert the collection to a DataFrame.</p>
 </section>
 <section id="mikeio1d.cross_sections.CrossSectionCollection.to_geopandas" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.to_geopandas">to_geopandas</h3>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.to_geopandas(mode<span class="op">=</span><span class="st">'sections'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.to_geopandas(mode<span class="op">=</span><span class="st">'sections'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Convert the collection to a GeoDataFrame.</p>
 <section id="parameters-4" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
@@ -664,7 +650,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.cross_sections.CrossSectionCollection.to_xns11" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSectionCollection.to_xns11">to_xns11</h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.to_xns11(file_name, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSectionCollection.to_xns11(file_name, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Save the collection to an Xns11 file.</p>
 <section id="parameters-5" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
@@ -689,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="examples-1" class="level4 doc-section doc-section-examples">
 <h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> csc.to_xns11(<span class="st">"cross_sections.xns11"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> csc.to_xns11(<span class="st">"cross_sections.xns11"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
