@@ -127,27 +127,6 @@ def test_lts_event_index(test_file):
         assert test_file.time_index[i] == i
 
 
-def test_get_node_values(test_file):
-    values = test_file.get_node_values("B4.1320", "WaterLevelMaximumTime")
-    assert len(values) == 10
-
-
-def test_get_reach_values(test_file):
-    values = test_file.get_reach_values("B4.1491l1", 144, "WaterLevelMaximumTime")
-    time_series = pd.Series(values, index=test_file.time_index)
-    assert len(values) == 10
-    assert len(time_series.index) == 10
-    # Just try to call the methods
-    test_file.get_reach_end_values("B4.1491l1", "WaterLevelMaximumTime")
-    test_file.get_reach_start_values("B4.1491l1", "WaterLevelMaximumTime")
-    test_file.get_reach_sum_values("B4.1491l1", "WaterLevelMaximumTime")
-
-
-def test_get_reach_value(test_file):
-    with pytest.raises(NotImplementedError):
-        assert test_file.get_reach_value("B4.1491l1", 144, "WaterLevel", 1)
-
-
 def test_res1d_filter(test_file_path, helpers):
     nodes = ["B4.1320", "A0.0327"]
     reaches = ["B4.1491l1"]
@@ -220,7 +199,7 @@ def test_res1d_merging_same_file(test_file_path):
     assert (b4_1491l1_time1 == b4_1491l1_time2).values[0]
 
     # Validate all merged events. Every event now needs to appear twice.
-    df = res1d.read_all()
+    df = res1d.read()
     # TODO: Maybe it is possible to vectorize this check.
     for col in df:
         for i in range(0, len(df[col]), 2):

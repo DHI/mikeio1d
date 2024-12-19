@@ -143,17 +143,6 @@ class Res1D:
         derived_quantities: Optional[list[str]] = None,
         **kwargs,
     ):
-        # region deprecation
-
-        self._issue_deprecation_warnings(kwargs)
-
-        col_name_delimiter = kwargs.get("col_name_delimiter", NAME_DELIMITER)
-        put_chainage_in_col_name = kwargs.get("put_chainage_in_col_name", True)
-        clear_queue_after_reading = kwargs.get("clear_queue_after_reading", True)
-        result_reader_type = kwargs.get("result_reader_type", ResultReaderType.COPIER)
-
-        # endregion deprecation
-
         self.filter = ResultFilter(
             [
                 NameFilter(reaches, nodes, catchments),
@@ -164,39 +153,22 @@ class Res1D:
         )
 
         self.reader = ResultReaderCreator.create(
-            result_reader_type=result_reader_type,
+            result_reader_type=ResultReaderType.COPIER,
             res1d=self,
             file_path=file_path,
-            col_name_delimiter=col_name_delimiter,
-            put_chainage_in_col_name=put_chainage_in_col_name,
             filter=self.filter,
         )
 
         self.network = ResultNetwork(self)
         self.writer = ResultWriter(self)
 
-        self.clear_queue_after_reading = clear_queue_after_reading
-
         self._derived_quantities = self._init_derived_quantities(derived_quantities)
+
+        self.clear_queue_after_reading = True
 
     def __repr__(self):
         """Return string representation of the Res1D object."""
         return "<mikeio1d.Res1D>"
-
-    def _issue_deprecation_warnings(self, kwargs):
-        def warn_deprecation(name: str, hint: str = ""):
-            if name in kwargs:
-                warnings.warn(
-                    f"The '{name}' parameter will be deprecated in 1.0. {hint}", FutureWarning
-                )
-
-        warn_deprecation("lazy_load")
-        warn_deprecation("col_name_delimiter")
-        warn_deprecation("put_chainage_in_col_name")
-        warn_deprecation("clear_queue_after_reading")
-        warn_deprecation(
-            "header_load", "Dynamic data is read lazily, so header_load is not needed."
-        )
 
     def _init_derived_quantities(
         self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
@@ -626,75 +598,6 @@ class Res1D:
     def projection_string(self) -> str:
         """Projection string of the result file."""
         return self.result_data.ProjectionString
-
-    # region deprecation
-
-    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
-        """Read all data from res1d file to dataframe. Deprecated, use read() instead."""
-        warnings.warn("This method will be deprecated in 1.0. Use read() instead.", FutureWarning)
-        return self.read(column_mode=column_mode)
-
-    def get_catchment_values(self, catchment_id, quantity):
-        """Get catchment values. Deprecated, use network.catchments instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        return to_numpy(self.query.GetCatchmentValues(catchment_id, quantity))
-
-    def get_node_values(self, node_id, quantity):
-        """Get node values. Deprecated, use network.nodes instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        return to_numpy(self.query.GetNodeValues(node_id, quantity))
-
-    def get_reach_values(self, reach_name, chainage, quantity):
-        """Get reach values. Deprecated, use network.reaches instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        return to_numpy(self.query.GetReachValues(reach_name, chainage, quantity))
-
-    def get_reach_value(self, reach_name, chainage, quantity, time):
-        """Get reach value. Deprecated, use network.reaches instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        if self.reader.is_lts_result_file():
-            raise NotImplementedError("The method is not implemented for LTS event statistics.")
-
-        time_dotnet = time if isinstance(time, DateTime) else to_dotnet_datetime(time)
-        return self.query.GetReachValue(reach_name, chainage, quantity, time_dotnet)
-
-    def get_reach_start_values(self, reach_name, quantity):
-        """Get reach start values. Deprecated, use network.reaches instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        return to_numpy(self.query.GetReachStartValues(reach_name, quantity))
-
-    def get_reach_end_values(self, reach_name, quantity):
-        """Get reach end values. Deprecated, use network.reaches instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        return to_numpy(self.query.GetReachEndValues(reach_name, quantity))
-
-    def get_reach_sum_values(self, reach_name, quantity):
-        """Get reach sum values. Deprecated, use network.reaches instead."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.reader.load_dynamic_data()
-        return to_numpy(self.query.GetReachSumValues(reach_name, quantity))
-
-    def clear_queue(self):
-        """Clear the current active list of queries."""
-        warnings.warn("This method will be deprecated in 1.0.", FutureWarning)
-        self.network.queue.clear()
-
-    @property
-    def result_network(self) -> ResultNetwork:
-        """Deprecated. Use network property instead."""
-        warnings.warn(
-            "The 'result_network' parameter will be deprecated in 1.0. Use 'network' instead.",
-            FutureWarning,
-        )
-        return self.network
-
-    # endregion deprecation
 
 
 __all__ = [
