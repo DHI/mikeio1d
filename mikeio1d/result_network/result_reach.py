@@ -220,7 +220,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     @property
     def reaches(self) -> List[IRes1DReach]:
         """List of IRes1DReach corresponding to this result location."""
-        warnings.warn("The 'reaches' property is deprecated. Use 'm1d_reaches' instead.")
+        warnings.warn("The 'reaches' property is deprecated. Use 'res1d_reaches' instead.")
         return self.res1d_reaches
 
     # endregion
