@@ -181,7 +181,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -190,8 +190,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -314,7 +314,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="Xns11.ipynb" download="Xns11.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -324,15 +324,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mikeio1d.Xns11" class="level1">
 <h1>Xns11</h1>
-<p><code>Xns11(self, file_path=None, *args, **kwargs)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Xns11(<span class="va">self</span>, file_path<span class="op">=</span><span class="va">None</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>A class to read and write xns11 files.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
+<col style="width: 13%">
 <col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 54%">
+<col style="width: 55%">
 <col style="width: 13%">
 </colgroup>
 <thead>
@@ -345,7 +345,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>file_path</code></td>
+<td>file_path</td>
 <td>str | Path</td>
 <td>full path and file name to the xns11 file.</td>
 <td><code>None</code></td>
@@ -353,29 +353,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="notes" class="level2">
-<h2 class="anchored" data-anchor-id="notes">Notes</h2>
+<section id="notes" class="level2 doc-section doc-section-notes">
+<h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
 <p>The Xns11 class is a subclass of CrossSectionCollection. The main difference is that Xns11 has a file_path property to track where the file was last loaded from or saved to.</p>
 </section>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Open an existing file</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xns <span class="op">=</span> Xns11(<span class="st">"file.xns11"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Overview of the cross sections</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xns.to_dataframe()</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a specific cross section</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs <span class="op">=</span> xns.sel(location_id<span class="op">=</span><span class="st">'basin_left1'</span>, chainage<span class="op">=</span><span class="st">'122.042'</span>, topo_id<span class="op">=</span><span class="st">'1'</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot a cross section</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs.plot()</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Access cross section raw data</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs.raw_data</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Access cross section processed data</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs.processed_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Open an existing file</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xns <span class="op">=</span> Xns11(<span class="st">"file.xns11"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Overview of the cross sections</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xns.to_dataframe()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a specific cross section</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs <span class="op">=</span> xns.sel(location_id<span class="op">=</span><span class="st">'basin_left1'</span>, chainage<span class="op">=</span><span class="st">'122.042'</span>, topo_id<span class="op">=</span><span class="st">'1'</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot a cross section</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs.plot()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Access cross section raw data</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs.raw_data</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Access cross section processed data</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> xs.processed_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="attributes" class="level2">
 <h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
@@ -508,10 +508,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="mikeio1d.Xns11.add" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.add">add</h3>
-<p><code>Xns11.add(cross_section)</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Xns11.add(cross_section)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Add a cross section to the collection.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -523,7 +523,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>cross_section</code></td>
+<td>cross_section</td>
 <td>CrossSection</td>
 <td>Cross section to add.</td>
 <td><em>required</em></td>
@@ -534,45 +534,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.Xns11.add_xsection" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.add_xsection">add_xsection</h3>
-<p><code>Xns11.add_xsection(xsection)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Xns11.add_xsection(xsection)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Add a cross section to the collection.</p>
 </section>
 <section id="mikeio1d.Xns11.close" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.close">close</h3>
-<p><code>Xns11.close()</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Xns11.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Close the file handle.</p>
 </section>
 <section id="mikeio1d.Xns11.from_cross_section_collection" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.from_cross_section_collection">from_cross_section_collection</h3>
-<p><code>Xns11.from_cross_section_collection(xsections)</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Xns11.from_cross_section_collection(xsections)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Create a Xns11 object from a CrossSectionCollection.</p>
 </section>
 <section id="mikeio1d.Xns11.get_supported_file_extensions" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.get_supported_file_extensions">get_supported_file_extensions</h3>
-<p><code>Xns11.get_supported_file_extensions()</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Xns11.get_supported_file_extensions()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get supported file extensions for Xns11.</p>
 </section>
 <section id="mikeio1d.Xns11.info" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.info">info</h3>
-<p><code>Xns11.info()</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Xns11.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Print information about the file.</p>
 </section>
 <section id="mikeio1d.Xns11.plot" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.plot">plot</h3>
-<p><code>Xns11.plot(*args, **kwargs)</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Xns11.plot(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot all cross sections in the collection.</p>
 </section>
 <section id="mikeio1d.Xns11.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.read">read</h3>
-<p><code>Xns11.read(queries)</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Xns11.read(queries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Read the requested data from the xns11 file and return a Pandas DataFrame.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 13%">
+<col style="width: 10%">
 <col style="width: 9%">
-<col style="width: 63%">
+<col style="width: 64%">
 <col style="width: 14%">
 </colgroup>
 <thead>
@@ -585,7 +585,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>queries</code></td>
+<td>queries</td>
 <td></td>
 <td><code>QueryData</code> objects that define the requested data.</td>
 <td><em>required</em></td>
@@ -593,17 +593,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>pd.DataFrame</td>
 <td></td>
 </tr>
@@ -613,17 +615,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.Xns11.remove" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.remove">remove</h3>
-<p><code>Xns11.remove(cross_section)</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Xns11.remove(cross_section)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Remove a cross section from the collection.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 24%">
-<col style="width: 20%">
-<col style="width: 37%">
-<col style="width: 17%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -634,7 +630,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>cross_section</code></td>
+<td>cross_section</td>
 <td>CrossSection</td>
 <td>Cross section to remove.</td>
 <td><em>required</em></td>
@@ -645,16 +641,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.Xns11.sel" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.sel">sel</h3>
-<p><code>Xns11.sel(location_id=..., chainage=..., topo_id=...)</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>Xns11.sel(location_id<span class="op">=</span>..., chainage<span class="op">=</span>..., topo_id<span class="op">=</span>...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Select cross sections from the collection.</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 18%">
-<col style="width: 46%">
-<col style="width: 14%">
+<col style="width: 17%">
+<col style="width: 19%">
+<col style="width: 47%">
+<col style="width: 15%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -666,19 +662,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>location_id</code></td>
+<td>location_id</td>
 <td>str</td>
 <td>Location ID of the cross section.</td>
 <td><code>...</code></td>
 </tr>
 <tr class="even">
-<td><code>chainage</code></td>
+<td>chainage</td>
 <td>str | float</td>
 <td>Chainage of the cross section.</td>
 <td><code>...</code></td>
 </tr>
 <tr class="odd">
-<td><code>topo_id</code></td>
+<td>topo_id</td>
 <td>str</td>
 <td>Topo ID of the cross section.</td>
 <td><code>...</code></td>
@@ -686,21 +682,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 80%">
+<col style="width: 4%">
+<col style="width: 19%">
+<col style="width: 76%">
 </colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>CrossSection or list[CrossSection]</td>
 <td>Providing all arguments will return a CrossSection. Provinding partial arguments will always return a list, even if it only includes one CrossSection.</td>
 </tr>
@@ -710,15 +709,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.Xns11.to_dataframe" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.to_dataframe">to_dataframe</h3>
-<p><code>Xns11.to_dataframe()</code></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>Xns11.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Convert the collection to a DataFrame.</p>
 </section>
 <section id="mikeio1d.Xns11.to_geopandas" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.to_geopandas">to_geopandas</h3>
-<p><code>Xns11.to_geopandas(mode='sections')</code></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>Xns11.to_geopandas(mode<span class="op">=</span><span class="st">'sections'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Convert the collection to a GeoDataFrame.</p>
-<section id="parameters-5" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 7%">
@@ -736,7 +735,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>mode</code></td>
+<td>mode</td>
 <td>str</td>
 <td>Mode of conversion. Options are “sections” and “markers”. Default is “sections”.</td>
 <td><code>'sections'</code></td>
@@ -744,34 +743,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns-2" class="level4">
-<h4 class="anchored" data-anchor-id="returns-2">Returns</h4>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 23%">
+<col style="width: 65%">
+</colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>gpd.GeoDataFrame</td>
 <td>GeoDataFrame with the cross sections or markers.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="note" class="level4">
-<h4 class="anchored" data-anchor-id="note">Note:</h4>
+<section id="note" class="level4 doc-section doc-section-note">
+<h4 class="doc-section doc-section-note anchored" data-anchor-id="note">Note:</h4>
 <p>This method requires the geopandas package to be installed. Cross sections must have defined coordinates.</p>
 </section>
 </section>
 <section id="mikeio1d.Xns11.to_xns11" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.to_xns11">to_xns11</h3>
-<p><code>Xns11.to_xns11(file_name, **kwargs)</code></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Xns11.to_xns11(file_name, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Save the collection to an Xns11 file.</p>
-<section id="parameters-6" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-6">Parameters</h4>
+<section id="parameters-6" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -783,7 +789,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>file_name</code></td>
+<td>file_name</td>
 <td>str or Path</td>
 <td>Path to the file to save.</td>
 <td><em>required</em></td>
@@ -791,22 +797,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="examples-1" class="level4">
-<h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> csc.to_xns11(<span class="st">"cross_sections.xns11"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> csc.to_xns11(<span class="st">"cross_sections.xns11"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="mikeio1d.Xns11.write" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Xns11.write">write</h3>
-<p><code>Xns11.write(file_path=None)</code></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Xns11.write(file_path<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Write cross section data to an xns11 file.</p>
-<section id="parameters-7" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-7">Parameters</h4>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
+<col style="width: 8%">
 <col style="width: 9%">
-<col style="width: 9%">
-<col style="width: 72%">
+<col style="width: 73%">
 <col style="width: 8%">
 </colgroup>
 <thead>
@@ -819,7 +825,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>file_path</code></td>
+<td>file_path</td>
 <td>str | Path</td>
 <td>Full file path of the xns11 file to be written. Default is the file_path used to open the file.</td>
 <td><code>None</code></td>

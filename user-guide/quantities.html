@@ -186,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -195,8 +195,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -304,7 +304,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#dynamic-selections" id="toc-dynamic-selections" class="nav-link" data-scroll-target="#dynamic-selections">Dynamic selections</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/quantities.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/quantities.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="quantities.ipynb" download="quantities.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -329,20 +329,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="hidden">
-<div id="397480c5" class="cell" data-execution_count="1">
+<div id="f68cdbb8" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> Res1D(<span class="st">'../data/network.res1d'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res_catchments <span class="op">=</span> Res1D(<span class="st">'../data/catchments.res1d'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<p>Quantities are the actual model results, which can be read into a pandas DataFrame or plotted directly.</p>
+<p><a href="../api/result_network.ResultQuantity.html#mikeio1d.result_network.ResultQuantity">Quantities</a> are the actual model results, which can be read into a pandas DataFrame or plotted directly.</p>
 <section id="data-structures" class="level2">
 <h2 class="anchored" data-anchor-id="data-structures">Data structures</h2>
-<p>Two main quantity structures exist: quantities and quantity collections.</p>
+<p>Two main quantity structures exist: <a href="../api/result_network.ResultQuantity.html#mikeio1d.result_network.ResultQuantity">quantities</a> and <a href="../api/result_network.ResultQuantityCollection.html#mikeio1d.result_network.ResultQuantityCollection">quantity collections</a>.</p>
 <section id="quantity" class="level3">
 <h3 class="anchored" data-anchor-id="quantity">Quantity</h3>
 <p>A quantity is a single quantity at a specific location. Quantities are accessed from a location object.</p>
-<div id="e3a0ae28" class="cell" data-execution_count="2">
+<div id="0eda38b3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel <span class="co"># single quantity (i.e. water level) at a single location (i.e. node 101)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>&lt;Quantity: Water level (m)&gt;</code></pre>
@@ -352,7 +352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="quantity-collection" class="level3">
 <h3 class="anchored" data-anchor-id="quantity-collection">Quantity Collection</h3>
 <p>A quantity collection is a single quantity at multiple locations. Quantity collections are accessed from a location collection.</p>
-<div id="ace5d377" class="cell" data-execution_count="3">
+<div id="4a8b117d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel <span class="co"># single quantity (i.e. water level) at multiple locations (i.e. all nodes)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>&lt;QuantityCollection (119): Water level (m)&gt;</code></pre>
@@ -363,7 +363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="reading-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-data">Reading data</h2>
 <p>Quantities and quantity collections can be read into a pandas DataFrame with their <code>read</code> method.</p>
-<div id="23e95ab9" class="cell" data-execution_count="4">
+<div id="08c1f76f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -404,7 +404,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="52d2999c" class="cell" data-execution_count="5">
+<div id="617c5d18" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes.WaterLevel.read()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -570,7 +570,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="plotting-data" class="level2">
 <h2 class="anchored" data-anchor-id="plotting-data">Plotting data</h2>
 <p>Quantities and quantity collections can be plotted directly with their <code>plot</code> method.</p>
-<div id="5c58dae5" class="cell" data-execution_count="6">
+<div id="7990c6c7" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -580,7 +580,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="fb78b9eb" class="cell" data-execution_count="7">
+<div id="841c44b0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.plot(legend<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -594,7 +594,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="dynamic-selections" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-selections">Dynamic selections</h2>
 <p>Quantities or quantity collections can be conveniently combined into a single DataFrame with the ‘add’ method.</p>
-<div id="128c3737" class="cell" data-execution_count="8">
+<div id="40eca669" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.add()</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'100'</span>].WaterLevel.add()</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
@@ -643,7 +643,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="9a75a7ad" class="cell" data-execution_count="9">
+<div id="3ed8ecfc" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res.nodes.WaterLevel.add()</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res.reaches.WaterLevel.add()</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>

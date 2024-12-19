@@ -181,7 +181,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -190,8 +190,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -292,9 +292,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mikeio1d.cross_sections.CrossSection" id="toc-mikeio1d.cross_sections.CrossSection" class="nav-link active" data-scroll-target="#mikeio1d.cross_sections.CrossSection">cross_sections.CrossSection</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#mikeio1d.cross_sections.CrossSection.from_xz" id="toc-mikeio1d.cross_sections.CrossSection.from_xz" class="nav-link" data-scroll-target="#mikeio1d.cross_sections.CrossSection.from_xz">from_xz</a></li>
@@ -305,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="cross_sections.CrossSection.ipynb" download="cross_sections.CrossSection.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -315,15 +315,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mikeio1d.cross_sections.CrossSection" class="level1">
 <h1>cross_sections.CrossSection</h1>
-<p><code>cross_sections.CrossSection(self, m1d_cross_section)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSection(<span class="va">self</span>, m1d_cross_section)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>A cross section in MIKE 1D, uniquely identified by a location ID, chainage, and topo ID.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 25%">
+<col style="width: 23%">
 <col style="width: 18%">
-<col style="width: 42%">
+<col style="width: 43%">
 <col style="width: 14%">
 </colgroup>
 <thead>
@@ -336,7 +336,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>m1d_cross_section</code></td>
+<td>m1d_cross_section</td>
 <td>ICrossSection</td>
 <td>The MIKE 1D cross section object.</td>
 <td><em>required</em></td>
@@ -344,45 +344,141 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
+<section id="notes" class="level2 doc-section doc-section-notes">
+<h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
+<p>Support is currently limited to open cross sections with raw data.</p>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.cross_sections <span class="im">import</span> CrossSection</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> x <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> z <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">0</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs <span class="op">=</span> CrossSection.from_xz(x, z, location_id<span class="op">=</span><span class="st">"loc1"</span>, chainage<span class="op">=</span><span class="dv">100</span>, topo_id<span class="op">=</span><span class="st">"topo1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 <section id="attributes" class="level2">
 <h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Name</th>
-<th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>location_id</td>
-<td>str(required)</td>
-<td>Location ID of the cross section.</td>
+<td><a href="#mikeio1d.cross_sections.CrossSection.bottom_level">bottom_level</a></td>
+<td>Bottom level of the cross section.</td>
 </tr>
 <tr class="even">
-<td>chainage</td>
-<td>float(required)</td>
+<td><a href="#mikeio1d.cross_sections.CrossSection.chainage">chainage</a></td>
 <td>Chainage of the cross section.</td>
 </tr>
 <tr class="odd">
-<td>topo_id</td>
-<td>str(required)</td>
+<td><a href="#mikeio1d.cross_sections.CrossSection.coords">coords</a></td>
+<td>Get the geographical coordinates of the cross section line.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.geometry">geometry</a></td>
+<td>The geographical geometry of the cross section line.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.height">height</a></td>
+<td>Height of the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.interpolated">interpolated</a></td>
+<td>Is the cross section interpolated? (i.e.&nbsp;not measured).</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.is_open">is_open</a></td>
+<td>Is the cross section open? (i.e.&nbsp;not closed).</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.location">location</a></td>
+<td>Location of the cross section (DHI.Mike1D.Generic.ZLocation object).</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.location_id">location_id</a></td>
+<td>Location ID of the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.m1d_cross_section">m1d_cross_section</a></td>
+<td>The DHI.Mike1D.CrossSectionModule.ICrossSection object that CrossSection wraps.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.markers">markers</a></td>
+<td>pandas.DataFrame: The markers of the cross section as a pandas DataFrame.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.max_width">max_width</a></td>
+<td>Maximum width of the cross section.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.min_water_depth">min_water_depth</a></td>
+<td>Minimum water depth of the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.number_of_processing_levels">number_of_processing_levels</a></td>
+<td>int: The number of levels used in the processed data.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.processed">processed</a></td>
+<td>pandas.DataFrame: The processed cross section data as a pandas DataFrame.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.processed_allow_recompute">processed_allow_recompute</a></td>
+<td>bool: Whether the processed data can be recomputed (e.g.&nbsp;if the raw data has changed).</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.processing_levels">processing_levels</a></td>
+<td>tuple[float]: A tuple of the level elevations used in the processed data.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.processing_levels_method">processing_levels_method</a></td>
+<td>int, ProcessLevelMethod: The method used to generate processing levels.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.radius_type">radius_type</a></td>
+<td>int, RadiusType: The type of hydraulic radius used in the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.raw">raw</a></td>
+<td>pandas.DataFrame: The raw cross section data as a pandas DataFrame.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.resistance_distribution">resistance_distribution</a></td>
+<td>int, ResistanceDistribution: The distribution of resistance used in the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.resistance_left_high_flow">resistance_left_high_flow</a></td>
+<td>float: Resistance for the left high flow zone.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.resistance_low_flow">resistance_low_flow</a></td>
+<td>float: Resistance for the low flow zone.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.resistance_right_high_flow">resistance_right_high_flow</a></td>
+<td>float: Resistance for the right high flow zone.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.resistance_type">resistance_type</a></td>
+<td>int, ResistanceType: The type of resistance used by the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.topo_id">topo_id</a></td>
 <td>Topo ID of the cross section.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.cross_sections.CrossSection.zmax">zmax</a></td>
+<td>Maximum elevation of the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.zmin">zmin</a></td>
+<td>Minimum elevation of the cross section.</td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="notes" class="level2">
-<h2 class="anchored" data-anchor-id="notes">Notes</h2>
-<p>Support is currently limited to open cross sections with raw data.</p>
-</section>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.cross_sections <span class="im">import</span> CrossSection</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> x <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>]</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> z <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">0</span>]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs <span class="op">=</span> CrossSection.from_xz(x, z, location_id<span class="op">=</span><span class="st">"loc1"</span>, chainage<span class="op">=</span><span class="dv">100</span>, topo_id<span class="op">=</span><span class="st">"topo1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
@@ -418,15 +514,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="mikeio1d.cross_sections.CrossSection.from_xz" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSection.from_xz">from_xz</h3>
-<p><code>cross_sections.CrossSection.from_xz(x, z, location_id, chainage, topo_id, default_markers=True)</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSection.from_xz(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    x,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    z,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    location_id,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    chainage,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    topo_id,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    default_markers<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Create an open cross section from xz data.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 55%">
+<col style="width: 15%">
+<col style="width: 17%">
+<col style="width: 56%">
 <col style="width: 10%">
 </colgroup>
 <thead>
@@ -439,37 +542,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>x</code></td>
+<td>x</td>
 <td>Iterable[float]</td>
 <td>The x coordinates of the cross section.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>z</code></td>
+<td>z</td>
 <td>Iterable[float]</td>
 <td>The z coordinates of the cross section.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>location_id</code></td>
+<td>location_id</td>
 <td>str</td>
 <td>Location ID of the cross section.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>chainage</code></td>
+<td>chainage</td>
 <td>float</td>
 <td>Chainage of the cross section.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>topo_id</code></td>
+<td>topo_id</td>
 <td>str</td>
 <td>Topo ID of the cross section.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>default_markers</code></td>
+<td>default_markers</td>
 <td>bool</td>
 <td>If True, default markers will be added to the cross section.</td>
 <td><code>True</code></td>
@@ -477,17 +580,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td>cross_section</td>
 <td>CrossSection</td>
 <td></td>
 </tr>
@@ -497,15 +602,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.cross_sections.CrossSection.plot" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSection.plot">plot</h3>
-<p><code>cross_sections.CrossSection.plot(ax=None, with_markers=True, with_marker_labels=True, **kwargs)</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSection.plot(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    with_markers<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    with_marker_labels<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot the cross section.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 57%">
+<col style="width: 15%">
+<col style="width: 17%">
+<col style="width: 58%">
 <col style="width: 8%">
 </colgroup>
 <thead>
@@ -518,19 +628,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>ax</code></td>
+<td>ax</td>
 <td>matplotlib.axes.Axes</td>
 <td>The axes to plot to. If not provided, a new figure will be created.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td><code>with_markers</code></td>
+<td>with_markers</td>
 <td>bool</td>
 <td>If True, markers will be plotted.</td>
 <td><code>True</code></td>
 </tr>
 <tr class="odd">
-<td><code>with_marker_labels</code></td>
+<td>with_marker_labels</td>
 <td>bool</td>
 <td>If True, marker labels will be plotted. Ignored if with_markers is False.</td>
 <td><code>True</code></td>
@@ -538,17 +648,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td>ax</td>
 <td>matplotlib.axes.Axes</td>
 <td>The axes that was plotted to.</td>
 </tr>
@@ -558,23 +670,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.cross_sections.CrossSection.recompute_processed" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSection.recompute_processed">recompute_processed</h3>
-<p><code>cross_sections.CrossSection.recompute_processed()</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSection.recompute_processed()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Recompute the processed data.</p>
+<section id="notes-1" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes-1">Notes</h4>
 <p>In most cases this is not necessary as it will be done automatically when the raw data changes. If processed_allow_recompute is set to False, then this will do nothing.</p>
+</section>
 </section>
 <section id="mikeio1d.cross_sections.CrossSection.set_marker" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSection.set_marker">set_marker</h3>
-<p><code>cross_sections.CrossSection.set_marker(marker, x, z=None)</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSection.set_marker(marker, x, z<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Set a marker at the point nearest to the specified x, z coordinates.</p>
 <p>Note: if z is not provided, the nearest point in the x direction will be found.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 12%">
-<col style="width: 29%">
-<col style="width: 41%">
-<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 30%">
+<col style="width: 42%">
+<col style="width: 16%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -586,19 +701,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>marker</code></td>
+<td>marker</td>
 <td>int | Marker</td>
 <td>The marker to set.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>x</code></td>
+<td>x</td>
 <td>float</td>
 <td>The x coordinate of the point.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td><code>z</code></td>
+<td>z</td>
 <td>float (default: None)</td>
 <td>The z coordinate of the point.</td>
 <td><code>None</code></td>
@@ -606,21 +721,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="examples-1" class="level4">
-<h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.cross_sections <span class="im">import</span> Marker</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.set_marker(Marker.LEFT_LEVEE_BANK, <span class="dv">10</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The LEFT_LEVEE_BANK marker has been set at the point nearest to x=10.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.set_marker(<span class="dv">99</span>, <span class="dv">10</span>, <span class="dv">5</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># A user-defined marker (99) has been set at the point nearest to x=10, z=5.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.cross_sections <span class="im">import</span> Marker</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.set_marker(Marker.LEFT_LEVEE_BANK, <span class="dv">10</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The LEFT_LEVEE_BANK marker has been set at the point nearest to x=10.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.set_marker(<span class="dv">99</span>, <span class="dv">10</span>, <span class="dv">5</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># A user-defined marker (99) has been set at the point nearest to x=10, z=5.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="mikeio1d.cross_sections.CrossSection.unset_marker" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.cross_sections.CrossSection.unset_marker">unset_marker</h3>
-<p><code>cross_sections.CrossSection.unset_marker(marker)</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cross_sections.CrossSection.unset_marker(marker)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Remove the specified marker from the cross section.</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -632,7 +747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>marker</code></td>
+<td>marker</td>
 <td>int | Marker</td>
 <td>The marker to remove.</td>
 <td><em>required</em></td>
@@ -640,12 +755,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="examples-2" class="level4">
-<h4 class="anchored" data-anchor-id="examples-2">Examples</h4>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.unset_marker(<span class="dv">99</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The user-defined marker (99) has been removed from the cross section.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.unset_marker(Marker.LEFT_LEVEE_BANK)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The LEFT_LEVEE_BANK marker has been removed from the cross section.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="examples-2" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.unset_marker(<span class="dv">99</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The user-defined marker (99) has been removed from the cross section.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> cs.unset_marker(Marker.LEFT_LEVEE_BANK)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The LEFT_LEVEE_BANK marker has been removed from the cross section.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

@@ -181,7 +181,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -190,8 +190,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -302,7 +302,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#convert-reaches-to-a-geodataframe-without-quantities" id="toc-convert-reaches-to-a-geodataframe-without-quantities" class="nav-link" data-scroll-target="#convert-reaches-to-a-geodataframe-without-quantities">Convert reaches to a GeoDataFrame (without quantities)</a></li>
   <li><a href="#convert-reaches-to-a-geodataframe-with-aggregated-quantities" id="toc-convert-reaches-to-a-geodataframe-with-aggregated-quantities" class="nav-link" data-scroll-target="#convert-reaches-to-a-geodataframe-with-aggregated-quantities">Convert reaches to a GeoDataFrame with aggregated quantities</a></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="result_network.ResultReaches.ipynb" download="result_network.ResultReaches.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -312,11 +312,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mikeio1d.result_network.ResultReaches" class="level1">
 <h1>result_network.ResultReaches</h1>
-<p><code>result_network.ResultReaches(self, res1d)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultReaches(<span class="va">self</span>, res1d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Class for wrapping ResultData reaches.</p>
 <p>By itself it is also a dict, which contains mapping between reach name and IRes1DReach object or a list of IRes1DReach objects.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -328,7 +328,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>res1d</code></td>
+<td>res1d</td>
 <td>Res1D</td>
 <td>Res1D object the reaches belong to.</td>
 <td><em>required</em></td>
@@ -395,15 +395,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <section id="mikeio1d.result_network.ResultReaches.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.read">read</h3>
-<p><code>result_network.ResultReaches.read(column_mode=None, include_derived=False)</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultReaches.read(column_mode<span class="op">=</span><span class="va">None</span>, include_derived<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Read the time series data for all quantities at these locations into a DataFrame.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 6%">
+<col style="width: 5%">
 <col style="width: 9%">
-<col style="width: 80%">
+<col style="width: 81%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -416,13 +416,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>column_mode</code></td>
+<td>column_mode</td>
 <td>str | ColumnMode(optional)</td>
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td><code>include_derived</code></td>
+<td>include_derived</td>
 <td>bool</td>
 <td>Include derived quantities.</td>
 <td><code>False</code></td>
@@ -433,11 +433,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.result_network.ResultReaches.to_geopandas" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.to_geopandas">to_geopandas</h3>
-<p><code>result_network.ResultReaches.to_geopandas(agg=None, agg_kwargs={}, segmented=True, include_derived=False)</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultReaches.to_geopandas(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    agg<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    agg_kwargs<span class="op">=</span>{},</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    segmented<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    include_derived<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Convert reaches to a geopandas.GeoDataFrame object.</p>
 <p>By default, quantities are not included. To include quantities, use the <code>agg</code> and <code>agg_kwargs</code> parameters.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
@@ -455,7 +460,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>agg</code></td>
+<td>agg</td>
 <td>str or callable</td>
 <td>Defines how to aggregate the quantities in time and space. Accepts any str or callable that is accepted by pandas.DataFrame.agg.</td>
 <td><code>None</code></td>
@@ -463,47 +468,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="examples" class="level4">
-<h4 class="anchored" data-anchor-id="examples">Examples</h4>
+<section id="examples" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
 <pre><code>- 'mean'  : mean value of all quantities
 - 'max'   : maximum value of all quantities
 -  np.max : maximum value of all quantities</code></pre>
 <p>agg_kwargs : dict, default {} Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}). segmented : bool, (default=True) True - one LineString per IRes1DReach object. False - one LineString per reach name. include_derived : bool, default False Include derived quantities.</p>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 27%">
-<col style="width: 72%">
+<col style="width: 8%">
+<col style="width: 25%">
+<col style="width: 65%">
 </colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td>gdf</td>
 <td>geopandas.GeoDataFrame</td>
 <td>A GeoDataFrame object with reaches as LineString geometries.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="examples-1" class="level4">
-<h4 class="anchored" data-anchor-id="examples-1">Examples</h4>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
 </section>
 </section>
 </section>
 </section>
 <section id="convert-reaches-to-a-geodataframe-without-quantities" class="level1">
 <h1>Convert reaches to a GeoDataFrame (without quantities)</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="convert-reaches-to-a-geodataframe-with-aggregated-quantities" class="level1">
 <h1>Convert reaches to a GeoDataFrame with aggregated quantities</h1>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

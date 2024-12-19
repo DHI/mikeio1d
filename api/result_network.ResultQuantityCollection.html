@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -147,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -156,8 +190,8 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -276,7 +310,7 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="result_network.ResultQuantityCollection.ipynb" download="result_network.ResultQuantityCollection.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -286,16 +320,16 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="mikeio1d.result_network.ResultQuantityCollection" class="level1">
 <h1>result_network.ResultQuantityCollection</h1>
-<p><code>result_network.ResultQuantityCollection(self, result_quantities, res1d)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection(<span class="va">self</span>, result_quantities, res1d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Class for dealing with a collection ResultQuantity objects.</p>
 <p>ResultQuantityCollection objects are the attributes assigned to a network type like nodes, catchments, etc. For example, res1d.nodes.WaterLevel They have the ability to add queries.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
+<col style="width: 18%">
 <col style="width: 7%">
-<col style="width: 60%">
+<col style="width: 61%">
 <col style="width: 11%">
 </colgroup>
 <thead>
@@ -308,13 +342,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>result_quantities</code></td>
+<td>result_quantities</td>
 <td></td>
 <td>A list of ResultQuantity objects having the same quantity id.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>res1d</code></td>
+<td>res1d</td>
 <td>Res1D</td>
 <td>Res1D object the quantity belongs to.</td>
 <td><em>required</em></td>
@@ -405,40 +439,40 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="mikeio1d.result_network.ResultQuantityCollection.add" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.add">add</h3>
-<p><code>result_network.ResultQuantityCollection.add()</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.add()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Add queries to ResultNetwork.queries from a list of result quantities.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry">get_data_entry</h3>
-<p><code>result_network.ResultQuantityCollection.get_data_entry()</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.get_data_entry()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get DataEntry corresponding to ResultQuantity.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_data_entry_net">get_data_entry_net</h3>
-<p><code>result_network.ResultQuantityCollection.get_data_entry_net()</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.get_data_entry_net()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get DataEntryNet corresponding to ResultQuantity.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.get_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_query">get_query</h3>
-<p><code>result_network.ResultQuantityCollection.get_query()</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.get_query()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get queries corresponding to ResultQuantityCollection.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.get_timeseries_ids" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.get_timeseries_ids">get_timeseries_ids</h3>
-<p><code>result_network.ResultQuantityCollection.get_timeseries_ids()</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.get_timeseries_ids()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get TimeSeriesId objects corresponding to ResultQuantityCollection.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.plot" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.plot">plot</h3>
-<p><code>result_network.ResultQuantityCollection.plot(ax=None, **kwargs)</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.plot(ax<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot the time series data.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 11%">
+<col style="width: 9%">
 <col style="width: 20%">
-<col style="width: 58%">
+<col style="width: 59%">
 <col style="width: 10%">
 </colgroup>
 <thead>
@@ -451,13 +485,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>ax</code></td>
+<td>ax</td>
 <td>matplotlib.axes.Axes</td>
 <td>Axes object to plot on.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td><code>**kwargs</code></td>
+<td>**kwargs</td>
 <td></td>
 <td>Additional keyword arguments passed to pandas.DataFrame.plot.</td>
 <td><code>{}</code></td>
@@ -465,17 +499,19 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4">
-<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>matplotlib.axes.Axes</td>
 <td>Axes object with the plot.</td>
 </tr>
@@ -485,15 +521,18 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.prettify_quantity" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.prettify_quantity">prettify_quantity</h3>
-<p><code>result_network.ResultQuantityCollection.prettify_quantity(quantity, latex_format=False)</code></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.prettify_quantity(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    quantity,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    latex_format<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get a pretty string representation of a ResultQuantity’s type and unit.</p>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 13%">
+<col style="width: 11%">
 <col style="width: 24%">
-<col style="width: 52%">
+<col style="width: 53%">
 <col style="width: 10%">
 </colgroup>
 <thead>
@@ -506,13 +545,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>quantity</code></td>
+<td>quantity</td>
 <td>ResultQuantity | IQuantity</td>
 <td>ResultQuantity object or DHI.Mike1D.Generic.IQuantity object.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>latex_format</code></td>
+<td>latex_format</td>
 <td></td>
 <td>If True, the unit abbreviation will use LaTeX-formatted text.</td>
 <td><code>False</code></td>
@@ -520,17 +559,24 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4">
-<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 77%">
+</colgroup>
 <thead>
 <tr class="header">
+<th>Name</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td></td>
 <td>str</td>
 <td>A string representation of the quantity type and unit.</td>
 </tr>
@@ -540,16 +586,16 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.read">read</h3>
-<p><code>result_network.ResultQuantityCollection.read(column_mode=None)</code></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.read(column_mode<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Read the time series data into a data frame.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 4%">
+<col style="width: 3%">
 <col style="width: 7%">
 <col style="width: 85%">
-<col style="width: 2%">
+<col style="width: 3%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -561,7 +607,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>column_mode</code></td>
+<td>column_mode</td>
 <td>str | ColumnMode(optional)</td>
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects ‘str’ - column index of str representations of QueryData objects</td>
 <td><code>None</code></td>
@@ -572,22 +618,31 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.to_csv" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_csv">to_csv</h3>
-<p><code>result_network.ResultQuantityCollection.to_csv(file_path, time_step_skipping_number=1)</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.to_csv(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    file_path,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    time_step_skipping_number<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Extract time series data into a csv file.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.to_dataframe" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_dataframe">to_dataframe</h3>
-<p><code>result_network.ResultQuantityCollection.to_dataframe()</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.to_dataframe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get a time series as a data frame.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.to_dfs0" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_dfs0">to_dfs0</h3>
-<p><code>result_network.ResultQuantityCollection.to_dfs0(file_path, time_step_skipping_number=1)</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.to_dfs0(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    file_path,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    time_step_skipping_number<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Extract time series data into a dfs0 file.</p>
 </section>
 <section id="mikeio1d.result_network.ResultQuantityCollection.to_txt" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantityCollection.to_txt">to_txt</h3>
-<p><code>result_network.ResultQuantityCollection.to_txt(file_path, time_step_skipping_number=1)</code></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantityCollection.to_txt(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    file_path,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    time_step_skipping_number<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Extract time series data into a txt file.</p>
 
 

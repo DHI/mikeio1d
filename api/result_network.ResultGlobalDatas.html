@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -147,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -156,8 +190,8 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -265,7 +299,7 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="result_network.ResultGlobalDatas.ipynb" download="result_network.ResultGlobalDatas.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -275,16 +309,16 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="mikeio1d.result_network.ResultGlobalDatas" class="level1">
 <h1>result_network.ResultGlobalDatas</h1>
-<p><code>result_network.ResultGlobalDatas(self, res1d)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultGlobalDatas(<span class="va">self</span>, res1d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Class for wrapping ResultData global data items.</p>
 <p>By itself it is also a dict, which contains mapping between global data item quantity ID and IDataItem object.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 13%">
 <col style="width: 11%">
-<col style="width: 57%">
+<col style="width: 11%">
+<col style="width: 58%">
 <col style="width: 17%">
 </colgroup>
 <thead>
@@ -297,7 +331,7 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>res1d</code></td>
+<td>res1d</td>
 <td>Res1D</td>
 <td>Res1D object the catchments belong to.</td>
 <td><em>required</em></td>
@@ -360,15 +394,15 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <section id="mikeio1d.result_network.ResultGlobalDatas.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGlobalDatas.read">read</h3>
-<p><code>result_network.ResultGlobalDatas.read(column_mode=None, include_derived=False)</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultGlobalDatas.read(column_mode<span class="op">=</span><span class="va">None</span>, include_derived<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Read the time series data for all quantities at these locations into a DataFrame.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 6%">
+<col style="width: 5%">
 <col style="width: 9%">
-<col style="width: 80%">
+<col style="width: 81%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -381,13 +415,13 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>column_mode</code></td>
+<td>column_mode</td>
 <td>str | ColumnMode(optional)</td>
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td><code>include_derived</code></td>
+<td>include_derived</td>
 <td>bool</td>
 <td>Include derived quantities.</td>
 <td><code>False</code></td>

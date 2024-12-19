@@ -148,7 +148,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -157,8 +157,8 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/getting-started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Getting Started</span></a>
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -264,7 +264,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#cross-sections" id="toc-cross-sections" class="nav-link" data-scroll-target="#cross-sections">Cross sections</a></li>
   </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -279,10 +279,14 @@ ul.task-list li input[type="checkbox"] {
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
+<td><a href="../api/open.html#mikeio1d.open">open</a></td>
+<td>Open a file type supported by MIKE IO 1D file.</td>
+</tr>
+<tr class="even">
 <td><a href="../api/Res1D.html#mikeio1d.Res1D">Res1D</a></td>
 <td>Class for reading data from 1D network result files.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../api/Xns11.html#mikeio1d.Xns11">Xns11</a></td>
 <td>A class to read and write xns11 files.</td>
 </tr>
@@ -293,6 +297,14 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="locations">Locations</h2>
 <table class="caption-top table">
 <tbody>
+<tr class="odd">
+<td><a href="../api/result_network.ResultLocation.html#mikeio1d.result_network.ResultLocation">result_network.ResultLocation</a></td>
+<td>A base class for a network location (node, reach) or a catchment wrapper class.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/result_network.ResultLocations.html#mikeio1d.result_network.ResultLocations">result_network.ResultLocations</a></td>
+<td>A base class for a network locations (nodes, reaches) or a catchments wrapper class.</td>
+</tr>
 <tr class="odd">
 <td><a href="../api/result_network.ResultNode.html#mikeio1d.result_network.ResultNode">result_network.ResultNode</a></td>
 <td>Class for wrapping a single ResultData node.</td>
