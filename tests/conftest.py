@@ -12,14 +12,11 @@ from .testdata import testdata
 
 
 class Helpers:
-    """
-    Class containing helper methods for performing tests.
-    """
+    """Class containing helper methods for performing tests."""
 
     @staticmethod
     def assert_shared_columns_equal(df_ref, df):
-        """
-        Compares columns in df to the ones in df_ref.
+        """Compare columns in df to the ones in df_ref.
 
         Note that df_ref typically has more columns than df.
         Comparison is performed only in columns of df.
