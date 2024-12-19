@@ -121,7 +121,7 @@ class ResultGridPoint(ResultLocation):
             IRes1DDataSet object associated with ResultGridPoint.
 
         """
-        return self.reach
+        return self.res1d_reach
 
     def get_query(self, data_item: IDataItem) -> QueryDataReach:
         """Get a QueryDataReach for given data item."""
