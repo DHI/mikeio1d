@@ -8,6 +8,30 @@
 
 ### Changed
 
+## [0.10.0] - 2024-12-19
+
+### Added
+
+- New step_every filter when loading Res1D files (e.g. load every 'i'th time step)
+- New quantity filter when loading Res1D files (e.g. load only specific quantities)
+- Update notebook on working with large files for the new filters.
+- Support for Python 3.13
+- Add Res1D.result_type property.
+
+### Fixed
+
+### Changed
+
+- Result plots now have gridlines by default.
+- Names no longer show up on ResultLocations html repr (i.e. cleaner notebooks)
+- Refactored Res1D.network and associated objects.
+- Refactored Res1D static attributes.
+- Xns11 is now a CrossSectionCollection (i.e. no longer needed to use Xns11.xsections)
+- Refactored filters.
+- Res1D.data is now an alias to the more explicit Res1D.result_data
+- CrossSectionCollection.data is now an alias to the more explicit CrossSectionCollection.cross_section_data
+- Updated documentation.
+
 ## [0.9.1] - 2024-11-12
 
 ### Added
