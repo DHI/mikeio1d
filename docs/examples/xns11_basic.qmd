@@ -169,8 +169,8 @@ xns.to_geopandas(mode='markers').plot("marker_label", legend=True)
 ```{python}
 # Plot markers on top of cross sections.
 
-gdf1 = xns.xsections.to_geopandas(mode='sections')
-gdf2 = xns.xsections.to_geopandas(mode='markers')
+gdf1 = xns.to_geopandas(mode='sections')
+gdf2 = xns.to_geopandas(mode='markers')
 
 ax = gdf1.plot()
 

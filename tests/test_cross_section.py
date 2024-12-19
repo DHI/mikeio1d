@@ -44,12 +44,12 @@ def cs_dummy(xz_data) -> CrossSection:
 
 @pytest.fixture
 def cs_basic(xns_basic) -> CrossSection:
-    return list(xns_basic.xsections.values())[0]
+    return list(xns_basic.values())[0]
 
 
 @pytest.fixture
 def cs_sample(xns_basic) -> List[CrossSection]:
-    x = list(xns_basic.xsections.values())
+    x = list(xns_basic.values())
     x = x[::2]
     return x
 
