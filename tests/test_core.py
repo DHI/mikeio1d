@@ -94,3 +94,35 @@ def test_mikeio1d_all_column_modes_basic(extension, column_mode):
         assert len(df) > 0
         df = res.read(column_mode=column_mode)
         assert len(df) > 0
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    "time",
+    [
+        slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+        slice(None, "1994-08-07 16:37:07.560000"),
+        slice("1994-08-07 18:32:07.967000", None),
+        [
+            slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+            slice("1994-08-07 16:37:07.560000", None),
+        ],
+        [
+            slice("1994-08-07 16:48:00.000", "1994-08-07 16:58:12.888000"),
+            slice("1994-08-07 16:35:00.000", "1994-08-07 16:38:00.000000"),
+            slice("1994-08-07 16:38:00.000", "1994-08-07 16:48:00.000000"),
+        ],
+    ],
+)
+def test_mikeio1d_network_res1d_using_time_filters(time, helpers):
+    for name in testdata_name():
+        path = getattr(testdata, name)
+        if not path.endswith("network.res1d"):
+            continue
+
+        df = Res1D(path, time=time).read(column_mode=ColumnMode.STRING)
+        df_expected = testdata.get_expected_dataframe(name)
+        if len(df.index) != len(df_expected):
+            df_expected = df_expected.loc[df.index]
+        assert_frame_equal(df_expected, df)
+

@@ -34,24 +34,51 @@ class TimeFilter(ResultSubFilter):
         if not self.use_filter():
             return
 
-        time = self._time
+        time_intervals = self._determine_time_intervals(self._time)
+
+        for time_interval in time_intervals:
+            start, end = time_interval
+            period = self.create_period(start, end)
+            filter.Periods.Add(period)
+
+    def _determine_time_intervals(
+        self, time_intervals: None | slice | tuple | list
+    ) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+        # In case of slice convert time_intervals to a list containing that slice.
+        # Needed to be able to evaluate contains_time_intervals properly.
+        time_intervals = [time_intervals] if isinstance(time_intervals, slice) else time_intervals
+
+        contains_time_intervals = (
+            all(isinstance(t, slice) for t in time_intervals)
+            or all(isinstance(t, tuple) for t in time_intervals)
+            or all(isinstance(t, list) for t in time_intervals)
+        )
+
+        if contains_time_intervals:
+            return [self._determine_start_and_end_time(t) for t in time_intervals]
+        else:
+            return [self._determine_start_and_end_time(time_intervals)]
+
+    def _determine_start_and_end_time(
+        self, time_interval: None | slice | tuple[any, any] | list[any, any]
+    ) -> tuple[pd.Timestamp, pd.Timestamp]:
         start, end = None, None
-        if isinstance(time, slice):
-            start = time.start
-            end = time.stop
-        elif isinstance(time, tuple) or isinstance(time, list):
-            start, end = time
+
+        if isinstance(time_interval, slice):
+            start = time_interval.start
+            end = time_interval.stop
+        elif isinstance(time_interval, tuple) or isinstance(time_interval, list):
+            start, end = time_interval
         else:
             raise ValueError("time parameter must be a slice, tuple or list")
 
-        if start is not None:
-            start = pd.to_datetime(start)
+        start = self._convert_to_datetime(start)
+        end = self._convert_to_datetime(end)
 
-        if end is not None:
-            end = pd.to_datetime(end)
+        return (start, end)
 
-        period = self.create_period(start, end)
-        filter.Periods.Add(period)
+    def _convert_to_datetime(self, time: str | datetime) -> pd.Timestamp:
+        return pd.to_datetime(time) if time is not None else None
 
     def create_period(self, start: None | datetime, end: None | datetime) -> Period:
         """Create a DHI.Mike1D.ResultDataAccess.Period object."""
