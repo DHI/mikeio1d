@@ -272,7 +272,7 @@ class TestCrossSectionCollectionUnits:
     def test_add_xsection(self, many_dummy_cross_sections):
         csc = CrossSectionCollection(many_dummy_cross_sections[:10])
         added_xs = many_dummy_cross_sections[10]
-        csc.add_xsection(added_xs)
+        csc.add(added_xs)
         assert len(csc) == 11
         assert added_xs in csc.values()
         assert (

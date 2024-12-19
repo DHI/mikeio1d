@@ -73,7 +73,7 @@ new_collection.to_dataframe()
 ## Cross sections
 A cross section is uniquely identified by its location ID, chainage, and topo ID.
 ```{python}
-xs = xns.xsections['basin_left1', '122.042', '1']
+xs = xns['basin_left1', '122.042', '1']
 xs
 ```
 
