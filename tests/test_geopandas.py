@@ -105,11 +105,13 @@ def test_geopandas_reaches_converter_segmented(res1d_river_network):
     converter = GeoPandasReachesConverterSegmented()
     gdf = converter.to_geopandas(res1d_river_network.reaches)
     assert isinstance(gdf, GeoDataFrame)
-    number_of_segments = sum(len(reach.reaches) for reach in res1d_river_network.reaches.values())
+    number_of_segments = sum(
+        len(reach.res1d_reaches) for reach in res1d_river_network.reaches.values()
+    )
     assert len(gdf) == number_of_segments
     assert ["group", "name", "tag", "geometry"] == list(gdf.columns)
     sample_reach_name = "river"
-    sample_reach_segments = res1d_river_network.reaches[sample_reach_name].reaches
+    sample_reach_segments = res1d_river_network.reaches[sample_reach_name].res1d_reaches
     sample_reach = sample_reach_segments[len(sample_reach_segments) // 2]
     sample_reach_tag = TimeSeriesId.create_reach_span_tag(sample_reach)
     geometry = gdf.query(f"name == '{sample_reach_name}' and tag == '{sample_reach_tag}'").iloc[0][
