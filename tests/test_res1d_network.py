@@ -151,27 +151,6 @@ def test_time_index_microseconds(test_file):
     assert df.index.microsecond.unique().size > 1
 
 
-def test_get_node_values(test_file):
-    values = test_file.get_node_values("1", "WaterLevel")
-    assert len(values) == 110
-
-
-def test_get_reach_values(test_file):
-    values = test_file.get_reach_values("9l1", 5, "WaterLevel")
-    time_series = pd.Series(values, index=test_file.time_index)
-    assert len(values) == 110
-    assert len(time_series.index) == 110
-    # Just try to call the methods
-    test_file.get_reach_end_values("9l1", "WaterLevel")
-    test_file.get_reach_start_values("9l1", "WaterLevel")
-    test_file.get_reach_sum_values("9l1", "WaterLevel")
-
-
-def test_get_reach_value(test_file):
-    value = test_file.get_reach_value("9l1", 5, "WaterLevel", test_file.start_time)
-    assert value > 0
-
-
 def test_dotnet_methods(test_file):
     res1d = test_file
     # Just try to access the properties and methods in .net
@@ -470,26 +449,3 @@ def test_structure_reach_maintains_backweards_compatibility(res1d_network):
 
     with pytest.warns(UserWarning):
         assert structures.s_119w1.structure_id == structures.s_119w1.id
-
-
-def test_nodes_dict_access_maintains_backwards_compatibility(res1d_network):
-    with pytest.warns(UserWarning):
-        node = res1d_network.nodes["1"]
-        assert node.GroundLevel == pytest.approx(197.07000732421875)
-        assert node.BottomLevel == pytest.approx(195.0500030517578)
-        assert node.XCoordinate == pytest.approx(-687934.6000976562)
-
-
-def test_node_node_property_maintains_backwards_compatibility(res1d_network):
-    node = res1d_network.nodes.n_1
-    assert node.node.GroundLevel == pytest.approx(197.07000732421875)
-    assert node.node.BottomLevel == pytest.approx(195.0500030517578)
-    assert node.node.XCoordinate == pytest.approx(-687934.6000976562)
-
-
-def test_reaches_dict_access_maintains_backwards_compatibility(res1d_network, res1d_river_network):
-    with pytest.warns(UserWarning):
-        # Indexing reaches could return a single dotnet reach
-        reach = res1d_network.reaches["100l1"]
-        assert reach.Name == "100l1"
-        assert reach.Length == pytest.approx(47.6827148432828)

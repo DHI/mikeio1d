@@ -444,24 +444,3 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
 
         """
         return self._cross_section_data.XSInterpolationType
-
-    # region Deprecated
-
-    @property
-    def xns11(self):
-        """Deprecated. Only use CrossSectionCollection instead."""
-        warn("Xns11 is deprecated. Use CrossSectionCollection instead.")
-        xns11 = getattr(self, "_xns11", None)
-        return xns11
-
-    @xns11.setter
-    def xns11(self, value):
-        warn("Xns11 is deprecated. Use CrossSectionCollection instead.")
-        self._xns11 = value
-
-    def add_xsection(self, xsection: CrossSection):
-        """Add a cross section to the collection."""
-        warn("add_xsection is deprecated. Use 'add' instead.")
-        return self.add(xsection)
-
-    # endregion

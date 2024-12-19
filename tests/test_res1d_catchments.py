@@ -109,11 +109,6 @@ def test_start_time(test_file):
     assert test_file.start_time == test_file.time_index.min()
 
 
-def test_get_catchment_values(test_file):
-    values = test_file.get_catchment_values("20_2_2", "TotalRunOff")
-    assert len(values) == 108
-
-
 def test_dotnet_methods(test_file):
     res1d = test_file
     # Just try to access the properties and methods in .net
@@ -184,16 +179,6 @@ def test_all_catchments_attributes(test_file):
 
     max_runoff = round(df.max().max(), 3)
     assert pytest.approx(max_runoff) == 0.469
-
-
-def test_catchment_attribute_access_maintains_backwards_compat(res1d_catchments):
-    res = res1d_catchments
-    catchment = res.catchments["100_16_16"]
-    with pytest.warns(UserWarning):
-        assert catchment.Id == "100_16_16"
-        assert pytest.approx(catchment.Area) == 22800.0
-    for name, catchment in res.catchments.items():
-        assert catchment.CatchmentName == name
 
 
 def test_catchments_map_to_python_catchment(res1d_catchments):
