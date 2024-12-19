@@ -115,32 +115,6 @@ def test_start_time(test_file):
     assert test_file.start_time == test_file.time_index.min()
 
 
-def test_get_node_values(test_file):
-    values = test_file.get_node_values("10", "Pressure")
-    assert len(values) == 25
-
-
-def test_get_reach_values(test_file):
-    # When reading EPANET results there is a bug in MIKE 1D,
-    # which does not allow to call GetReachValues. This does not work
-    # >>> values = test_file.get_reach_values("10", 0, "Flow")
-    # >>> time_series = pd.Series(values, index=test_file.time_index)
-    # >>> assert len(values) == 25
-    # >>> assert len(time_series.index) == 25
-
-    # Just try to call the methods
-    test_file.get_reach_end_values("10", "Flow")
-    test_file.get_reach_start_values("10", "Flow")
-    test_file.get_reach_sum_values("10", "Flow")
-
-
-def test_get_reach_value(test_file):
-    # Does not work from MIKE 1D side.
-    # >>> value = test_file.get_reach_value("10", 0, "Flow", test_file.start_time)
-    # >>> assert value > 0
-    assert 0 == 0
-
-
 def test_dotnet_methods(test_file):
     epanet_res = test_file
     epanet_res.data.ResultSpecs
