@@ -71,6 +71,7 @@ from .pandas_extension import Mikeio1dAccessor  # noqa: F401
 
 from System import DateTime
 from DHI.Mike1D.Generic import Connection
+from DHI.Mike1D.ResultDataAccess import Res1DExtensions
 
 
 class Res1D:
@@ -308,6 +309,7 @@ class Res1D:
         self.reader.load_dynamic_data()
         connection_original = self.result_data.Connection
         self.result_data.Connection = Connection.Create(file_path)
+        Res1DExtensions.RemoveUnusedDataItems(self.result_data)
         self.result_data.Save()
         self.result_data.Connection = connection_original
 
