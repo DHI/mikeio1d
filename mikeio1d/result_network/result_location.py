@@ -49,7 +49,6 @@ class ResultLocation(ABC):
     @property
     def res1d(self) -> Res1D:
         """The Res1D instance that this location belongs to."""
-        # TODO: Consider to remove this property for version 1.0.0
         return self._creator.res1d
 
     @property
