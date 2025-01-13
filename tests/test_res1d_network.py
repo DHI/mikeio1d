@@ -442,10 +442,3 @@ def test_structure_reach_static_attributes(res1d_network):
     assert structures.s_115p1.type == "Pump"
     assert structures.s_115p1.id == "115p1"
     assert structures.s_115p1.chainage == pytest.approx(41.21402714094492)
-
-
-def test_structure_reach_maintains_backweards_compatibility(res1d_network):
-    structures = res1d_network.structures
-
-    with pytest.warns(UserWarning):
-        assert structures.s_119w1.structure_id == structures.s_119w1.id

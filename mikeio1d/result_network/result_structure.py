@@ -75,15 +75,6 @@ class ResultStructure(ResultLocation):
         return self._creator.reach
 
     @property
-    def structure_id(self):
-        """Get structure ID."""
-        # TODO: Remove this in 1.0.0
-        warn(
-            "Please use .id instead of .structure_id. This attribute will be removed in the future."
-        )
-        return self.id
-
-    @property
     def id(self) -> str:
         """Structure ID."""
         return self._id
