@@ -8,6 +8,11 @@
 
 ### Changed
 
+## [1.0.1]  - 2025-01-13
+
+### Fixed
+- Res1D can now be saved when it was loaded using filters
+
 ## [1.0.0]  - 2024-12-19
 
 ### Changed
