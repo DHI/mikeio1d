@@ -8,6 +8,11 @@
 
 ### Changed
 
+## [1.0.2]  - 2025-01-14
+
+### Fixed
+- Matplotlib is now included as a dependency, avoiding import errors on fresh install
+
 ## [1.0.1]  - 2025-01-13
 
 ### Fixed
@@ -245,7 +250,9 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.2
+[1.0.1]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.1
 [1.0.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.0
 [0.10.0]: https://github.com/DHI/mikeio1d/releases/tag/v0.10.0
 [0.9.1]: https://github.com/DHI/mikeio1d/releases/tag/v0.9.1
