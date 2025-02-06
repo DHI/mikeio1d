@@ -1,3 +1,5 @@
+"""Module retrieving MIKE 1D nuget packages for runnig MIKE IO 1D."""
+
 import os
 import shutil
 import urllib.request
@@ -9,9 +11,7 @@ from pathlib import Path
 
 
 class NuGetPackageInfo:
-    """
-    Information about NuGet package to retrieve
-    """
+    """Information about NuGet package to retrieve."""
 
     root = "https://www.nuget.org/api/v2/package/"
 
@@ -28,9 +28,7 @@ class NuGetPackageInfo:
 
 
 class NuGetRetriever:
-    """
-    Retrieves necessary DHI NuGet packages and installs them into bin folder of MIKE IO 1D.
-    """
+    """Retrieves necessary DHI NuGet packages and installs them into bin folder of MIKE IO 1D."""
 
     # Default path
     path_default = f".{os.sep}"
@@ -180,7 +178,7 @@ class NuGetRetriever:
 
     @staticmethod
     def install(version=version_default):
-        """Installs NuGet packages into mikeio1d/bin folder"""
+        """Installs NuGet packages into mikeio1d/bin folder."""
         cwd = os.getcwd()
         path, _ = os.path.split(os.path.join(cwd, __file__))
         path = os.path.normpath(os.path.join(path, ".."))
