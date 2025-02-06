@@ -42,7 +42,7 @@ class NuGetRetriever:
     bin_dir_name = os.path.join("mikeio1d", "bin")
 
     # Default version of DHI NuGet packages to retrieve
-    version_default = "22.0.3"
+    version_default = "23.0.3"
 
     # DHI NuGet packages to install
     package_names = [
@@ -66,7 +66,6 @@ class NuGetRetriever:
 
     version_map = {
         "DHI.corlib": "1.0.0",
-        "DHI.Mike1D.ResultDataAccess": "22.0.4",
         "NetTopologySuite": "2.0.0",
         "DHI.MikeCore.Linux.rhel7": "20.0.0",
     }
