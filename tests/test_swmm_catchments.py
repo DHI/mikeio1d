@@ -28,7 +28,7 @@ def test_read(test_file):
 
 def test_quantities(test_file):
     quantities = test_file.quantities
-    assert len(quantities) == 36
+    assert len(quantities) == 37
 
 
 @pytest.mark.parametrize(

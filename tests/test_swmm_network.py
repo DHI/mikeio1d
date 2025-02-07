@@ -30,7 +30,7 @@ def test_read(test_file):
 
 def test_quantities(test_file):
     quantities = test_file.quantities
-    assert len(quantities) == 36
+    assert len(quantities) == 37
 
 
 def test_info(test_file):
@@ -43,7 +43,7 @@ def test_data_item_dicts(test_file):
     assert len(swmm_out.catchments) == 8
     assert len(swmm_out.nodes) == 14
     assert len(swmm_out.reaches) == 13
-    assert len(swmm_out.global_data) == 14
+    assert len(swmm_out.global_data) == 15
 
 
 @pytest.mark.parametrize(
