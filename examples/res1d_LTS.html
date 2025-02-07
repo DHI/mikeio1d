@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-92219a23c832b5d445f67cc8edb22532.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-45e2f07e1b8998ab5e9fb35277e52621.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -327,12 +327,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="b5e7b119" class="cell" data-execution_count="1">
+<div id="fc1f20c7" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mikeio1d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="event-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="event-statistics">Event statistics</h2>
-<div id="62b8f2b7" class="cell" data-execution_count="2">
+<div id="2ef5050c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">"../data/lts_event_statistics.res1d"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -369,7 +369,7 @@ End time: 1963-01-01 00:00:00
 23 - Flow velocity, Maximum, Time (sec)</code></pre>
 </div>
 </div>
-<div id="e083ab33" class="cell" data-execution_count="3">
+<div id="9a2cced7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -531,7 +531,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="31c9ea46" class="cell" data-execution_count="4">
+<div id="4c7b1f39" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">'WaterLevelMaximum:B4.1200'</span>, <span class="st">'WaterLevelMaximumTime:B4.1200'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
@@ -602,7 +602,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="3989d6c4" class="cell" data-execution_count="5">
+<div id="616929b9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>quantities <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> df.columns <span class="cf">if</span> <span class="st">'Discharge'</span> <span class="kw">in</span> c <span class="kw">and</span> <span class="st">'B4.1200l1:26.666'</span> <span class="kw">in</span> c]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df[quantities]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -718,7 +718,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="e1d38fd6" class="cell" data-execution_count="6">
+<div id="6b3364f2" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df[</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    [</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"WaterLevelMaximum:B4.1200"</span>,</span>
@@ -738,7 +738,7 @@ End time: 1963-01-01 00:00:00
 </section>
 <section id="chronological-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="chronological-statistics">Chronological statistics</h2>
-<div id="20773aac" class="cell" data-execution_count="7">
+<div id="bb84f4a0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">"../data/lts_monthly_statistics.res1d"</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -901,7 +901,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="1f3cb5f2" class="cell" data-execution_count="8">
+<div id="580098bf" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>quantities <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> df.columns <span class="cf">if</span> <span class="st">'Discharge'</span> <span class="kw">in</span> c <span class="kw">and</span> <span class="st">'B4.1200l1:26.666'</span> <span class="kw">in</span> c]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df[quantities].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -954,7 +954,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="99e8ec09" class="cell" data-execution_count="9">
+<div id="f71e8609" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quantities[<span class="dv">0</span>])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df[quantities[<span class="dv">0</span>]].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -968,7 +968,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="9b6ddcd6" class="cell" data-execution_count="10">
+<div id="c83644a9" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quantities[<span class="dv">1</span>])</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df[quantities[<span class="dv">1</span>]].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -982,7 +982,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="417a48ef" class="cell" data-execution_count="11">
+<div id="7bd2763a" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quantities[<span class="dv">2</span>])</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df[quantities[<span class="dv">2</span>]].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
