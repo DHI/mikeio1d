@@ -8,6 +8,11 @@
 
 ### Changed
 
+## [1.0.3] - 2025-02-17
+
+### Fixed
+- Update MIKE 1D binaries for MIKE+ 2025, solving some issues with reading res/resx files created with MIKE+ 2025.
+
 ## [1.0.2]  - 2025-01-14
 
 ### Fixed
