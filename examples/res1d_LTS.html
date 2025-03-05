@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-4d2b2bc788a3e61b580ccf37e85ee16d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-003e6e4e7ad8eba8d171ee7d305fea0c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -327,12 +327,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="c3a9bf32" class="cell" data-execution_count="1">
+<div id="e89f0a84" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mikeio1d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="event-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="event-statistics">Event statistics</h2>
-<div id="53a8845e" class="cell" data-execution_count="2">
+<div id="4e5b1990" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">"../data/lts_event_statistics.res1d"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>res.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -369,7 +369,7 @@ End time: 1963-01-01 00:00:00
 23 - Flow velocity, Maximum, Time (sec)</code></pre>
 </div>
 </div>
-<div id="b2f780b5" class="cell" data-execution_count="3">
+<div id="d3cd38cd" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -531,7 +531,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="fe7131e8" class="cell" data-execution_count="4">
+<div id="1a347b9c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">'WaterLevelMaximum:B4.1200'</span>, <span class="st">'WaterLevelMaximumTime:B4.1200'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
@@ -602,7 +602,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="c2afd2f9" class="cell" data-execution_count="5">
+<div id="99e07e19" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>quantities <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> df.columns <span class="cf">if</span> <span class="st">'Discharge'</span> <span class="kw">in</span> c <span class="kw">and</span> <span class="st">'B4.1200l1:26.666'</span> <span class="kw">in</span> c]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df[quantities]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -718,7 +718,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="5b21784b" class="cell" data-execution_count="6">
+<div id="fa1e6254" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df[</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    [</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"WaterLevelMaximum:B4.1200"</span>,</span>
@@ -730,7 +730,7 @@ End time: 1963-01-01 00:00:00
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="res1d_LTS_files/figure-html/cell-7-output-1.png" width="579" height="414" class="figure-img"></p>
+<p><img src="res1d_LTS_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -738,7 +738,7 @@ End time: 1963-01-01 00:00:00
 </section>
 <section id="chronological-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="chronological-statistics">Chronological statistics</h2>
-<div id="772cf26b" class="cell" data-execution_count="7">
+<div id="9fd9b77d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">"../data/lts_monthly_statistics.res1d"</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.read()</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -901,7 +901,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="3d9235b2" class="cell" data-execution_count="8">
+<div id="d2fa3eb7" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>quantities <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> df.columns <span class="cf">if</span> <span class="st">'Discharge'</span> <span class="kw">in</span> c <span class="kw">and</span> <span class="st">'B4.1200l1:26.666'</span> <span class="kw">in</span> c]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df[quantities].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -954,7 +954,7 @@ End time: 1963-01-01 00:00:00
 </div>
 </div>
 </div>
-<div id="a049c400" class="cell" data-execution_count="9">
+<div id="0422a4c1" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quantities[<span class="dv">0</span>])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df[quantities[<span class="dv">0</span>]].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -963,12 +963,12 @@ End time: 1963-01-01 00:00:00
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="res1d_LTS_files/figure-html/cell-10-output-2.png" width="600" height="411" class="figure-img"></p>
+<p><img src="res1d_LTS_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="454aefa9" class="cell" data-execution_count="10">
+<div id="e32f6ac1" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quantities[<span class="dv">1</span>])</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df[quantities[<span class="dv">1</span>]].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -977,12 +977,12 @@ End time: 1963-01-01 00:00:00
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="res1d_LTS_files/figure-html/cell-11-output-2.png" width="587" height="411" class="figure-img"></p>
+<p><img src="res1d_LTS_files/figure-html/cell-11-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="daa6cf2c" class="cell" data-execution_count="11">
+<div id="325adbb5" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quantities[<span class="dv">2</span>])</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df[quantities[<span class="dv">2</span>]].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -991,7 +991,7 @@ End time: 1963-01-01 00:00:00
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="res1d_LTS_files/figure-html/cell-12-output-2.png" width="583" height="411" class="figure-img"></p>
+<p><img src="res1d_LTS_files/figure-html/cell-12-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
