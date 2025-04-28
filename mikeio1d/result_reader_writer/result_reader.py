@@ -17,6 +17,8 @@ from abc import ABC
 from abc import abstractmethod
 
 import os.path
+from pathlib import Path
+
 import pandas as pd
 import datetime
 
@@ -80,7 +82,7 @@ class ResultReader(ABC):
     def __init__(
         self,
         res1d,
-        file_path=None,
+        file_path: str | Path = None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
         filter: ResultFilter = None,
@@ -120,7 +122,7 @@ class ResultReader(ABC):
             raise FileExistsError(f"File {self.file_path} does not exist.")
 
         self.data = ResultData()
-        self.data.Connection = Connection.Create(self.file_path)
+        self.data.Connection = Connection.Create(str(self.file_path))
         self.diagnostics = Diagnostics("Loading header")
 
         if self.lazy_load:
