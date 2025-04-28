@@ -1,5 +1,6 @@
 import os
 import pytest
+from pathlib import Path
 
 import mikeio1d
 from mikeio1d import Res1D
@@ -66,11 +67,17 @@ def test_mikeio1d_and_mikepluspy_coexistence(test_file_path):
     assert exit_code == 0
 
 
-def test_res11_to_res1d_conversion(test_file_path_res11):
+@pytest.mark.parametrize("with_pathlib", [False, True])
+def test_res11_to_res1d_conversion(test_file_path_res11, with_pathlib: bool):
+    test_file_path_res11 = Path(test_file_path_res11)
+    test_file_path_res1d = test_file_path_res11.with_suffix(".res1d")
+
+    if not with_pathlib:
+        test_file_path_res11 = str(test_file_path_res11)
+        test_file_path_res1d = str(test_file_path_res1d)
+
     res11 = Res1D(test_file_path_res11)
     res11.read()
-
-    test_file_path_res1d = test_file_path_res11.replace("res11", "res1d")
     res11.save(test_file_path_res1d)
 
     res1d = Res1D(test_file_path_res1d)
