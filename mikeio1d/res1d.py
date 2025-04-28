@@ -289,7 +289,7 @@ class Res1D:
         if file_path is not None:
             self.save(file_path)
 
-    def save(self, file_path):
+    def save(self, file_path: str | Path):
         """Save the ResultData to a new res1d file.
 
         Useful for persisting modified data, as well as converting supported result
@@ -297,7 +297,7 @@ class Res1D:
 
         Parameters
         ----------
-        file_path : str
+        file_path : str | Path
             File path for the new res1d file.
 
         Examples
@@ -308,7 +308,7 @@ class Res1D:
         """
         self.reader.load_dynamic_data()
         connection_original = self.result_data.Connection
-        self.result_data.Connection = Connection.Create(file_path)
+        self.result_data.Connection = Connection.Create(str(file_path))
         Res1DExtensions.RemoveUnusedDataItems(self.result_data)
         self.result_data.Save()
         self.result_data.Connection = connection_original
