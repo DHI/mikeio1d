@@ -5,9 +5,13 @@
 ### Added
 
 ### Fixed
-- Creating Res1D objects with pathlib.Path is now possible (same as mikeio.open)
 
 ### Changed
+
+## [1.0.4] - 2025-05-21
+
+### Fixed
+- Creating Res1D objects with pathlib.Path is now possible (same as mikeio.open)
 
 ## [1.0.3] - 2025-02-17
 
