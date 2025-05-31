@@ -69,6 +69,22 @@ class ResultQuantityCollection(ResultQuantity):
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
         return self.res1d.read(timeseries_ids, column_mode=column_mode)
 
+    def to_dataframe(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+        """Read the time series data into a data frame.
+
+        Alias for read() method.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+            'str' - column index of str representations of QueryData objects
+        """
+        return self.read(column_mode)
+
     def plot(self, ax=None, **kwargs):
         """Plot the time series data.
 

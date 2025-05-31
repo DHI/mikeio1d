@@ -242,6 +242,28 @@ class Res1D:
 
         return df
 
+    def to_dataframe(
+        self,
+        queries: Optional[list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData] = None,
+        column_mode: Optional[str | ColumnMode] = None,
+    ) -> pd.DataFrame:
+        """Read result data into a pandas DataFrame.
+
+        Alias for read() method.
+
+        Parameters
+        ----------
+        queries: list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData, default=None
+            A list of queries to read. If None, all data is read.
+        column_mode : {'str', 'timeseries', 'compact', 'all'}, default='str'
+            Specifies the type of column index of returned DataFrame.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
+        return self.read(queries, column_mode)
+
     def _get_timeseries_ids_to_read(
         self, queries: List[QueryData] | List[TimeSeriesId]
     ) -> List[TimeSeriesId]:

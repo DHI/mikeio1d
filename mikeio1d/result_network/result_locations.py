@@ -120,6 +120,28 @@ class ResultLocations(ABC, Dict[str, ResultLocation]):
 
         return df
 
+    def to_dataframe(
+        self,
+        column_mode: Optional[str | ColumnMode] = None,
+        include_derived: bool = False,
+    ) -> pd.DataFrame:
+        """Read the time series data for all quantities at these locations into a DataFrame.
+
+        Alias for read() method.
+
+        Parameters
+        ----------
+        column_mode : str | ColumnMode (optional)
+            Specifies the type of column index of returned DataFrame.
+            'all' - column MultiIndex with levels matching TimeSeriesId objects.
+            'compact' - same as 'all', but removes levels with default values.
+            'timeseries' - column index of TimeSeriesId objects
+
+        include_derived: bool, default False
+            Include derived quantities.
+        """
+        return self.read(column_mode, include_derived)
+
 
 class ResultLocationsCreator(ABC):
     """A base helper class for creating ResultLocations.
