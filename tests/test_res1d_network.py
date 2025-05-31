@@ -442,3 +442,35 @@ def test_structure_reach_static_attributes(res1d_network):
     assert structures.s_115p1.type == "Pump"
     assert structures.s_115p1.id == "115p1"
     assert structures.s_115p1.chainage == pytest.approx(41.21402714094492)
+
+
+def test_to_dataframe_aliases(res1d_network):
+    """Test that to_dataframe() alias exists and returns a DataFrame in all relevant classes."""
+    # Test Res1D class
+    df = res1d_network.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+    
+    # Test ResultLocation class (node)
+    node = res1d_network.nodes["1"]
+    df = node.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+    
+    # Test ResultLocations class (nodes)
+    df = res1d_network.nodes.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+    
+    # Test ResultQuantityCollection class
+    quantity_collection = res1d_network.nodes.quantities["WaterLevel"]
+    df = quantity_collection.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+    
+    # Test ResultQuantity class (base class for all quantities)
+    quantity = res1d_network.nodes["1"].WaterLevel
+    df = quantity.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+    
+    # Test ResultQuantityDerived class if available
+    if hasattr(res1d_network.nodes, "WaterLevelPlusOne"):
+        derived_quantity = res1d_network.nodes.WaterLevelPlusOne
+        df = derived_quantity.to_dataframe()
+        assert isinstance(df, pd.DataFrame)
