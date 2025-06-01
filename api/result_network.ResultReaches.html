@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-a5c23cfe6b9ae4909e4e769c1049622c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-bd23f212f340dd537ea1f20b83fd7441.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -296,6 +296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
   <li><a href="#mikeio1d.result_network.ResultReaches.read" id="toc-mikeio1d.result_network.ResultReaches.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultReaches.to_dataframe" id="toc-mikeio1d.result_network.ResultReaches.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.to_dataframe">to_dataframe</a></li>
   <li><a href="#mikeio1d.result_network.ResultReaches.to_geopandas" id="toc-mikeio1d.result_network.ResultReaches.to_geopandas" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultReaches.to_geopandas">to_geopandas</a></li>
   </ul></li>
   </ul></li>
@@ -388,6 +389,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Read the time series data for all quantities at these locations into a DataFrame.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.result_network.ResultReaches.to_dataframe">to_dataframe</a></td>
+<td>Read the time series data for all quantities at these locations into a DataFrame.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReaches.to_geopandas">to_geopandas</a></td>
 <td>Convert reaches to a geopandas.GeoDataFrame object.</td>
 </tr>
@@ -431,18 +436,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </section>
 </section>
-<section id="mikeio1d.result_network.ResultReaches.to_geopandas" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.to_geopandas">to_geopandas</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultReaches.to_geopandas(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    agg<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    agg_kwargs<span class="op">=</span>{},</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    segmented<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    include_derived<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Convert reaches to a geopandas.GeoDataFrame object.</p>
-<p>By default, quantities are not included. To include quantities, use the <code>agg</code> and <code>agg_kwargs</code> parameters.</p>
+<section id="mikeio1d.result_network.ResultReaches.to_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.to_dataframe">to_dataframe</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultReaches.to_dataframe(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    column_mode<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    include_derived<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Read the time series data for all quantities at these locations into a DataFrame.</p>
+<p>Alias for read() method.</p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 9%">
+<col style="width: 81%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>column_mode</td>
+<td>str | ColumnMode(optional)</td>
+<td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>include_derived</td>
+<td>bool</td>
+<td>Include derived quantities.</td>
+<td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultReaches.to_geopandas" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultReaches.to_geopandas">to_geopandas</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultReaches.to_geopandas(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    agg<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    agg_kwargs<span class="op">=</span>{},</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    segmented<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    include_derived<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Convert reaches to a geopandas.GeoDataFrame object.</p>
+<p>By default, quantities are not included. To include quantities, use the <code>agg</code> and <code>agg_kwargs</code> parameters.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
@@ -507,11 +554,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="convert-reaches-to-a-geodataframe-without-quantities" class="level1">
 <h1>Convert reaches to a GeoDataFrame (without quantities)</h1>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="convert-reaches-to-a-geodataframe-with-aggregated-quantities" class="level1">
 <h1>Convert reaches to a GeoDataFrame with aggregated quantities</h1>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> gdf <span class="op">=</span> res1d.reaches.to_geopandas(agg<span class="op">=</span><span class="st">'mean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

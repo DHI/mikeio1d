@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-a5c23cfe6b9ae4909e4e769c1049622c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-bd23f212f340dd537ea1f20b83fd7441.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -299,6 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mikeio1d.result_network.ResultGridPoint.get_m1d_dataset" id="toc-mikeio1d.result_network.ResultGridPoint.get_m1d_dataset" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGridPoint.get_m1d_dataset">get_m1d_dataset</a></li>
   <li><a href="#mikeio1d.result_network.ResultGridPoint.get_query" id="toc-mikeio1d.result_network.ResultGridPoint.get_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGridPoint.get_query">get_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultGridPoint.read" id="toc-mikeio1d.result_network.ResultGridPoint.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGridPoint.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultGridPoint.to_dataframe" id="toc-mikeio1d.result_network.ResultGridPoint.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultGridPoint.to_dataframe">to_dataframe</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -474,6 +475,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><a href="#mikeio1d.result_network.ResultGridPoint.read">read</a></td>
 <td>Read the time series data for all quantities at this location into a DataFrame.</td>
 </tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultGridPoint.to_dataframe">to_dataframe</a></td>
+<td>Read the time series data for all quantities at this location into a DataFrame.</td>
+</tr>
 </tbody>
 </table>
 <section id="mikeio1d.result_network.ResultGridPoint.add_query" class="level3">
@@ -543,6 +548,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Read the time series data for all quantities at this location into a DataFrame.</p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 9%">
+<col style="width: 82%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>column_mode</td>
+<td>str | ColumnMode(optional)</td>
+<td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultGridPoint.to_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultGridPoint.to_dataframe">to_dataframe</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultGridPoint.to_dataframe(column_mode<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Read the time series data for all quantities at this location into a DataFrame.</p>
+<p>Alias for read() method.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
