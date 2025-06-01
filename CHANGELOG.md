@@ -8,7 +8,7 @@
 
 ### Changed
 
-## [1.0.5] - 2025-05-31
+## [1.1.0] - 2025-06-01
 
 ### Added
 - Added to_dataframe() method alias for read() in multiple classes for API consistency
