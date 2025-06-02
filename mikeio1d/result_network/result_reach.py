@@ -91,7 +91,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
                 except ValueError:
                     continue
 
-            raise KeyError(f"Chainage {key} not found in reach. Available chainages: {self.chainages}")
+            raise KeyError(f"Chainage {key} not found in reach. Available chainages: {self.chainages}\nNote: Integer indices (e.g., reach[10]) access by position, while float indices (e.g., reach[10.0]) access by chainage value.")
             
         return super().__getitem__(key)
 
