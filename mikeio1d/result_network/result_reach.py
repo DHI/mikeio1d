@@ -60,10 +60,39 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """Return a string representation of ResultReach."""
         return f"<Reach: {self.name}>"
 
-    def __getitem__(self, key: str | int) -> ResultGridPoint:
-        """Get a ResultGridPoint object by chainage."""
+    def __getitem__(self, key: str | int | float) -> ResultGridPoint:
+        """Get a ResultGridPoint object by chainage.
+        
+        Parameters
+        ----------
+        key : str | int | float
+            If int: index in gridpoints list
+            If str: chainage as string
+            If float: chainage as float, will be converted to string
+            
+        Returns
+        -------
+        ResultGridPoint
+            The grid point at the specified chainage or index
+        """
         if isinstance(key, int):
             return self.gridpoints[key]
+        elif isinstance(key, float):          
+            key_str = str(key)
+            if key_str in self:
+                return super().__getitem__(key_str)
+            
+            for chainage_str in self.chainages:
+                try:
+                    chainage_float = float(chainage_str)
+                    epsilon = 1e-1
+                    if abs(chainage_float - key) < epsilon:
+                        return super().__getitem__(chainage_str)
+                except ValueError:
+                    continue
+
+            raise KeyError(f"Chainage {key} not found in reach. Available chainages: {self.chainages}")
+            
         return super().__getitem__(key)
 
     @property
