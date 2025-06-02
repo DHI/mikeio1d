@@ -444,6 +444,46 @@ def test_structure_reach_static_attributes(res1d_network):
     assert structures.s_115p1.chainage == pytest.approx(41.21402714094492)
 
 
+@pytest.mark.parametrize(
+    "str_chainage,float_chainage",
+    [
+        ("0.000", 0.0),       # Exact match
+        ("23.841", 23.841),   # Exact match
+        ("23.841", 23.84),    # Fewer decimal places
+        ("23.841", 23.8),     # Fewer decimal places
+        ("47.683", 47.683),   # Exact match for last chainage
+        ("47.683", 47.68),    # Fewer decimal places
+        ("47.683", 47.6),    # Fewer decimal places
+    ],
+)
+def test_reach_float_chainage_indexing(test_file, str_chainage, float_chainage):
+    """Test that ResultReach can be indexed with a float chainage value.
+    
+    Uses reach 100l1 with chainages ['0.000', '23.841', '47.683']
+    """
+    res1d = test_file
+    reaches = res1d.reaches
+    reach = reaches.r_100l1
+    
+    # Get grid points using both string and float representations
+    grid_point_from_str = reach[str_chainage]
+    grid_point_from_float = reach[float_chainage]
+    
+    # Assert they are the same grid point
+    assert grid_point_from_float is grid_point_from_str
+
+
+def test_reach_float_chainage_indexing_keyerror(test_file):
+    """Test that trying to access a non-existent chainage raises KeyError."""
+    res1d = test_file
+    reaches = res1d.reaches
+    reach = reaches.r_100l1
+    
+    # Test that trying to access a non-existent chainage raises KeyError
+    with pytest.raises(KeyError):
+        reach[999.999]
+
+
 def test_to_dataframe_aliases(res1d_network):
     """Test that to_dataframe() alias exists and returns a DataFrame in all relevant classes."""
     # Test Res1D class
