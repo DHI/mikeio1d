@@ -5,6 +5,7 @@
 ### Added
 
 ### Fixed
+- Quantity filter for not predefined MIKE 1D quantities
 
 ### Changed
 
