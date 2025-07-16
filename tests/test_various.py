@@ -27,6 +27,12 @@ def test_file_path2():
     return os.path.join(test_folder_path, "testdata", "network.res1d")
 
 
+@pytest.fixture
+def test_file_path3():
+    test_folder_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(test_folder_path, "testdata", "network_sirius_h2s.res1d")
+
+
 def test_make_proper_variable_name():
     mpvn = make_proper_variable_name  # alias
     assert mpvn("a") == "a"
@@ -99,3 +105,17 @@ def test_saving_with_filter(test_file_path2):
     assert res_filtered.quantities == ["WaterLevel"]
 
     os.remove("filtered.res1d")
+
+
+def test_saving_with_filter_for_not_predefined_quantities(test_file_path3):
+    res_unfiltered = mikeio1d.open(test_file_path3)
+    assert res_unfiltered.quantities == ["S_II", "S_O"]
+
+    res_filtered = mikeio1d.open(test_file_path3, quantities=["S_II"])
+    test_file_path3_filtered = test_file_path3.replace(".res1d", "_filtered.res1d")
+    res_filtered.save(test_file_path3_filtered)
+
+    res_filtered = mikeio1d.open(test_file_path3_filtered)
+    assert res_filtered.quantities == ["S_II"]
+
+    os.remove(test_file_path3_filtered)
