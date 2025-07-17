@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeGuard
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
     from typing import Optional
-    from typing import Union
     from typing import Type
     from typing import Set
-    from typing import cast
 
     from datetime import datetime
 
