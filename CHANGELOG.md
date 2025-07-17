@@ -6,6 +6,7 @@
 
 ### Fixed
 - Quantity filter for not predefined MIKE 1D quantities
+- Filtering on opening Res1D no longer requires single values to be in list.
 
 ### Changed
 
