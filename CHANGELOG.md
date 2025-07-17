@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Added
+- More helpful error messages when indexing reach gridpoints.
+- If reach index does not exist as integer, automatically tries float chainage (e.g. 1000 tries chainage 1000.0)
 
 ### Fixed
 - Quantity filter for not predefined MIKE 1D quantities
