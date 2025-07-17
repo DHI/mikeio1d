@@ -22,9 +22,9 @@ class QuantityFilter(ResultSubFilter):
 
     def __init__(
         self,
-        quantities: None | list[str],
+        quantities: str | list[str] | None = None,
     ):
-        self._quantities = quantities if quantities else []
+        self._quantities = self._box_inputs_to_str_list(quantities)
         self._quantities_in_res1d = None
         self._predefined_quantity_table = PredefinedQuantityTable()
 

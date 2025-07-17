@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeGuard
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
@@ -10,6 +10,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Union
     from typing import Type
     from typing import Set
+    from typing import cast
 
     from datetime import datetime
 
@@ -134,14 +135,14 @@ class Res1D:
 
     def __init__(
         self,
-        file_path: Union[str, Path] = None,
-        reaches: Optional[list[str]] = None,
-        nodes: Optional[list[str]] = None,
-        catchments: Optional[list[str]] = None,
-        time: Union[tuple[str], list[str], slice, None] = None,
-        step_every: Optional[int] = None,
-        quantities: Optional[list[str]] = None,
-        derived_quantities: Optional[list[str]] = None,
+        file_path: str | Path | None = None,
+        reaches: str | list[str] | None = None,
+        nodes: str | list[str] | None = None,
+        catchments: str | list[str] | None = None,
+        time: tuple[str] | list[str] | slice | None = None,
+        step_every: int | None = None,
+        quantities: str | list[str] | None = None,
+        derived_quantities: str | list[str] | None = None,
         **kwargs,
     ):
         self.filter = ResultFilter(
@@ -172,13 +173,31 @@ class Res1D:
         return "<mikeio1d.Res1D>"
 
     def _init_derived_quantities(
-        self, derived_quantity_classes: List[Type[DerivedQuantity]] | None
-    ) -> List[DerivedQuantity]:
-        if derived_quantity_classes is None:
-            derived_quantity_classes = get_default_derived_quantity_classes()
+        self,
+        derived_quantity_classes: str
+        | list[str]
+        | type[DerivedQuantity]
+        | list[type[DerivedQuantity]]
+        | None,
+    ) -> list[type[DerivedQuantity]]:
+        default_derived_quantities = get_default_derived_quantity_classes()
 
+        if derived_quantity_classes is None:
+            derived_quantity_classes = default_derived_quantities
+
+        derived_quantity_classes = make_list_if_not_iterable(derived_quantity_classes)
+
+        derived_quantities: list[type[DerivedQuantity]] = []
         for dq in derived_quantity_classes:
-            self.add_derived_quantity(dq)
+            if isinstance(dq, str):
+                for found_dq in filter(lambda x: x._NAME == dq, default_derived_quantities):
+                    self.add_derived_quantity(found_dq)
+                    derived_quantities.append(found_dq)
+            elif issubclass(dq, DerivedQuantity):
+                self.add_derived_quantity(dq)
+                derived_quantities.append(dq)
+
+        return derived_quantities
 
     def info(self) -> None:
         """Print information about the result file."""
@@ -479,12 +498,12 @@ class Res1D:
             ".resx",
         }
 
-    def add_derived_quantity(self, derived_quantity: Type[DerivedQuantity]):
+    def add_derived_quantity(self, derived_quantity: str | Type[DerivedQuantity]):
         """Add a derived quantity to the Res1D object, propogating changes to the network.
 
         Parameters
         ----------
-        derived_quantity : Type[DerivedQuantity]
+        derived_quantity : str | Type[DerivedQuantity]
             Derived quantity to be added
         """
         derived_quantity = derived_quantity(self)

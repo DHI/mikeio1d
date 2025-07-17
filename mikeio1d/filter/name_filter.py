@@ -19,13 +19,13 @@ class NameFilter(ResultSubFilter):
 
     def __init__(
         self,
-        reaches: None | list[str],
-        nodes: None | list[str],
-        catchments: None | list[str],
+        reaches: str | list[str] | None = None,
+        nodes: str | list[str] | None = None,
+        catchments: str | list[str] | None = None,
     ):
-        self._reaches = reaches if reaches else []
-        self._nodes = nodes if nodes else []
-        self._catchments = catchments if catchments else []
+        self._reaches = self._box_inputs_to_str_list(reaches)
+        self._nodes = self._box_inputs_to_str_list(nodes)
+        self._catchments = self._box_inputs_to_str_list(catchments)
 
     def use_filter(self) -> bool:
         """Check if the filter should be used."""
