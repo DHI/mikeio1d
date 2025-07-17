@@ -59,7 +59,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
     def __repr__(self) -> str:
         """Return a string representation of ResultReach."""
         return f"<Reach: {self.name}>"
-        
+
     def _format_chainage_index_error_message(self, key) -> str:
         """Format a consistent error message for chainage not found errors."""
         key_desc = f"Index {key}" if isinstance(key, int) else f"Chainage '{key}'"
@@ -72,14 +72,14 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     def __getitem__(self, key: str | int | float) -> ResultGridPoint:
         """Get a ResultGridPoint object by chainage.
-        
+
         Parameters
         ----------
         key : str | int | float
             If int: index in gridpoints list
             If str: chainage as string
             If float: chainage as float, will be converted to string
-            
+
         Returns
         -------
         ResultGridPoint
@@ -89,13 +89,17 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             try:
                 return self.gridpoints[key]
             except IndexError:
-                raise IndexError(self._format_chainage_index_error_message(key)) from None
+                # maybe user inputted chainage as integer
+                try:
+                    return self.__getitem__(float(key))
+                except IndexError:
+                    raise IndexError(self._format_chainage_index_error_message(key)) from None
 
-        elif isinstance(key, float):          
+        elif isinstance(key, float):
             key_str = str(key)
             if key_str in self:
                 return super().__getitem__(key_str)
-            
+
             for chainage_str in self.chainages:
                 try:
                     chainage_float = float(chainage_str)
@@ -105,10 +109,10 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
                 except ValueError:
                     continue
             raise KeyError(self._format_chainage_index_error_message(key)) from None
-        
+
         if key in self:
             return super().__getitem__(key)
-        
+
         raise KeyError(self._format_chainage_index_error_message(key)) from None
 
     @property
