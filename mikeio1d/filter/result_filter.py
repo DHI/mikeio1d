@@ -54,3 +54,11 @@ class ResultSubFilter(Protocol):
     def use_filter(self) -> bool:
         """Check if the filter should be used."""
         pass
+
+    def _box_inputs_to_str_list(self, value: str | list[str] | None) -> list[str]:
+        if value is None:
+            return []
+        elif isinstance(value, str):
+            return [value]
+        else:
+            return value
