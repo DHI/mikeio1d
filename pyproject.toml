@@ -74,6 +74,7 @@ notebooks = [
 docs = [
     "quarto-cli==1.6.37",
     "quartodoc==0.9.1",
+    "griffe==1.5.1",
 ]
 test = [
     "pytest",
