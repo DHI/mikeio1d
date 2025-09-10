@@ -129,14 +129,20 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         return self._creator._get_total_length()
 
     @property
-    def start_chainage(self) -> float:
+    def start_chainage(self) -> float | None:
         """Start chainage of the reach."""
-        return self.res1d_reaches[0].LocationSpan.StartChainage
+        try:
+            return self.res1d_reaches[0].LocationSpan.StartChainage
+        except Exception as _:
+            return None
 
     @property
     def end_chainage(self) -> float:
         """End chainage of the reach."""
-        return self.res1d_reaches[-1].LocationSpan.EndChainage
+        try:
+            return self.res1d_reaches[-1].LocationSpan.EndChainage
+        except Exception as _:
+            return None
 
     @property
     def n_gridpoints(self) -> int:
@@ -404,12 +410,13 @@ class ResultReachCreator(ResultLocationCreator):
         )
 
     def _get_total_length(self) -> float:
-        total_length = 0
-        for reach in self.reaches:
-            if not hasattr(reach, "Length"):
-                return None
-            total_length += reach.Length
-        return total_length
+        try:
+            total_length = 0
+            for reach in self.reaches:
+                total_length += reach.Length
+            return total_length
+        except Exception as _:
+            return None
 
     def _get_total_gridpoints(self) -> int:
         return sum([len(gp_list) for gp_list in self.result_gridpoints])
