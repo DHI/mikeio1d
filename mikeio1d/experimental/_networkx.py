@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import networkx as nx
 from .. import Res1D
+from typing import Literal
 
 
-def to_networkx(res: Res1D, directed: bool = True) -> nx.Graph:
+def to_networkx(
+    res: Res1D,
+    graph_type: Literal["MultiDiGraph", "DiGraph", "MultiGraph", "Graph"] = "MultiDiGraph",
+) -> nx.Graph:
     """Convert a Res1D object to a networkx Graph.
 
     Nodes become nodes, reaches become edges. Gridpoints ignored.
@@ -13,29 +17,30 @@ def to_networkx(res: Res1D, directed: bool = True) -> nx.Graph:
     ----------
     res : Res1D
         The Res1D object
-    directed : bool, optional
-        If True, returns a DiGraph (default). If False, returns an undirected Graph.
+    graph_type : {"MultiDiGraph", "DiGraph", "MultiGraph", "Graph"}, optional
+        The type of networkx graph to return. Defaults to "MultiDiGraph".
 
     Returns
     -------
-    nx.Graph or nx.DiGraph
+    nx.Graph / nx.DiGraph / nx.MultiGraph / nx.MultiDiGraph
         The networkx Graph object.
 
     Examples
     --------
-    Convert a mikeio1d.Res1D object into a networkx Graph (or DiGraph)
-
     >>> from mikeio1d.experimental import to_networkx
-    >>> G = to_networkx(res, directed=True)
-
-    Get dataframe of water level for all nodes within depth 3 of a particular node.
-
-    >>> node = res.nodes['1']
-    >>> for n in nx.bfs_tree(G, node, depth_limit=3).nodes:
-    >>>     n.WaterLevel.add()
-    >>> df = res.read()
+    >>> G = to_networkx(res, graph_type="MultiDiGraph")
     """
-    G = nx.DiGraph() if directed else nx.Graph()
+    if graph_type == "MultiDiGraph":
+        G = nx.MultiDiGraph()
+    elif graph_type == "DiGraph":
+        G = nx.DiGraph()
+    elif graph_type == "MultiGraph":
+        G = nx.MultiGraph()
+    elif graph_type == "Graph":
+        G = nx.Graph()
+    else:
+        raise ValueError(f"Unsupported graph_type: {graph_type!r}")
+
     for reach in res.reaches.values():
         start, end = reach.start_node, reach.end_node
         G.add_edge(res.nodes[start], res.nodes[end], reach=reach)
