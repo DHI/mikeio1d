@@ -4,6 +4,7 @@
 
 ### Added
 - Export to Networkx graphs (experimental - see mikeio1d.experimental)
+- Export to Xarray DataArray (experimental - see mikeio1d.experimental)
 
 ### Fixed
 - Quantity filter for not predefined MIKE 1D quantities
