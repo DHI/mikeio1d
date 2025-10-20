@@ -7,3 +7,4 @@ Note:
 """
 
 from ._networkx import to_networkx
+from ._xarray import to_dataarray
