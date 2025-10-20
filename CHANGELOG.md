@@ -3,12 +3,16 @@
 ## [Unreleased]
 
 ### Added
+- Support for Python 3.14
 
 ### Fixed
 - Quantity filter for not predefined MIKE 1D quantities
 - Filtering on opening Res1D no longer requires single values to be in list.
 
 ### Changed
+
+### Removed
+- Support for Python 3.9 (end of service life)
 
 ## [1.1.1] - 2025-06-02
 
