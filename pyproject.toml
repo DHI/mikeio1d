@@ -81,6 +81,7 @@ notebooks = [
     "folium",
     "mapclassify",
 ]
+
 docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1"]
 experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 
