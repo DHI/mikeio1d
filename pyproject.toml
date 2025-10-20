@@ -50,6 +50,20 @@ dependencies = [
     'mikecore; platform_system=="Linux"'
 ]
 
+[dependency-groups]
+dev = [
+    "folium>=0.20.0",
+    "geopandas>=1.1.1",
+    "hatch>=1.15.1",
+    "ipykernel>=7.0.1",
+    "jupyterlab>=4.4.9",
+    "mapclassify>=2.8.1",
+    "matplotlib>=3.10.7",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.1",
+]
+
 [project.optional-dependencies]
 dev = [
     "hatch",
