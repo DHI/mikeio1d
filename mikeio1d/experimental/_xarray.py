@@ -46,6 +46,6 @@ def to_dataarray(res: Res1D) -> xr.DataArray:
     """
     df = res.read(column_mode="all")
     da = xr.DataArray(df, dims=("time", "feature"))
-    da = da = da.reset_index("feature")
+    da = da.reset_index("feature")
     da = da.set_xindex(["group", "quantity", "chainage", "name"])
     return da
