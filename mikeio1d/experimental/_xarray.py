@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-import xarray as xr
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import xarray as xr
 
 from ..res1d import Res1D
 
@@ -44,8 +47,8 @@ def to_dataarray(res: Res1D) -> xr.DataArray:
     >>> da = da.where(da.chainage == 0, drop=True)
     >>> da = da.isel(time=slice(0, 10))
     """
+    import xarray as xr
+
     df = res.read(column_mode="all")
     da = xr.DataArray(df, dims=("time", "feature"))
-    da = da.reset_index("feature")
-    da = da.set_xindex(["group", "quantity", "chainage", "name"])
     return da
