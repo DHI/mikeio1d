@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-import networkx as nx
 from .. import Res1D
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import networkx as nx
 
 
 def to_networkx(
@@ -30,6 +32,8 @@ def to_networkx(
     >>> from mikeio1d.experimental import to_networkx
     >>> G = to_networkx(res, graph_type="MultiDiGraph")
     """
+    import networkx as nx
+
     if graph_type == "MultiDiGraph":
         G = nx.MultiDiGraph()
     elif graph_type == "DiGraph":

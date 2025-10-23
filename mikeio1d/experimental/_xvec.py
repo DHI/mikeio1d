@@ -25,12 +25,10 @@ from typing import Any, List, Optional, cast, TYPE_CHECKING, TypeIs
 if TYPE_CHECKING:
     import shapely
     from shapely.geometry.base import BaseGeometry
+    import xarray as xr
 
 import math
-import xarray as xr
-import xvec
 import pandas as pd
-from shapely.geometry import GeometryCollection
 
 from ..res1d import Res1D
 from ..result_network import (
@@ -87,6 +85,9 @@ def to_dataarray_xvec(res: Res1D) -> xr.DataArray:
     >>> da.xvec.query("geometry", [point], predicate="intersects")
     """
     import shapely
+    from shapely.geometry import GeometryCollection
+    import xarray as xr
+    import xvec
 
     da = _to_dataarray_xarray(res)
 
