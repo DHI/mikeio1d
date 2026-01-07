@@ -6,7 +6,7 @@ This guide will help you set up your development environment.
 
 This project uses [`uv`](https://docs.astral.sh/uv/) as the package manager. If you don't have it installed, please refer to the [installation guide](https://dhigroup.sharepoint.com/sites/TechnologyandInnovation/SitePages/Installing-Python.aspx).
 
-## Development Setup
+## Setup
 
 1. **Clone the repository**
 2. **Install dependencies**
