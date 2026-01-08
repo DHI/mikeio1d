@@ -139,6 +139,9 @@ Debug
 Release
 .vs
 
+# UV lock file
+uv.lock
+
 # mikeio1d/bin folder
 mikeio1d/bin/**/*.dll
 mikeio1d/bin/**/*.pfs
