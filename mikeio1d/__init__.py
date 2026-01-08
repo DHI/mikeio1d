@@ -33,7 +33,9 @@ __version__ = "1.2.0"
 
 
 def python_upper_boundary(py_req: str) -> Tuple[int, int]:
-    """Fetch the upper boundary of mikeio1d of python defined in pyproject.toml.
+    """Fetch the python upper boundary of the 'requires-python' field in pyproject.toml.
+
+    It works with strings like '>=3.13,<3.14'. Python upper boundary must not include the patch level.
 
     Returns
     -------
@@ -48,15 +50,21 @@ def python_upper_boundary(py_req: str) -> Tuple[int, int]:
     # (\d+\.\d+)   → Match a decimal number: one or more digits, a dot, then one or more digits.
     # Parentheses create capture groups, so we can extract both the operator and the number.
     pattern = r"(<=|=<|<)\s*(\d+\.\d+)"
-    upper_boundary = re.search(pattern, py_req)
-    if upper_boundary:
-        operator, py_version = upper_boundary.groups()
-        py_version = [int(v) for v in py_version.split(".")]
+    upper_boundary = re.findall(pattern, py_req)
+    if len(upper_boundary) == 0:
+        return sys.version_info[:2]
+    elif len(upper_boundary) == 1:
+        operator, py_version = upper_boundary[0]
+        major, minor = map(int, py_version.split("."))
         if operator == "<":
-            py_version[1] -= 1
-        return tuple(py_version)
+            if minor > 0:
+                minor -= 1
+            else:
+                major -= 1
+
+        return (major, minor)
     else:
-        return sys.version_info
+        raise RuntimeError("'requires-python' contains multiple upper boundaries.")
 
 
 python_requirements = metadata("mikeio1d").get("Requires-Python")
