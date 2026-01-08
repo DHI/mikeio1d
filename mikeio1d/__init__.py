@@ -8,6 +8,7 @@ import warnings
 import platform
 from pathlib import Path
 from typing import Tuple
+from packaging.specifiers import SpecifierSet
 
 from importlib.metadata import metadata
 
@@ -32,49 +33,39 @@ from .mikepath import MikePath
 __version__ = "1.2.0"
 
 
-def python_upper_boundary(py_req: str) -> Tuple[int, int]:
+def get_version_upper_boundary() -> str:
     """Fetch the python upper boundary of the 'requires-python' field in pyproject.toml.
 
     It works with strings like '>=3.13,<3.14'. Python upper boundary must not include the patch level.
 
     Returns
     -------
-    Tuple[int, int]
-        Returns highest compatible Python version (as a tuple)
+    str
+        Upper boundary as specified in 'requires-python'
     """
-    # Regex pattern explanation:
-    # (<=|=<|<)    → Match one of the three operators: <=, =<, or <.
-    #                The order matters: <= and =< are checked first so that
-    #                the single < doesn't match inside them.
-    # \s*          → Match zero or more spaces between the operator and the number.
-    # (\d+\.\d+)   → Match a decimal number: one or more digits, a dot, then one or more digits.
-    # Parentheses create capture groups, so we can extract both the operator and the number.
-    pattern = r"(<=|=<|<)\s*(\d+\.\d+)"
-    upper_boundary = re.findall(pattern, py_req)
+    #     # Regex pattern explanation:
+    #     # <=|=<|<    → Match one of the three operators: <=, =<, or <.
+    #     #               The order matters: <= and =< are checked first so that
+    #     #               the single < doesn't match inside them.
+    #     # \s*          → Match zero or more spaces between the operator and the number.
+    #     # \d+\.\d+   → Match a decimal number: one or more digits, a dot, then one or more digits.
+    pattern = r"<=|=<|<\s*\d+\.\d+"
+    requires_python = metadata("mikeio1d").get("Requires-Python")
+    upper_boundary = re.findall(pattern, requires_python)
     if len(upper_boundary) == 0:
         return sys.version_info[:2]
     elif len(upper_boundary) == 1:
-        operator, py_version = upper_boundary[0]
-        major, minor = map(int, py_version.split("."))
-        if operator == "<":
-            if minor > 0:
-                minor -= 1
-            else:
-                major -= 1
-
-        return (major, minor)
+        py_version = upper_boundary[0]
+        return py_version
     else:
         raise RuntimeError("'requires-python' contains multiple upper boundaries.")
 
 
-python_requirements = metadata("mikeio1d").get("Requires-Python")
-max_python = python_upper_boundary(python_requirements)
-python_version = (sys.version_info.major, sys.version_info.minor)
-print(max_python, python_version)
-if python_version > max_python:
-    max_python_version = ".".join([str(n) for n in max_python])
+valid_python = get_version_upper_boundary()
+current_python = ".".join(map(str, sys.version_info[:3]))
+if current_python not in SpecifierSet(valid_python):
     warnings.warn(
-        f"'mikeio1d' officially supports Python <= {max_python_version} and you are using Python {sys.version_info.major}.{sys.version_info.minor}. "
+        f"'mikeio1d' officially supports Python {valid_python} and you are using Python {current_python}. "
         "Functionality may be unstable, likely due to incompatibilities with 'pythonnet'.",
         stacklevel=2,
     )
