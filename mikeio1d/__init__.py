@@ -7,7 +7,6 @@ import sys
 import warnings
 import platform
 from pathlib import Path
-from typing import Tuple
 from packaging.specifiers import SpecifierSet
 
 from importlib.metadata import metadata
@@ -32,6 +31,8 @@ from .mikepath import MikePath
 #
 __version__ = "1.2.0"
 
+current_python_version = ".".join(map(str, sys.version_info[:3]))
+
 
 def get_version_upper_boundary() -> str:
     """Fetch the python upper boundary of the 'requires-python' field in pyproject.toml.
@@ -53,7 +54,7 @@ def get_version_upper_boundary() -> str:
     requires_python = metadata("mikeio1d").get("Requires-Python")
     upper_boundary = re.findall(pattern, requires_python)
     if len(upper_boundary) == 0:
-        return sys.version_info[:2]
+        return current_python_version
     elif len(upper_boundary) == 1:
         py_version = upper_boundary[0]
         return py_version
@@ -62,10 +63,9 @@ def get_version_upper_boundary() -> str:
 
 
 valid_python = get_version_upper_boundary()
-current_python = ".".join(map(str, sys.version_info[:3]))
-if current_python not in SpecifierSet(valid_python):
+if current_python_version not in SpecifierSet(valid_python):
     warnings.warn(
-        f"'mikeio1d' officially supports Python {valid_python} and you are using Python {current_python}. "
+        f"'mikeio1d' officially supports Python {valid_python} and you are using Python {current_python_version}. "
         "Functionality may be unstable, likely due to incompatibilities with 'pythonnet'.",
         stacklevel=2,
     )
