@@ -21,10 +21,15 @@ def test_can_import_mike1d_quantities_from_res1d():
 
 
 @pytest.mark.parametrize(
-    "requires_python",
-    [">=3.9,<3.13", ">=3.9,<=3.13", "<3.13,>=3.9"],
+    "requires_python, boundary",
+    [
+        (">=3.9,<=3.13", (3, 13)),
+        ("<=3.13,>=3.9", (3, 13)),
+        (">=3.9,<3.13", (3, 12)),
+        ("<3.13,>=3.9", (3, 12)),
+    ],
 )
-def test_read_python_upper_boundary(requires_python):
+def test_read_python_upper_boundary(requires_python, boundary):
     from mikeio1d import python_upper_boundary
 
-    assert python_upper_boundary(requires_python) == (3, 13)
+    assert python_upper_boundary(requires_python) == boundary

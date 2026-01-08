@@ -38,23 +38,25 @@ def python_upper_boundary(py_req: str) -> Tuple[int, int]:
     Returns
     -------
     Tuple[int, int]
-        Python version as a tuple
+        Returns highest compatible Python version (as a tuple)
     """
-    # Regex to match decimals after <, <=, or =<
-    # Explanation:
-    # (?<=pattern) → positive lookbehind (asserts what comes before)
-    # <|<=|=<    → matches <, <=, or =<
-    # \d+\.\d+   → matches a decimal number (e.g., 3.45)
-    pattern = r"(?:(?<=<)|(?<=<=)|(?<==<))\d+\.\d+"
-    upper_boundary = re.findall(pattern, py_req)
-    if len(upper_boundary) == 0:
-        return sys.version_info
-    elif len(upper_boundary) == 1:
-        return tuple(int(v) for v in upper_boundary[0].split("."))
+    # Regex pattern explanation:
+    # (<=|=<|<)    → Match one of the three operators: <=, =<, or <.
+    #                The order matters: <= and =< are checked first so that
+    #                the single < doesn't match inside them.
+    # \s*          → Match zero or more spaces between the operator and the number.
+    # (\d+\.\d+)   → Match a decimal number: one or more digits, a dot, then one or more digits.
+    # Parentheses create capture groups, so we can extract both the operator and the number.
+    pattern = r"(<=|=<|<)\s*(\d+\.\d+)"
+    upper_boundary = re.search(pattern, py_req)
+    if upper_boundary:
+        operator, py_version = upper_boundary.groups()
+        py_version = [int(v) for v in py_version.split(".")]
+        if operator == "<":
+            py_version[1] -= 1
+        return tuple(py_version)
     else:
-        raise ValueError(
-            "'requires-python' field is not properly set: multiple upper boundaries were found."
-        )
+        return sys.version_info
 
 
 python_requirements = metadata("mikeio1d").get("Requires-Python")
