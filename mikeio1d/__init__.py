@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import warnings
 import platform
 from pathlib import Path
+from typing import Tuple
+
+from importlib.metadata import metadata
 
 from .mikepath import MikePath
 
@@ -27,10 +31,38 @@ from .mikepath import MikePath
 #
 __version__ = "1.2.0"
 
-PYTHONNET_MAX_PYTHON = (3, 13)
 
-if sys.version_info > PYTHONNET_MAX_PYTHON:
-    max_python_version = ".".join([str(n) for n in PYTHONNET_MAX_PYTHON])
+def python_upper_boundary(py_req: str) -> Tuple[int, int]:
+    """Fetch the upper boundary of mikeio1d of python defined in pyproject.toml.
+
+    Returns
+    -------
+    Tuple[int, int]
+        Python version as a tuple
+    """
+    # Regex to match decimals after <, <=, or =<
+    # Explanation:
+    # (?<=pattern) → positive lookbehind (asserts what comes before)
+    # <|<=|=<    → matches <, <=, or =<
+    # \d+\.\d+   → matches a decimal number (e.g., 3.45)
+    pattern = r"(?:(?<=<)|(?<=<=)|(?<==<))\d+\.\d+"
+    upper_boundary = re.findall(pattern, py_req)
+    if len(upper_boundary) == 0:
+        return sys.version_info
+    elif len(upper_boundary) == 1:
+        return tuple(int(v) for v in upper_boundary[0].split("."))
+    else:
+        raise ValueError(
+            "'requires-python' field is not properly set: multiple upper boundaries were found."
+        )
+
+
+python_requirements = metadata("mikeio1d").get("Requires-Python")
+max_python = python_upper_boundary(python_requirements)
+python_version = (sys.version_info.major, sys.version_info.minor)
+print(max_python, python_version)
+if python_version > max_python:
+    max_python_version = ".".join([str(n) for n in max_python])
     warnings.warn(
         f"'mikeio1d' officially supports Python <= {max_python_version} and you are using Python {sys.version_info.major}.{sys.version_info.minor}. "
         "Functionality may be unstable, likely due to incompatibilities with 'pythonnet'.",
