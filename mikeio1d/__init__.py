@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import warnings
 import platform
 from pathlib import Path
 
@@ -25,6 +26,16 @@ from .mikepath import MikePath
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
 __version__ = "1.2.0"
+
+PYTHONNET_MAX_PYTHON = (3, 13)
+
+if sys.version_info > PYTHONNET_MAX_PYTHON:
+    max_python_version = ".".join([str(n) for n in PYTHONNET_MAX_PYTHON])
+    warnings.warn(
+        f"'mikeio1d' officially supports Python <= {max_python_version} and you are using Python {sys.version_info.major}.{sys.version_info.minor}. "
+        "Functionality may be unstable, likely due to incompatibilities with 'pythonnet'.",
+        stacklevel=2,
+    )
 
 if "64" not in platform.architecture()[0]:
     raise Exception("This library has not been tested for a 32 bit system.")
