@@ -33,36 +33,22 @@ __version__ = "1.2.0"
 
 current_python_version = ".".join(map(str, sys.version_info[:3]))
 
+#     # Regex pattern explanation:
+#     # <=|=<|<    → Match one of the three operators: <=, =<, or <.
+#     #               The order matters: <= and =< are checked first so that
+#     #               the single < doesn't match inside them.
+#     # \s*          → Match zero or more spaces between the operator and the number.
+#     # \d+\.\d+   → Match a decimal number: one or more digits, a dot, then one or more digits.
+pattern = r"<=|=<|<\s*\d+\.\d+"
+requires_python = metadata("mikeio1d").get("Requires-Python")
+upper_boundary = re.findall(pattern, requires_python)
+if len(upper_boundary) == 0:
+    valid_python = current_python_version
+elif len(upper_boundary) == 1:
+    valid_python = upper_boundary[0]
+else:
+    raise RuntimeError("'requires-python' contains multiple upper boundaries.")
 
-def get_version_upper_boundary() -> str:
-    """Fetch the python upper boundary of the 'requires-python' field in pyproject.toml.
-
-    It works with strings like '>=3.13,<3.14'. Python upper boundary must not include the patch level.
-
-    Returns
-    -------
-    str
-        Upper boundary as specified in 'requires-python'
-    """
-    #     # Regex pattern explanation:
-    #     # <=|=<|<    → Match one of the three operators: <=, =<, or <.
-    #     #               The order matters: <= and =< are checked first so that
-    #     #               the single < doesn't match inside them.
-    #     # \s*          → Match zero or more spaces between the operator and the number.
-    #     # \d+\.\d+   → Match a decimal number: one or more digits, a dot, then one or more digits.
-    pattern = r"<=|=<|<\s*\d+\.\d+"
-    requires_python = metadata("mikeio1d").get("Requires-Python")
-    upper_boundary = re.findall(pattern, requires_python)
-    if len(upper_boundary) == 0:
-        return current_python_version
-    elif len(upper_boundary) == 1:
-        py_version = upper_boundary[0]
-        return py_version
-    else:
-        raise RuntimeError("'requires-python' contains multiple upper boundaries.")
-
-
-valid_python = get_version_upper_boundary()
 if current_python_version not in SpecifierSet(valid_python):
     warnings.warn(
         f"'mikeio1d' officially supports Python {valid_python} and you are using Python {current_python_version}. "
