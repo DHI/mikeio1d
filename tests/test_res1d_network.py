@@ -327,11 +327,11 @@ def test_res1d_filter_quantity_invalid_id(test_file_path):
         Res1D(test_file_path, quantities=["InvalidQuantity"])
 
 
-@pytest.mark.parametrize("quantities", [["WaterLevel"], ["WaterLevel", "Discharge"]])
+@pytest.mark.parametrize("quantities", [["WaterLevel"], ["WaterLevel", "Discharge"], "WaterLevel"])
 def test_res1d_filter_quantity(test_file_path, quantities):
-    res = Res1D(test_file_path, quantities=quantities[0])
+    res = Res1D(test_file_path, quantities=quantities)
 
-    quantities = set(quantities)
+    quantities = set([quantities] if isinstance(quantities, str) else quantities)
     assert quantities.issuperset(set(res.nodes.quantities))
     assert quantities.issuperset(set(res.catchments.quantities))
     assert quantities.issuperset(set(res.structures.quantities))
