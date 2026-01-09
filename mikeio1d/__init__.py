@@ -30,6 +30,10 @@ from .mikepath import MikePath
 #
 __version__ = "1.2.0"
 
+# UV may ignore requires-python upper bounds for local installs, potentially causing
+# compatibility issues with dependencies like 'pythonnet'. Adding this warning to help
+# identify such problems early.
+# For more info see https://docs.astral.sh/uv/reference/internals/resolver/#requires-python .
 current_python_version = ".".join(map(str, sys.version_info[:3]))
 requires_python = metadata("mikeio1d").get("Requires-Python")
 if current_python_version not in SpecifierSet(requires_python):
