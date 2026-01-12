@@ -91,7 +91,13 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             except IndexError:
                 # maybe user inputted chainage as integer
                 try:
-                    return self.__getitem__(float(key))
+                    key_as_float = float(key)
+                    item = self.__getitem__(key_as_float)
+                    warnings.warn(
+                        f"Input was passed as integer {key}, which does not exist as index. Instead, chainage '{key_as_float}' will be used.",
+                        stacklevel=2,
+                    )
+                    return item
                 except IndexError:
                     raise IndexError(self._format_chainage_index_error_message(key)) from None
 
