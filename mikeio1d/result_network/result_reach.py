@@ -89,35 +89,31 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             try:
                 return self.gridpoints[key]
             except IndexError:
-                # maybe user inputted chainage as integer
-                try:
-                    key_as_float = float(key)
-                    item = self.__getitem__(key_as_float)
-                    warnings.warn(
-                        f"Input was passed as integer {key}, which does not exist as index. Instead, chainage '{key_as_float}' will be used.",
-                        stacklevel=2,
-                    )
-                    return item
-                except IndexError:
-                    raise IndexError(self._format_chainage_index_error_message(key)) from None
+                result = self._get_by_chainage(float(key))
+                warnings.warn(
+                    f"Index {key} not found, using chainage {float(key)} instead.",
+                    stacklevel=2,
+                )
+                return result
 
-        elif isinstance(key, float):
-            key_str = str(key)
-            if key_str in self:
-                return super().__getitem__(key_str)
+        # Handle float/string indexing (chainage access)
+        return self._get_by_chainage(key)
 
-            for chainage_str in self.chainages:
-                try:
-                    chainage_float = float(chainage_str)
-                    epsilon = 1e-1
-                    if abs(chainage_float - key) < epsilon:
-                        return super().__getitem__(chainage_str)
-                except ValueError:
-                    continue
-            raise KeyError(self._format_chainage_index_error_message(key)) from None
+    def _get_by_chainage(self, key: str | float) -> ResultGridPoint:
+        if isinstance(key, str):
+            if key.replace(".", "", 1).isnumeric():  # Check if key is numeric (including decimals)
+                key = float(key)
+            else:
+                if key in self:
+                    return super().__getitem__(key)
+                else:
+                    raise KeyError(self._format_chainage_index_error_message(key)) from None
 
-        if key in self:
-            return super().__getitem__(key)
+        # Fuzzy matching
+        tolerance = 1e-1
+        for chainage in self.chainages:
+            if abs(float(chainage) - key) < tolerance:
+                return super().__getitem__(chainage)
 
         raise KeyError(self._format_chainage_index_error_message(key)) from None
 
