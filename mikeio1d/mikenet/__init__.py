@@ -7,7 +7,7 @@ variable which points to desired installation:
 
 ```python
 >>> import os
->>> os.environ["MIKE_INSTALL_PATH"] = "C:/Program File (x86)/DHI/MIKE+/2023/"
+>>> os.environ["MIKE_INSTALL_PATH"] = "C:/Program Files (x86)/DHI/MIKE+/2023/"
 ```
 
 If this variable is not defined the MIKE IO 1D bin folder will be used per
