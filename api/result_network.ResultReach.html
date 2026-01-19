@@ -370,7 +370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.end_chainage">end_chainage</a></td>
-<td>End chainage of the reach.</td>
+<td>End chainage of the reach or a DELETE_VALUE=-1e-30 in case it is not available.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.end_node">end_node</a></td>
@@ -398,7 +398,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.length">length</a></td>
-<td>Length of the reach.</td>
+<td>Length of the reach. If no length is available, returns zero.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.n_gridpoints">n_gridpoints</a></td>
@@ -422,7 +422,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultReach.start_chainage">start_chainage</a></td>
-<td>Start chainage of the reach.</td>
+<td>Start chainage of the reach or a DELETE_VALUE=-1e-30 in case it is not available.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultReach.start_node">start_node</a></td>
