@@ -11,6 +11,8 @@
 ## [1.2.0] - 2025-10-23
 
 ### Added
+- More helpful error messages when indexing reach gridpoints.
+- If reach index does not exist as integer, automatically tries float chainage (e.g. 1000 tries chainage 1000.0)
 - Export to Networkx graphs (experimental - see mikeio1d.experimental)
 - Export to Xarray DataArray (experimental - see mikeio1d.experimental)
 - Export to XVec DataArray (experimental - see mikeio1d.experimental)

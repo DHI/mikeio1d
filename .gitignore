@@ -170,3 +170,5 @@ tests/testdata/network_cali.res1d
 tests/testdata/NetworkFactorTwo.res1d
 tests/testdata/NetworkNodeWaterLevel.dfs0
 
+# uv
+uv.lock
