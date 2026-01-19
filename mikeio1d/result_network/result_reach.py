@@ -132,7 +132,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     @property
     def start_chainage(self) -> float:
-        """Start chainage of the reach or a DELETE_VALUE in case it is not available."""
+        """Start chainage of the reach or a DELETE_VALUE=-1e-30 in case it is not available."""
         try:
             return self.res1d_reaches[0].LocationSpan.StartChainage
         except Exception as _:
@@ -140,7 +140,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     @property
     def end_chainage(self) -> float:
-        """End chainage of the reach or a DELETE_VALUE in case it is not available."""
+        """End chainage of the reach or a DELETE_VALUE=-1e-30 in case it is not available."""
         try:
             return self.res1d_reaches[-1].LocationSpan.EndChainage
         except Exception as _:
