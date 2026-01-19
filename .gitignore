@@ -139,6 +139,9 @@ Debug
 Release
 .vs
 
+# UV lock file
+uv.lock
+
 # mikeio1d/bin folder
 mikeio1d/bin/**/*.dll
 mikeio1d/bin/**/*.pfs
@@ -167,3 +170,5 @@ tests/testdata/network_cali.res1d
 tests/testdata/NetworkFactorTwo.res1d
 tests/testdata/NetworkNodeWaterLevel.dfs0
 
+# uv
+uv.lock

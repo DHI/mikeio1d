@@ -60,6 +60,16 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """Return a string representation of ResultReach."""
         return f"<Reach: {self.name}>"
 
+    def _format_chainage_index_error_message(self, key) -> str:
+        """Format a consistent error message for chainage not found errors."""
+        key_desc = f"Index {key}" if isinstance(key, int) else f"Chainage '{key}'"
+        return (
+            f"{key_desc} not found in reach. "
+            f"Available chainages: {self.chainages}. "
+            "Integer indices (e.g., reach[10]) access by position like a list, while "
+            "float indices (e.g., reach[10.0]) access by chainage value."
+        )
+
     def __getitem__(self, key: str | int | float) -> ResultGridPoint:
         """Get a ResultGridPoint object by chainage.
 
@@ -76,26 +86,36 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             The grid point at the specified chainage or index
         """
         if isinstance(key, int):
-            return self.gridpoints[key]
-        elif isinstance(key, float):
-            key_str = str(key)
-            if key_str in self:
-                return super().__getitem__(key_str)
+            try:
+                return self.gridpoints[key]
+            except IndexError:
+                result = self._get_by_chainage(float(key))
+                warnings.warn(
+                    f"Index {key} not found, using chainage {float(key)} instead.",
+                    stacklevel=2,
+                )
+                return result
 
-            for chainage_str in self.chainages:
-                try:
-                    chainage_float = float(chainage_str)
-                    epsilon = 1e-1
-                    if abs(chainage_float - key) < epsilon:
-                        return super().__getitem__(chainage_str)
-                except ValueError:
-                    continue
+        # Handle float/string indexing (chainage access)
+        return self._get_by_chainage(key)
 
-            raise KeyError(
-                f"Chainage {key} not found in reach. Available chainages: {self.chainages}\nNote: Integer indices (e.g., reach[10]) access by position, while float indices (e.g., reach[10.0]) access by chainage value."
-            )
+    def _get_by_chainage(self, key: str | float) -> ResultGridPoint:
+        if isinstance(key, str):
+            if key.replace(".", "", 1).isnumeric():  # Check if key is numeric (including decimals)
+                key = float(key)
+            else:
+                if key in self:
+                    return super().__getitem__(key)
+                else:
+                    raise KeyError(self._format_chainage_index_error_message(key)) from None
 
-        return super().__getitem__(key)
+        # Fuzzy matching
+        tolerance = 1e-1
+        for chainage in self.chainages:
+            if abs(float(chainage) - key) < tolerance:
+                return super().__getitem__(chainage)
+
+        raise KeyError(self._format_chainage_index_error_message(key)) from None
 
     @property
     def res1d_reaches(self) -> List[IRes1DReach]:
