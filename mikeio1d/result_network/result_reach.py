@@ -127,7 +127,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     @property
     def length(self) -> float:
-        """Length of the reach."""
+        """Length of the reach. If no length is available, returns zero."""
         return self._creator._get_total_length()
 
     @property
