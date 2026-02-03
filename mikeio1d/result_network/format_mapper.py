@@ -78,7 +78,8 @@ class Res1DMapper:
         self.graph = self._generate_graph()
         self._node_map = self._generate_node_map(self.graph)
 
-        self._df = pd.concat({k: v["series"] for k, v in self.graph.nodes.items()}, axis=1)
+        self._df = pd.concat({k: v["data"] for k, v in self.graph.nodes.items()}, axis=1)
+        self._df.columns = self._df.columns.set_names(["node", "quantity"])
 
     def _validate_priority(self):
         valid_keys = {"edges", "nodes", "inclusions"}
@@ -153,7 +154,12 @@ class Res1DMapper:
             Id in the simplified network
         """
         alias = NetworkNode._generate_alias(element)
-        return self._node_map[alias]
+        try:
+            return self._node_map[alias]
+        except KeyError:
+            # If the alias is not found in the node map, the passed element was not included
+            # in the simplified network. Likely due to prioritization.
+            raise ValueError("Element was not found in simplified network.")
 
     def _initialize_graph(self) -> nx.Graph:
         graph = nx.Graph()
@@ -161,7 +167,7 @@ class Res1DMapper:
         for node in list(self._res1d.nodes.values()):
             element = self._prioritize_node(node)
             if not element.is_empty:
-                graph.add_node(n, series=element.data, alias=element.alias)
+                graph.add_node(n, data=element.data, alias=element.alias)
                 n += 1
 
         return graph
