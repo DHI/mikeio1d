@@ -65,7 +65,13 @@ class Res1DMapper:
         self._res1d = res
         self.priority = priority
         self._validate_priority()
-        self.graph, self._node_map = self._generate_graph_and_node_map()
+
+        g0 = nx.Graph()
+        for reach in self._res1d.reaches.values():
+            g0.add_edge(reach.start_node, reach.end_node, name=reach.name)
+        self._g0 = g0.copy()
+
+        self.graph, self._node_map = self._generate_graph_and_alias_map()
         self._df = self._build_node_dataframe()
 
     def _build_node_dataframe(self) -> pd.DataFrame:
@@ -82,27 +88,17 @@ class Res1DMapper:
             if not set(self.priority["edges"]).issubset(set(self._res1d.reaches.keys())):
                 raise ValueError("'edges' must only include values found in reaches.")
 
-    def _get_overlapping_elements(self, node: ResultNode) -> List[ResultNode | ResultGridPoint]:
-        gridpoints = []
-        for reach in list(self._res1d.reaches.values()):
-            if reach.start_node == node.id:
-                gridpoints.append(reach.gridpoints[0])
-            elif reach.end_node == node.id:
-                gridpoints.append(reach.gridpoints[-1])
-        elements = [node] + gridpoints
-        return [element for element in elements if element is not None]
-
-    def _prioritize_node(self, node: ResultNode) -> NetworkNode:
+    def _prioritize(self, elements: List[ResultNode | ResultGridPoint]) -> NetworkNode:
         # TODO: refresh, can catchment be an overlapping element?
         # TODO: prioritize by quantity
-        elements = self._get_overlapping_elements(node)
+
         if len(elements) == 0:
             return NetworkNode()
         elif len(elements) == 1:
             # Only one element was found, which is directly passed to the network
             element = elements[0]
         else:
-            # Multiple elements were found, so we check priority
+            # Multiple overlapping elements were found, so we check priority
             node_elements = [element for element in elements if isinstance(element, ResultNode)]
 
             priority_elements = []
@@ -149,76 +145,77 @@ class Res1DMapper:
             # in the simplified network. Likely due to prioritization.
             raise ValueError("Element was not found in simplified network.")
 
-    def _initialize_graph(self) -> nx.Graph:
+    def _find_overlapping_elements(self, node: ResultNode) -> List[ResultNode | ResultGridPoint]:
+        touching_reaches = self._get_touching_reaches(node)
+        # Finding elements that are overlapping (node and gridpoint ends)
+        gridpoints = []
+        for reach in touching_reaches:
+            if reach.start_node == node.id:
+                gridpoints.append(reach.gridpoints[0])
+            elif reach.end_node == node.id:
+                gridpoints.append(reach.gridpoints[-1])
+        return [node] + gridpoints
+
+    def _initialize_nodes(self) -> Tuple[nx.Graph, Dict[str, str]]:
+        alias_map = {}
         graph = nx.Graph()
-        n = 0
-        for node in list(self._res1d.nodes.values()):
-            element = self._prioritize_node(node)
+        for node in self._res1d.nodes.values():
+            nnode = NetworkNode(node)
+            elements = self._find_overlapping_elements(node)
+            element = self._prioritize(elements)
             if not element.is_empty:
-                graph.add_node(n, data=element.data, alias=element.alias)
-                n += 1
+                graph.add_node(element.alias, data=element.data)
+                alias_map[nnode.alias] = element.alias
+
+        return graph, alias_map
+
+    def _fill_edges(self, graph: nx.Graph, alias_map: Dict[str, str]) -> nx.Graph:
+        for reach in self._res1d.reaches.values():
+            start_id, end_id = self._get_reach_ends(reach, alias_map)
+            graph.add_edge(start_id, end_id, length=reach.length)
 
         return graph
 
-    def _fill_edges(self, graph: nx.Graph, node_map: Dict[str, int]) -> nx.Graph:
-        for reach in list(self._res1d.reaches.values()):
-            try:
-                start_id, end_id = self._get_reach_ends(reach, node_map)
-                graph.add_edge(start_id, end_id, length=reach.length)
-            except KeyError:
-                pass
+    def _get_touching_reaches(self, node: ResultNode) -> List[ResultReach]:
+        return [
+            self._res1d.reaches[data["name"]] for _, _, data in self._g0.edges(node.id, data=True)
+        ]
 
-        return graph
-
-    def _generate_graph_and_node_map(self) -> Tuple[nx.Graph, Dict[str, int]]:
-        graph = self._initialize_graph()
-        node_map = {v["alias"]: k for k, v in graph.nodes.items()}
-        graph = self._fill_edges(graph, node_map)
+    def _generate_graph_and_alias_map(self) -> Tuple[nx.Graph, Dict[str, int]]:
+        graph, alias_map = self._initialize_nodes()
+        graph = self._fill_edges(graph, alias_map)
 
         if "inclusions" in self.priority:
-            graph, node_map = self._add_inclusions(graph, node_map)
+            graph, alias_map = self._add_inclusions(graph, alias_map)
 
-        return graph, node_map
+        return graph, alias_map
 
     def _add_inclusions(
-        self, graph: nx.Graph, node_map: Dict[str, int]
-    ) -> Tuple[nx.Graph, Dict[str, int]]:
-        n = graph.number_of_nodes()
+        self, graph: nx.Graph, alias_map: Dict[str, int]
+    ) -> Tuple[nx.Graph, Dict[str, str]]:
         for inclusion in self.priority["inclusions"]:
             edge_id = inclusion["edge"]
             distance = inclusion["distance"]
             reach = self._res1d.reaches[edge_id]
             element = NetworkNode(reach[distance])
 
-            start_id, end_id = self._get_reach_ends(reach, node_map)
-
+            start_id, end_id = self._get_reach_ends(reach, alias_map)
             edge_data = graph.get_edge_data(start_id, end_id)
             total_length = edge_data.get("length", 1)
 
             graph.remove_edge(start_id, end_id)
-            graph.add_node(n, data=element.data, alias=element.alias)
-            graph.add_edge(start_id, n, length=distance)
-            graph.add_edge(n, end_id, length=total_length - distance)
+            graph.add_node(element.alias, data=element.data)
+            graph.add_edge(start_id, element.alias, length=distance)
+            graph.add_edge(element.alias, end_id, length=total_length - distance)
+            alias_map[element.alias] = element.alias
 
-            node_map[element.alias] = n
-            n += 1
+        return graph, alias_map
 
-        return graph, node_map
+    def _get_reach_ends(self, reach: ResultReach, alias_map: Dict[str, int]) -> Tuple[str, str]:
+        start_node = NetworkNode(self._res1d.nodes[reach.start_node])
+        end_node = NetworkNode(self._res1d.nodes[reach.end_node])
 
-    def _get_reach_ends(
-        self, reach: ResultReach, node_map: Optional[Dict[str, int]] = None
-    ) -> Tuple[str, str] | Tuple[int, int]:
-        start_node = self._res1d.nodes[reach.start_node]
-        end_node = self._res1d.nodes[reach.end_node]
-        start_node_alias = NetworkNode._generate_alias(start_node)
-        end_node_alias = NetworkNode._generate_alias(end_node)
-
-        if node_map is None:
-            # Returning aliased (using Res1D nomenclature)
-            return start_node_alias, end_node_alias
-        else:
-            # Returning new ids (int)
-            return node_map[start_node_alias], node_map[end_node_alias]
+        return alias_map[start_node.alias], alias_map[end_node.alias]
 
     @property
     def as_df(self) -> pd.DataFrame:
