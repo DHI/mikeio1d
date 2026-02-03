@@ -17,8 +17,6 @@ class NetworkNode:
     def __init__(
         self,
         element: Optional[ResultNode | ResultGridPoint],
-        *,
-        quantity: Optional[str] = None,
     ):
         self._empty_node = element is None
         if self._empty_node:
@@ -28,7 +26,7 @@ class NetworkNode:
         else:
             self.alias = self._generate_alias(element)
             self.quantities = element.quantities
-            self.data = self._build_node_data(element, quantity)
+            self.data = self._build_node_data(element)
 
     @staticmethod
     def _generate_alias(element: ResultNode | ResultGridPoint) -> str:
@@ -49,9 +47,7 @@ class NetworkNode:
         """
         return self._empty_node
 
-    def _build_node_data(
-        self, element: ResultNode | ResultGridPoint, quantity: Optional[str]
-    ) -> pd.DataFrame:
+    def _build_node_data(self, element: ResultNode | ResultGridPoint) -> pd.DataFrame:
         df = element.to_dataframe()
         renamer_dict = {}
         for quantity in self.quantities:
@@ -59,18 +55,14 @@ class NetworkNode:
             assert len(relevant_columns) == 1, "There must be exactly one column matching quantity"
             renamer_dict[relevant_columns[0]] = quantity
         df = df.rename(columns=renamer_dict)
-        if quantity is not None:
-            df = df[[quantity]].copy()
         return df.copy()
 
 
 class Res1DMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, res: Res1D, quantity: str, priority: Dict[str, List]):
-        assert quantity in res.quantities, f"Network does not include quantity={quantity}"
+    def __init__(self, res: Res1D, priority: Dict[str, List]):
         self._res1d = res
-        self.quantity = quantity
         self.priority = priority
         self._validate_priority()
         self.graph, self._node_map = self._generate_graph_and_node_map()
@@ -98,14 +90,11 @@ class Res1DMapper:
             elif reach.end_node == node.id:
                 gridpoints.append(reach.gridpoints[-1])
         elements = [node] + gridpoints
-        return [
-            element
-            for element in elements
-            if (element is not None) and (self.quantity in element.quantities)
-        ]
+        return [element for element in elements if element is not None]
 
     def _prioritize_node(self, node: ResultNode) -> NetworkNode:
         # TODO: refresh, can catchment be an overlapping element?
+        # TODO: prioritize by quantity
         elements = self._get_overlapping_elements(node)
         if len(elements) == 0:
             return NetworkNode()
@@ -137,7 +126,7 @@ class Res1DMapper:
             else:
                 element = priority_elements[0]
 
-        return NetworkNode(element, quantity=self.quantity)
+        return NetworkNode(element)
 
     def get_node_id(self, element: ResultNode | ResultGridPoint) -> int:
         """Return the node id in the simplified network.
