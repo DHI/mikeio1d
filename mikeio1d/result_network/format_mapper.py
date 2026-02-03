@@ -1,3 +1,5 @@
+"""FormatMapper class."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,33 +14,26 @@ from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment
 
 
 class NetworkNode:
-    """Network node in the simplified network."""
+    """Node in the simplified network."""
 
     def __init__(
         self,
         element: Optional[ResultNode | ResultGridPoint],
         *,
-        # TODO: we might want to include all quantities in the element and then we can remove this argument
         quantity: Optional[str],
     ):
-        self._ntype = type(element)
-        valid_init = (quantity is not None) and (element is not None)
-        self._empty_node = (quantity is None) and (element is None)
-        if valid_init:
-            self.id = self._generate_id(element)
-            self.quantity = quantity
-            self.series = self.get_pd_series(element)
-        elif self._empty_node:
-            self.id = None
-            self.quantity = None
-            self.series = None
+        self._empty_node = element is None
+        if self._empty_node:
+            self.alias = None
+            self.quantities = None
+            self.data = None
         else:
-            raise ValueError(
-                "Invalid node init: either contains id, quantity and df or none of them."
-            )
+            self.alias = self._generate_alias(element)
+            self.quantities = element.quantities
+            self.data = self._build_node_data(element, quantity)
 
     @staticmethod
-    def _generate_id(element: ResultNode | ResultGridPoint) -> str:
+    def _generate_alias(element: ResultNode | ResultGridPoint) -> str:
         if isinstance(element, ResultGridPoint):
             return f"{"gridpoint"}-{element.reach_name}-{round(element.chainage, 3)}"
         elif isinstance(element, ResultNode):
@@ -48,14 +43,27 @@ class NetworkNode:
 
     @property
     def is_empty(self) -> bool:
+        """Specifies if a node is empty.
+
+        Returns
+        -------
+        bool
+        """
         return self._empty_node
 
-    def get_pd_series(self, element: ResultNode | ResultGridPoint) -> pd.Series:
+    def _build_node_data(
+        self, element: ResultNode | ResultGridPoint, quantity: Optional[str]
+    ) -> pd.DataFrame:
         df = element.to_dataframe()
-        relevant_columns = [col for col in df.columns if self.quantity in col]
-        assert len(relevant_columns) == 1, "Multiple relevant columns were found!"
-        col = relevant_columns[0]
-        return df[col].copy()
+        renamer_dict = {}
+        for quantity in self.quantities:
+            relevant_columns = [col for col in df.columns if quantity in col]
+            assert len(relevant_columns) == 1, "There must be exactly one column matching quantity"
+            renamer_dict[relevant_columns[0]] = quantity
+        df = df.rename(columns=renamer_dict)
+        if quantity is not None:
+            df = df[[quantity]].copy()
+        return df.copy()
 
 
 class Res1DMapper:
@@ -66,7 +74,7 @@ class Res1DMapper:
         self.quantity = quantity
 
         self.priority = priority
-        self.validate_priority()
+        self._validate_priority()
 
         self._res1d = res
         self.graph = self._generate_graph()
@@ -74,13 +82,16 @@ class Res1DMapper:
 
         self._df = pd.concat({k: v["series"] for k, v in self.graph.nodes.items()}, axis=1)
 
-    def validate_priority(self):
-        assert True
+    def _validate_priority(self):
+        valid_keys = {"edges", "nodes", "inclusions"}
+        priority_keys = set(self.priority.keys())
+        if not priority_keys.issubset(valid_keys):
+            raise ValueError(f"Invalid keys in priority, they must be one of {valid_keys}")
+        if "edges" in priority_keys:
+            if not set(self.priority["edges"]).issubset(set(self._res1d.reaches.keys())):
+                raise ValueError("'edges' must only include values found in reaches.")
 
-    def validate_inclusions(self):
-        assert True
-
-    def get_overlapping_elements(self, node: ResultNode) -> List[ResultNode | ResultGridPoint]:
+    def _get_overlapping_elements(self, node: ResultNode) -> List[ResultNode | ResultGridPoint]:
         gridpoints = []
         for reach in list(self._res1d.reaches.values()):
             if reach.start_node == node.id:
@@ -96,7 +107,7 @@ class Res1DMapper:
 
     def _prioritize_node(self, node: ResultNode) -> NetworkNode:
         # TODO: refresh, can catchment be an overlapping element?
-        elements = self.get_overlapping_elements(node)
+        elements = self._get_overlapping_elements(node)
         if len(elements) == 0:
             return NetworkNode()
         elif len(elements) == 1:
@@ -130,8 +141,21 @@ class Res1DMapper:
 
         return NetworkNode(element, quantity=self.quantity)
 
-    def get_node(self, id: str) -> int:
-        return self._node_map[id]
+    def get_node_id(self, element: ResultNode | ResultGridPoint) -> int:
+        """Return the node id in the simplified network.
+
+        Parameters
+        ----------
+        element : ResultNode | ResultGridPoint
+            Element in the Res1D network
+
+        Returns
+        -------
+        int
+            Id in the simplified network
+        """
+        alias = NetworkNode._generate_alias(element)
+        return self._node_map[alias]
 
     def _initialize_graph(self) -> nx.Graph:
         graph = nx.Graph()
@@ -139,14 +163,14 @@ class Res1DMapper:
         for node in list(self._res1d.nodes.values()):
             element = self._prioritize_node(node)
             if not element.is_empty:
-                graph.add_node(n, series=element.series, id=element.id)
+                graph.add_node(n, series=element.data, alias=element.alias)
                 n += 1
 
         return graph
 
     @staticmethod
     def _generate_node_map(graph: nx.Graph) -> Dict[str, int]:
-        return {v["id"]: k for k, v in graph.nodes.items()}
+        return {v["alias"]: k for k, v in graph.nodes.items()}
 
     def _fill_edges(self, graph: nx.Graph, node_map: Dict[str, int]) -> nx.Graph:
         for reach in list(self._res1d.reaches.values()):
