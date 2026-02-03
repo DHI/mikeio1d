@@ -8,7 +8,7 @@ import pandas as pd
 from typing import Dict, List, Optional, Tuple
 
 from mikeio1d import Res1D
-from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment
+from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment, ResultReach
 
 
 class NetworkNode:
@@ -18,7 +18,7 @@ class NetworkNode:
         self,
         element: Optional[ResultNode | ResultGridPoint],
         *,
-        quantity: Optional[str],
+        quantity: Optional[str] = None,
     ):
         self._empty_node = element is None
         if self._empty_node:
@@ -174,13 +174,8 @@ class Res1DMapper:
     def _fill_edges(self, graph: nx.Graph, node_map: Dict[str, int]) -> nx.Graph:
         for reach in list(self._res1d.reaches.values()):
             try:
-                start_node = self._res1d.nodes[reach.start_node]
-                end_node = self._res1d.nodes[reach.end_node]
-                start_node_alias = NetworkNode._generate_alias(start_node)
-                end_node_alias = NetworkNode._generate_alias(end_node)
-                graph.add_edge(
-                    node_map[start_node_alias], node_map[end_node_alias], length=reach.length
-                )
+                start_id, end_id = self._get_reach_ends(reach, node_map)
+                graph.add_edge(start_id, end_id, length=reach.length)
             except KeyError:
                 pass
 
@@ -191,7 +186,50 @@ class Res1DMapper:
         node_map = {v["alias"]: k for k, v in graph.nodes.items()}
         graph = self._fill_edges(graph, node_map)
 
+        if "inclusions" in self.priority:
+            graph, node_map = self._add_inclusions(graph, node_map)
+
         return graph, node_map
+
+    def _add_inclusions(
+        self, graph: nx.Graph, node_map: Dict[str, int]
+    ) -> Tuple[nx.Graph, Dict[str, int]]:
+        n = graph.number_of_nodes()
+        for inclusion in self.priority["inclusions"]:
+            edge_id = inclusion["edge"]
+            distance = inclusion["distance"]
+            reach = self._res1d.reaches[edge_id]
+            element = NetworkNode(reach[distance])
+
+            start_id, end_id = self._get_reach_ends(reach, node_map)
+
+            edge_data = graph.get_edge_data(start_id, end_id)
+            total_length = edge_data.get("length", 1)
+
+            graph.remove_edge(start_id, end_id)
+            graph.add_node(n, data=element.data, alias=element.alias)
+            graph.add_edge(start_id, n, length=distance)
+            graph.add_edge(n, end_id, length=total_length - distance)
+
+            node_map[element.alias] = n
+            n += 1
+
+        return graph, node_map
+
+    def _get_reach_ends(
+        self, reach: ResultReach, node_map: Optional[Dict[str, int]] = None
+    ) -> Tuple[str, str] | Tuple[int, int]:
+        start_node = self._res1d.nodes[reach.start_node]
+        end_node = self._res1d.nodes[reach.end_node]
+        start_node_alias = NetworkNode._generate_alias(start_node)
+        end_node_alias = NetworkNode._generate_alias(end_node)
+
+        if node_map is None:
+            # Returning aliased (using Res1D nomenclature)
+            return start_node_alias, end_node_alias
+        else:
+            # Returning new ids (int)
+            return node_map[start_node_alias], node_map[end_node_alias]
 
     @property
     def as_df(self) -> pd.DataFrame:
