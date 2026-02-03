@@ -82,7 +82,7 @@ class Res1DMapper:
         return df.copy()
 
     def _validate_priority(self):
-        valid_keys = {"edges", "nodes", "inclusions"}
+        valid_keys = {"edges", "inclusions"}
         priority_keys = set(self.priority.keys())
         if not priority_keys.issubset(valid_keys):
             raise ValueError(f"Invalid keys in priority, they must be one of {valid_keys}")
@@ -112,7 +112,6 @@ class Res1DMapper:
         elif len(elements) == 1:
             # Only one element was found, which is directly passed to the network
             element = elements[0]
-            print(type(element))
         else:
             # Multiple elements were found, so we check priority
             node_elements = [element for element in elements if isinstance(element, ResultNode)]
@@ -175,7 +174,13 @@ class Res1DMapper:
     def _fill_edges(self, graph: nx.Graph, node_map: Dict[str, int]) -> nx.Graph:
         for reach in list(self._res1d.reaches.values()):
             try:
-                graph.add_edge(node_map[reach.start_node], node_map[reach.end_node])
+                start_node = self._res1d.nodes[reach.start_node]
+                end_node = self._res1d.nodes[reach.end_node]
+                start_node_alias = NetworkNode._generate_alias(start_node)
+                end_node_alias = NetworkNode._generate_alias(end_node)
+                graph.add_edge(
+                    node_map[start_node_alias], node_map[end_node_alias], length=reach.length
+                )
             except KeyError:
                 pass
 
