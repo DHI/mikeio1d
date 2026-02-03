@@ -230,3 +230,14 @@ class Res1DMapper:
             Timeseries contained in graph nodes
         """
         return self._df
+
+    @property
+    def quantities(self) -> List[str]:
+        """Quantities present in data.
+
+        Returns
+        -------
+        List[str]
+            List of quantities
+        """
+        return list(self.as_df.columns.get_level_values(1).unique())
