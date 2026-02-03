@@ -66,16 +66,19 @@ class Res1DMapper:
         self.priority = priority
         self._validate_priority()
 
-        g0 = nx.Graph()
-        for reach in self._res1d.reaches.values():
-            g0.add_edge(reach.start_node, reach.end_node, name=reach.name)
-        self._g0 = g0.copy()
-
-        self.graph, self._node_map = self._generate_graph_and_alias_map()
+        self._g0 = self._initialize_graph()
+        self._alias_map = self._update_graph_with_alias()
         self._df = self._build_node_dataframe()
 
+    def _initialize_graph(self) -> nx.Graph:
+        # We create an initial graph to store the topology of the network
+        g0 = nx.Graph()
+        for reach in self._res1d.reaches.values():
+            g0.add_edge(reach.start_node, reach.end_node, name=reach.name, length=reach.length)
+        return g0.copy()
+
     def _build_node_dataframe(self) -> pd.DataFrame:
-        df = pd.concat({k: v["data"] for k, v in self.graph.nodes.items()}, axis=1)
+        df = pd.concat({k: v["data"] for k, v in self._g0.nodes.items()}, axis=1)
         df.columns = df.columns.set_names(["node", "quantity"])
         return df.copy()
 
@@ -88,7 +91,7 @@ class Res1DMapper:
             if not set(self.priority["edges"]).issubset(set(self._res1d.reaches.keys())):
                 raise ValueError("'edges' must only include values found in reaches.")
 
-    def _prioritize(self, elements: List[ResultNode | ResultGridPoint]) -> NetworkNode:
+    def _choose_element(self, elements: List[ResultNode | ResultGridPoint]) -> NetworkNode:
         # TODO: refresh, can catchment be an overlapping element?
         # TODO: prioritize by quantity
 
@@ -137,9 +140,14 @@ class Res1DMapper:
         int
             Id in the simplified network
         """
-        alias = NetworkNode._generate_alias(element)
+        if isinstance(element, ResultNode):
+            alias = element.id
+        elif isinstance(element, ResultGridPoint):
+            alias = NetworkNode(element).alias
+        else:
+            raise ValueError("Invalid element type")
         try:
-            return self._node_map[alias]
+            return self._alias_map[alias]
         except KeyError:
             # If the alias is not found in the node map, the passed element was not included
             # in the simplified network. Likely due to prioritization.
@@ -156,66 +164,50 @@ class Res1DMapper:
                 gridpoints.append(reach.gridpoints[-1])
         return [node] + gridpoints
 
-    def _initialize_nodes(self) -> Tuple[nx.Graph, Dict[str, str]]:
+    def _create_alias_map(self) -> Dict[str, str]:
         alias_map = {}
-        graph = nx.Graph()
-        for node in self._res1d.nodes.values():
-            nnode = NetworkNode(node)
+        for node_id in self._g0.nodes:
+            node = self._res1d.nodes[node_id]
             elements = self._find_overlapping_elements(node)
-            element = self._prioritize(elements)
+            element = self._choose_element(elements)
             if not element.is_empty:
-                graph.add_node(element.alias, data=element.data)
-                alias_map[nnode.alias] = element.alias
+                alias_map[node_id] = element.alias
+                self._g0.nodes[node_id]["data"] = element.data
 
-        return graph, alias_map
-
-    def _fill_edges(self, graph: nx.Graph, alias_map: Dict[str, str]) -> nx.Graph:
-        for reach in self._res1d.reaches.values():
-            start_id, end_id = self._get_reach_ends(reach, alias_map)
-            graph.add_edge(start_id, end_id, length=reach.length)
-
-        return graph
+        nx.relabel_nodes(self._g0, alias_map, copy=False)
+        return alias_map
 
     def _get_touching_reaches(self, node: ResultNode) -> List[ResultReach]:
         return [
             self._res1d.reaches[data["name"]] for _, _, data in self._g0.edges(node.id, data=True)
         ]
 
-    def _generate_graph_and_alias_map(self) -> Tuple[nx.Graph, Dict[str, int]]:
-        graph, alias_map = self._initialize_nodes()
-        graph = self._fill_edges(graph, alias_map)
-
+    def _update_graph_with_alias(self) -> Dict[str, str]:
+        alias_map = self._create_alias_map()
         if "inclusions" in self.priority:
-            graph, alias_map = self._add_inclusions(graph, alias_map)
+            alias_map = self._add_inclusions(alias_map)
 
-        return graph, alias_map
+        return alias_map
 
-    def _add_inclusions(
-        self, graph: nx.Graph, alias_map: Dict[str, int]
-    ) -> Tuple[nx.Graph, Dict[str, str]]:
+    def _add_inclusions(self, alias_map: Dict[str, int]) -> Dict[str, str]:
         for inclusion in self.priority["inclusions"]:
             edge_id = inclusion["edge"]
             distance = inclusion["distance"]
             reach = self._res1d.reaches[edge_id]
-            element = NetworkNode(reach[distance])
 
-            start_id, end_id = self._get_reach_ends(reach, alias_map)
-            edge_data = graph.get_edge_data(start_id, end_id)
+            start_id = alias_map[reach.start_node]
+            end_id = alias_map[reach.end_node]
+            edge_data = self._g0.get_edge_data(start_id, end_id)
             total_length = edge_data.get("length", 1)
+            self._g0.remove_edge(start_id, end_id)
 
-            graph.remove_edge(start_id, end_id)
-            graph.add_node(element.alias, data=element.data)
-            graph.add_edge(start_id, element.alias, length=distance)
-            graph.add_edge(element.alias, end_id, length=total_length - distance)
+            element = NetworkNode(reach[distance])
+            self._g0.add_node(element.alias, data=element.data)
+            self._g0.add_edge(start_id, element.alias, length=distance)
+            self._g0.add_edge(element.alias, end_id, length=total_length - distance)
             alias_map[element.alias] = element.alias
 
-        return graph, alias_map
-
-    def _get_reach_ends(self, reach: ResultReach, alias_map: Dict[str, int]) -> Tuple[str, str]:
-        start_node = NetworkNode(self._res1d.nodes[reach.start_node])
-        end_node = NetworkNode(self._res1d.nodes[reach.end_node])
-
-        return alias_map[start_node.alias], alias_map[end_node.alias]
+        return alias_map
 
     @property
     def as_df(self) -> pd.DataFrame:
