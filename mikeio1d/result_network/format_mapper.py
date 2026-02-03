@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import networkx as nx
 import pandas as pd
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment
@@ -75,11 +73,13 @@ class Res1DMapper:
         self.quantity = quantity
         self.priority = priority
         self._validate_priority()
-        self.graph = self._generate_graph()
-        self._node_map = self._generate_node_map(self.graph)
+        self.graph, self._node_map = self._generate_graph_and_node_map()
+        self._df = self._build_node_dataframe()
 
-        self._df = pd.concat({k: v["data"] for k, v in self.graph.nodes.items()}, axis=1)
-        self._df.columns = self._df.columns.set_names(["node", "quantity"])
+    def _build_node_dataframe(self) -> pd.DataFrame:
+        df = pd.concat({k: v["data"] for k, v in self.graph.nodes.items()}, axis=1)
+        df.columns = df.columns.set_names(["node", "quantity"])
+        return df.copy()
 
     def _validate_priority(self):
         valid_keys = {"edges", "nodes", "inclusions"}
@@ -172,10 +172,6 @@ class Res1DMapper:
 
         return graph
 
-    @staticmethod
-    def _generate_node_map(graph: nx.Graph) -> Dict[str, int]:
-        return {v["alias"]: k for k, v in graph.nodes.items()}
-
     def _fill_edges(self, graph: nx.Graph, node_map: Dict[str, int]) -> nx.Graph:
         for reach in list(self._res1d.reaches.values()):
             try:
@@ -185,12 +181,12 @@ class Res1DMapper:
 
         return graph
 
-    def _generate_graph(self) -> nx.Graph:
+    def _generate_graph_and_node_map(self) -> Tuple[nx.Graph, Dict[str, int]]:
         graph = self._initialize_graph()
-        node_map = self._generate_node_map(graph)
+        node_map = {v["alias"]: k for k, v in graph.nodes.items()}
         graph = self._fill_edges(graph, node_map)
 
-        return graph
+        return graph, node_map
 
     @property
     def as_df(self) -> pd.DataFrame:
