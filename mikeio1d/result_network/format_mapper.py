@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import networkx as nx
 import pandas as pd
 
@@ -16,14 +18,14 @@ class NetworkNode:
         self,
         element: Optional[ResultNode | ResultGridPoint],
         *,
-        id: Optional[str] = None,
-        quantity: Optional[str] = None,
+        # TODO: we might want to include all quantities in the element and then we can remove this argument
+        quantity: Optional[str],
     ):
         self._ntype = type(element)
-        valid_init = (id is not None) and (quantity is not None) and (element is not None)
-        self._empty_node = (id is None) and (quantity is None) and (element is None)
+        valid_init = (quantity is not None) and (element is not None)
+        self._empty_node = (quantity is None) and (element is None)
         if valid_init:
-            self.id = id
+            self.id = self._generate_id(element)
             self.quantity = quantity
             self.series = self.get_pd_series(element)
         elif self._empty_node:
@@ -35,13 +37,18 @@ class NetworkNode:
                 "Invalid node init: either contains id, quantity and df or none of them."
             )
 
+    @staticmethod
+    def _generate_id(element: ResultNode | ResultGridPoint) -> str:
+        if isinstance(element, ResultGridPoint):
+            return f"{"gridpoint"}-{element.reach_name}-{round(element.chainage, 3)}"
+        elif isinstance(element, ResultNode):
+            return f"{"node"}-{element.id}"
+        else:
+            raise ValueError("Invalid element type.")
+
     @property
     def is_empty(self) -> bool:
         return self._empty_node
-
-    @property
-    def ntype(self) -> ResultGridPoint | ResultNode:
-        return self._ntype
 
     def get_pd_series(self, element: ResultNode | ResultGridPoint) -> pd.Series:
         df = element.to_dataframe()
@@ -49,12 +56,6 @@ class NetworkNode:
         assert len(relevant_columns) == 1, "Multiple relevant columns were found!"
         col = relevant_columns[0]
         return df[col].copy()
-
-    def generate_id(self, id: str):
-        if self.ntype == ResultGridPoint:
-            return f"{"gridpoint"}-{id}"
-        elif self.ntype == ResultNode:
-            return f"{"node"}-{id}"
 
 
 class Res1DMapper:
@@ -70,6 +71,8 @@ class Res1DMapper:
         self._res1d = res
         self.graph = self._generate_graph()
         self._node_map = self._generate_node_map(self.graph)
+
+        self._df = pd.concat({k: v["series"] for k, v in self.graph.nodes.items()}, axis=1)
 
     def validate_priority(self):
         assert True
@@ -91,7 +94,7 @@ class Res1DMapper:
             if (element is not None) and (self.quantity in element.quantities)
         ]
 
-    def prioritize_node(self, node: ResultNode) -> NetworkNode:
+    def _prioritize_node(self, node: ResultNode) -> NetworkNode:
         # TODO: refresh, can catchment be an overlapping element?
         elements = self.get_overlapping_elements(node)
         if len(elements) == 0:
@@ -125,7 +128,7 @@ class Res1DMapper:
             else:
                 element = priority_elements[0]
 
-        return NetworkNode(element, id=node.id, quantity=self.quantity)
+        return NetworkNode(element, quantity=self.quantity)
 
     def get_node(self, id: str) -> int:
         return self._node_map[id]
@@ -134,7 +137,7 @@ class Res1DMapper:
         graph = nx.Graph()
         n = 0
         for node in list(self._res1d.nodes.values()):
-            element = self.prioritize_node(node)
+            element = self._prioritize_node(node)
             if not element.is_empty:
                 graph.add_node(n, series=element.series, id=element.id)
                 n += 1
@@ -160,3 +163,14 @@ class Res1DMapper:
         graph = self._fill_edges(graph, node_map)
 
         return graph
+
+    @property
+    def as_df(self) -> pd.DataFrame:
+        """Dataframe using new node ids as column names.
+
+        Returns
+        -------
+        pd.DataFrame
+            Timeseries contained in graph nodes
+        """
+        return self._df
