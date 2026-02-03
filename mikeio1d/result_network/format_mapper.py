@@ -119,7 +119,7 @@ class Res1DMapper:
             priority_elements = []
             for element in elements:
                 if isinstance(element, ResultGridPoint) and (
-                    element.reach_name in self.priority["edge"]
+                    element.reach_name in self.priority["edges"]
                 ):
                     priority_elements.append(element)
                 elif isinstance(element, ResultCatchment):
