@@ -71,12 +71,10 @@ class Res1DMapper:
 
     def __init__(self, res: Res1D, quantity: str, priority: Dict[str, List]):
         assert quantity in res.quantities, f"Network does not include quantity={quantity}"
+        self._res1d = res
         self.quantity = quantity
-
         self.priority = priority
         self._validate_priority()
-
-        self._res1d = res
         self.graph = self._generate_graph()
         self._node_map = self._generate_node_map(self.graph)
 
