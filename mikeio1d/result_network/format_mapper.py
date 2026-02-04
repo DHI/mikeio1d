@@ -12,7 +12,6 @@ from mikeio1d import Res1D
 from mikeio1d.result_network import (
     ResultNode,
     ResultGridPoint,
-    ResultCatchment,
     ResultReach,
     ResultReaches,
     ResultNodes,
@@ -24,6 +23,7 @@ class Res1DNodeType(Enum):
 
     NODE = 1
     GRIDPOINT = 2
+    CATCHMENT = 3
 
 
 class NetworkNode:
@@ -48,10 +48,10 @@ class NetworkNode:
             )
 
     def _generate_alias(self, element: ResultNode | ResultGridPoint) -> str:
-        if self.type == Res1DNodeType.GRIDPOINT:
-            return f"{"gridpoint"}-{element.reach_name}-{round(element.chainage, 3)}"
+        if isinstance(element, ResultGridPoint):
+            return f"break@reach-{element.reach_name}-{round(element.chainage, 3)}"
         else:
-            return f"{"node"}-{element.id}"
+            return f"node-{element.id}"
 
     def _build_node_data(self, element: ResultNode | ResultGridPoint) -> pd.DataFrame:
         df = element.to_dataframe()
@@ -180,43 +180,6 @@ class NetworkMapper:
         if "inclusions" not in self.priority:
             self.priority["inclusions"] = {}
 
-    def _choose_element(self, elements: List[ResultNode | ResultGridPoint]) -> NetworkNode:
-        # TODO: refresh, can catchment be an overlapping element?
-        # TODO: prioritize by quantity
-
-        if len(elements) == 0:
-            raise ValueError("elements list should contain at least one element.")
-
-        if len(elements) == 1:
-            # Only one element was found, which is directly passed to the network
-            element = elements[0]
-        else:
-            # Multiple overlapping elements were found, so we check priority
-            node_elements = [element for element in elements if isinstance(element, ResultNode)]
-
-            priority_elements = []
-            for element in elements:
-                if isinstance(element, ResultGridPoint) and (
-                    element.reach_name in self.priority["edges"]
-                ):
-                    priority_elements.append(element)
-                elif isinstance(element, ResultCatchment):
-                    raise NotImplementedError("'Catchments' are still not supported")
-
-            if len(priority_elements) == 0:
-                if len(node_elements) == 0:
-                    raise ValueError("Neither node nor prioritized gridpoints were found.")
-                elif len(node_elements) > 1:
-                    raise ValueError("There cannot be more than one 'ResultNode'.")
-                else:
-                    element = node_elements[0]
-            elif len(priority_elements) > 1:
-                raise ValueError("Multiple elements were prioritized in this intersection.")
-            else:
-                element = priority_elements[0]
-
-        return NetworkNode(element)
-
     def get_node_id(self, element: ResultNode | ResultGridPoint) -> int:
         """Return the node id in the simplified network.
 
@@ -233,28 +196,32 @@ class NetworkMapper:
         element = NetworkNode(element)
         return element.id
 
-    def _find_overlapping_elements(
-        self, node: ResultNode, g0: nx.Graph
-    ) -> List[ResultNode | ResultGridPoint]:
+    def _prioritize_overlapping_element(self, node: ResultNode, g0: nx.Graph) -> NetworkNode:
         def get_adjacent_edges() -> List[ResultReach]:
             return [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
 
         adjacent_edges = get_adjacent_edges()
-        # Finding elements that are overlapping (node and gridpoint ends)
+        relevant_edges = [edge for edge in adjacent_edges if edge in self.priority["edges"]]
+        # Storing edge breaks if the edge is prioritized
         gridpoints = []
-        for edge in adjacent_edges:
+        for edge in relevant_edges:
             if edge.start_node == node.id:
                 gridpoints.append(edge.gridpoints[0])
             elif edge.end_node == node.id:
                 gridpoints.append(edge.gridpoints[-1])
-        return [node] + gridpoints
+
+        if len(gridpoints) == 0:
+            return NetworkNode(node)
+        elif len(gridpoints) == 1:
+            return NetworkNode(gridpoints[0])
+        else:
+            raise ValueError("There cannot be multiple prioritized edges for the same node.")
 
     def _prioritize_graph_elements(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
         for node_id in g0.nodes:
             node = self._nodes[node_id]
-            elements = self._find_overlapping_elements(node, g0)
-            element = self._choose_element(elements)
+            element = self._prioritize_overlapping_element(node, g0)
             alias_map[node_id] = element.id
             g0.nodes[node_id]["data"] = element.data
         return nx.relabel_nodes(g0, alias_map, copy=True)
