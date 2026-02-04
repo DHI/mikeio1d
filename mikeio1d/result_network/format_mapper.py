@@ -13,6 +13,8 @@ from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment
 
 
 class Res1DNodeType:
+    """Type of the original network element."""
+
     NODE = 1
     GRIDPOINT = 2
 
@@ -56,10 +58,17 @@ class NetworkNode:
 
     @property
     def quantities(self) -> List[str]:
+        """Quantities that are present in the node.
+
+        Returns
+        -------
+        List[str]
+        """
         return self._quantities
 
     @property
     def type(self) -> Res1DNodeType:
+        """Type of the initial Res1D element."""
         return self._node_type
 
 
