@@ -130,6 +130,53 @@ class NodeCollection:
         return self._dict.get(key, default)
 
 
+class NetworkEdge:
+    """Edge of a network."""
+
+    def __init__(self, reach: ResultReach, nodes: ResultNodes):
+        self.id = reach.name
+        self.start = NetworkNode(nodes[reach.start_node])
+        self.end = NetworkNode(nodes[reach.end_node])
+        self.length = reach.length
+
+        self._reach = reach
+
+    def __getitem__(self, key: Any) -> NetworkNode:
+        """Get network node."""
+        return NetworkNode(self._reach[key])
+
+
+class EdgeCollection:
+    """Collection of nodes."""
+
+    def __init__(self, nodes: ResultNodes, reaches: ResultReaches):
+        self._dict = {reach_id: NetworkEdge(reach, nodes) for reach_id, reach in reaches.items()}
+
+    def __getitem__(self, key: str) -> NetworkNode:
+        """Get network node."""
+        return self._dict[key]
+
+    def __contains__(self, key: str) -> bool:
+        """Check if edge ID exists in the collection."""
+        return key in self._dict
+
+    def keys(self):
+        """Return edge IDs."""
+        return self._dict.keys()
+
+    def values(self):
+        """Return NetworkEdge objects."""
+        return self._dict.values()
+
+    def items(self):
+        """Return (id, edge) pairs."""
+        return self._dict.items()
+
+    def get(self, key: str, default=None) -> NetworkNode:
+        """Get edge by ID with optional default value."""
+        return self._dict.get(key, default)
+
+
 class GenericNetwork:
     """Generic network structure."""
 
@@ -193,16 +240,14 @@ class NetworkMapper:
     @staticmethod
     def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, ResultReaches]:
         if isinstance(res, Res1D):
-            return NodeCollection(res.nodes), res.reaches
+            return NodeCollection(res.nodes), EdgeCollection(res.nodes, res.reaches)
         else:
             raise NotImplementedError("Only Res1D formats are supported.")
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            start_node = self._nodes[edge.start_node]
-            end_node = self._nodes[edge.end_node]
-            g0.add_edge(start_node.id, end_node.id, name=edge.name, length=edge.length)
+            g0.add_edge(edge.start.id, edge.end.id, name=edge.id, length=edge.length)
         return g0.copy()
 
     def _validate_priority(self):
@@ -231,19 +276,19 @@ class NetworkMapper:
 
     def _prioritize_overlapping_element(self, node: NetworkNode, g0: nx.Graph) -> NetworkNode:
         adjacent_edges = [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
-        relevant_edges = [edge for edge in adjacent_edges if edge.name in self.priority["edges"]]
+        relevant_edges = [edge for edge in adjacent_edges if edge.id in self.priority["edges"]]
         # Storing edge breaks if the edge is prioritized
         breaks = []
         for edge in relevant_edges:
-            if edge.start_node == node.id:
-                breaks.append(edge.gridpoints[0])
-            elif edge.end_node == node.id:
-                breaks.append(edge.gridpoints[-1])
+            if edge.start.id == node.id:
+                breaks.append(edge[0])
+            elif edge.end.id == node.id:
+                breaks.append(edge[-1])
 
         if len(breaks) == 0:
             return node
         elif len(breaks) == 1:
-            return NetworkNode(breaks[0])
+            return breaks[0]
         else:
             raise ValueError("There cannot be multiple prioritized edges for the same node.")
 
@@ -271,16 +316,12 @@ class NetworkMapper:
             distance = inclusion["distance"]
             edge = self._edges[edge_id]
 
-            start_node = self._nodes[edge.start_node]
-            end_node = self._nodes[edge.end_node]
+            total_length = edge.length
+            g0.remove_edge(edge.start.id, edge.end.id)
 
-            edge_data = g0.get_edge_data(start_node.id, end_node.id)
-            total_length = edge_data.get("length", 1)
-            g0.remove_edge(start_node.id, end_node.id)
-
-            element = NetworkNode(edge[distance])
+            element = edge[distance]
             g0.add_node(element.id, data=element.data)
-            g0.add_edge(start_node.id, element.id, length=distance)
-            g0.add_edge(element.id, end_node.id, length=total_length - distance)
+            g0.add_edge(edge.start.id, element.id, length=distance)
+            g0.add_edge(element.id, edge.end.id, length=total_length - distance)
 
         return g0.copy()
