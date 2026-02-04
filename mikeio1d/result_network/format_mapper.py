@@ -75,14 +75,22 @@ class NetworkNode:
 class Res1DMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, res: Res1D, priority: Dict[str, List]):
-        self._res1d = res
+    def __init__(self, priority: Dict[str, List]):
         self.priority = priority
         self._validate_priority()
 
-        self._g0 = self._initialize_graph()
-        self._update_graph()
-        self._df = self._build_node_dataframe()
+    def map_network(self, res: Res1D) -> GenericNetwork:
+        """Return generic network object.
+
+        Returns
+        -------
+        GenericNetwork
+        """
+        self._res1d = res
+        g0 = self._initialize_graph()
+        g0 = self._update_graph(g0)
+
+        return GenericNetwork(g0)
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
@@ -90,19 +98,13 @@ class Res1DMapper:
             g0.add_edge(reach.start_node, reach.end_node, name=reach.name, length=reach.length)
         return g0.copy()
 
-    def _build_node_dataframe(self) -> pd.DataFrame:
-        df = pd.concat({k: v["data"] for k, v in self._g0.nodes.items()}, axis=1)
-        df.columns = df.columns.set_names(["node", "quantity"])
-        return df.copy()
-
     def _validate_priority(self):
         valid_keys = {"edges", "inclusions"}
         priority_keys = set(self.priority.keys())
         if not priority_keys.issubset(valid_keys):
             raise ValueError(f"Invalid keys in priority, they must be one of {valid_keys}")
-        if "edges" in priority_keys:
-            if not set(self.priority["edges"]).issubset(set(self._res1d.reaches.keys())):
-                raise ValueError("'edges' must only include values found in reaches.")
+        if "inclusions" not in self.priority:
+            self.priority["inclusions"] = {}
 
     def _choose_element(self, elements: List[ResultNode | ResultGridPoint]) -> NetworkNode:
         # TODO: refresh, can catchment be an overlapping element?
@@ -155,15 +157,17 @@ class Res1DMapper:
             Id in the simplified network
         """
         element = NetworkNode(element)
-        if element.id in self._g0.nodes:
-            return element.id
-        else:
-            # When the element id does not correspond to any node and is not
-            # a key in the alias map, it means that such element was never parsed.
-            raise ValueError("Element is not present in the network.")
+        return element.id
 
-    def _find_overlapping_elements(self, node: ResultNode) -> List[ResultNode | ResultGridPoint]:
-        touching_reaches = self._get_touching_reaches(node)
+    def _find_overlapping_elements(
+        self, node: ResultNode, g0: nx.Graph
+    ) -> List[ResultNode | ResultGridPoint]:
+        def get_touching_reaches() -> List[ResultReach]:
+            return [
+                self._res1d.reaches[data["name"]] for _, _, data in g0.edges(node.id, data=True)
+            ]
+
+        touching_reaches = get_touching_reaches()
         # Finding elements that are overlapping (node and gridpoint ends)
         gridpoints = []
         for reach in touching_reaches:
@@ -173,27 +177,22 @@ class Res1DMapper:
                 gridpoints.append(reach.gridpoints[-1])
         return [node] + gridpoints
 
-    def _prioritize_graph_elements(self):
+    def _prioritize_graph_elements(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
-        for node_id in self._g0.nodes:
+        for node_id in g0.nodes:
             node = self._res1d.nodes[node_id]
-            elements = self._find_overlapping_elements(node)
+            elements = self._find_overlapping_elements(node, g0)
             element = self._choose_element(elements)
             alias_map[node_id] = element.id
-            self._g0.nodes[node_id]["data"] = element.data
-        nx.relabel_nodes(self._g0, alias_map, copy=False)
+            g0.nodes[node_id]["data"] = element.data
+        return nx.relabel_nodes(g0, alias_map, copy=True)
 
-    def _get_touching_reaches(self, node: ResultNode) -> List[ResultReach]:
-        return [
-            self._res1d.reaches[data["name"]] for _, _, data in self._g0.edges(node.id, data=True)
-        ]
+    def _update_graph(self, g0: nx.Graph) -> nx.Graph:
+        g0 = self._prioritize_graph_elements(g0)
+        g0 = self._add_inclusions(g0)
+        return g0
 
-    def _update_graph(self) -> Dict[str, str]:
-        self._prioritize_graph_elements()
-        if "inclusions" in self.priority:
-            self._add_inclusions()
-
-    def _add_inclusions(self) -> Dict[str, str]:
+    def _add_inclusions(self, g0: nx.Graph) -> nx.Graph:
         # Some measurements might be taken in the middle of an edge. In a Res1D
         # file that node is found as a gridpoint that has an associated chainage.
         # We select it and convert it into a node.
@@ -205,14 +204,34 @@ class Res1DMapper:
             start_node = NetworkNode(self._res1d.nodes[reach.start_node])
             end_node = NetworkNode(self._res1d.nodes[reach.end_node])
 
-            edge_data = self._g0.get_edge_data(start_node.id, end_node.id)
+            edge_data = g0.get_edge_data(start_node.id, end_node.id)
             total_length = edge_data.get("length", 1)
-            self._g0.remove_edge(start_node.id, end_node.id)
+            g0.remove_edge(start_node.id, end_node.id)
 
             element = NetworkNode(reach[distance])
-            self._g0.add_node(element.id, data=element.data)
-            self._g0.add_edge(start_node.id, element.id, length=distance)
-            self._g0.add_edge(element.id, end_node.id, length=total_length - distance)
+            g0.add_node(element.id, data=element.data)
+            g0.add_edge(start_node.id, element.id, length=distance)
+            g0.add_edge(element.id, end_node.id, length=total_length - distance)
+
+        return g0.copy()
+
+
+class GenericNetwork:
+    """Generic network structure."""
+
+    def __init__(self, graph: nx.Graph):
+        self._graph = graph.copy()
+        self._df = self._build_node_dataframe()
+
+    def _build_node_dataframe(self) -> pd.DataFrame:
+        df = pd.concat({k: v["data"] for k, v in self._graph.nodes.items()}, axis=1)
+        df.columns = df.columns.set_names(["node", "quantity"])
+        return df.copy()
+
+    @property
+    def as_graph(self) -> nx.Graph:
+        """Graph of the network."""
+        return self._graph
 
     @property
     def as_df(self) -> pd.DataFrame:
