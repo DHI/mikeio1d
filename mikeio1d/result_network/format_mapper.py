@@ -193,17 +193,17 @@ class Res1DMapper:
             distance = inclusion["distance"]
             reach = self._res1d.reaches[edge_id]
 
-            start_id = NetworkNode(self._res1d.nodes[reach.start_node]).id
-            end_id = NetworkNode(self._res1d.nodes[reach.end_node]).id
+            start_node = NetworkNode(self._res1d.nodes[reach.start_node])
+            end_node = NetworkNode(self._res1d.nodes[reach.end_node])
 
-            edge_data = self._g0.get_edge_data(start_id, end_id)
+            edge_data = self._g0.get_edge_data(start_node.id, end_node.id)
             total_length = edge_data.get("length", 1)
-            self._g0.remove_edge(start_id, end_id)
+            self._g0.remove_edge(start_node.id, end_node.id)
 
             element = NetworkNode(reach[distance])
             self._g0.add_node(element.id, data=element.data)
-            self._g0.add_edge(start_id, element.id, length=distance)
-            self._g0.add_edge(element.id, end_id, length=total_length - distance)
+            self._g0.add_edge(start_node.id, element.id, length=distance)
+            self._g0.add_edge(element.id, end_node.id, length=total_length - distance)
 
     @property
     def as_df(self) -> pd.DataFrame:
