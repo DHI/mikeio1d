@@ -6,13 +6,13 @@ import networkx as nx
 import pandas as pd
 
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment, ResultReach
 
 
-class Res1DNodeType:
+class Res1DNodeType(Enum):
     """Type of the original network element."""
 
     NODE = 1
@@ -70,6 +70,46 @@ class NetworkNode:
     def type(self) -> Res1DNodeType:
         """Type of the initial Res1D element."""
         return self._node_type
+
+
+class GenericNetwork:
+    """Generic network structure."""
+
+    def __init__(self, graph: nx.Graph):
+        self._graph = graph.copy()
+        self._df = self._build_node_dataframe()
+
+    def _build_node_dataframe(self) -> pd.DataFrame:
+        df = pd.concat({k: v["data"] for k, v in self._graph.nodes.items()}, axis=1)
+        df.columns = df.columns.set_names(["node", "quantity"])
+        return df.copy()
+
+    @property
+    def as_graph(self) -> nx.Graph:
+        """Graph of the network."""
+        return self._graph
+
+    @property
+    def as_df(self) -> pd.DataFrame:
+        """Dataframe using new node ids as column names.
+
+        Returns
+        -------
+        pd.DataFrame
+            Timeseries contained in graph nodes
+        """
+        return self._df
+
+    @property
+    def quantities(self) -> List[str]:
+        """Quantities present in data.
+
+        Returns
+        -------
+        List[str]
+            List of quantities
+        """
+        return list(self.as_df.columns.get_level_values(1).unique())
 
 
 class Res1DMapper:
@@ -214,43 +254,3 @@ class Res1DMapper:
             g0.add_edge(element.id, end_node.id, length=total_length - distance)
 
         return g0.copy()
-
-
-class GenericNetwork:
-    """Generic network structure."""
-
-    def __init__(self, graph: nx.Graph):
-        self._graph = graph.copy()
-        self._df = self._build_node_dataframe()
-
-    def _build_node_dataframe(self) -> pd.DataFrame:
-        df = pd.concat({k: v["data"] for k, v in self._graph.nodes.items()}, axis=1)
-        df.columns = df.columns.set_names(["node", "quantity"])
-        return df.copy()
-
-    @property
-    def as_graph(self) -> nx.Graph:
-        """Graph of the network."""
-        return self._graph
-
-    @property
-    def as_df(self) -> pd.DataFrame:
-        """Dataframe using new node ids as column names.
-
-        Returns
-        -------
-        pd.DataFrame
-            Timeseries contained in graph nodes
-        """
-        return self._df
-
-    @property
-    def quantities(self) -> List[str]:
-        """Quantities present in data.
-
-        Returns
-        -------
-        List[str]
-            List of quantities
-        """
-        return list(self.as_df.columns.get_level_values(1).unique())
