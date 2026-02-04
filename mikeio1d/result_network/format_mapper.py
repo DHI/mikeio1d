@@ -99,6 +99,37 @@ class NetworkNode:
         return self._data
 
 
+class NodeCollection:
+    """Collection of nodes."""
+
+    def __init__(self, nodes: ResultNodes):
+        self._dict = {node_id: NetworkNode(node) for node_id, node in nodes.items()}
+
+    def __getitem__(self, key: str) -> NetworkNode:
+        """Get network node."""
+        return self._dict[key]
+
+    def __contains__(self, key: str) -> bool:
+        """Check if edge ID exists in the collection."""
+        return key in self._dict
+
+    def keys(self):
+        """Return edge IDs."""
+        return self._dict.keys()
+
+    def values(self):
+        """Return NetworkEdge objects."""
+        return self._dict.values()
+
+    def items(self):
+        """Return (id, edge) pairs."""
+        return self._dict.items()
+
+    def get(self, key: str, default=None) -> NetworkNode:
+        """Get edge by ID with optional default value."""
+        return self._dict.get(key, default)
+
+
 class GenericNetwork:
     """Generic network structure."""
 
@@ -160,17 +191,17 @@ class NetworkMapper:
         return GenericNetwork(g0)
 
     @staticmethod
-    def _parse_nodes_and_edges(res: Any) -> Tuple[ResultNodes, ResultReaches]:
+    def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, ResultReaches]:
         if isinstance(res, Res1D):
-            return res.nodes, res.reaches
+            return NodeCollection(res.nodes), res.reaches
         else:
             raise NotImplementedError("Only Res1D formats are supported.")
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            start_node = NetworkNode(self._nodes[edge.start_node])
-            end_node = NetworkNode(self._nodes[edge.end_node])
+            start_node = self._nodes[edge.start_node]
+            end_node = self._nodes[edge.end_node]
             g0.add_edge(start_node.id, end_node.id, name=edge.name, length=edge.length)
         return g0.copy()
 
@@ -219,7 +250,6 @@ class NetworkMapper:
     def _prioritize(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
         for node in self._nodes.values():
-            node = NetworkNode(node)
             element = self._prioritize_overlapping_element(node, g0)
             if element.id != node.id:  # An element has been prioritized
                 alias_map[node.id] = element.id
@@ -241,8 +271,8 @@ class NetworkMapper:
             distance = inclusion["distance"]
             edge = self._edges[edge_id]
 
-            start_node = NetworkNode(self._nodes[edge.start_node])
-            end_node = NetworkNode(self._nodes[edge.end_node])
+            start_node = self._nodes[edge.start_node]
+            end_node = self._nodes[edge.end_node]
 
             edge_data = g0.get_edge_data(start_node.id, end_node.id)
             total_length = edge_data.get("length", 1)
