@@ -15,6 +15,7 @@ from mikeio1d.result_network import (
     ResultCatchment,
     ResultReach,
     ResultReaches,
+    ResultNodes,
 )
 
 
@@ -30,21 +31,21 @@ class NetworkNode:
 
     def __init__(
         self,
-        element: ResultNode | ResultGridPoint,
+        element: Any,
     ):
-        self._validate_element_type(element)
+        if isinstance(element, (ResultNode, ResultGridPoint)):
+            if isinstance(element, ResultNode):
+                self._node_type = Res1DNodeType.NODE
+            if isinstance(element, ResultGridPoint):
+                self._node_type = Res1DNodeType.GRIDPOINT
 
-        self.id = self._generate_alias(element)
-        self._quantities = element.quantities
-        self.data = self._build_node_data(element)
-
-    def _validate_element_type(self, element: ResultNode | ResultGridPoint):
-        if isinstance(element, ResultNode):
-            self._node_type = Res1DNodeType.NODE
-        elif isinstance(element, ResultGridPoint):
-            self._node_type = Res1DNodeType.GRIDPOINT
+            self._id = self._generate_alias(element)
+            self._quantities = element.quantities
+            self._data = self._build_node_data(element)
         else:
-            raise ValueError("Invalid element type")
+            raise NotImplementedError(
+                "Invalid element type, only ResultNode or ResultGridPoint from Res1D are supported."
+            )
 
     def _generate_alias(self, element: ResultNode | ResultGridPoint) -> str:
         if self.type == Res1DNodeType.GRIDPOINT:
@@ -77,45 +78,9 @@ class NetworkNode:
         """Type of the initial Res1D element."""
         return self._node_type
 
-
-class NetworkEdge:
-    """Generic edge class."""
-
-    def __init__(self, edge: Any):
-        if isinstance(edge, ResultReach):
-            self._parse_from_res1d(edge)
-        else:
-            raise NotImplementedError("Only Res1D formats are supported")
-
-    def _parse_from_res1d(self, edge: ResultReach):
-        self._start = edge.start_node
-        self._end = edge.end_node
-        self._id = edge.name
-        self._length = edge.length
-
-    @property
-    def start(self) -> str:
-        """Id of the starting node of the edge.
-
-        Returns
-        -------
-        str
-        """
-        return self._start
-
-    @property
-    def end(self) -> str:
-        """Id of the ending node of the edge.
-
-        Returns
-        -------
-        str
-        """
-        return self._end
-
     @property
     def id(self) -> str:
-        """Id of the edge.
+        """Id of the node.
 
         Returns
         -------
@@ -124,32 +89,14 @@ class NetworkEdge:
         return self._id
 
     @property
-    def length(self) -> float:
-        # TODO: handle units
-        """Length of the edge.
+    def data(self) -> pd.DataFrame:
+        """Data in the node.
 
         Returns
         -------
-        str
+        DataFrame
         """
-        return self._length
-
-
-class NetworkEdgeCollection:
-    """Collection of network edges."""
-
-    def __init__(self, edges: List[NetworkEdge] | ResultReaches):
-        if isinstance(edges, ResultReaches):
-            edges = [NetworkEdge(edge) for edge in edges.values()]
-        self._dict = {edge.id: edge for edge in edges}
-
-    def __getitem__(self, key: str) -> NetworkEdge:
-        """Get edge by ID like a dictionary."""
-        return self._dict[key]
-
-    def __contains__(self, key: str) -> bool:
-        """Check if edge ID exists in the collection."""
-        return key in self._dict
+        return self._data
 
 
 class GenericNetwork:
@@ -192,7 +139,7 @@ class GenericNetwork:
         return list(self.as_df.columns.get_level_values(1).unique())
 
 
-class Res1DMapper:
+class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
     def __init__(self, priority: Dict[str, List]):
@@ -212,18 +159,17 @@ class Res1DMapper:
 
         return GenericNetwork(g0)
 
-    def _parse_nodes_and_edges(res: Any) -> Tuple[List[NetworkNode], List[NetworkEdge]]:
+    @staticmethod
+    def _parse_nodes_and_edges(res: Any) -> Tuple[ResultNodes, ResultReaches]:
         if isinstance(res, Res1D):
-            nodes = res.nodes
-            edges = NetworkEdgeCollection(res.reaches)
-            return nodes, edges
+            return res.nodes, res.reaches
         else:
             raise NotImplementedError("Only Res1D formats are supported.")
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
-        for edge in self._edges:
-            g0.add_edge(edge.start, edge.end, name=edge.id, length=edge.length)
+        for edge in self._edges.values():
+            g0.add_edge(edge.start_node, edge.end_node, name=edge.name, length=edge.length)
         return g0.copy()
 
     def _validate_priority(self):
@@ -290,23 +236,23 @@ class Res1DMapper:
     def _find_overlapping_elements(
         self, node: ResultNode, g0: nx.Graph
     ) -> List[ResultNode | ResultGridPoint]:
-        def get_touching_reaches() -> List[ResultReach]:
+        def get_adjacent_edges() -> List[ResultReach]:
             return [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
 
-        touching_reaches = get_touching_reaches()
+        adjacent_edges = get_adjacent_edges()
         # Finding elements that are overlapping (node and gridpoint ends)
         gridpoints = []
-        for reach in touching_reaches:
-            if reach.start_node == node.id:
-                gridpoints.append(reach.gridpoints[0])
-            elif reach.end_node == node.id:
-                gridpoints.append(reach.gridpoints[-1])
+        for edge in adjacent_edges:
+            if edge.start_node == node.id:
+                gridpoints.append(edge.gridpoints[0])
+            elif edge.end_node == node.id:
+                gridpoints.append(edge.gridpoints[-1])
         return [node] + gridpoints
 
     def _prioritize_graph_elements(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
         for node_id in g0.nodes:
-            node = self._edges[node_id]
+            node = self._nodes[node_id]
             elements = self._find_overlapping_elements(node, g0)
             element = self._choose_element(elements)
             alias_map[node_id] = element.id
