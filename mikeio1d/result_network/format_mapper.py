@@ -6,10 +6,16 @@ import networkx as nx
 import pandas as pd
 
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Tuple, Any
 
 from mikeio1d import Res1D
-from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment, ResultReach
+from mikeio1d.result_network import (
+    ResultNode,
+    ResultGridPoint,
+    ResultCatchment,
+    ResultReach,
+    ResultReaches,
+)
 
 
 class Res1DNodeType(Enum):
@@ -72,6 +78,80 @@ class NetworkNode:
         return self._node_type
 
 
+class NetworkEdge:
+    """Generic edge class."""
+
+    def __init__(self, edge: Any):
+        if isinstance(edge, ResultReach):
+            self._parse_from_res1d(edge)
+        else:
+            raise NotImplementedError("Only Res1D formats are supported")
+
+    def _parse_from_res1d(self, edge: ResultReach):
+        self._start = edge.start_node
+        self._end = edge.end_node
+        self._id = edge.name
+        self._length = edge.length
+
+    @property
+    def start(self) -> str:
+        """Id of the starting node of the edge.
+
+        Returns
+        -------
+        str
+        """
+        return self._start
+
+    @property
+    def end(self) -> str:
+        """Id of the ending node of the edge.
+
+        Returns
+        -------
+        str
+        """
+        return self._end
+
+    @property
+    def id(self) -> str:
+        """Id of the edge.
+
+        Returns
+        -------
+        str
+        """
+        return self._id
+
+    @property
+    def length(self) -> float:
+        # TODO: handle units
+        """Length of the edge.
+
+        Returns
+        -------
+        str
+        """
+        return self._length
+
+
+class NetworkEdgeCollection:
+    """Collection of network edges."""
+
+    def __init__(self, edges: List[NetworkEdge] | ResultReaches):
+        if isinstance(edges, ResultReaches):
+            edges = [NetworkEdge(edge) for edge in edges.values()]
+        self._dict = {edge.id: edge for edge in edges}
+
+    def __getitem__(self, key: str) -> NetworkEdge:
+        """Get edge by ID like a dictionary."""
+        return self._dict[key]
+
+    def __contains__(self, key: str) -> bool:
+        """Check if edge ID exists in the collection."""
+        return key in self._dict
+
+
 class GenericNetwork:
     """Generic network structure."""
 
@@ -126,16 +206,24 @@ class Res1DMapper:
         -------
         GenericNetwork
         """
-        self._res1d = res
+        self._nodes, self._edges = self._parse_nodes_and_edges(res)
         g0 = self._initialize_graph()
         g0 = self._update_graph(g0)
 
         return GenericNetwork(g0)
 
+    def _parse_nodes_and_edges(res: Any) -> Tuple[List[NetworkNode], List[NetworkEdge]]:
+        if isinstance(res, Res1D):
+            nodes = res.nodes
+            edges = NetworkEdgeCollection(res.reaches)
+            return nodes, edges
+        else:
+            raise NotImplementedError("Only Res1D formats are supported.")
+
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
-        for reach in self._res1d.reaches.values():
-            g0.add_edge(reach.start_node, reach.end_node, name=reach.name, length=reach.length)
+        for edge in self._edges:
+            g0.add_edge(edge.start, edge.end, name=edge.id, length=edge.length)
         return g0.copy()
 
     def _validate_priority(self):
@@ -203,9 +291,7 @@ class Res1DMapper:
         self, node: ResultNode, g0: nx.Graph
     ) -> List[ResultNode | ResultGridPoint]:
         def get_touching_reaches() -> List[ResultReach]:
-            return [
-                self._res1d.reaches[data["name"]] for _, _, data in g0.edges(node.id, data=True)
-            ]
+            return [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
 
         touching_reaches = get_touching_reaches()
         # Finding elements that are overlapping (node and gridpoint ends)
@@ -220,7 +306,7 @@ class Res1DMapper:
     def _prioritize_graph_elements(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
         for node_id in g0.nodes:
-            node = self._res1d.nodes[node_id]
+            node = self._edges[node_id]
             elements = self._find_overlapping_elements(node, g0)
             element = self._choose_element(elements)
             alias_map[node_id] = element.id
@@ -239,16 +325,16 @@ class Res1DMapper:
         for inclusion in self.priority["inclusions"]:
             edge_id = inclusion["edge"]
             distance = inclusion["distance"]
-            reach = self._res1d.reaches[edge_id]
+            edge = self._edges[edge_id]
 
-            start_node = NetworkNode(self._res1d.nodes[reach.start_node])
-            end_node = NetworkNode(self._res1d.nodes[reach.end_node])
+            start_node = NetworkNode(self._nodes[edge.start_node])
+            end_node = NetworkNode(self._nodes[edge.end_node])
 
             edge_data = g0.get_edge_data(start_node.id, end_node.id)
             total_length = edge_data.get("length", 1)
             g0.remove_edge(start_node.id, end_node.id)
 
-            element = NetworkNode(reach[distance])
+            element = NetworkNode(edge[distance])
             g0.add_node(element.id, data=element.data)
             g0.add_edge(start_node.id, element.id, length=distance)
             g0.add_edge(element.id, end_node.id, length=total_length - distance)
