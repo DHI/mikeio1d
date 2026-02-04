@@ -217,17 +217,18 @@ class NetworkMapper:
         else:
             raise ValueError("There cannot be multiple prioritized edges for the same node.")
 
-    def _prioritize_graph_elements(self, g0: nx.Graph) -> nx.Graph:
+    def _prioritize(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
         for node_id in g0.nodes:
             node = self._nodes[node_id]
             element = self._prioritize_overlapping_element(node, g0)
             alias_map[node_id] = element.id
             g0.nodes[node_id]["data"] = element.data
+        # We rename based on the alias convention defined by NetworkNode class
         return nx.relabel_nodes(g0, alias_map, copy=True)
 
     def _update_graph(self, g0: nx.Graph) -> nx.Graph:
-        g0 = self._prioritize_graph_elements(g0)
+        g0 = self._prioritize(g0)
         g0 = self._add_inclusions(g0)
         return g0
 
