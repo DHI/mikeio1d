@@ -5,10 +5,16 @@ from __future__ import annotations
 import networkx as nx
 import pandas as pd
 
+from enum import Enum
 from typing import Dict, List, Optional
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment, ResultReach
+
+
+class Res1DNodeType:
+    NODE = 1
+    GRIDPOINT = 2
 
 
 class NetworkNode:
@@ -16,20 +22,27 @@ class NetworkNode:
 
     def __init__(
         self,
-        element: Optional[ResultNode | ResultGridPoint],
+        element: ResultNode | ResultGridPoint,
     ):
+        self._validate_element_type(element)
+
         self.id = self._generate_alias(element)
         self._quantities = element.quantities
         self.data = self._build_node_data(element)
 
-    @staticmethod
-    def _generate_alias(element: ResultNode | ResultGridPoint) -> str:
-        if isinstance(element, ResultGridPoint):
-            return f"{"gridpoint"}-{element.reach_name}-{round(element.chainage, 3)}"
-        elif isinstance(element, ResultNode):
-            return f"{"node"}-{element.id}"
+    def _validate_element_type(self, element: ResultNode | ResultGridPoint):
+        if isinstance(element, ResultNode):
+            self._node_type = Res1DNodeType.NODE
+        elif isinstance(element, ResultGridPoint):
+            self._node_type = Res1DNodeType.GRIDPOINT
         else:
-            raise ValueError("Invalid element type.")
+            raise ValueError("Invalid element type")
+
+    def _generate_alias(self, element: ResultNode | ResultGridPoint) -> str:
+        if self.type == Res1DNodeType.GRIDPOINT:
+            return f"{"gridpoint"}-{element.reach_name}-{round(element.chainage, 3)}"
+        else:
+            return f"{"node"}-{element.id}"
 
     def _build_node_data(self, element: ResultNode | ResultGridPoint) -> pd.DataFrame:
         df = element.to_dataframe()
@@ -45,6 +58,10 @@ class NetworkNode:
     def quantities(self) -> List[str]:
         return self._quantities
 
+    @property
+    def type(self) -> Res1DNodeType:
+        return self._node_type
+
 
 class Res1DMapper:
     """Mapper class to transform Res1D to a general network coord system."""
@@ -55,7 +72,7 @@ class Res1DMapper:
         self._validate_priority()
 
         self._g0 = self._initialize_graph()
-        self._alias_map = self._update_graph_with_alias()
+        self._update_graph()
         self._df = self._build_node_dataframe()
 
     def _initialize_graph(self) -> nx.Graph:
@@ -128,18 +145,13 @@ class Res1DMapper:
         int
             Id in the simplified network
         """
-        if isinstance(element, ResultNode):
-            id = element.id
-        elif isinstance(element, ResultGridPoint):
-            id = NetworkNode(element).id
+        element = NetworkNode(element)
+        if element.id in self._g0.nodes:
+            return element.id
         else:
-            raise ValueError("Invalid element type, must be {ResultNode, ResultGridPoint}")
-        try:
-            return self._alias_map[id]
-        except KeyError:
-            # If the alias is not found in the node map, the passed element was not included
-            # in the simplified network. Likely due to prioritization.
-            raise ValueError("Element was not found in simplified network.")
+            # When the element id does not correspond to any node and is not
+            # a key in the alias map, it means that such element was never parsed.
+            raise ValueError("Element is not present in the network.")
 
     def _find_overlapping_elements(self, node: ResultNode) -> List[ResultNode | ResultGridPoint]:
         touching_reaches = self._get_touching_reaches(node)
@@ -152,7 +164,7 @@ class Res1DMapper:
                 gridpoints.append(reach.gridpoints[-1])
         return [node] + gridpoints
 
-    def _create_alias_map(self) -> Dict[str, str]:
+    def _prioritize_graph_elements(self):
         alias_map = {}
         for node_id in self._g0.nodes:
             node = self._res1d.nodes[node_id]
@@ -160,29 +172,30 @@ class Res1DMapper:
             element = self._choose_element(elements)
             alias_map[node_id] = element.id
             self._g0.nodes[node_id]["data"] = element.data
-        return alias_map
+        nx.relabel_nodes(self._g0, alias_map, copy=False)
 
     def _get_touching_reaches(self, node: ResultNode) -> List[ResultReach]:
         return [
             self._res1d.reaches[data["name"]] for _, _, data in self._g0.edges(node.id, data=True)
         ]
 
-    def _update_graph_with_alias(self) -> Dict[str, str]:
-        alias_map = self._create_alias_map()
-        nx.relabel_nodes(self._g0, alias_map, copy=False)
+    def _update_graph(self) -> Dict[str, str]:
+        self._prioritize_graph_elements()
         if "inclusions" in self.priority:
-            alias_map = self._add_inclusions(alias_map)
+            self._add_inclusions()
 
-        return alias_map
-
-    def _add_inclusions(self, alias_map: Dict[str, int]) -> Dict[str, str]:
+    def _add_inclusions(self) -> Dict[str, str]:
+        # Some measurements might be taken in the middle of an edge. In a Res1D
+        # file that node is found as a gridpoint that has an associated chainage.
+        # We select it and convert it into a node.
         for inclusion in self.priority["inclusions"]:
             edge_id = inclusion["edge"]
             distance = inclusion["distance"]
             reach = self._res1d.reaches[edge_id]
 
-            start_id = alias_map[reach.start_node]
-            end_id = alias_map[reach.end_node]
+            start_id = NetworkNode(self._res1d.nodes[reach.start_node]).id
+            end_id = NetworkNode(self._res1d.nodes[reach.end_node]).id
+
             edge_data = self._g0.get_edge_data(start_id, end_id)
             total_length = edge_data.get("length", 1)
             self._g0.remove_edge(start_id, end_id)
@@ -191,9 +204,6 @@ class Res1DMapper:
             self._g0.add_node(element.id, data=element.data)
             self._g0.add_edge(start_id, element.id, length=distance)
             self._g0.add_edge(element.id, end_id, length=total_length - distance)
-            alias_map[element.id] = element.id
-
-        return alias_map
 
     @property
     def as_df(self) -> pd.DataFrame:
