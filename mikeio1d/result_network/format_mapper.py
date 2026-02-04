@@ -5,7 +5,7 @@ from __future__ import annotations
 import networkx as nx
 import pandas as pd
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultGridPoint, ResultCatchment, ResultReach
@@ -18,15 +18,9 @@ class NetworkNode:
         self,
         element: Optional[ResultNode | ResultGridPoint],
     ):
-        self._empty_node = element is None
-        if self._empty_node:
-            self.alias = None
-            self.quantities = None
-            self.data = None
-        else:
-            self.alias = self._generate_alias(element)
-            self.quantities = element.quantities
-            self.data = self._build_node_data(element)
+        self.id = self._generate_alias(element)
+        self._quantities = element.quantities
+        self.data = self._build_node_data(element)
 
     @staticmethod
     def _generate_alias(element: ResultNode | ResultGridPoint) -> str:
@@ -37,16 +31,6 @@ class NetworkNode:
         else:
             raise ValueError("Invalid element type.")
 
-    @property
-    def is_empty(self) -> bool:
-        """Specifies if a node is empty.
-
-        Returns
-        -------
-        bool
-        """
-        return self._empty_node
-
     def _build_node_data(self, element: ResultNode | ResultGridPoint) -> pd.DataFrame:
         df = element.to_dataframe()
         renamer_dict = {}
@@ -56,6 +40,10 @@ class NetworkNode:
             renamer_dict[relevant_columns[0]] = quantity
         df = df.rename(columns=renamer_dict)
         return df.copy()
+
+    @property
+    def quantities(self) -> List[str]:
+        return self._quantities
 
 
 class Res1DMapper:
@@ -71,7 +59,6 @@ class Res1DMapper:
         self._df = self._build_node_dataframe()
 
     def _initialize_graph(self) -> nx.Graph:
-        # We create an initial graph to store the topology of the network
         g0 = nx.Graph()
         for reach in self._res1d.reaches.values():
             g0.add_edge(reach.start_node, reach.end_node, name=reach.name, length=reach.length)
@@ -96,8 +83,9 @@ class Res1DMapper:
         # TODO: prioritize by quantity
 
         if len(elements) == 0:
-            return NetworkNode()
-        elif len(elements) == 1:
+            raise ValueError("elements list should contain at least one element.")
+
+        if len(elements) == 1:
             # Only one element was found, which is directly passed to the network
             element = elements[0]
         else:
@@ -141,13 +129,13 @@ class Res1DMapper:
             Id in the simplified network
         """
         if isinstance(element, ResultNode):
-            alias = element.id
+            id = element.id
         elif isinstance(element, ResultGridPoint):
-            alias = NetworkNode(element).alias
+            id = NetworkNode(element).id
         else:
-            raise ValueError("Invalid element type")
+            raise ValueError("Invalid element type, must be {ResultNode, ResultGridPoint}")
         try:
-            return self._alias_map[alias]
+            return self._alias_map[id]
         except KeyError:
             # If the alias is not found in the node map, the passed element was not included
             # in the simplified network. Likely due to prioritization.
@@ -170,11 +158,8 @@ class Res1DMapper:
             node = self._res1d.nodes[node_id]
             elements = self._find_overlapping_elements(node)
             element = self._choose_element(elements)
-            if not element.is_empty:
-                alias_map[node_id] = element.alias
-                self._g0.nodes[node_id]["data"] = element.data
-
-        nx.relabel_nodes(self._g0, alias_map, copy=False)
+            alias_map[node_id] = element.id
+            self._g0.nodes[node_id]["data"] = element.data
         return alias_map
 
     def _get_touching_reaches(self, node: ResultNode) -> List[ResultReach]:
@@ -184,6 +169,7 @@ class Res1DMapper:
 
     def _update_graph_with_alias(self) -> Dict[str, str]:
         alias_map = self._create_alias_map()
+        nx.relabel_nodes(self._g0, alias_map, copy=False)
         if "inclusions" in self.priority:
             alias_map = self._add_inclusions(alias_map)
 
@@ -202,10 +188,10 @@ class Res1DMapper:
             self._g0.remove_edge(start_id, end_id)
 
             element = NetworkNode(reach[distance])
-            self._g0.add_node(element.alias, data=element.data)
-            self._g0.add_edge(start_id, element.alias, length=distance)
-            self._g0.add_edge(element.alias, end_id, length=total_length - distance)
-            alias_map[element.alias] = element.alias
+            self._g0.add_node(element.id, data=element.data)
+            self._g0.add_edge(start_id, element.id, length=distance)
+            self._g0.add_edge(element.id, end_id, length=total_length - distance)
+            alias_map[element.id] = element.id
 
         return alias_map
 
