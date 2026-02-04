@@ -169,7 +169,9 @@ class NetworkMapper:
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            g0.add_edge(edge.start_node, edge.end_node, name=edge.name, length=edge.length)
+            start_node = NetworkNode(self._nodes[edge.start_node])
+            end_node = NetworkNode(self._nodes[edge.end_node])
+            g0.add_edge(start_node.id, end_node.id, name=edge.name, length=edge.length)
         return g0.copy()
 
     def _validate_priority(self):
@@ -196,34 +198,32 @@ class NetworkMapper:
         element = NetworkNode(element)
         return element.id
 
-    def _prioritize_overlapping_element(self, node: ResultNode, g0: nx.Graph) -> NetworkNode:
-        def get_adjacent_edges() -> List[ResultReach]:
-            return [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
-
-        adjacent_edges = get_adjacent_edges()
-        relevant_edges = [edge for edge in adjacent_edges if edge in self.priority["edges"]]
+    def _prioritize_overlapping_element(self, node: NetworkNode, g0: nx.Graph) -> NetworkNode:
+        adjacent_edges = [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
+        relevant_edges = [edge for edge in adjacent_edges if edge.name in self.priority["edges"]]
         # Storing edge breaks if the edge is prioritized
-        gridpoints = []
+        breaks = []
         for edge in relevant_edges:
             if edge.start_node == node.id:
-                gridpoints.append(edge.gridpoints[0])
+                breaks.append(edge.gridpoints[0])
             elif edge.end_node == node.id:
-                gridpoints.append(edge.gridpoints[-1])
+                breaks.append(edge.gridpoints[-1])
 
-        if len(gridpoints) == 0:
-            return NetworkNode(node)
-        elif len(gridpoints) == 1:
-            return NetworkNode(gridpoints[0])
+        if len(breaks) == 0:
+            return node
+        elif len(breaks) == 1:
+            return NetworkNode(breaks[0])
         else:
             raise ValueError("There cannot be multiple prioritized edges for the same node.")
 
     def _prioritize(self, g0: nx.Graph) -> nx.Graph:
         alias_map = {}
-        for node_id in g0.nodes:
-            node = self._nodes[node_id]
+        for node in self._nodes.values():
+            node = NetworkNode(node)
             element = self._prioritize_overlapping_element(node, g0)
-            alias_map[node_id] = element.id
-            g0.nodes[node_id]["data"] = element.data
+            if element.id != node.id:  # An element has been prioritized
+                alias_map[node.id] = element.id
+            g0.nodes[node.id]["data"] = element.data
         # We rename based on the alias convention defined by NetworkNode class
         return nx.relabel_nodes(g0, alias_map, copy=True)
 
