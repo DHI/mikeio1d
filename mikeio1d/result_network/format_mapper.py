@@ -5,6 +5,7 @@ from __future__ import annotations
 import networkx as nx
 import pandas as pd
 
+from pathlib import Path
 from enum import Enum
 from typing import Dict, List, Tuple, Any, Iterator
 
@@ -255,6 +256,15 @@ class NetworkMapper:
 
     @staticmethod
     def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, EdgeCollection]:
+        if isinstance(res, (str, Path)):
+            path = Path(res)
+            if path.suffix.lower() == ".res1d":
+                res = Res1D(res)
+            else:
+                raise NotImplementedError(
+                    f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
+                )
+
         if isinstance(res, Res1D):
             backend = NetworkBackend.RES1D
         else:
