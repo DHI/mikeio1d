@@ -143,11 +143,14 @@ class NetworkEdge:
     """Edge of a network."""
 
     def __init__(self, reach: ResultReach, nodes: ResultNodes):
+        # TODO: currently this works only for Res1D files, it needs to be generalized
         self.id = reach.name
         self.start = NetworkNode(nodes[reach.start_node])
         self.end = NetworkNode(nodes[reach.end_node])
         self.length = reach.length
-
+        # We only copy the breakpoints in the middle (the ends would need to be prioritized)
+        self.breaks = [NetworkNode(point) for point in reach.gridpoints[1:-1]]
+        # TODO: find a way to avoid loading the whole reach for getitem
         self._reach = reach
 
     def __getitem__(self, key: Any) -> NetworkNode:
@@ -237,9 +240,8 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, priority: Dict[str, List]):
-        self.priority = priority
-        self._validate_priority()
+    def __init__(self):
+        pass
 
     def map_network(self, res: Any) -> GenericNetwork:
         """Return generic network object.
@@ -250,7 +252,6 @@ class NetworkMapper:
         """
         self._nodes, self._edges = self._parse_nodes_and_edges(res)
         g0 = self._initialize_graph()
-        g0 = self._update_graph(g0)
 
         return GenericNetwork(g0)
 
@@ -278,16 +279,21 @@ class NetworkMapper:
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            g0.add_edge(edge.start.id, edge.end.id, name=edge.id, length=edge.length)
-        return g0.copy()
+            edge_points = [edge.start] + edge.breaks + [edge.end]
+            for i in range(len(edge_points) - 1):
+                start_i, end_i = edge_points[i], edge_points[i + 1]
+                g0.add_edge(start_i.id, end_i.id)
+                g0.nodes[start_i.id]["data"] = start_i.data
+                g0.nodes[end_i.id]["data"] = end_i.data
 
-    def _validate_priority(self):
-        valid_keys = {"edges", "inclusions"}
-        priority_keys = set(self.priority.keys())
-        if not priority_keys.issubset(valid_keys):
-            raise ValueError(f"Invalid keys in priority, they must be one of {valid_keys}")
-        if "inclusions" not in self.priority:
-            self.priority["inclusions"] = {}
+            # Including an overlap with the data inside the extremes inside the edge
+            for side in [edge.start, edge.end]:
+                if "overlap" in g0.nodes[side.id]:
+                    g0.nodes[side.id]["overlap"][edge.id] = side.data
+                else:
+                    g0.nodes[side.id]["overlap"] = {edge.id: side.data}
+
+        return g0.copy()
 
     def get_node_id(self, element: ResultNode | ResultGridPoint) -> str:
         """Return the node id in the simplified network.
@@ -304,55 +310,3 @@ class NetworkMapper:
         """
         element = NetworkNode(element)
         return element.id
-
-    def _prioritize_overlapping_element(self, node: NetworkNode, g0: nx.Graph) -> NetworkNode:
-        adjacent_edges = [self._edges[data["name"]] for _, _, data in g0.edges(node.id, data=True)]
-        relevant_edges = [edge for edge in adjacent_edges if edge.id in self.priority["edges"]]
-        # Storing edge breaks if the edge is prioritized
-        breaks = []
-        for edge in relevant_edges:
-            if edge.start.id == node.id:
-                breaks.append(edge[0])
-            elif edge.end.id == node.id:
-                breaks.append(edge[-1])
-
-        if len(breaks) == 0:
-            return node
-        elif len(breaks) == 1:
-            return breaks[0]
-        else:
-            raise ValueError("There cannot be multiple prioritized edges for the same node.")
-
-    def _prioritize(self, g0: nx.Graph) -> nx.Graph:
-        alias_map = {}
-        for node in self._nodes.values():
-            element = self._prioritize_overlapping_element(node, g0)
-            if element.id != node.id:  # An element has been prioritized
-                alias_map[node.id] = element.id
-            g0.nodes[node.id]["data"] = element.data
-        # We rename based on the alias convention defined by NetworkNode class
-        return nx.relabel_nodes(g0, alias_map, copy=True)
-
-    def _update_graph(self, g0: nx.Graph) -> nx.Graph:
-        g0 = self._prioritize(g0)
-        g0 = self._add_inclusions(g0)
-        return g0
-
-    def _add_inclusions(self, g0: nx.Graph) -> nx.Graph:
-        # Some measurements might be taken in the middle of an edge. In a Res1D
-        # file that node is found as a gridpoint that has an associated chainage.
-        # We select it and convert it into a node.
-        for inclusion in self.priority["inclusions"]:
-            edge_id = inclusion["edge"]
-            distance = inclusion["distance"]
-            edge = self._edges[edge_id]
-
-            total_length = edge.length
-            g0.remove_edge(edge.start.id, edge.end.id)
-
-            element = edge[distance]
-            g0.add_node(element.id, data=element.data)
-            g0.add_edge(edge.start.id, element.id, length=distance)
-            g0.add_edge(element.id, edge.end.id, length=total_length - distance)
-
-        return g0.copy()
