@@ -18,6 +18,13 @@ from mikeio1d.result_network import (
 )
 
 
+class NetworkBackend(Enum):
+    """Backend of network."""
+
+    RES1D = 1
+    EPANET = 2
+
+
 class Res1DNodeType(Enum):
     """Type of the original network element."""
 
@@ -44,7 +51,7 @@ class NetworkNode:
             self._data = self._build_node_data(element)
         else:
             raise NotImplementedError(
-                "Invalid element type, only ResultNode or ResultGridPoint from Res1D are supported."
+                f"Invalid element type {type(element)}, only ResultNode or ResultGridPoint from Res1D are supported."
             )
 
     def _generate_alias(self, element: ResultNode | ResultGridPoint) -> str:
@@ -102,8 +109,13 @@ class NetworkNode:
 class NodeCollection:
     """Collection of nodes."""
 
-    def __init__(self, nodes: ResultNodes):
-        self._dict = {node_id: NetworkNode(node) for node_id, node in nodes.items()}
+    def __init__(self, network: Any, backend: NetworkBackend):
+        if backend == NetworkBackend.RES1D:
+            node_dict = {node_id: NetworkNode(node) for node_id, node in network.nodes.items()}
+        else:
+            raise ValueError(f"Invalid backend {backend.name} for network of type {type(network)}")
+
+        self._dict = node_dict
 
     def __getitem__(self, key: str) -> NetworkNode:
         """Get network node."""
@@ -149,8 +161,16 @@ class NetworkEdge:
 class EdgeCollection:
     """Collection of nodes."""
 
-    def __init__(self, nodes: ResultNodes, reaches: ResultReaches):
-        self._dict = {reach_id: NetworkEdge(reach, nodes) for reach_id, reach in reaches.items()}
+    def __init__(self, network: Any, backend: NetworkBackend):
+        if backend == NetworkBackend.RES1D:
+            node_dict = {
+                reach_id: NetworkEdge(reach, network.nodes)
+                for reach_id, reach in network.reaches.items()
+            }
+        else:
+            raise ValueError(f"Invalid backend {backend.name} for network of type {type(network)}")
+
+        self._dict = node_dict
 
     def __getitem__(self, key: str) -> NetworkEdge:
         """Get network node."""
@@ -175,6 +195,51 @@ class EdgeCollection:
     def get(self, key: str, default=None) -> NetworkEdge:
         """Get edge by ID with optional default value."""
         return self._dict.get(key, default)
+
+
+class NetworkParser:
+    """Parser for network. Validates network backend."""
+
+    def __init__(self, res: Any):
+        if isinstance(res, Res1D):
+            self._backend = NetworkBackend.RES1D
+        else:
+            raise NotImplementedError(
+                f"Only Res1D can be parsed, and network is of type {type(res)}"
+            )
+
+        self._nodes = NodeCollection(res, backend=self._backend)
+        self._edges = EdgeCollection(res, backend=self._backend)
+
+    def get_nodes(self) -> NodeCollection:
+        """Get nodes of a network.
+
+        Parameters
+        ----------
+        network : Any
+            Arbitrary network structure
+
+        Returns
+        -------
+        NodeCollection
+            Collection of nodes
+        """
+        return self._nodes
+
+    def get_edges(self) -> EdgeCollection:
+        """Get edges of a network.
+
+        Parameters
+        ----------
+        network : Any
+            Arbitrary network structure
+
+        Returns
+        -------
+        EdgeCollection
+            Collection of edges.
+        """
+        return self._edges
 
 
 class GenericNetwork:
@@ -239,10 +304,10 @@ class NetworkMapper:
 
     @staticmethod
     def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, EdgeCollection]:
-        if isinstance(res, Res1D):
-            return NodeCollection(res.nodes), EdgeCollection(res.nodes, res.reaches)
-        else:
-            raise NotImplementedError("Only Res1D formats are supported.")
+        parser = NetworkParser(res)
+        nodes = parser.get_nodes()
+        edges = parser.get_edges()
+        return nodes, edges
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
