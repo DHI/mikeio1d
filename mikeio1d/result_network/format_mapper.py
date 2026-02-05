@@ -6,7 +6,7 @@ import networkx as nx
 import pandas as pd
 
 from enum import Enum
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Iterator
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import (
@@ -113,15 +113,15 @@ class NodeCollection:
         """Check if edge ID exists in the collection."""
         return key in self._dict
 
-    def keys(self):
+    def keys(self) -> Iterator[str]:
         """Return edge IDs."""
         return self._dict.keys()
 
-    def values(self):
+    def values(self) -> Iterator[NetworkNode]:
         """Return NetworkEdge objects."""
         return self._dict.values()
 
-    def items(self):
+    def items(self) -> Iterator[Tuple[str, NetworkNode]]:
         """Return (id, edge) pairs."""
         return self._dict.items()
 
@@ -152,7 +152,7 @@ class EdgeCollection:
     def __init__(self, nodes: ResultNodes, reaches: ResultReaches):
         self._dict = {reach_id: NetworkEdge(reach, nodes) for reach_id, reach in reaches.items()}
 
-    def __getitem__(self, key: str) -> NetworkNode:
+    def __getitem__(self, key: str) -> NetworkEdge:
         """Get network node."""
         return self._dict[key]
 
@@ -160,19 +160,19 @@ class EdgeCollection:
         """Check if edge ID exists in the collection."""
         return key in self._dict
 
-    def keys(self):
+    def keys(self) -> Iterator[str]:
         """Return edge IDs."""
         return self._dict.keys()
 
-    def values(self):
+    def values(self) -> Iterator[NetworkEdge]:
         """Return NetworkEdge objects."""
         return self._dict.values()
 
-    def items(self):
+    def items(self) -> Iterator[Tuple[str, NetworkEdge]]:
         """Return (id, edge) pairs."""
         return self._dict.items()
 
-    def get(self, key: str, default=None) -> NetworkNode:
+    def get(self, key: str, default=None) -> NetworkEdge:
         """Get edge by ID with optional default value."""
         return self._dict.get(key, default)
 
@@ -238,7 +238,7 @@ class NetworkMapper:
         return GenericNetwork(g0)
 
     @staticmethod
-    def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, ResultReaches]:
+    def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, EdgeCollection]:
         if isinstance(res, Res1D):
             return NodeCollection(res.nodes), EdgeCollection(res.nodes, res.reaches)
         else:
