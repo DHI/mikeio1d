@@ -202,9 +202,9 @@ class GenericNetwork:
 
     def __init__(self, graph: nx.Graph):
         self._graph = graph.copy()
-        self._df = self._build_node_dataframe()
+        self._df = self._build_dataframe()
 
-    def _build_node_dataframe(self) -> pd.DataFrame:
+    def _build_dataframe(self) -> pd.DataFrame:
         df = pd.concat({k: v["data"] for k, v in self._graph.nodes.items()}, axis=1)
         df.columns = df.columns.set_names(["node", "quantity"])
         return df.copy()
