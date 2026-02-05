@@ -35,8 +35,8 @@ class Res1DNodeType(Enum):
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, element: Any, backend: NetworkBackend):
-        if backend == NetworkBackend.RES1D:
+    def __init__(self, element: Any):
+        if isinstance(element, (ResultNode, ResultGridPoint)):
             if isinstance(element, ResultNode):
                 self._node_type = Res1DNodeType.NODE
             if isinstance(element, ResultGridPoint):
@@ -107,9 +107,7 @@ class NodeCollection:
 
     def __init__(self, network: Any, backend: NetworkBackend):
         if backend == NetworkBackend.RES1D:
-            node_dict = {
-                node_id: NetworkNode(node, backend) for node_id, node in network.nodes.items()
-            }
+            node_dict = {node_id: NetworkNode(node) for node_id, node in network.nodes.items()}
         else:
             raise ValueError(f"Invalid backend {backend.name} for network of type {type(network)}")
 
@@ -242,7 +240,7 @@ class NetworkMapper:
         self.priority = priority
         self._validate_priority()
 
-    def map_network(self, res: Res1D) -> GenericNetwork:
+    def map_network(self, res: Any) -> GenericNetwork:
         """Return generic network object.
 
         Returns
