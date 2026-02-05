@@ -13,7 +13,6 @@ from mikeio1d.result_network import (
     ResultNode,
     ResultGridPoint,
     ResultReach,
-    ResultReaches,
     ResultNodes,
 )
 
@@ -36,11 +35,8 @@ class Res1DNodeType(Enum):
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(
-        self,
-        element: Any,
-    ):
-        if isinstance(element, (ResultNode, ResultGridPoint)):
+    def __init__(self, element: Any, backend: NetworkBackend):
+        if backend == NetworkBackend.RES1D:
             if isinstance(element, ResultNode):
                 self._node_type = Res1DNodeType.NODE
             if isinstance(element, ResultGridPoint):
@@ -111,7 +107,9 @@ class NodeCollection:
 
     def __init__(self, network: Any, backend: NetworkBackend):
         if backend == NetworkBackend.RES1D:
-            node_dict = {node_id: NetworkNode(node) for node_id, node in network.nodes.items()}
+            node_dict = {
+                node_id: NetworkNode(node, backend) for node_id, node in network.nodes.items()
+            }
         else:
             raise ValueError(f"Invalid backend {backend.name} for network of type {type(network)}")
 
@@ -197,51 +195,6 @@ class EdgeCollection:
         return self._dict.get(key, default)
 
 
-class NetworkParser:
-    """Parser for network. Validates network backend."""
-
-    def __init__(self, res: Any):
-        if isinstance(res, Res1D):
-            self._backend = NetworkBackend.RES1D
-        else:
-            raise NotImplementedError(
-                f"Only Res1D can be parsed, and network is of type {type(res)}"
-            )
-
-        self._nodes = NodeCollection(res, backend=self._backend)
-        self._edges = EdgeCollection(res, backend=self._backend)
-
-    def get_nodes(self) -> NodeCollection:
-        """Get nodes of a network.
-
-        Parameters
-        ----------
-        network : Any
-            Arbitrary network structure
-
-        Returns
-        -------
-        NodeCollection
-            Collection of nodes
-        """
-        return self._nodes
-
-    def get_edges(self) -> EdgeCollection:
-        """Get edges of a network.
-
-        Parameters
-        ----------
-        network : Any
-            Arbitrary network structure
-
-        Returns
-        -------
-        EdgeCollection
-            Collection of edges.
-        """
-        return self._edges
-
-
 class GenericNetwork:
     """Generic network structure."""
 
@@ -304,9 +257,14 @@ class NetworkMapper:
 
     @staticmethod
     def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, EdgeCollection]:
-        parser = NetworkParser(res)
-        nodes = parser.get_nodes()
-        edges = parser.get_edges()
+        if isinstance(res, Res1D):
+            backend = NetworkBackend.RES1D
+        else:
+            raise NotImplementedError(
+                f"Only Res1D can be parsed, and network is of type {type(res)}"
+            )
+        nodes = NodeCollection(res, backend=backend)
+        edges = EdgeCollection(res, backend=backend)
         return nodes, edges
 
     def _initialize_graph(self) -> nx.Graph:
@@ -323,7 +281,7 @@ class NetworkMapper:
         if "inclusions" not in self.priority:
             self.priority["inclusions"] = {}
 
-    def get_node_id(self, element: ResultNode | ResultGridPoint) -> int:
+    def get_node_id(self, element: ResultNode | ResultGridPoint) -> str:
         """Return the node id in the simplified network.
 
         Parameters
@@ -333,7 +291,7 @@ class NetworkMapper:
 
         Returns
         -------
-        int
+        str
             Id in the simplified network
         """
         element = NetworkNode(element)
