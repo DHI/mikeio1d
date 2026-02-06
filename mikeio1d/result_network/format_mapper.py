@@ -7,7 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from enum import Enum
-from typing import Optional, List, Tuple, Any, Iterator, Dict
+from typing import Optional, List, Tuple, Any, Iterator, Union
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import (
@@ -16,6 +16,8 @@ from mikeio1d.result_network import (
     ResultReach,
     ResultNodes,
 )
+
+Res1DElement = Union[ResultNode, ResultGridPoint]
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
@@ -56,39 +58,20 @@ class NetworkBackend(Enum):
     EPANET = 2
 
 
-class Res1DNodeType(Enum):
-    """Type of the original network element."""
-
-    NODE = 1
-    GRIDPOINT = 2
-    CATCHMENT = 3
-
-
 class NetworkNode:
     """Node in the simplified network."""
 
     def __init__(self, element: Any):
-        if isinstance(element, (ResultNode, ResultGridPoint)):
-            if isinstance(element, ResultNode):
-                self._node_type = Res1DNodeType.NODE
-            if isinstance(element, ResultGridPoint):
-                self._node_type = Res1DNodeType.GRIDPOINT
-
-            self._id = self._generate_alias(element)
+        if isinstance(element, Res1DElement):
+            self._id = node_id_generator(node=element.id)
             self._quantities = element.quantities
             self._data = self._build_node_data(element)
         else:
             raise NotImplementedError(
-                f"Invalid element type {type(element)}, only ResultNode or ResultGridPoint from Res1D are supported."
+                f"Invalid element type {type(element)}, only ResultNode from Res1D are supported."
             )
 
-    def _generate_alias(self, element: ResultNode | ResultGridPoint) -> str:
-        if isinstance(element, ResultGridPoint):
-            return node_id_generator(edge=element.reach_name, distance=element.chainage)
-        else:
-            return node_id_generator(node=element.id)
-
-    def _build_node_data(self, element: ResultNode | ResultGridPoint) -> pd.DataFrame:
+    def _build_node_data(self, element: Res1DElement) -> pd.DataFrame:
         df = element.to_dataframe()
         renamer_dict = {}
         for quantity in self.quantities:
@@ -107,11 +90,6 @@ class NetworkNode:
         List[str]
         """
         return self._quantities
-
-    @property
-    def type(self) -> Res1DNodeType:
-        """Type of the initial Res1D element."""
-        return self._node_type
 
     @property
     def id(self) -> str:
@@ -174,13 +152,15 @@ class BreakPoint(NetworkNode):
     """Edge break point."""
 
     def __init__(self, element: Any):
-        super().__init__(element)
-        self._distance = self._read_length(element)
-
-    @staticmethod
-    def _read_length(element: Any):
-        if isinstance(element, ResultGridPoint):
-            return element.chainage
+        if isinstance(element, Res1DElement):
+            self._id = node_id_generator(edge=element.reach_name, distance=element.chainage)
+            self._quantities = element.quantities
+            self._data = self._build_node_data(element)
+            self._distance = element.chainage
+        else:
+            raise NotImplementedError(
+                f"Invalid element type {type(element)}, only ResultGridPoint from Res1D are supported."
+            )
 
     @property
     def distance(self) -> float:
@@ -197,17 +177,12 @@ class NetworkEdge:
         self.start = NetworkNode(nodes[reach.start_node])
         self.end = NetworkNode(nodes[reach.end_node])
         self.length = reach.length
-        self.breaks = [BreakPoint(point) for point in reach.gridpoints]
+        self.breakpoints = [BreakPoint(point) for point in reach.gridpoints]
 
     @property
-    def n_breaks(self) -> int:
+    def n_breakpoints(self) -> int:
         """Number of break points in the edge."""
-        return len(self.breaks)
-
-    @property
-    def n_parts(self) -> int:
-        """Number of edge parts."""
-        return self.n_breaks - 1
+        return len(self.breakpoints)
 
 
 class EdgeCollection:
@@ -344,37 +319,41 @@ class NetworkMapper:
             # this means the gridpoints touching the node
             if edge.start.id not in g0.nodes:
                 g0.add_node(
-                    edge.start.id, boundary={edge.id: edge.breaks[0].data}, data=edge.start.data
+                    edge.start.id,
+                    boundary={edge.id: edge.breakpoints[0].data},
+                    data=edge.start.data,
                 )
             else:
-                g0.nodes[edge.start.id]["boundary"].update({edge.id: edge.breaks[0].data})
+                g0.nodes[edge.start.id]["boundary"].update({edge.id: edge.breakpoints[0].data})
 
             if edge.end.id not in g0.nodes:
                 g0.add_node(
-                    edge.end.id, boundary={edge.id: edge.breaks[-1].data}, data=edge.end.data
+                    edge.end.id, boundary={edge.id: edge.breakpoints[-1].data}, data=edge.end.data
                 )
             else:
-                g0.nodes[edge.end.id]["boundary"].update({edge.id: edge.breaks[-1].data})
+                g0.nodes[edge.end.id]["boundary"].update({edge.id: edge.breakpoints[-1].data})
 
             # Ensure all intermediate gridpoints (breaks[1] to breaks[n_breaks-2]) have data attributes
-            for i in range(1, edge.n_breaks - 1):
-                break_point = edge.breaks[i]
+            for i in range(1, edge.n_breakpoints - 1):
+                break_point = edge.breakpoints[i]
                 g0.add_node(break_point.id, data=break_point.data)
 
             # Add edges connecting start/end nodes to their adjacent gridpoints
-            if edge.n_breaks >= 2:
-                g0.add_edge(edge.start.id, edge.breaks[1].id, length=edge.breaks[1].distance)
+            if edge.n_breakpoints >= 2:
                 g0.add_edge(
-                    edge.breaks[-2].id,
+                    edge.start.id, edge.breakpoints[1].id, length=edge.breakpoints[1].distance
+                )
+                g0.add_edge(
+                    edge.breakpoints[-2].id,
                     edge.end.id,
-                    length=edge.length - edge.breaks[-2].distance,
+                    length=edge.length - edge.breakpoints[-2].distance,
                 )
 
             # Connect consecutive intermediate gridpoints
-            if edge.n_breaks > 2:
-                for i in range(1, edge.n_breaks - 2):
-                    length = edge.breaks[i + 1].distance - edge.breaks[i].distance
-                    g0.add_edge(edge.breaks[i].id, edge.breaks[i + 1].id, length=length)
+            if edge.n_breakpoints > 2:
+                for i in range(1, edge.n_breakpoints - 2):
+                    length = edge.breakpoints[i + 1].distance - edge.breakpoints[i].distance
+                    g0.add_edge(edge.breakpoints[i].id, edge.breakpoints[i + 1].id, length=length)
 
         return g0.copy()
 
