@@ -21,7 +21,7 @@ Res1DElement = Union[ResultNode, ResultGridPoint]
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
-    """Generate teh id of a network node.
+    """Generate the id of a network node.
 
     Parameters
     ----------
@@ -186,7 +186,7 @@ class NetworkEdge:
 
 
 class EdgeCollection:
-    """Collection of nodes."""
+    """Collection of edges."""
 
     def __init__(self, network: Any, backend: NetworkBackend):
         if backend == NetworkBackend.RES1D:
@@ -200,7 +200,7 @@ class EdgeCollection:
         self._dict = node_dict
 
     def __getitem__(self, key: str) -> NetworkEdge:
-        """Get network node."""
+        """Get network edge."""
         return self._dict[key]
 
     def __contains__(self, key: str) -> bool:
@@ -371,7 +371,7 @@ class NetworkMapper:
             Node id(s) in the original network, by default None
         edge : Optional[str | List[str]], optional
             Edge id(s) for breakpoint lookup or edge endpoint lookup, by default None
-        at : Optional[str | List[str]], optional
+        at : Optional[str | float | List[str | float]], optional
             Distance(s) along edge for breakpoint lookup, or "start"/"end"
             for edge endpoints, by default None
 
