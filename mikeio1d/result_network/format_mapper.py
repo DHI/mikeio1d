@@ -382,7 +382,7 @@ class NetworkMapper:
         self,
         node: Optional[str | List[str]] = None,
         edge: Optional[str | List[str]] = None,
-        distance: Optional[str | List[str]] = None,
+        at: Optional[str | float | List[str | float]] = None,
     ) -> str | List[str]:
         """Find node or breakpoint id in the generic network.
 
@@ -391,9 +391,10 @@ class NetworkMapper:
         node : Optional[str | List[str]], optional
             Node id(s) in the original network, by default None
         edge : Optional[str | List[str]], optional
-            Edge id(s) for breakpoint lookup, by default None
-        distance : Optional[str | List[str]], optional
-            Distance(s) along edge for breakpoint lookup, by default None
+            Edge id(s) for breakpoint lookup or edge endpoint lookup, by default None
+        at : Optional[str | List[str]], optional
+            Distance(s) along edge for breakpoint lookup, or "start"/"end"
+            for edge endpoints, by default None
 
         Returns
         -------
@@ -409,7 +410,7 @@ class NetworkMapper:
         """
         # Determine lookup mode
         by_node = node is not None
-        by_breakpoint = edge is not None or distance is not None
+        by_breakpoint = edge is not None or at is not None
 
         if by_node and by_breakpoint:
             raise ValueError(
@@ -426,31 +427,42 @@ class NetworkMapper:
             ids = [node_id_generator(node_i) for node_i in node]
 
         else:
-            # Handle breakpoint lookup
-            if edge is None or distance is None:
+            # Handle breakpoint/edge endpoint lookup
+            if edge is None or at is None:
                 raise ValueError(
-                    "Both 'edge' and 'distance' parameters are required for breakpoint lookup"
+                    "Both 'edge' and 'distance' parameters are required for breakpoint/endpoint lookup"
                 )
 
             if not isinstance(edge, list):
                 edge = [edge]
 
-            if not isinstance(distance, list):
-                distance = [distance]
+            if not isinstance(at, list):
+                at = [at]
 
-            # We can pass one edge and multiple breakpoints
+            # We can pass one edge and multiple breakpoints/endpoints
             if len(edge) == 1:
-                edge = [edge] * len(distance)
+                edge = edge * len(at)
 
-            if len(edge) != len(distance):
+            if len(edge) != len(at):
                 raise ValueError(
                     "Incompatible lengths of 'edge' and 'distance' arguments. One 'edge' admits multiple distances, otherwise they must be the same length."
                 )
 
-            ids = [
-                node_id_generator(edge=edge_i, distance=distance_i)
-                for edge_i, distance_i in zip(edge, distance)
-            ]
+            ids = []
+            for edge_i, distance_i in zip(edge, at):
+                if distance_i in ["start", "end"]:
+                    # Handle edge endpoint lookup
+                    if edge_i not in self._edges:
+                        raise KeyError(f"Edge '{edge_i}' not found in the network.")
+
+                    network_edge = self._edges[edge_i]
+                    if distance_i == "start":
+                        ids.append(network_edge.start.id)
+                    else:  # distance_i == "end"
+                        ids.append(network_edge.end.id)
+                else:
+                    # Handle breakpoint lookup
+                    ids.append(node_id_generator(edge=edge_i, distance=distance_i))
 
         # Check if all ids exist in the network
         if all([id in self._node_alias for id in ids]):
