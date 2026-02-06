@@ -7,7 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from enum import Enum
-from typing import Dict, List, Tuple, Any, Iterator
+from typing import Optional, List, Tuple, Any, Iterator, Dict
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import (
@@ -16,6 +16,37 @@ from mikeio1d.result_network import (
     ResultReach,
     ResultNodes,
 )
+
+
+def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
+    """Generate teh id of a network node.
+
+    Parameters
+    ----------
+    node : Optional[str  |  int], optional
+        node id in the original network, by default None
+
+    Returns
+    -------
+    str
+
+    Raises
+    ------
+    ValueError
+        Error raised if kwargs are not valid.
+    """
+    by_node = node is not None
+    by_distance = ("edge" in kwargs) and ("distance" in kwargs)
+    if by_node == by_distance:
+        raise ValueError(
+            "Invalid kwarg combination: 'node' was not passed and kwargs are incomplete. Only accepted methods are either 'node' or both 'edge' and 'distance'."
+        )
+
+    if by_node:
+        return f"node-{node}"
+
+    if by_distance:
+        return f"break@edge-{kwargs["edge"]}-{round(kwargs["distance"], 3)}"
 
 
 class NetworkBackend(Enum):
@@ -53,9 +84,9 @@ class NetworkNode:
 
     def _generate_alias(self, element: ResultNode | ResultGridPoint) -> str:
         if isinstance(element, ResultGridPoint):
-            return f"break@reach-{element.reach_name}-{round(element.chainage, 3)}"
+            return node_id_generator(edge=element.reach_name, distance=element.chainage)
         else:
-            return f"node-{element.id}"
+            return node_id_generator(node=element.id)
 
     def _build_node_data(self, element: ResultNode | ResultGridPoint) -> pd.DataFrame:
         df = element.to_dataframe()
@@ -148,14 +179,23 @@ class NetworkEdge:
         self.start = NetworkNode(nodes[reach.start_node])
         self.end = NetworkNode(nodes[reach.end_node])
         self.length = reach.length
-        # We only copy the breakpoints in the middle (the ends would need to be prioritized)
-        self.breaks = [NetworkNode(point) for point in reach.gridpoints[1:-1]]
+        self.breaks = [NetworkNode(point) for point in reach.gridpoints]
         # TODO: find a way to avoid loading the whole reach for getitem
         self._reach = reach
 
     def __getitem__(self, key: Any) -> NetworkNode:
         """Get network node."""
         return NetworkNode(self._reach[key])
+
+    @property
+    def n_breaks(self) -> int:
+        """Number of break points in the edge."""
+        return len(self.breaks)
+
+    @property
+    def n_parts(self) -> int:
+        """Number of edge parts."""
+        return self.n_breaks - 1
 
 
 class EdgeCollection:
@@ -241,7 +281,7 @@ class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
     def __init__(self):
-        pass
+        self._node_alias = {}
 
     def map_network(self, res: Any) -> GenericNetwork:
         """Return generic network object.
@@ -250,63 +290,84 @@ class NetworkMapper:
         -------
         GenericNetwork
         """
+        res = self._read_network(res)
+        self._backend = self._load_backend(res)
         self._nodes, self._edges = self._parse_nodes_and_edges(res)
         g0 = self._initialize_graph()
+        self._node_alias = set(g0.nodes.keys())
 
         return GenericNetwork(g0)
 
     @staticmethod
-    def _parse_nodes_and_edges(res: Any) -> Tuple[NodeCollection, EdgeCollection]:
-        if isinstance(res, (str, Path)):
-            path = Path(res)
-            if path.suffix.lower() == ".res1d":
-                res = Res1D(res)
-            else:
-                raise NotImplementedError(
-                    f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
-                )
-
+    def _load_backend(res: Any) -> NetworkBackend:
         if isinstance(res, Res1D):
-            backend = NetworkBackend.RES1D
+            return NetworkBackend.RES1D
         else:
             raise NotImplementedError(
                 f"Only Res1D can be parsed, and network is of type {type(res)}"
             )
-        nodes = NodeCollection(res, backend=backend)
-        edges = EdgeCollection(res, backend=backend)
+
+    def _read_network(self, res: Any) -> Any:
+        if isinstance(res, (str, Path)):
+            path = Path(res)
+            if path.suffix.lower() == ".res1d":
+                return Res1D(res)
+            else:
+                raise NotImplementedError(
+                    f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
+                )
+        else:
+            return res
+
+    def _parse_nodes_and_edges(self, res: Any) -> Tuple[NodeCollection, EdgeCollection]:
+        nodes = NodeCollection(res, backend=self._backend)
+        edges = EdgeCollection(res, backend=self._backend)
+
         return nodes, edges
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            edge_points = [edge.start] + edge.breaks + [edge.end]
-            for i in range(len(edge_points) - 1):
-                start_i, end_i = edge_points[i], edge_points[i + 1]
-                g0.add_edge(start_i.id, end_i.id)
-                g0.nodes[start_i.id]["data"] = start_i.data
-                g0.nodes[end_i.id]["data"] = end_i.data
+            # Including the data at the boundaries of the nodes (if any). In Res1D
+            # this means the gridpoints touching the node
+            if edge.start.id not in g0.nodes:
+                g0.add_node(
+                    edge.start.id, boundary={edge.id: edge.breaks[0].data}, data=edge.start.data
+                )
+            else:
+                g0.nodes[edge.start.id]["boundary"].update({edge.id: edge.breaks[0].data})
 
-            # Including an overlap with the data inside the extremes inside the edge
-            for side in [edge.start, edge.end]:
-                if "overlap" in g0.nodes[side.id]:
-                    g0.nodes[side.id]["overlap"][edge.id] = side.data
-                else:
-                    g0.nodes[side.id]["overlap"] = {edge.id: side.data}
+            if edge.end.id not in g0.nodes:
+                g0.add_node(
+                    edge.end.id, boundary={edge.id: edge.breaks[-1].data}, data=edge.end.data
+                )
+            else:
+                g0.nodes[edge.end.id]["boundary"].update({edge.id: edge.breaks[-1].data})
+
+
+            # Ensure all intermediate gridpoints (breaks[1] to breaks[n_breaks-2]) have data attributes
+            for i in range(1, edge.n_breaks - 1):
+                break_point = edge.breaks[i]
+                g0.add_node(break_point.id, data=break_point.data)
+
+            # Add edges connecting start/end nodes to their adjacent gridpoints
+            if edge.n_breaks >= 2:
+                g0.add_edge(edge.start.id, edge.breaks[1].id)
+                g0.add_edge(edge.breaks[edge.n_breaks - 2].id, edge.end.id)
+
+            # Connect consecutive intermediate gridpoints
+            if edge.n_breaks > 2:
+                for i in range(1, edge.n_breaks - 2):
+                    g0.add_edge(edge.breaks[i].id, edge.breaks[i + 1].id)
 
         return g0.copy()
 
-    def get_node_id(self, element: ResultNode | ResultGridPoint) -> str:
-        """Return the node id in the simplified network.
-
-        Parameters
-        ----------
-        element : ResultNode | ResultGridPoint
-            Element in the Res1D network
-
-        Returns
-        -------
-        str
-            Id in the simplified network
-        """
-        element = NetworkNode(element)
-        return element.id
+    def get_node_id(self, node: Optional[str] = None, **kwargs) -> str:
+        """Return the node id in the generic network."""
+        id = node_id_generator(node, **kwargs)
+        if id in self._node_alias:
+            return id
+        else:
+            raise KeyError(
+                f"Node {node} was not found in the network. Available nodes are {self._node_alias}"
+            )
