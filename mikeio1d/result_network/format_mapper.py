@@ -378,54 +378,88 @@ class NetworkMapper:
 
         return g0.copy()
 
-    def get_node_id(
+    def find(
         self,
         node: Optional[str | List[str]] = None,
-    ) -> str:
-        """Return the node id in the generic network."""
-        if not isinstance(node, list):
-            node = [node]
-        ids = [node_id_generator(node_i) for node_i in node]
-        if all([id in self._node_alias for id in ids]):
-            if len(ids) == 1:
-                return ids[0]
-            else:
-                return ids
-        else:
-            raise KeyError(
-                f"Node/s was not found in the network. Available nodes are {self._node_alias}"
-            )
-
-    def get_breakpoint_id(
-        self,
         edge: Optional[str | List[str]] = None,
         distance: Optional[str | List[str]] = None,
     ) -> str | List[str]:
-        """Return the id of a breakpoint."""
-        if not isinstance(edge, list):
-            edge = [edge]
+        """Find node or breakpoint id in the generic network.
 
-        if not isinstance(distance, list):
-            distance = [distance]
+        Parameters
+        ----------
+        node : Optional[str | List[str]], optional
+            Node id(s) in the original network, by default None
+        edge : Optional[str | List[str]], optional
+            Edge id(s) for breakpoint lookup, by default None
+        distance : Optional[str | List[str]], optional
+            Distance(s) along edge for breakpoint lookup, by default None
 
-        # We can pass one edge and multiple breakpoints
-        if len(edge) == 1:
-            edge = [edge] * len(distance)
+        Returns
+        -------
+        str | List[str]
+            Node or breakpoint id(s) in the generic network
 
-        if len(edge) != len(distance):
+        Raises
+        ------
+        ValueError
+            If invalid combination of parameters is provided
+        KeyError
+            If requested node/breakpoint is not found in the network
+        """
+        # Determine lookup mode
+        by_node = node is not None
+        by_breakpoint = edge is not None or distance is not None
+
+        if by_node and by_breakpoint:
             raise ValueError(
-                "Incompatible lengths of 'edge' and 'distance' arguments. One 'edge' admits multiple distances, otherwise they must be the same length."
+                "Cannot specify both 'node' and 'edge'/'distance' parameters simultaneously"
             )
-        ids = [
-            node_id_generator(edge=edge_i, distance=distance_i)
-            for edge_i, distance_i in zip(edge, distance)
-        ]
+
+        if not by_node and not by_breakpoint:
+            raise ValueError("Must specify either 'node' or both 'edge' and 'distance' parameters")
+
+        if by_node:
+            # Handle node lookup
+            if not isinstance(node, list):
+                node = [node]
+            ids = [node_id_generator(node_i) for node_i in node]
+
+        else:
+            # Handle breakpoint lookup
+            if edge is None or distance is None:
+                raise ValueError(
+                    "Both 'edge' and 'distance' parameters are required for breakpoint lookup"
+                )
+
+            if not isinstance(edge, list):
+                edge = [edge]
+
+            if not isinstance(distance, list):
+                distance = [distance]
+
+            # We can pass one edge and multiple breakpoints
+            if len(edge) == 1:
+                edge = [edge] * len(distance)
+
+            if len(edge) != len(distance):
+                raise ValueError(
+                    "Incompatible lengths of 'edge' and 'distance' arguments. One 'edge' admits multiple distances, otherwise they must be the same length."
+                )
+
+            ids = [
+                node_id_generator(edge=edge_i, distance=distance_i)
+                for edge_i, distance_i in zip(edge, distance)
+            ]
+
+        # Check if all ids exist in the network
         if all([id in self._node_alias for id in ids]):
             if len(ids) == 1:
                 return ids[0]
             else:
                 return ids
         else:
+            missing_ids = [id for id in ids if id not in self._node_alias]
             raise KeyError(
-                f"Breakpoint/s was not found in the network. Available nodes are {self._node_alias}"
+                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {self._node_alias}"
             )
