@@ -170,6 +170,24 @@ class NodeCollection:
         return self._dict.get(key, default)
 
 
+class BreakPoint(NetworkNode):
+    """Edge break point."""
+
+    def __init__(self, element: Any):
+        super().__init__(element)
+        self._distance = self._read_length(element)
+
+    @staticmethod
+    def _read_length(element: Any):
+        if isinstance(element, ResultGridPoint):
+            return element.chainage
+
+    @property
+    def distance(self) -> float:
+        """Distance to beginning of the edge."""
+        return self._distance
+
+
 class NetworkEdge:
     """Edge of a network."""
 
@@ -179,13 +197,7 @@ class NetworkEdge:
         self.start = NetworkNode(nodes[reach.start_node])
         self.end = NetworkNode(nodes[reach.end_node])
         self.length = reach.length
-        self.breaks = [NetworkNode(point) for point in reach.gridpoints]
-        # TODO: find a way to avoid loading the whole reach for getitem
-        self._reach = reach
-
-    def __getitem__(self, key: Any) -> NetworkNode:
-        """Get network node."""
-        return NetworkNode(self._reach[key])
+        self.breaks = [BreakPoint(point) for point in reach.gridpoints]
 
     @property
     def n_breaks(self) -> int:
@@ -280,19 +292,19 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self):
+    def __init__(self, res: Any):
         self._node_alias = {}
+        res = self._read_network(res)
+        self._backend = self._load_backend(res)
+        self._nodes, self._edges = self._parse_nodes_and_edges(res)
 
-    def map_network(self, res: Any) -> GenericNetwork:
+    def map_network(self) -> GenericNetwork:
         """Return generic network object.
 
         Returns
         -------
         GenericNetwork
         """
-        res = self._read_network(res)
-        self._backend = self._load_backend(res)
-        self._nodes, self._edges = self._parse_nodes_and_edges(res)
         g0 = self._initialize_graph()
         self._node_alias = set(g0.nodes.keys())
 
@@ -351,13 +363,18 @@ class NetworkMapper:
 
             # Add edges connecting start/end nodes to their adjacent gridpoints
             if edge.n_breaks >= 2:
-                g0.add_edge(edge.start.id, edge.breaks[1].id)
-                g0.add_edge(edge.breaks[edge.n_breaks - 2].id, edge.end.id)
+                g0.add_edge(edge.start.id, edge.breaks[1].id, length=edge.breaks[1].distance)
+                g0.add_edge(
+                    edge.breaks[-2].id,
+                    edge.end.id,
+                    length=edge.length - edge.breaks[-2].distance,
+                )
 
             # Connect consecutive intermediate gridpoints
             if edge.n_breaks > 2:
                 for i in range(1, edge.n_breaks - 2):
-                    g0.add_edge(edge.breaks[i].id, edge.breaks[i + 1].id)
+                    length = edge.breaks[i + 1].distance - edge.breaks[i].distance
+                    g0.add_edge(edge.breaks[i].id, edge.breaks[i + 1].id, length=length)
 
         return g0.copy()
 
