@@ -285,7 +285,7 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, res: Any, backend: Optional[NetworkBackend]):
+    def __init__(self, res: Any, backend: Optional[NetworkBackend] = None):
         self._node_alias: set = {}
         res = self._read_network(res)
         self._backend = self._load_backend(res) if backend is None else backend
