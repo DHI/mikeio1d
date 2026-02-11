@@ -7,7 +7,18 @@ import pandas as pd
 
 from pathlib import Path
 from enum import Enum
-from typing import Optional, List, Tuple, Any, Iterator, Union
+from typing import (
+    Optional,
+    List,
+    Tuple,
+    Any,
+    Iterator,
+    Union,
+    get_args,
+    KeysView,
+    ValuesView,
+    ItemsView,
+)
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import (
@@ -17,7 +28,7 @@ from mikeio1d.result_network import (
     ResultNodes,
 )
 
-Res1DElement = Union[ResultNode, ResultGridPoint]
+Res1DElementType = Union[ResultNode, ResultGridPoint]
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
@@ -43,12 +54,14 @@ def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
         raise ValueError(
             "Invalid kwarg combination: 'node' was not passed and kwargs are incomplete. Only accepted methods are either 'node' or both 'edge' and 'distance'."
         )
-
     if by_node:
         return f"node-{node}"
 
     if by_distance:
-        return f"break@edge-{kwargs["edge"]}-{round(kwargs["distance"], 3)}"
+        return f"break@edge-{kwargs['edge']}-{round(kwargs['distance'], 3)}"
+
+    # This should never be reached due to the logic above, but added for mypy
+    raise ValueError("Unexpected code path reached")
 
 
 class NetworkBackend(Enum):
@@ -62,7 +75,7 @@ class NetworkNode:
     """Node in the simplified network."""
 
     def __init__(self, element: Any):
-        if isinstance(element, Res1DElement):
+        if isinstance(element, get_args(Res1DElementType)):
             self._id = node_id_generator(node=element.id)
             self._quantities = element.quantities
             self._data = self._build_node_data(element)
@@ -71,7 +84,7 @@ class NetworkNode:
                 f"Invalid element type {type(element)}, only ResultNode from Res1D are supported."
             )
 
-    def _build_node_data(self, element: Res1DElement) -> pd.DataFrame:
+    def _build_node_data(self, element: Res1DElementType) -> pd.DataFrame:
         df = element.to_dataframe()
         renamer_dict = {}
         for quantity in self.quantities:
@@ -131,15 +144,15 @@ class NodeCollection:
         """Check if edge ID exists in the collection."""
         return key in self._dict
 
-    def keys(self) -> Iterator[str]:
+    def keys(self) -> KeysView[str]:
         """Return edge IDs."""
         return self._dict.keys()
 
-    def values(self) -> Iterator[NetworkNode]:
+    def values(self) -> ValuesView[NetworkNode]:
         """Return NetworkEdge objects."""
         return self._dict.values()
 
-    def items(self) -> Iterator[Tuple[str, NetworkNode]]:
+    def items(self) -> ItemsView[str, NetworkNode]:
         """Return (id, edge) pairs."""
         return self._dict.items()
 
@@ -152,7 +165,7 @@ class BreakPoint(NetworkNode):
     """Edge break point."""
 
     def __init__(self, element: Any):
-        if isinstance(element, Res1DElement):
+        if isinstance(element, get_args(Res1DElementType)):
             self._id = node_id_generator(edge=element.reach_name, distance=element.chainage)
             self._quantities = element.quantities
             self._data = self._build_node_data(element)
@@ -174,6 +187,11 @@ class NetworkEdge:
     def __init__(self, reach: ResultReach, nodes: ResultNodes):
         # TODO: currently this works only for Res1D files, it needs to be generalized
         self.id = reach.name
+        if reach.start_node is None:
+            raise ValueError(f"Reach {reach.name} has no start_node")
+        if reach.end_node is None:
+            raise ValueError(f"Reach {reach.name} has no end_node")
+
         self.start = NetworkNode(nodes[reach.start_node])
         self.end = NetworkNode(nodes[reach.end_node])
         self.length = reach.length
@@ -207,15 +225,15 @@ class EdgeCollection:
         """Check if edge ID exists in the collection."""
         return key in self._dict
 
-    def keys(self) -> Iterator[str]:
+    def keys(self) -> KeysView[str]:
         """Return edge IDs."""
         return self._dict.keys()
 
-    def values(self) -> Iterator[NetworkEdge]:
+    def values(self) -> ValuesView[NetworkEdge]:
         """Return NetworkEdge objects."""
         return self._dict.values()
 
-    def items(self) -> Iterator[Tuple[str, NetworkEdge]]:
+    def items(self) -> ItemsView[str, NetworkEdge]:
         """Return (id, edge) pairs."""
         return self._dict.items()
 
@@ -267,10 +285,10 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, res: Any):
-        self._node_alias = {}
+    def __init__(self, res: Any, backend: Optional[NetworkBackend]):
+        self._node_alias: set = {}
         res = self._read_network(res)
-        self._backend = self._load_backend(res)
+        self._backend = self._load_backend(res) if backend is None else backend
         self._nodes, self._edges = self._parse_nodes_and_edges(res)
 
     def map_network(self) -> GenericNetwork:
