@@ -27,9 +27,18 @@ jobs:
     - uses: chartboost/ruff-action@v1 # Fail fast if there are any linting errors
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      run: uv python install ${{ matrix.python-version }}
+
+    - name: Cache uv dependencies
+      uses: actions/cache@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        path: |
+          ~/.cache/uv
+          .venv
+        key: v1-${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          v1-${{ runner.os }}-uv-${{ matrix.python-version }}-
+          v1-${{ runner.os }}-uv-
     
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
