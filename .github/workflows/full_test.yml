@@ -54,7 +54,7 @@ jobs:
         uv run pytest -c .pytest-ci.ini 
     - name: Install mikeio1d (optional dependencies)
       run: |
-        uv pip install .[all]
+        uv pip install . --group all
     - name: Test with pytest (optional dependencies)
       run: |
         uv run pytest -c .pytest-ci.ini -m "optional_dependency"

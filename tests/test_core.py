@@ -19,10 +19,11 @@ def testdata_name():
     return list(dataclasses.asdict(testdata).keys())
 
 
+@pytest.mark.sklow
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
 @pytest.mark.parametrize("result_reader", ["copier", "query"])
 def test_mikeio1d_generates_expected_dataframe_for_filetype_read_all(result_reader, extension):
-    for name in testdata_name()[5:]:
+    for name in testdata_name():
         path = getattr(testdata, name)
         if not path.endswith(extension):
             continue

@@ -43,7 +43,7 @@ classifiers = [
 dependencies = [
     "pythonnet>=3.0.0",
     "numpy",
-    "pandas>=2.1",
+    "pandas>=2.1.0",
     "matplotlib",
     'mikecore; platform_system=="Linux"',
 ]
@@ -58,6 +58,8 @@ test = [
     "nbconvert",
     "ipykernel",
 ]
+
+all = ["matplotlib", "geopandas"]
 
 [project.optional-dependencies]
 dev = [
@@ -81,8 +83,6 @@ notebooks = [
     "mapclassify",
 ]
 docs = ["quarto-cli==1.6.37", "quartodoc==0.9.1", "griffe==1.5.1"]
-
-all = ["matplotlib", "geopandas"]
 
 [project.urls]
 "Homepage" = "https://github.com/DHI/mikeio1d"
