@@ -43,7 +43,7 @@ classifiers = [
 dependencies = [
     "pythonnet>=3.0.0",
     "numpy",
-    "pandas>=2.1.0,<3.0.0",
+    "pandas>=2.1",
     "matplotlib",
     'mikecore; platform_system=="Linux"',
 ]
