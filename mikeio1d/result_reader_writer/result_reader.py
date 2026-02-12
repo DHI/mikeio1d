@@ -275,22 +275,17 @@ class ResultReader(ABC):
             column_level_names = df.columns.names
 
         # Loop over all columns by number and update them by number as well.
-        for i in range(len(df.columns)):
-            if not self._is_lts_event_time_column(
-                df.columns[i], column_level_names=column_level_names
-            ):
+        for colname in df.columns:
+            if not self._is_lts_event_time_column(colname, column_level_names=column_level_names):
                 continue
 
-            seconds_since_simulation_started = df.iloc[:, i]
-            datetime_since_simulation_started = [
-                simulation_start + datetime.timedelta(seconds=s)
-                for s in seconds_since_simulation_started
-            ]
+            df[colname] = pd.to_timedelta(df[colname], unit="s")
+            datetime_since_simulation_started = pd.to_datetime(simulation_start) + df[colname]
 
             # Suppress casting warning for now with hope that it will be fixed by pandas in the future.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=FutureWarning)
-                df.iloc[:, i] = datetime_since_simulation_started
+                df[colname] = datetime_since_simulation_started
 
     def _is_lts_event_time_column(
         self,
