@@ -268,7 +268,7 @@ class ResultReader(ABC):
         if not self.is_lts_result_file():
             return
 
-        simulation_start = from_dotnet_datetime(self.data.StartTime)
+        simulation_start = pd.to_datetime(from_dotnet_datetime(self.data.StartTime))
 
         column_level_names = None
         if isinstance(df.columns, pd.MultiIndex):
@@ -279,13 +279,13 @@ class ResultReader(ABC):
             if not self._is_lts_event_time_column(colname, column_level_names=column_level_names):
                 continue
 
-            df[colname] = pd.to_timedelta(df[colname], unit="s")
-            datetime_since_simulation_started = pd.to_datetime(simulation_start) + df[colname]
+            seconds_since_start = pd.to_timedelta(df[colname], unit="s")
+            datetime_since_simulation_start = simulation_start + seconds_since_start
 
             # Suppress casting warning for now with hope that it will be fixed by pandas in the future.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=FutureWarning)
-                df[colname] = datetime_since_simulation_started
+                df[colname] = datetime_since_simulation_start
 
     def _is_lts_event_time_column(
         self,
