@@ -44,7 +44,7 @@ def to_dotnet_datetime(x):
     return dotnet_datetime
 
 
-def from_dotnet_datetime(x, round_to_milliseconds=True):
+def from_dotnet_datetime(x, round_to_milliseconds=True) -> datetime.datetime:
     """Convert from .NET System.DateTime to python datetime."""
     # Get microseconds from .NET ticks
     microseconds = x.Ticks % 10**7 // 10

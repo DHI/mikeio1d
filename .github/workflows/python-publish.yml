@@ -22,22 +22,21 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      run: uv python install 3.12
+        
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '6.0.x'
+
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools build wheel twine
+      run: uv pip install setuptools build wheel twine
+      
     - name: Build
-      run: |
-        python -m build --wheel
+      run: uv build --wheel
 
     # Doesn't run on Windows ☹️
     # - name: Publish package distributions to PyPI
@@ -47,6 +46,5 @@ jobs:
       env:
         TWINE_USERNAME: '__token__'
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload dist/*.whl
+      run: uv run twine upload dist/*.whl
 

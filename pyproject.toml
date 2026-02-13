@@ -49,9 +49,19 @@ dependencies = [
     'mikecore; platform_system=="Linux"',
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+    "matplotlib",
+    "pyarrow",
+    "nbformat",
+    "nbconvert",
+    "ipykernel",
+]
+all = ["matplotlib", "geopandas"]
 dev = [
-    "hatch",
+    "hatchling",
     "pytest",
     "pytest-cov",
     "ruff",
@@ -71,16 +81,6 @@ notebooks = [
     "mapclassify",
 ]
 docs = ["quarto-cli==1.6.37", "quartodoc==0.9.1", "griffe==1.5.1"]
-test = [
-    "pytest",
-    "pytest-cov",
-    "matplotlib",
-    "pyarrow",
-    "nbformat",
-    "nbconvert",
-    "ipykernel",
-]
-all = ["matplotlib", "geopandas"]
 
 [project.urls]
 "Homepage" = "https://github.com/DHI/mikeio1d"
