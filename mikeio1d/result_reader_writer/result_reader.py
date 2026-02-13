@@ -24,7 +24,7 @@ import datetime
 
 from ..dotnet import from_dotnet_datetime
 from ..dotnet import pythonnet_implementation as impl
-from ..various import NAME_DELIMITER
+from ..various import NAME_DELIMITER, DATETIME_DTYPE
 from ..quantities import TimeSeriesId
 from ..result_network import ResultNetwork
 
@@ -233,7 +233,7 @@ class ResultReader(ABC):
             return self.lts_event_index
 
         time_stamps = [from_dotnet_datetime(t) for t in self.data.TimesList]
-        self._time_index = pd.DatetimeIndex(time_stamps)
+        self._time_index = pd.DatetimeIndex(time_stamps, dtype=DATETIME_DTYPE)
         return self._time_index
 
     def get_data_set_name(self, data_set, item_id=None):
@@ -285,7 +285,7 @@ class ResultReader(ABC):
             # Suppress casting warning for now with hope that it will be fixed by pandas in the future.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=FutureWarning)
-                df[colname] = datetime_since_simulation_start
+                df[colname] = datetime_since_simulation_start.astype(DATETIME_DTYPE)
 
     def _is_lts_event_time_column(
         self,

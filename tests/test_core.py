@@ -19,7 +19,7 @@ def testdata_name():
     return list(dataclasses.asdict(testdata).keys())
 
 
-@pytest.mark.slow
+# @pytest.mark.slow
 @pytest.mark.parametrize("extension", [".res1d", ".res", ".resx", ".out"])
 @pytest.mark.parametrize("result_reader", ["copier", "query"])
 def test_mikeio1d_generates_expected_dataframe_for_filetype_read_all(result_reader, extension):
@@ -33,7 +33,7 @@ def test_mikeio1d_generates_expected_dataframe_for_filetype_read_all(result_read
             :, ~df.columns.duplicated()
         ]  # TODO: Remove this when column names are guaranteed unique
         df_expected = testdata.get_expected_dataframe(name)
-        assert_frame_equal(df, df_expected, check_index_type=False, check_dtype=False)
+        assert_frame_equal(df, df_expected)
 
 
 def sample_random_time_series_ids(res: Res1D) -> List[TimeSeriesId]:
@@ -124,4 +124,4 @@ def test_mikeio1d_network_res1d_using_time_filters(time, helpers):
         df_expected = testdata.get_expected_dataframe(name)
         if len(df.index) != len(df_expected):
             df_expected = df_expected.loc[df.index]
-        assert_frame_equal(df_expected, df, check_index_type=False, check_dtype=False)
+        assert_frame_equal(df_expected, df)
