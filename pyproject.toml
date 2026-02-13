@@ -58,10 +58,7 @@ test = [
     "nbconvert",
     "ipykernel",
 ]
-
 all = ["matplotlib", "geopandas"]
-
-[project.optional-dependencies]
 dev = [
     "hatch",
     "pytest",
