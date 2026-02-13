@@ -60,6 +60,7 @@ test = [
 ]
 all = ["matplotlib", "geopandas"]
 dev = [
+    "hatchling",
     "pytest",
     "pytest-cov",
     "ruff",
