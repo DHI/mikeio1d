@@ -34,7 +34,7 @@ jobs:
 
     - name: Install dependencies
       run: uv pip install setuptools build wheel twine
-      
+
     - name: Build
       run: uv build --wheel
 
@@ -46,6 +46,5 @@ jobs:
       env:
         TWINE_USERNAME: '__token__'
         TWINE_PASSWORD: ${{ secrets.TESTPYPI_PASSWORD }}
-      run: |
-        uv run twine upload --repository testpypi dist/*.whl
+      run: uv run twine upload --repository testpypi dist/*.whl
 
