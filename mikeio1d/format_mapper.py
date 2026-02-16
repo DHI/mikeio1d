@@ -65,19 +65,9 @@ class NetworkBackend(Enum):
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, id: str, *, data: pd.DataFrame, quantities: str | List[str]):
+    def __init__(self, id: str, data: pd.DataFrame):
         self._id = id
-        self._quantities = [quantities] if isinstance(quantities, str) else quantities
-        self._data = self._build_node_data(data)
-
-    def _build_node_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        renamer_dict = {}
-        for quantity in self._quantities:
-            relevant_columns = [col for col in df.columns if quantity in col]
-            assert len(relevant_columns) == 1, "There must be exactly one column matching quantity"
-            renamer_dict[relevant_columns[0]] = quantity
-        df = df.rename(columns=renamer_dict)
-        return df.copy()
+        self._data = data
 
     @property
     def quantities(self) -> List[str]:
@@ -87,7 +77,7 @@ class NetworkNode:
         -------
         List[str]
         """
-        return self._quantities
+        return list(self._data.columns)
 
     @property
     def id(self) -> str:
@@ -113,13 +103,10 @@ class NetworkNode:
 class EdgeBreakPoint(NetworkNode):
     """Edge break point."""
 
-    def __init__(
-        self, id: str, distance: float, *, data: pd.DataFrame, quantities: str | List[str]
-    ):
+    def __init__(self, id: str, distance: float, data: pd.DataFrame):
         self._id = id
-        self._quantities = [quantities] if isinstance(quantities, str) else quantities
-        self._data = self._build_node_data(data)
         self._distance = distance
+        self._data = data
 
     @property
     def distance(self) -> float:
@@ -133,7 +120,6 @@ class NetworkEdge:
     def __init__(
         self,
         id: str,
-        *,
         start: NetworkNode,
         end: NetworkNode,
         breaks: List[EdgeBreakPoint],
@@ -182,25 +168,39 @@ class EdgeCollection:
     @staticmethod
     def _parse_res1d_network(network: Res1D) -> Dict[str, NetworkEdge]:
 
+        def simplify_column_names(df: pd.DataFrame, quantities: List[str]) -> pd.DataFrame:
+            renamer_dict = {}
+            for quantity in quantities:
+                relevant_columns = [col for col in df.columns if quantity in col]
+                if len(relevant_columns) != 1:
+                    raise ValueError(
+                        f"There must be exactly one column per quantity, found {relevant_columns}."
+                    )
+                renamer_dict[relevant_columns[0]] = quantity
+            return df.rename(columns=renamer_dict, copy=True)
+
         def parse_reach(reach: ResultReach) -> NetworkEdge:
             return NetworkEdge(
                 reach.name,
-                start=NetworkNode(
+                NetworkNode(
                     node_id_generator(reach.start_node),
-                    data=network.nodes[reach.start_node].to_dataframe(),
-                    quantities=network.nodes[reach.start_node].quantities,
+                    simplify_column_names(
+                        network.nodes[reach.start_node].to_dataframe(),
+                        network.nodes[reach.start_node].quantities,
+                    ),
                 ),
-                end=NetworkNode(
+                NetworkNode(
                     node_id_generator(reach.end_node),
-                    data=network.nodes[reach.end_node].to_dataframe(),
-                    quantities=network.nodes[reach.end_node].quantities,
+                    simplify_column_names(
+                        network.nodes[reach.end_node].to_dataframe(),
+                        network.nodes[reach.end_node].quantities,
+                    ),
                 ),
-                breaks=[
+                [
                     EdgeBreakPoint(
                         node_id_generator(edge=point.reach_name, distance=point.chainage),
                         point.chainage,
-                        data=point.to_dataframe(),
-                        quantities=point.quantities,
+                        simplify_column_names(point.to_dataframe(), point.quantities),
                     )
                     for point in reach.gridpoints
                 ],
