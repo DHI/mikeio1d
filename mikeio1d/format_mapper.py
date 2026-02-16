@@ -75,20 +75,14 @@ class NetworkBackend(Enum):
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, element: Any):
-        if isinstance(element, get_args(Res1DElementType)):
-            self._id = node_id_generator(node=element.id)
-            self._quantities = element.quantities
-            self._data = self._build_node_data(element)
-        else:
-            raise NotImplementedError(
-                f"Invalid element type {type(element)}, only ResultNode from Res1D are supported."
-            )
+    def __init__(self, id: str, *, data: pd.DataFrame, quantities: str | List[str]):
+        self._id = id
+        self._quantities = [quantities] if isinstance(quantities, str) else quantities
+        self._data = self._build_node_data(data)
 
-    def _build_node_data(self, element: Res1DElementType) -> pd.DataFrame:
-        df = element.to_dataframe()
+    def _build_node_data(self, df: pd.DataFrame) -> pd.DataFrame:
         renamer_dict = {}
-        for quantity in self.quantities:
+        for quantity in self._quantities:
             relevant_columns = [col for col in df.columns if quantity in col]
             assert len(relevant_columns) == 1, "There must be exactly one column matching quantity"
             renamer_dict[relevant_columns[0]] = quantity
@@ -126,19 +120,16 @@ class NetworkNode:
         return self._data
 
 
-class BreakPoint(NetworkNode):
+class EdgeBreakPoint(NetworkNode):
     """Edge break point."""
 
-    def __init__(self, element: Any):
-        if isinstance(element, get_args(Res1DElementType)):
-            self._id = node_id_generator(edge=element.reach_name, distance=element.chainage)
-            self._quantities = element.quantities
-            self._data = self._build_node_data(element)
-            self._distance = element.chainage
-        else:
-            raise NotImplementedError(
-                f"Invalid element type {type(element)}, only ResultGridPoint from Res1D are supported."
-            )
+    def __init__(
+        self, id: str, distance: float, *, data: pd.DataFrame, quantities: str | List[str]
+    ):
+        self._id = id
+        self._quantities = [quantities] if isinstance(quantities, str) else quantities
+        self._data = self._build_node_data(data)
+        self._distance = distance
 
     @property
     def distance(self) -> float:
@@ -155,7 +146,7 @@ class NetworkEdge:
         *,
         start: NetworkNode,
         end: NetworkNode,
-        breaks: List[BreakPoint],
+        breaks: List[EdgeBreakPoint],
     ):
         self.id = id
         self._start = start
@@ -202,15 +193,32 @@ class EdgeCollection:
 
     @staticmethod
     def _parse_res1d_edges(network: Res1D) -> Dict[str, NetworkEdge]:
-        return {
-            reach_id: NetworkEdge(
+
+        def parse_reach(reach: ResultReach) -> NetworkEdge:
+            return NetworkEdge(
                 reach.name,
-                start=NetworkNode(network.nodes[reach.start_node]),
-                end=NetworkNode(network.nodes[reach.end_node]),
-                breaks=[BreakPoint(point) for point in reach.gridpoints],
+                start=NetworkNode(
+                    node_id_generator(reach.start_node),
+                    data=network.nodes[reach.start_node],
+                    quantities=network.nodes[reach.start_node].quantities,
+                ),
+                end=NetworkNode(
+                    node_id_generator(reach.end_node),
+                    data=network.nodes[reach.end_node],
+                    quantities=network.nodes[reach.end_node].quantities,
+                ),
+                breaks=[
+                    EdgeBreakPoint(
+                        node_id_generator(edge=point.reach_name, distance=point.chainage),
+                        point.chainage,
+                        data=point.to_dataframe(),
+                        quantities=point.quantities,
+                    )
+                    for point in reach.gridpoints
+                ],
             )
-            for reach_id, reach in network.reaches.items()
-        }
+
+        return {reach_id: parse_reach(reach) for reach_id, reach in network.reaches.items()}
 
     def __getitem__(self, key: str) -> NetworkEdge:
         """Get network edge."""
