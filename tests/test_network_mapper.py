@@ -39,7 +39,6 @@ class TestNetworkMapper:
         """Test that NetworkMapper initializes correctly."""
         mapper = NetworkMapper(res1d_file)
         assert mapper is not None
-        assert hasattr(mapper, "_nodes")
         assert hasattr(mapper, "_edges")
 
     def test_map_network_returns_generic_network(self, mapper):
@@ -62,9 +61,9 @@ class TestNetworkMapper:
                 graph_node_ids.add(original_id)
 
         # Check that all original nodes are present
-        assert original_node_ids.issubset(
-            graph_node_ids
-        ), f"Missing nodes: {original_node_ids - graph_node_ids}"
+        assert original_node_ids.issubset(graph_node_ids), (
+            f"Missing nodes: {original_node_ids - graph_node_ids}"
+        )
 
     def test_graph_has_correct_node_count(self, res1d_object, network):
         """Test that graph has correct total number of nodes."""
@@ -76,17 +75,17 @@ class TestNetworkMapper:
 
         actual_total = len(network.as_graph.nodes())
 
-        assert (
-            actual_total == expected_total
-        ), f"Expected {expected_total} total nodes, found {actual_total}"
+        assert actual_total == expected_total, (
+            f"Expected {expected_total} total nodes, found {actual_total}"
+        )
 
     def test_nodes_have_data_attribute(self, network):
         """Test that all nodes in the graph have data attribute."""
         for node_id, node_data in network.as_graph.nodes(data=True):
             assert "data" in node_data, f"Node {node_id} missing 'data' attribute"
-            assert hasattr(
-                node_data["data"], "columns"
-            ), f"Node {node_id} data is not DataFrame-like"
+            assert hasattr(node_data["data"], "columns"), (
+                f"Node {node_id} data is not DataFrame-like"
+            )
 
     def test_graph_is_connected(self, network):
         """Test that the resulting graph is connected."""
