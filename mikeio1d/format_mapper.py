@@ -13,7 +13,6 @@ from typing import (
     Tuple,
     Dict,
     Any,
-    Iterator,
     Union,
     get_args,
     KeysView,
@@ -150,23 +149,38 @@ class BreakPoint(NetworkNode):
 class NetworkEdge:
     """Edge of a network."""
 
-    def __init__(self, reach: ResultReach, nodes: ResultNodes):
-        # TODO: currently this works only for Res1D files, it needs to be generalized
-        self.id = reach.name
-        if reach.start_node is None:
-            raise ValueError(f"Reach {reach.name} has no start_node")
-        if reach.end_node is None:
-            raise ValueError(f"Reach {reach.name} has no end_node")
-
-        self.start = NetworkNode(nodes[reach.start_node])
-        self.end = NetworkNode(nodes[reach.end_node])
-        self.length = reach.length
-        self.breakpoints = [BreakPoint(point) for point in reach.gridpoints]
+    def __init__(
+        self,
+        id: str,
+        *,
+        start: NetworkNode,
+        end: NetworkNode,
+        breaks: List[BreakPoint],
+    ):
+        self.id = id
+        self._start = start
+        self._end = end
+        self.breakpoints = breaks
 
     @property
     def n_breakpoints(self) -> int:
         """Number of break points in the edge."""
         return len(self.breakpoints)
+
+    @property
+    def length(self) -> float:
+        """Length of edge."""
+        return self.breakpoints[-1].distance - self.breakpoints[0].distance
+
+    @property
+    def start(self) -> NetworkNode:
+        """Starting node of the edge."""
+        return self._start
+
+    @property
+    def end(self) -> NetworkNode:
+        """Ending node of the edge."""
+        return self._end
 
 
 class EdgeCollection:
@@ -189,7 +203,12 @@ class EdgeCollection:
     @staticmethod
     def _parse_res1d_edges(network: Res1D) -> Dict[str, NetworkEdge]:
         return {
-            reach_id: NetworkEdge(reach, network.nodes)
+            reach_id: NetworkEdge(
+                reach.name,
+                start=NetworkNode(network.nodes[reach.start_node]),
+                end=NetworkNode(network.nodes[reach.end_node]),
+                breaks=[BreakPoint(point) for point in reach.gridpoints],
+            )
             for reach_id, reach in network.reaches.items()
         }
 
@@ -309,21 +328,28 @@ class NetworkMapper:
         for edge in self._edges.values():
             # Including the data at the boundaries of the nodes (if any). In Res1D
             # this means the gridpoints touching the node
-            if edge.start.id not in g0.nodes:
-                g0.add_node(
-                    edge.start.id,
-                    boundary={edge.id: edge.breakpoints[0].data},
-                    data=edge.start.data,
-                )
-            else:
-                g0.nodes[edge.start.id]["boundary"].update({edge.id: edge.breakpoints[0].data})
+            start_breakpoint = edge.breakpoints[0]
+            end_breakpoint = edge.breakpoints[-1]
 
-            if edge.end.id not in g0.nodes:
+            # TODO: Refactor to omit these assertions
+            assert start_breakpoint.distance == 0, "First breakpoint starts inside edge."
+            assert end_breakpoint.distance == edge.length, "Last breakpoint ends inside edge."
+
+            if edge._start.id not in g0.nodes:
                 g0.add_node(
-                    edge.end.id, boundary={edge.id: edge.breakpoints[-1].data}, data=edge.end.data
+                    edge._start.id,
+                    boundary={edge.id: start_breakpoint.data},
+                    data=edge._start.data,
                 )
             else:
-                g0.nodes[edge.end.id]["boundary"].update({edge.id: edge.breakpoints[-1].data})
+                g0.nodes[edge._start.id]["boundary"].update({edge.id: start_breakpoint.data})
+
+            if edge._end.id not in g0.nodes:
+                g0.add_node(
+                    edge._end.id, boundary={edge.id: end_breakpoint.data}, data=edge._end.data
+                )
+            else:
+                g0.nodes[edge._end.id]["boundary"].update({edge.id: end_breakpoint.data})
 
             # Ensure all intermediate gridpoints (breaks[1] to breaks[n_breaks-2]) have data attributes
             for i in range(1, edge.n_breakpoints - 1):
@@ -333,11 +359,11 @@ class NetworkMapper:
             # Add edges connecting start/end nodes to their adjacent gridpoints
             if edge.n_breakpoints >= 2:
                 g0.add_edge(
-                    edge.start.id, edge.breakpoints[1].id, length=edge.breakpoints[1].distance
+                    edge._start.id, edge.breakpoints[1].id, length=edge.breakpoints[1].distance
                 )
                 g0.add_edge(
                     edge.breakpoints[-2].id,
-                    edge.end.id,
+                    edge._end.id,
                     length=edge.length - edge.breakpoints[-2].distance,
                 )
 
@@ -428,9 +454,9 @@ class NetworkMapper:
 
                     network_edge = self._edges[edge_i]
                     if distance_i == "start":
-                        ids.append(network_edge.start.id)
+                        ids.append(network_edge._start.id)
                     else:  # distance_i == "end"
-                        ids.append(network_edge.end.id)
+                        ids.append(network_edge._end.id)
                 else:
                     # Handle breakpoint lookup
                     ids.append(node_id_generator(edge=edge_i, distance=distance_i))
