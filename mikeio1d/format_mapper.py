@@ -25,10 +25,7 @@ from mikeio1d.result_network import (
     ResultNode,
     ResultGridPoint,
     ResultReach,
-    ResultNodes,
 )
-
-Res1DElementType = Union[ResultNode, ResultGridPoint]
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
