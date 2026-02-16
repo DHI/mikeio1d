@@ -10,22 +10,15 @@ from enum import Enum
 from typing import (
     Optional,
     List,
-    Tuple,
     Dict,
     Any,
-    Union,
-    get_args,
     KeysView,
     ValuesView,
     ItemsView,
 )
 
 from mikeio1d import Res1D
-from mikeio1d.result_network import (
-    ResultNode,
-    ResultGridPoint,
-    ResultReach,
-)
+from mikeio1d.result_network import ResultReach
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
