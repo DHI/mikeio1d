@@ -79,7 +79,7 @@ notebooks = [
     "folium",
     "mapclassify",
 ]
-docs = ["quarto-cli==1.6.37", "quartodoc==0.9.1", "griffe==1.5.1"]
+docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1"]
 
 [project.urls]
 "Homepage" = "https://github.com/DHI/mikeio1d"
