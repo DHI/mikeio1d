@@ -11,6 +11,7 @@ from typing import (
     Optional,
     List,
     Tuple,
+    Dict,
     Any,
     Iterator,
     Union,
@@ -125,42 +126,6 @@ class NetworkNode:
         return self._data
 
 
-class NodeCollection:
-    """Collection of nodes."""
-
-    def __init__(self, network: Any, backend: NetworkBackend):
-        if backend == NetworkBackend.RES1D:
-            node_dict = {node_id: NetworkNode(node) for node_id, node in network.nodes.items()}
-        else:
-            raise ValueError(f"Invalid backend {backend.name} for network of type {type(network)}")
-
-        self._dict = node_dict
-
-    def __getitem__(self, key: str) -> NetworkNode:
-        """Get network node."""
-        return self._dict[key]
-
-    def __contains__(self, key: str) -> bool:
-        """Check if edge ID exists in the collection."""
-        return key in self._dict
-
-    def keys(self) -> KeysView[str]:
-        """Return edge IDs."""
-        return self._dict.keys()
-
-    def values(self) -> ValuesView[NetworkNode]:
-        """Return NetworkEdge objects."""
-        return self._dict.values()
-
-    def items(self) -> ItemsView[str, NetworkNode]:
-        """Return (id, edge) pairs."""
-        return self._dict.items()
-
-    def get(self, key: str, default=None) -> NetworkNode:
-        """Get edge by ID with optional default value."""
-        return self._dict.get(key, default)
-
-
 class BreakPoint(NetworkNode):
     """Edge break point."""
 
@@ -206,16 +171,26 @@ class NetworkEdge:
 class EdgeCollection:
     """Collection of edges."""
 
-    def __init__(self, network: Any, backend: NetworkBackend):
-        if backend == NetworkBackend.RES1D:
-            node_dict = {
-                reach_id: NetworkEdge(reach, network.nodes)
-                for reach_id, reach in network.reaches.items()
-            }
-        else:
-            raise ValueError(f"Invalid backend {backend.name} for network of type {type(network)}")
+    def __init__(self, network: Any):
+        self._backend = self._identify_backend(network)
+        self._dict = self._load_network_as_dict(network)
 
-        self._dict = node_dict
+    def _load_network_as_dict(self, network: Any) -> Dict[str, NetworkEdge]:
+        if self._backend == NetworkBackend.RES1D:
+            node_dict = self._parse_res1d_edges(network)
+        else:
+            raise ValueError(
+                f"Invalid backend {self._backend.name} for network of type {type(network)}"
+            )
+
+        return node_dict
+
+    @staticmethod
+    def _parse_res1d_edges(network: Res1D) -> Dict[str, NetworkEdge]:
+        return {
+            reach_id: NetworkEdge(reach, network.nodes)
+            for reach_id, reach in network.reaches.items()
+        }
 
     def __getitem__(self, key: str) -> NetworkEdge:
         """Get network edge."""
@@ -240,6 +215,20 @@ class EdgeCollection:
     def get(self, key: str, default=None) -> NetworkEdge:
         """Get edge by ID with optional default value."""
         return self._dict.get(key, default)
+
+    @staticmethod
+    def _identify_backend(res: Any) -> NetworkBackend:
+        if isinstance(res, Res1D):
+            return NetworkBackend.RES1D
+        else:
+            raise NotImplementedError(
+                f"Only Res1D can be parsed, and network is of type {type(res)}"
+            )
+
+    @property
+    def backend(self) -> NetworkBackend:
+        """Backend of network."""
+        return self._backend
 
 
 class GenericNetwork:
@@ -285,32 +274,10 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, res: Any, backend: Optional[NetworkBackend] = None):
+    def __init__(self, res: Any):
         self._node_alias: set = {}
         res = self._read_network(res)
-        self._backend = self._load_backend(res) if backend is None else backend
-        self._nodes, self._edges = self._parse_nodes_and_edges(res)
-
-    def map_network(self) -> GenericNetwork:
-        """Return generic network object.
-
-        Returns
-        -------
-        GenericNetwork
-        """
-        g0 = self._initialize_graph()
-        self._node_alias = set(g0.nodes.keys())
-
-        return GenericNetwork(g0)
-
-    @staticmethod
-    def _load_backend(res: Any) -> NetworkBackend:
-        if isinstance(res, Res1D):
-            return NetworkBackend.RES1D
-        else:
-            raise NotImplementedError(
-                f"Only Res1D can be parsed, and network is of type {type(res)}"
-            )
+        self._edges = EdgeCollection(res)
 
     def _read_network(self, res: Any) -> Any:
         if isinstance(res, (str, Path)):
@@ -324,11 +291,17 @@ class NetworkMapper:
         else:
             return res
 
-    def _parse_nodes_and_edges(self, res: Any) -> Tuple[NodeCollection, EdgeCollection]:
-        nodes = NodeCollection(res, backend=self._backend)
-        edges = EdgeCollection(res, backend=self._backend)
+    def map_network(self) -> GenericNetwork:
+        """Return generic network object.
 
-        return nodes, edges
+        Returns
+        -------
+        GenericNetwork
+        """
+        g0 = self._initialize_graph()
+        self._node_alias = set(g0.nodes.keys())
+
+        return GenericNetwork(g0)
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
