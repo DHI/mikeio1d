@@ -69,8 +69,8 @@ class TestNetworkMapper:
         """Test that graph has correct total number of nodes."""
         node_count = len(res1d_object.nodes)
         gridpoint_count = sum(
-            len(reach.gridpoints) for reach in res1d_object.reaches.values()
-        ) - 2 * len(res1d_object.reaches)
+            max(0, len(reach.gridpoints) - 2) for reach in res1d_object.reaches.values()
+        )
         expected_total = node_count + gridpoint_count
 
         actual_total = len(network.as_graph.nodes())

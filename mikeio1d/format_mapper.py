@@ -62,12 +62,35 @@ class NetworkBackend(Enum):
     CUSTOM = 3
 
 
-class NetworkNode:
-    """Node in the simplified network."""
+class NodeBoundary:
+    """Boundary of node."""
 
     def __init__(self, id: str, data: pd.DataFrame):
         self._id = id
         self._data = data
+
+    def as_dict(self) -> Dict[str, pd.DataFrame]:
+        """Boundary as dict."""
+        return {self._id: self.data}
+
+    @property
+    def id(self) -> str:
+        """Id of boundary."""
+        return self._id
+
+    @property
+    def data(self) -> pd.DataFrame:
+        """Data in boundary."""
+        return self._data
+
+
+class NetworkNode:
+    """Node in the simplified network."""
+
+    def __init__(self, id: str, data: pd.DataFrame, *, boundary: Optional[NodeBoundary] = None):
+        self._id = id
+        self._data = data
+        self._boundary = boundary
 
     @property
     def quantities(self) -> List[str]:
@@ -99,6 +122,11 @@ class NetworkNode:
         """
         return self._data
 
+    @property
+    def boundary(self) -> NodeBoundary:
+        """Boundary of node."""
+        return self._boundary
+
 
 class EdgeBreakPoint(NetworkNode):
     """Edge break point."""
@@ -124,7 +152,7 @@ class NetworkEdge:
         end: NetworkNode,
         breaks: List[EdgeBreakPoint],
     ):
-        self.id = id
+        self._id = id
         self._start = start
         self._end = end
         self.breakpoints = breaks
@@ -148,6 +176,11 @@ class NetworkEdge:
     def end(self) -> NetworkNode:
         """Ending node of the edge."""
         return self._end
+
+    @property
+    def id(self) -> str:
+        """Id of edge."""
+        return self._id
 
 
 class EdgeCollection:
@@ -180,6 +213,16 @@ class EdgeCollection:
             return df.rename(columns=renamer_dict, copy=True)
 
         def parse_reach(reach: ResultReach) -> NetworkEdge:
+            # By definition, the first and last gridpoint in a reach are at distance
+            # 0 and 'length' from the start and end node respectively, effectively overlapping with
+            # the start and end nodes in a 1d representation.
+
+            # Don't mutate the original data!
+            start_gridpoint = reach.gridpoints[0]
+            end_gridpoint = reach.gridpoints[-1]
+
+            intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
+
             return NetworkEdge(
                 reach.name,
                 NetworkNode(
@@ -188,12 +231,24 @@ class EdgeCollection:
                         network.nodes[reach.start_node].to_dataframe(),
                         network.nodes[reach.start_node].quantities,
                     ),
+                    boundary=NodeBoundary(
+                        reach.name,
+                        simplify_column_names(
+                            start_gridpoint.to_dataframe(), start_gridpoint.quantities
+                        ),
+                    ),
                 ),
                 NetworkNode(
                     node_id_generator(reach.end_node),
                     simplify_column_names(
                         network.nodes[reach.end_node].to_dataframe(),
                         network.nodes[reach.end_node].quantities,
+                    ),
+                    boundary=NodeBoundary(
+                        reach.name,
+                        simplify_column_names(
+                            end_gridpoint.to_dataframe(), end_gridpoint.quantities
+                        ),
                     ),
                 ),
                 [
@@ -202,7 +257,7 @@ class EdgeCollection:
                         point.chainage,
                         simplify_column_names(point.to_dataframe(), point.quantities),
                     )
-                    for point in reach.gridpoints
+                    for point in intermediate_gridpoints
                 ],
             )
 
@@ -322,52 +377,44 @@ class NetworkMapper:
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            # Including the data at the boundaries of the nodes (if any). In Res1D
-            # this means the gridpoints touching the node
-            start_breakpoint = edge.breakpoints[0]
-            end_breakpoint = edge.breakpoints[-1]
-
-            # TODO: Refactor to omit these assertions
-            assert start_breakpoint.distance == 0, "First breakpoint starts inside edge."
-            assert end_breakpoint.distance == edge.length, "Last breakpoint ends inside edge."
-
-            if edge._start.id not in g0.nodes:
-                g0.add_node(
-                    edge._start.id,
-                    boundary={edge.id: start_breakpoint.data},
-                    data=edge._start.data,
-                )
+            if edge.start.id in g0.nodes:
+                g0.nodes[edge.start.id]["boundary"].update(edge.start.boundary.as_dict())
             else:
-                g0.nodes[edge._start.id]["boundary"].update({edge.id: start_breakpoint.data})
-
-            if edge._end.id not in g0.nodes:
                 g0.add_node(
-                    edge._end.id, boundary={edge.id: end_breakpoint.data}, data=edge._end.data
+                    edge.start.id,
+                    data=edge.start.data,
+                    boundary=edge.start.boundary.as_dict(),
                 )
-            else:
-                g0.nodes[edge._end.id]["boundary"].update({edge.id: end_breakpoint.data})
 
-            # Ensure all intermediate gridpoints (breaks[1] to breaks[n_breaks-2]) have data attributes
-            for i in range(1, edge.n_breakpoints - 1):
-                break_point = edge.breakpoints[i]
-                g0.add_node(break_point.id, data=break_point.data)
+            if edge.end.id in g0.nodes:
+                g0.nodes[edge.end.id]["boundary"].update(edge.end.boundary.as_dict())
+            else:
+                g0.add_node(edge.end.id, data=edge.end.data, boundary=edge.end.boundary.as_dict())
 
             # Add edges connecting start/end nodes to their adjacent gridpoints
-            if edge.n_breakpoints >= 2:
+            if edge.n_breakpoints == 0:
+                g0.add_edge(edge.start.id, edge.end.id, length=edge.length)
+            else:
+                # Add all breakpoint nodes first
+                for breakpoint in edge.breakpoints:
+                    g0.add_node(breakpoint.id, data=breakpoint.data)
+
                 g0.add_edge(
-                    edge._start.id, edge.breakpoints[1].id, length=edge.breakpoints[1].distance
-                )
-                g0.add_edge(
-                    edge.breakpoints[-2].id,
-                    edge._end.id,
-                    length=edge.length - edge.breakpoints[-2].distance,
+                    edge.start.id, edge.breakpoints[0].id, length=edge.breakpoints[0].distance
                 )
 
-            # Connect consecutive intermediate gridpoints
-            if edge.n_breakpoints > 2:
-                for i in range(1, edge.n_breakpoints - 2):
-                    length = edge.breakpoints[i + 1].distance - edge.breakpoints[i].distance
-                    g0.add_edge(edge.breakpoints[i].id, edge.breakpoints[i + 1].id, length=length)
+                g0.add_edge(
+                    edge.breakpoints[-1].id,
+                    edge.end.id,
+                    length=edge.length - edge.breakpoints[-1].distance,
+                )
+
+            # Connect consecutive intermediate breakpoints
+            for i in range(edge.n_breakpoints - 1):
+                current_ = edge.breakpoints[i]
+                next_ = edge.breakpoints[i + 1]
+                length = next_.distance - current_.distance
+                g0.add_edge(current_.id, next_.id, length=length)
 
         return g0.copy()
 
@@ -450,9 +497,9 @@ class NetworkMapper:
 
                     network_edge = self._edges[edge_i]
                     if distance_i == "start":
-                        ids.append(network_edge._start.id)
+                        ids.append(network_edge.start.id)
                     else:  # distance_i == "end"
-                        ids.append(network_edge._end.id)
+                        ids.append(network_edge.end.id)
                 else:
                     # Handle breakpoint lookup
                     ids.append(node_id_generator(edge=edge_i, distance=distance_i))
