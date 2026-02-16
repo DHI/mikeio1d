@@ -70,6 +70,7 @@ class NetworkBackend(Enum):
 
     RES1D = 1
     EPANET = 2
+    CUSTOM = 3
 
 
 class NetworkNode:
