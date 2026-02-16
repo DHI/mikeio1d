@@ -180,16 +180,14 @@ class EdgeCollection:
 
     def _load_network_as_dict(self, network: Any) -> Dict[str, NetworkEdge]:
         if self._backend == NetworkBackend.RES1D:
-            node_dict = self._parse_res1d_edges(network)
+            return self._parse_res1d_network(network)
         else:
-            raise ValueError(
+            raise NotImplementedError(
                 f"Invalid backend {self._backend.name} for network of type {type(network)}"
             )
 
-        return node_dict
-
     @staticmethod
-    def _parse_res1d_edges(network: Res1D) -> Dict[str, NetworkEdge]:
+    def _parse_res1d_network(network: Res1D) -> Dict[str, NetworkEdge]:
 
         def parse_reach(reach: ResultReach) -> NetworkEdge:
             return NetworkEdge(
