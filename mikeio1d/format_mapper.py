@@ -199,12 +199,12 @@ class EdgeCollection:
                 reach.name,
                 start=NetworkNode(
                     node_id_generator(reach.start_node),
-                    data=network.nodes[reach.start_node],
+                    data=network.nodes[reach.start_node].to_dataframe(),
                     quantities=network.nodes[reach.start_node].quantities,
                 ),
                 end=NetworkNode(
                     node_id_generator(reach.end_node),
-                    data=network.nodes[reach.end_node],
+                    data=network.nodes[reach.end_node].to_dataframe(),
                     quantities=network.nodes[reach.end_node].quantities,
                 ),
                 breaks=[
