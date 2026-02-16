@@ -65,6 +65,7 @@ clr.AddReference("DHI.Mike1D.MikeIO")
 from .res1d import Res1D
 from .xns11 import Xns11
 from .top_level import open
+from .format_mapper import NetworkMapper
 
 from .various import allow_nested_autocompletion_for_ipython
 
@@ -72,4 +73,4 @@ allow_nested_autocompletion_for_ipython(Res1D)
 allow_nested_autocompletion_for_ipython(Xns11)
 
 
-__all__ = ["Res1D", "Xns11", "open"]
+__all__ = ["Res1D", "Xns11", "open", "NetworkMapper"]
