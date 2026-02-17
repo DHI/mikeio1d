@@ -54,6 +54,35 @@ def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
     raise ValueError("Unexpected code path reached")
 
 
+def parse_node_id(node_id: str) -> Dict[str, Any]:
+    """Parse a node ID string back to its original coordinates.
+
+    Parameters
+    ----------
+    node_id : str
+        The string ID to parse
+
+    Returns
+    -------
+    Dict[str, Any]
+        Dictionary containing the original coordinates
+    """
+    if node_id.startswith("node-"):
+        return {"node": node_id[5:]}
+    elif node_id.startswith("break@edge-"):
+        # Format: break@edge-{edge}-{distance}
+        # Find the last hyphen to separate edge name from distance
+        remaining = node_id[11:]  # Remove "break@edge-"
+        last_hyphen = remaining.rfind("-")
+        if last_hyphen == -1:
+            raise ValueError(f"Invalid breakpoint ID format: {node_id}")
+        edge = remaining[:last_hyphen]
+        distance = float(remaining[last_hyphen + 1 :])
+        return {"edge": edge, "at": distance}
+    else:
+        raise ValueError(f"Unknown node ID format: {node_id}")
+
+
 class NetworkBackend(Enum):
     """Backend of network."""
 
@@ -382,7 +411,7 @@ class NetworkMapper:
         node: Optional[str | List[str]] = None,
         edge: Optional[str | List[str]] = None,
         at: Optional[str | float | List[str | float]] = None,
-    ) -> str | List[str]:
+    ) -> int | List[int]:
         """Find node or breakpoint id in the generic network.
 
         Parameters
@@ -397,7 +426,7 @@ class NetworkMapper:
 
         Returns
         -------
-        str | List[str]
+        int | List[int]
             Node or breakpoint id(s) in the generic network
 
         Raises
@@ -475,3 +504,48 @@ class NetworkMapper:
             raise KeyError(
                 f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {alias_set}"
             )
+
+    def recall(self, id: int | List[int]) -> Dict[str, Any] | List[Dict[str, Any]]:
+        """Recall the original coordinates from generic network node id(s).
+
+        Parameters
+        ----------
+        id : int | List[int]
+            Node id(s) in the generic network
+
+        Returns
+        -------
+        Dict[str, Any] | List[Dict[str, Any]]
+            Original coordinates. For single input returns dict, for multiple inputs returns list of dicts.
+            Dict contains coordinates:
+            - For nodes: 'node' key with node id
+            - For breakpoints: 'edge' and 'at' keys with edge id and distance
+
+        Raises
+        ------
+        KeyError
+            If node id is not found in the network
+        ValueError
+            If node id string format is invalid
+        """
+        # Convert to list for uniform processing
+        if not isinstance(id, list):
+            id = [id]
+
+        # Create reverse lookup map
+        reverse_alias_map = {v: k for k, v in self._alias_map.items()}
+
+        results = []
+        for node_id in id:
+            if node_id not in reverse_alias_map:
+                raise KeyError(f"Node ID {node_id} not found in the network.")
+
+            string_id = reverse_alias_map[node_id]
+            coordinates = parse_node_id(string_id)
+            results.append(coordinates)
+
+        # Return single dict if single input, list otherwise
+        if len(results) == 1:
+            return results[0]
+        else:
+            return results
