@@ -62,32 +62,10 @@ class NetworkBackend(Enum):
     CUSTOM = 3
 
 
-class NodeBoundary:
-    """Boundary of node."""
-
-    def __init__(self, id: str, data: pd.DataFrame):
-        self._id = id
-        self._data = data
-
-    def as_dict(self) -> Dict[str, pd.DataFrame]:
-        """Boundary as dict."""
-        return {self._id: self.data}
-
-    @property
-    def id(self) -> str:
-        """Id of boundary."""
-        return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        """Data in boundary."""
-        return self._data
-
-
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, id: str, data: pd.DataFrame, *, boundary: Optional[NodeBoundary] = None):
+    def __init__(self, id: str, data: pd.DataFrame, *, boundary: Optional[Dict[str, Any]] = {}):
         self._id = id
         self._data = data
         self._boundary = boundary
@@ -123,7 +101,7 @@ class NetworkNode:
         return self._data
 
     @property
-    def boundary(self) -> NodeBoundary:
+    def boundary(self) -> Dict[str, pd.DataFrame]:
         """Boundary of node."""
         return self._boundary
 
@@ -201,7 +179,8 @@ class EdgeCollection:
     @staticmethod
     def _parse_res1d_network(network: Res1D) -> Dict[str, NetworkEdge]:
 
-        def simplify_column_names(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
+        def simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
+            # We remove suffixes and indexes so the columns contain only the quantities
             df = node.to_dataframe()
             quantities = node.quantities
             renamer_dict = {}
@@ -223,11 +202,8 @@ class EdgeCollection:
             gridpoint = reach.gridpoints[idx]
             return NetworkNode(
                 node_id_generator(node.id),
-                simplify_column_names(node),
-                boundary=NodeBoundary(
-                    reach.name,
-                    simplify_column_names(gridpoint),
-                ),
+                simplify_colnames(node),
+                boundary={reach.name: simplify_colnames(gridpoint)},
             )
 
         def parse_gridpoints(reach: ResultReach) -> List[EdgeBreakPoint]:
@@ -236,7 +212,7 @@ class EdgeCollection:
                 EdgeBreakPoint(
                     node_id_generator(edge=gridpoint.reach_name, distance=gridpoint.chainage),
                     gridpoint.chainage,
-                    simplify_column_names(gridpoint),
+                    simplify_colnames(gridpoint),
                 )
                 for gridpoint in intermediate_gridpoints
             ]
@@ -327,7 +303,7 @@ class GenericNetwork:
         List[str]
             List of quantities
         """
-        return list(self.to_dataframe.columns.get_level_values(1).unique())
+        return list(self.to_dataframe().columns.get_level_values(1).unique())
 
 
 class NetworkMapper:
@@ -366,18 +342,18 @@ class NetworkMapper:
         g0 = nx.Graph()
         for edge in self._edges.values():
             if edge.start.id in g0.nodes:
-                g0.nodes[edge.start.id]["boundary"].update(edge.start.boundary.as_dict())
+                g0.nodes[edge.start.id]["boundary"].update(edge.start.boundary)
             else:
                 g0.add_node(
                     edge.start.id,
                     data=edge.start.data,
-                    boundary=edge.start.boundary.as_dict(),
+                    boundary=edge.start.boundary,
                 )
 
             if edge.end.id in g0.nodes:
-                g0.nodes[edge.end.id]["boundary"].update(edge.end.boundary.as_dict())
+                g0.nodes[edge.end.id]["boundary"].update(edge.end.boundary)
             else:
-                g0.add_node(edge.end.id, data=edge.end.data, boundary=edge.end.boundary.as_dict())
+                g0.add_node(edge.end.id, data=edge.end.data, boundary=edge.end.boundary)
 
             # Add edges connecting start/end nodes to their adjacent gridpoints
             if edge.n_breakpoints == 0:
