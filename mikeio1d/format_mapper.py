@@ -78,7 +78,7 @@ def parse_node_id(node_id: str) -> Dict[str, Any]:
             raise ValueError(f"Invalid breakpoint ID format: {node_id}")
         edge = remaining[:last_hyphen]
         distance = float(remaining[last_hyphen + 1 :])
-        return {"edge": edge, "at": distance}
+        return {"edge": edge, "distance": distance}
     else:
         raise ValueError(f"Unknown node ID format: {node_id}")
 
@@ -410,7 +410,7 @@ class NetworkMapper:
         self,
         node: Optional[str | List[str]] = None,
         edge: Optional[str | List[str]] = None,
-        at: Optional[str | float | List[str | float]] = None,
+        distance: Optional[str | float | List[str | float]] = None,
     ) -> int | List[int]:
         """Find node or breakpoint id in the generic network.
 
@@ -420,7 +420,7 @@ class NetworkMapper:
             Node id(s) in the original network, by default None
         edge : Optional[str | List[str]], optional
             Edge id(s) for breakpoint lookup or edge endpoint lookup, by default None
-        at : Optional[str | float | List[str | float]], optional
+        distance : Optional[str | float | List[str | float]], optional
             Distance(s) along edge for breakpoint lookup, or "start"/"end"
             for edge endpoints, by default None
 
@@ -438,7 +438,7 @@ class NetworkMapper:
         """
         # Determine lookup mode
         by_node = node is not None
-        by_breakpoint = edge is not None or at is not None
+        by_breakpoint = edge is not None or distance is not None
 
         if by_node and by_breakpoint:
             raise ValueError(
@@ -456,7 +456,7 @@ class NetworkMapper:
 
         else:
             # Handle breakpoint/edge endpoint lookup
-            if edge is None or at is None:
+            if edge is None or distance is None:
                 raise ValueError(
                     "Both 'edge' and 'distance' parameters are required for breakpoint/endpoint lookup"
                 )
@@ -464,20 +464,20 @@ class NetworkMapper:
             if not isinstance(edge, list):
                 edge = [edge]
 
-            if not isinstance(at, list):
-                at = [at]
+            if not isinstance(distance, list):
+                distance = [distance]
 
             # We can pass one edge and multiple breakpoints/endpoints
             if len(edge) == 1:
-                edge = edge * len(at)
+                edge = edge * len(distance)
 
-            if len(edge) != len(at):
+            if len(edge) != len(distance):
                 raise ValueError(
                     "Incompatible lengths of 'edge' and 'distance' arguments. One 'edge' admits multiple distances, otherwise they must be the same length."
                 )
 
             ids = []
-            for edge_i, distance_i in zip(edge, at):
+            for edge_i, distance_i in zip(edge, distance):
                 if distance_i in ["start", "end"]:
                     # Handle edge endpoint lookup
                     if edge_i not in self._edges:
@@ -519,7 +519,7 @@ class NetworkMapper:
             Original coordinates. For single input returns dict, for multiple inputs returns list of dicts.
             Dict contains coordinates:
             - For nodes: 'node' key with node id
-            - For breakpoints: 'edge' and 'at' keys with edge id and distance
+            - For breakpoints: 'edge' and 'distance' keys with edge id and distance
 
         Raises
         ------
