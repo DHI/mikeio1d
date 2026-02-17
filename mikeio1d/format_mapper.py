@@ -156,11 +156,13 @@ class NetworkEdge:
         id: str,
         start: NetworkNode,
         end: NetworkNode,
+        length: float,
         breaks: List[EdgeBreakPoint],
     ):
         self._id = id
         self._start = start
         self._end = end
+        self._length = length
         self.breakpoints = breaks
 
     @property
@@ -171,7 +173,7 @@ class NetworkEdge:
     @property
     def length(self) -> float:
         """Length of edge."""
-        return self.breakpoints[-1].distance - self.breakpoints[0].distance
+        return self._length
 
     @property
     def start(self) -> NetworkNode:
@@ -251,6 +253,7 @@ class EdgeCollection:
                 reach.name,
                 parse_end(reach, 0),
                 parse_end(reach, -1),
+                reach.length,
                 parse_gridpoints(reach),
             )
 
