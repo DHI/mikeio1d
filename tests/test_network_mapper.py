@@ -45,7 +45,7 @@ class TestNetworkMapper:
         """Test that map_network returns GenericNetwork instance."""
         network = mapper.map_network()
         assert isinstance(network, GenericNetwork)
-        assert isinstance(network.as_graph, nx.Graph)
+        assert isinstance(network.graph, nx.Graph)
 
     def test_all_res1d_nodes_mapped(self, res1d_object, network):
         """Test that all nodes from Res1D are present in the graph."""
@@ -54,7 +54,7 @@ class TestNetworkMapper:
 
         # Get all node IDs in the graph (filter for actual nodes, not gridpoints)
         graph_node_ids = set()
-        for node_id in network.as_graph.nodes():
+        for node_id in network.graph.nodes():
             if node_id.startswith("node-"):
                 # Extract original node ID from the mapped ID
                 original_id = node_id.replace("node-", "")
@@ -73,7 +73,7 @@ class TestNetworkMapper:
         )
         expected_total = node_count + gridpoint_count
 
-        actual_total = len(network.as_graph.nodes())
+        actual_total = len(network.graph.nodes())
 
         assert actual_total == expected_total, (
             f"Expected {expected_total} total nodes, found {actual_total}"
@@ -81,7 +81,7 @@ class TestNetworkMapper:
 
     def test_nodes_have_data_attribute(self, network):
         """Test that all nodes in the graph have data attribute."""
-        for node_id, node_data in network.as_graph.nodes(data=True):
+        for node_id, node_data in network.graph.nodes(data=True):
             assert "data" in node_data, f"Node {node_id} missing 'data' attribute"
             assert hasattr(node_data["data"], "columns"), (
                 f"Node {node_id} data is not DataFrame-like"
@@ -91,6 +91,6 @@ class TestNetworkMapper:
         """Test that the resulting graph is connected."""
         # Note: This might not always be true for all networks,
         # but it's a good sanity check for most cases
-        graph = network.as_graph
+        graph = network.graph
         if len(graph.nodes()) > 0:
             assert nx.is_connected(graph), "Graph should be connected"

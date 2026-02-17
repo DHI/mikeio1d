@@ -18,7 +18,7 @@ from typing import (
 )
 
 from mikeio1d import Res1D
-from mikeio1d.result_network import ResultReach
+from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
@@ -201,7 +201,9 @@ class EdgeCollection:
     @staticmethod
     def _parse_res1d_network(network: Res1D) -> Dict[str, NetworkEdge]:
 
-        def simplify_column_names(df: pd.DataFrame, quantities: List[str]) -> pd.DataFrame:
+        def simplify_column_names(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
+            df = node.to_dataframe()
+            quantities = node.quantities
             renamer_dict = {}
             for quantity in quantities:
                 relevant_columns = [col for col in df.columns if quantity in col]
@@ -212,53 +214,40 @@ class EdgeCollection:
                 renamer_dict[relevant_columns[0]] = quantity
             return df.rename(columns=renamer_dict, copy=True)
 
-        def parse_reach(reach: ResultReach) -> NetworkEdge:
+        def parse_end(reach: ResultReach, idx: int) -> NetworkNode:
+            ends = (reach.start_node, reach.end_node)
+            node: ResultNode = network.nodes[ends[idx]]
             # By definition, the first and last gridpoint in a reach are at distance
             # 0 and 'length' from the start and end node respectively, effectively overlapping with
             # the start and end nodes in a 1d representation.
+            gridpoint = reach.gridpoints[idx]
+            return NetworkNode(
+                node_id_generator(node.id),
+                simplify_column_names(node),
+                boundary=NodeBoundary(
+                    reach.name,
+                    simplify_column_names(gridpoint),
+                ),
+            )
 
-            # Don't mutate the original data!
-            start_gridpoint = reach.gridpoints[0]
-            end_gridpoint = reach.gridpoints[-1]
-
+        def parse_gridpoints(reach: ResultReach) -> List[EdgeBreakPoint]:
             intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
+            return [
+                EdgeBreakPoint(
+                    node_id_generator(edge=gridpoint.reach_name, distance=gridpoint.chainage),
+                    gridpoint.chainage,
+                    simplify_column_names(gridpoint),
+                )
+                for gridpoint in intermediate_gridpoints
+            ]
+
+        def parse_reach(reach: ResultReach) -> NetworkEdge:
 
             return NetworkEdge(
                 reach.name,
-                NetworkNode(
-                    node_id_generator(reach.start_node),
-                    simplify_column_names(
-                        network.nodes[reach.start_node].to_dataframe(),
-                        network.nodes[reach.start_node].quantities,
-                    ),
-                    boundary=NodeBoundary(
-                        reach.name,
-                        simplify_column_names(
-                            start_gridpoint.to_dataframe(), start_gridpoint.quantities
-                        ),
-                    ),
-                ),
-                NetworkNode(
-                    node_id_generator(reach.end_node),
-                    simplify_column_names(
-                        network.nodes[reach.end_node].to_dataframe(),
-                        network.nodes[reach.end_node].quantities,
-                    ),
-                    boundary=NodeBoundary(
-                        reach.name,
-                        simplify_column_names(
-                            end_gridpoint.to_dataframe(), end_gridpoint.quantities
-                        ),
-                    ),
-                ),
-                [
-                    EdgeBreakPoint(
-                        node_id_generator(edge=point.reach_name, distance=point.chainage),
-                        point.chainage,
-                        simplify_column_names(point.to_dataframe(), point.quantities),
-                    )
-                    for point in intermediate_gridpoints
-                ],
+                parse_end(reach, 0),
+                parse_end(reach, -1),
+                parse_gridpoints(reach),
             )
 
         return {reach_id: parse_reach(reach) for reach_id, reach in network.reaches.items()}
@@ -314,13 +303,7 @@ class GenericNetwork:
         df.columns = df.columns.set_names(["node", "quantity"])
         return df.copy()
 
-    @property
-    def as_graph(self) -> nx.Graph:
-        """Graph of the network."""
-        return self._graph
-
-    @property
-    def as_df(self) -> pd.DataFrame:
+    def to_dataframe(self) -> pd.DataFrame:
         """Dataframe using new node ids as column names.
 
         Returns
@@ -328,7 +311,12 @@ class GenericNetwork:
         pd.DataFrame
             Timeseries contained in graph nodes
         """
-        return self._df
+        return self._df.copy()
+
+    @property
+    def graph(self) -> nx.Graph:
+        """Graph of the network."""
+        return self._graph
 
     @property
     def quantities(self) -> List[str]:
@@ -339,7 +327,7 @@ class GenericNetwork:
         List[str]
             List of quantities
         """
-        return list(self.as_df.columns.get_level_values(1).unique())
+        return list(self.to_dataframe.columns.get_level_values(1).unique())
 
 
 class NetworkMapper:
