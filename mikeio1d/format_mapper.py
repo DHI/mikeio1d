@@ -341,25 +341,21 @@ class NetworkMapper:
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
         for edge in self._edges.values():
-            if edge.start.id in g0.nodes:
-                g0.nodes[edge.start.id]["boundary"].update(edge.start.boundary)
-            else:
-                g0.add_node(
-                    edge.start.id,
-                    data=edge.start.data,
-                    boundary=edge.start.boundary,
-                )
+            # 1) Add start and end nodes
+            for node in [edge.start, edge.end]:
+                if node.id in g0.nodes:
+                    g0.nodes[node.id]["boundary"].update(node.boundary)
+                else:
+                    g0.add_node(
+                        node.id,
+                        data=node.data,
+                        boundary=node.boundary,
+                    )
 
-            if edge.end.id in g0.nodes:
-                g0.nodes[edge.end.id]["boundary"].update(edge.end.boundary)
-            else:
-                g0.add_node(edge.end.id, data=edge.end.data, boundary=edge.end.boundary)
-
-            # Add edges connecting start/end nodes to their adjacent gridpoints
+            # 2) Add edges connecting start/end nodes to their adjacent breakpoints
             if edge.n_breakpoints == 0:
                 g0.add_edge(edge.start.id, edge.end.id, length=edge.length)
             else:
-                # Add all breakpoint nodes first
                 for breakpoint in edge.breakpoints:
                     g0.add_node(breakpoint.id, data=breakpoint.data)
 
@@ -373,7 +369,7 @@ class NetworkMapper:
                     length=edge.length - edge.breakpoints[-1].distance,
                 )
 
-            # Connect consecutive intermediate breakpoints
+            # 3) Connect consecutive intermediate breakpoints
             for i in range(edge.n_breakpoints - 1):
                 current_ = edge.breakpoints[i]
                 next_ = edge.breakpoints[i + 1]
