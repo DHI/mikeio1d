@@ -110,9 +110,8 @@ class EdgeBreakPoint(NetworkNode):
     """Edge break point."""
 
     def __init__(self, id: str, distance: float, data: pd.DataFrame):
-        self._id = id
+        super().__init__(id, data)  # Call parent constructor
         self._distance = distance
-        self._data = data
 
     @property
     def distance(self) -> float:
@@ -310,7 +309,7 @@ class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
     def __init__(self, res: Any):
-        self._node_alias: set = {}
+        self._alias_map: Dict[int, str] = {}
         res = self._read_network(res)
         self._edges = EdgeCollection(res)
 
@@ -334,7 +333,7 @@ class NetworkMapper:
         GenericNetwork
         """
         g0 = self._initialize_graph()
-        self._node_alias = set(g0.nodes.keys())
+        self._alias_map = {g0.nodes[id]["alias"]: id for id in g0.nodes()}
 
         return GenericNetwork(g0)
 
@@ -376,7 +375,7 @@ class NetworkMapper:
                 length = next_.distance - current_.distance
                 g0.add_edge(current_.id, next_.id, length=length)
 
-        return g0.copy()
+        return nx.convert_node_labels_to_integers(g0, label_attribute="alias")
 
     def find(
         self,
@@ -465,13 +464,14 @@ class NetworkMapper:
                     ids.append(node_id_generator(edge=edge_i, distance=distance_i))
 
         # Check if all ids exist in the network
-        if all([id in self._node_alias for id in ids]):
+        alias_set = set(self._alias_map.keys())
+        if all([id in alias_set for id in ids]):
             if len(ids) == 1:
-                return ids[0]
+                return self._alias_map[ids[0]]
             else:
-                return ids
+                return [self._alias_map[id] for id in ids]
         else:
-            missing_ids = [id for id in ids if id not in self._node_alias]
+            missing_ids = [id for id in ids if id not in alias_set]
             raise KeyError(
-                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {self._node_alias}"
+                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {alias_set}"
             )
