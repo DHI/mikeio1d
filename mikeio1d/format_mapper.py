@@ -330,6 +330,7 @@ class GenericNetwork:
         if sel is None:
             return df
         else:
+            df.attrs["quantity"] = sel
             return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
 
     @property
