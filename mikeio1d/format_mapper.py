@@ -308,17 +308,29 @@ class GenericNetwork:
     def _build_dataframe(self) -> pd.DataFrame:
         df = pd.concat({k: v["data"] for k, v in self._graph.nodes.items()}, axis=1)
         df.columns = df.columns.set_names(["node", "quantity"])
+        df.index.name = "time"
         return df.copy()
 
-    def to_dataframe(self) -> pd.DataFrame:
+    def to_dataframe(self, sel: Optional[str] = None) -> pd.DataFrame:
         """Dataframe using new node ids as column names.
+
+        It will be multiindex unless 'sel' is passed.
+
+        Parameters
+        ----------
+        sel : Optional[str], optional
+            Quantity to select, by default None
 
         Returns
         -------
         pd.DataFrame
             Timeseries contained in graph nodes
         """
-        return self._df.copy()
+        df = self._df.copy()
+        if sel is None:
+            return df
+        else:
+            return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
 
     @property
     def graph(self) -> nx.Graph:
