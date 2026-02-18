@@ -89,7 +89,8 @@ class NetworkBackend(Enum):
 
     RES1D = 1
     EPANET = 2
-    CUSTOM = 3
+    SWMM = 3
+    CUSTOM = 4
 
 
 class NetworkNode:
