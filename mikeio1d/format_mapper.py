@@ -343,7 +343,19 @@ class GenericNetwork:
             Timeseries contained in graph nodes
         """
         df = self.to_dataframe()
-        return df.reorder_levels(["quantity", "node"], axis=1).melt().to_xarray()
+        df = df.reorder_levels(["quantity", "node"], axis=1).melt(ignore_index=False)
+
+        duplicate_check = df.reset_index().duplicated()
+        if duplicate_check.any():
+            raise ValueError("Duplicated values found")
+
+        df = df.pivot_table(
+            index=["time", "node"],
+            columns="quantity",
+            values="value",
+            aggfunc="first",
+        )
+        return df.to_xarray()
 
     @property
     def graph(self) -> nx.Graph:
