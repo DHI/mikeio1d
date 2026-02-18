@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import networkx as nx
 import pandas as pd
+import xarray as xr
 
 from pathlib import Path
 from enum import Enum
@@ -312,7 +313,7 @@ class GenericNetwork:
         return df.copy()
 
     def to_dataframe(self, sel: Optional[str] = None) -> pd.DataFrame:
-        """Dataframe using new node ids as column names.
+        """Dataframe using node ids as column names.
 
         It will be multiindex unless 'sel' is passed.
 
@@ -332,6 +333,17 @@ class GenericNetwork:
         else:
             df.attrs["quantity"] = sel
             return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
+
+    def to_dataset(self) -> xr.Dataset:
+        """Dataset using node ids as coords.
+
+        Returns
+        -------
+        xr.Dataset
+            Timeseries contained in graph nodes
+        """
+        df = self.to_dataframe()
+        return df.reorder_levels(["quantity", "node"], axis=1).melt().to_xarray()
 
     @property
     def graph(self) -> nx.Graph:

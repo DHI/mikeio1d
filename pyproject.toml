@@ -44,6 +44,7 @@ dependencies = [
     "pythonnet>=3.0.0",
     "numpy",
     "networkx",
+    "xarray",
     "pandas>=2.1.0",
     "matplotlib",
     'mikecore; platform_system=="Linux"',
