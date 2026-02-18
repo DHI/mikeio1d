@@ -20,7 +20,8 @@ Implementation notes
 """
 
 from operator import ge
-from typing import Any, List, Optional, cast, TYPE_CHECKING, TypeIs
+from typing import Any, List, Optional, cast, TYPE_CHECKING
+from typing_extensions import TypeIs
 
 if TYPE_CHECKING:
     import shapely
