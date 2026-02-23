@@ -18,19 +18,8 @@ Implementation notes
   geometries become an empty `GeometryCollection` placeholder so the index
   remains consistent.
 """
-import sys
-
 from operator import ge
-from typing import Any, List, Optional, cast, TYPE_CHECKING
-
-# TypeIs was introduced in Python 3.10 as part of PEP 647
-if sys.version_info >= (3, 10):
-    from typing import TypeIs
-else:
-    # Fallback for Python < 3.10
-    from typing import Callable
-
-    TypeIs = Callable[[Any], bool]
+from typing import Any, List, Optional, cast, TYPE_CHECKING, TypeIs
 
 if TYPE_CHECKING:
     import shapely
