@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
-## Added
+### Added
 
-## Fixed
+### Fixed
 
-## Changed
+### Changed
+
+### Removed
+
+- Support for Python 3.9 (endo of serfice life)
 
 ## [1.2.0] - 2025-10-23
 
