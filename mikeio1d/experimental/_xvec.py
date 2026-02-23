@@ -18,8 +18,18 @@ Implementation notes
   geometries become an empty `GeometryCollection` placeholder so the index
   remains consistent.
 """
+import sys
+
 from operator import ge
-from typing import Any, List, Optional, cast, TYPE_CHECKING, TypeIs
+from typing import Any, List, Optional, cast, TYPE_CHECKING
+
+# TypeIs was introduced in 'typing' since Python 3.13 (https://peps.python.org/pep-0742/)
+# Otherwise, it is found in 'typing_extensions' (>= 4.10)
+if sys.version_info >= (3, 13):
+    from typing import TypeIs
+else:
+    from typing_extensions import TypeIs
+
 
 if TYPE_CHECKING:
     import shapely
