@@ -35,7 +35,7 @@ jobs:
         dotnet-version: '6.0.x'
     
     - name: Install dependencies
-      run: uv sync --group test
+      run: uv sync --group test --group experimental
 
     - name: Test with pytest (basic)
       run: uv run pytest -c .pytest-ci.ini 
