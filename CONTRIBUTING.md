@@ -13,7 +13,7 @@ This project uses [`uv`](https://docs.astral.sh/uv/) as the package manager. If 
    ```bash
    uv sync --extra dev --extra test --extra notebooks --python 3.XX
    ```
-   Replace `XX` with your Python version (3.9 through 3.13 are supported).
+   Replace `XX` with your Python version (3.10 through 3.13 are supported).
 3. **Verify installation** with `uv run pytest`
 
 ## Making Contributions
