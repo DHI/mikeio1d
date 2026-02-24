@@ -1,0 +1,29 @@
+{
+  "name": "mikeio1d",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "6.0"
+    }
+  },
+  "postCreateCommand": "pip install uv && uv sync --group dev --group test --group experimental",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true
+        },
+        "python.testing.pytestArgs": ["tests"],
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestEnabled": true
+      },
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-toolsai.jupyter",
+        "ms-dotnettools.csharp"
+      ]
+    }
+  }
+}
