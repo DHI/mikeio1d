@@ -3,8 +3,14 @@
 from __future__ import annotations
 
 import pandas as pd
-import networkx as nx
-import xarray as xr
+try:
+    import networkx as nx
+    import xarray as xr
+except ImportError as e:
+    raise ImportError(
+        "mikeio1d.experimental.network_mapper requires optional dependencies. "
+        "Install with: pip install 'mikeio1d[experimental]'"
+    ) from e
 
 from pathlib import Path
 from enum import Enum
