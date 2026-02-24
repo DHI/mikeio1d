@@ -373,7 +373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="read-network-results" class="level3">
 <h3 class="anchored" data-anchor-id="read-network-results">Read network results</h3>
 <p>Use <a href="./api/open.html#mikeio1d.open"><code>mikeio1d.open</code></a> to create a <a href="./user-guide/res1d.html">Res1D</a> object, then <a href="./api/Res1D.html#mikeio1d.Res1D.read"><code>read</code></a> its content into a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a>.</p>
-<div id="802f362a" class="cell" data-execution_count="1">
+<div id="3ad2da0e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mikeio1d</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">"data/network.res1d"</span>)</span>
@@ -539,7 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Request more specific data by using the <a href="./user-guide/res1d.html">Res1D</a> object to select specific <a href="./user-guide/locations.html">Locations</a>.</p>
-<div id="63aaff86" class="cell" data-execution_count="2">
+<div id="0e11e049" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches[<span class="st">'100l1'</span>].read()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
@@ -593,7 +593,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Similarly, select a specific <a href="./user-guide/quantities.html">Quantity</a> that you can both <a href="./api/result_network.ResultQuantity.html#mikeio1d.result_network.ResultQuantity.read"><code>read</code></a> and <a href="./api/result_network.ResultQuantity.html#mikeio1d.result_network.ResultQuantity.plot"><code>plot</code></a>.</p>
-<div id="51fbe2df" class="cell" data-execution_count="3">
+<div id="44e00646" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'100'</span>].WaterLevel.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -607,7 +607,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="read-cross-section-data" class="level3">
 <h3 class="anchored" data-anchor-id="read-cross-section-data">Read cross section data</h3>
 <p>Use <a href="./api/open.html#mikeio1d.open"><code>mikeio1d.open</code></a> to create an <a href="./user-guide/xns11.html">Xns11</a> object, then get a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a> overview of its content.</p>
-<div id="86bef9c4" class="cell" data-execution_count="4">
+<div id="a2fde900" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>xns <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">"data/mikep_cs_demo.xns11"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>xns.to_dataframe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -696,7 +696,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Select a specific <a href="./api/cross_sections.CrossSection.html#mikeio1d.cross_sections.CrossSection"><code>CrossSection</code></a> using <a href="./api/Xns11.html#mikeio1d.Xns11.sel"><code>sel</code></a>, then plot it with <a href="./api/cross_sections.CrossSection.html#mikeio1d.cross_sections.CrossSection.plot"><code>plot</code></a>.</p>
-<div id="a7b5f6a1" class="cell" data-execution_count="5">
+<div id="0e5bab72" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> xns.sel(location_id<span class="op">=</span><span class="st">"basin_left1"</span>, chainage<span class="op">=</span><span class="fl">122.042</span>, topo_id<span class="op">=</span><span class="st">'1'</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>xs.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
