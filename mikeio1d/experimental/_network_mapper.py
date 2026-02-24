@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import pandas as pd
+import networkx as nx
+import xarray as xr
 
 from pathlib import Path
 from enum import Enum
@@ -14,15 +16,10 @@ from typing import (
     KeysView,
     ValuesView,
     ItemsView,
-    TYPE_CHECKING,
 )
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
-
-if TYPE_CHECKING:
-    import networkx as nx
-    import xarray as xr
 
 
 def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
@@ -411,8 +408,6 @@ class NetworkMapper:
         return GenericNetwork(g0)
 
     def _initialize_graph(self) -> nx.Graph:
-        import networkx as nx
-
         g0 = nx.Graph()
         for edge in self._edges.values():
             # 1) Add start and end nodes
