@@ -36,6 +36,7 @@ class Res1DIdGenerator(NetworkNodeIdGenerator):
     to unique string identifiers and vice versa.
     """
 
+    # TODO: Doe we need to improve this? Shouldn't it be static method?
     def generate(self, node: str | int | None = None, **kwargs) -> str:
         """Generate a unique string ID from network coordinates.
 
@@ -106,7 +107,9 @@ class Res1DIdGenerator(NetworkNodeIdGenerator):
             raise ValueError(f"Unknown node ID format: {node_id}")
 
 
-def get_res1d_mapper(res: Any, idgen: NetworkNodeIdGenerator) -> NetworkMapper:
+def create_res1d_mapper(res: Any) -> NetworkMapper:
+
+    idgen = Res1DIdGenerator()
 
     def read_res1d_network(res: Any) -> Res1D:
         if isinstance(res, (str, Path)):
@@ -179,6 +182,5 @@ def get_res1d_mapper(res: Any, idgen: NetworkNodeIdGenerator) -> NetworkMapper:
 
 if __name__ == "__main__":
     path_to_res1d = "./tests/testdata/network.res1d"
-    idgen = Res1DIdGenerator()
-    res1d_mapper = get_res1d_mapper(path_to_res1d, idgen)
+    res1d_mapper = create_res1d_mapper(path_to_res1d)
     print("Mapper was created!")
