@@ -17,6 +17,7 @@ from mikeio1d.experimental._network_protocol import (
     NetworkNode,
     EdgeBreakPoint,
     GenericNetwork,
+    NetworkNodeIdGenerator,
 )
 
 
@@ -29,66 +30,81 @@ class NetworkBackend(Enum):
     CUSTOM = 4
 
 
-def node_id_generator(node: str | int | None = None, **kwargs) -> str:
-    """Generate a unique id for a res1d element.
+class Res1DIdGenerator(NetworkNodeIdGenerator):
+    """Bidirectional mapping between network coordinates and string IDs.
 
-    Parameters
-    ----------
-    node : str  |  int, optional
-        node id in the original network, by default None
-
-    Returns
-    -------
-    str
-
-    Raises
-    ------
-    ValueError
-        Error raised if kwargs are not valid.
+    Handles conversion from network element coordinates (node ID or edge + distance)
+    to unique string identifiers and vice versa.
     """
-    by_node = node is not None
-    by_distance = ("edge" in kwargs) and ("distance" in kwargs)
-    if by_node == by_distance:
-        raise ValueError(
-            "Invalid kwarg combination: 'node' was not passed and kwargs are incomplete. Only accepted methods are either 'node' or both 'edge' and 'distance'."
-        )
-    if by_node:
-        return f"node-{node}"
 
-    if by_distance:
-        return f"break@edge-{kwargs['edge']}-{round(kwargs['distance'], 3)}"
+    def __call__(self, node: str | int | None = None, **kwargs) -> str:
+        """Generate a unique string ID from network coordinates.
 
-    # This should never be reached due to the logic above, but added for mypy
-    raise ValueError("Unexpected code path reached")
+        Parameters
+        ----------
+        node : str | int, optional
+            Node ID in the original network, by default None
 
+        Returns
+        -------
+        str
+            Unique string identifier
 
-def parse_node_id(node_id: str) -> dict[str, Any]:
-    """Parse a node ID string back to its original coordinates.
+        Raises
+        ------
+        ValueError
+            If invalid combination of parameters is provided
+        """
+        by_node = node is not None
+        by_distance = ("edge" in kwargs) and ("distance" in kwargs)
+        if by_node == by_distance:
+            raise ValueError(
+                "Invalid kwarg combination: 'node' was not passed and kwargs are incomplete. "
+                "Only accepted methods are either 'node' or both 'edge' and 'distance'."
+            )
+        if by_node:
+            return f"node-{node}"
 
-    Parameters
-    ----------
-    node_id : str
-        The string ID to parse
+        if by_distance:
+            return f"break@edge-{kwargs['edge']}-{round(kwargs['distance'], 3)}"
 
-    Returns
-    -------
-    Dict[str, Any]
-        Dictionary containing the original coordinates
-    """
-    if node_id.startswith("node-"):
-        return {"node": node_id[5:]}
-    elif node_id.startswith("break@edge-"):
-        # Format: break@edge-{edge}-{distance}
-        # Find the last hyphen to separate edge name from distance
-        remaining = node_id[11:]  # Remove "break@edge-"
-        last_hyphen = remaining.rfind("-")
-        if last_hyphen == -1:
-            raise ValueError(f"Invalid breakpoint ID format: {node_id}")
-        edge = remaining[:last_hyphen]
-        distance = float(remaining[last_hyphen + 1 :])
-        return {"edge": edge, "distance": distance}
-    else:
-        raise ValueError(f"Unknown node ID format: {node_id}")
+        # This should never be reached due to the logic above, but added for mypy
+        raise ValueError("Unexpected code path reached")
+
+    def parse(self, node_id: str) -> dict[str, Any]:
+        """Parse a string ID back to its original network coordinates.
+
+        Parameters
+        ----------
+        node_id : str
+            The string ID to parse
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary containing the original coordinates:
+            - For nodes: {"node": node_id}
+            - For breakpoints: {"edge": edge_id, "distance": distance}
+
+        Raises
+        ------
+        ValueError
+            If node ID string format is invalid
+        """
+        if node_id.startswith("node-"):
+            return {"node": node_id[5:]}
+        elif node_id.startswith("break@edge-"):
+            # Format: break@edge-{edge}-{distance}
+            # Find the last hyphen to separate edge name from distance
+            remaining = node_id[11:]  # Remove "break@edge-"
+            last_hyphen = remaining.rfind("-")
+            if last_hyphen == -1:
+                raise ValueError(f"Invalid breakpoint ID format: {node_id}")
+            edge = remaining[:last_hyphen]
+            distance = float(remaining[last_hyphen + 1 :])
+            return {"edge": edge, "distance": distance}
+        else:
+            raise ValueError(f"Unknown node ID format: {node_id}")
 
 
 def read_res1d_network(res: Any) -> Res1D:
@@ -165,7 +181,7 @@ def parse_res1d_network(res: Any, id_gen: Callable[..., str]) -> dict[str, Netwo
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, edges_dict: dict[str, NetworkEdge], id_generator: Callable[..., str]):
+    def __init__(self, edges_dict: dict[str, NetworkEdge], id_generator: NetworkNodeIdGenerator):
         self._alias_map: dict[int, str] = {}
         # We include id_generator because we need a way to generate unique ids
         # of elements with arbitrary architecture. For instance, here we might pass
@@ -360,7 +376,7 @@ class NetworkMapper:
                 raise KeyError(f"Node ID {node_id} not found in the network.")
 
             string_id = reverse_alias_map[node_id]
-            coordinates = parse_node_id(string_id)
+            coordinates = self._id_generator.parse(string_id)
             results.append(coordinates)
 
         # Return single dict if single input, list otherwise

@@ -4,7 +4,19 @@ import pandas as pd
 import networkx as nx
 import xarray as xr
 
-from typing import Any
+from typing import Any, Protocol
+
+
+class NetworkNodeIdGenerator(Protocol):
+    """Bidirectional mapping between network coordinates and string IDs.
+
+    Handles conversion from network element coordinates (node ID or edge + distance)
+    to unique string identifiers and vice versa.
+    """
+
+    def __call__(self, node: str | int | None = None, **kwargs) -> str: ...
+
+    def parse(self, node_id: str) -> dict[str, Any]: ...
 
 
 @dataclass
