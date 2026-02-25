@@ -7,7 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
@@ -16,6 +16,7 @@ from mikeio1d.experimental._network_protocol import (
     NetworkNode,
     EdgeBreakPoint,
     NetworkNodeIdGenerator,
+    NetworkMapper,
 )
 
 
@@ -35,7 +36,7 @@ class Res1DIdGenerator(NetworkNodeIdGenerator):
     to unique string identifiers and vice versa.
     """
 
-    def __call__(self, node: str | int | None = None, **kwargs) -> str:
+    def generate(self, node: str | int | None = None, **kwargs) -> str:
         """Generate a unique string ID from network coordinates.
 
         Parameters
@@ -105,24 +106,23 @@ class Res1DIdGenerator(NetworkNodeIdGenerator):
             raise ValueError(f"Unknown node ID format: {node_id}")
 
 
-def read_res1d_network(res: Any) -> Res1D:
-    if isinstance(res, (str, Path)):
-        path = Path(res)
-        if path.suffix.lower() == ".res1d":
-            return Res1D(res)
+def get_res1d_mapper(res: Any, idgen: NetworkNodeIdGenerator) -> NetworkMapper:
+
+    def read_res1d_network(res: Any) -> Res1D:
+        if isinstance(res, (str, Path)):
+            path = Path(res)
+            if path.suffix.lower() == ".res1d":
+                return Res1D(res)
+            else:
+                raise NotImplementedError(
+                    f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
+                )
+        elif isinstance(res, Res1D):
+            return res
         else:
             raise NotImplementedError(
-                f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
+                f"Unsupported type '{type(res)}'. Only Res1D files are supported."
             )
-    elif isinstance(res, Res1D):
-        return res
-    else:
-        raise NotImplementedError(
-            f"Unsupported type '{type(res)}'. Only Res1D files are supported."
-        )
-
-
-def parse_res1d_network(res: Any, id_gen: Callable[..., str]) -> dict[str, NetworkEdge]:
 
     def simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
         # We remove suffixes and indexes so the columns contain only the quantities
@@ -146,7 +146,7 @@ def parse_res1d_network(res: Any, id_gen: Callable[..., str]) -> dict[str, Netwo
         # the start and end nodes in a 1d representation.
         gridpoint = reach.gridpoints[idx]
         return NetworkNode(
-            id_gen(node.id),
+            idgen.generate(node.id),
             simplify_colnames(node),
             boundary={reach.name: simplify_colnames(gridpoint)},
         )
@@ -155,7 +155,7 @@ def parse_res1d_network(res: Any, id_gen: Callable[..., str]) -> dict[str, Netwo
         intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
         return [
             EdgeBreakPoint(
-                id_gen(edge=gridpoint.reach_name, distance=gridpoint.chainage),
+                idgen.generate(edge=gridpoint.reach_name, distance=gridpoint.chainage),
                 simplify_colnames(gridpoint),
                 gridpoint.chainage,
             )
@@ -173,4 +173,12 @@ def parse_res1d_network(res: Any, id_gen: Callable[..., str]) -> dict[str, Netwo
         )
 
     network = read_res1d_network(res)
-    return {reach_id: parse_reach(reach) for reach_id, reach in network.reaches.items()}
+    edges_dict = {reach_id: parse_reach(reach) for reach_id, reach in network.reaches.items()}
+    return NetworkMapper(edges_dict, idgen)
+
+
+if __name__ == "__main__":
+    path_to_res1d = "./tests/testdata/network.res1d"
+    idgen = Res1DIdGenerator()
+    res1d_mapper = get_res1d_mapper(path_to_res1d, idgen)
+    print("Mapper was created!")
