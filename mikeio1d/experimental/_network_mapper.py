@@ -101,7 +101,11 @@ class NetworkNode:
 
     id: str
     data: pd.DataFrame
-    boundary: Dict[str, Any] = {}
+    boundary: Dict[str, Any] | None = None
+
+    def __post_init__(self):
+        if self.boundary is None:
+            self.boundary = {}
 
     @property
     def quantities(self) -> List[str]:
@@ -123,47 +127,20 @@ class EdgeBreakPoint:
     distance: float
 
 
+@dataclass
 class NetworkEdge:
     """Edge of a network."""
 
-    def __init__(
-        self,
-        id: str,
-        start: NetworkNode,
-        end: NetworkNode,
-        length: float,
-        breaks: List[EdgeBreakPoint],
-    ):
-        self._id = id
-        self._start = start
-        self._end = end
-        self._length = length
-        self.breakpoints = breaks
+    id: str
+    start: NetworkNode
+    end: NetworkNode
+    length: float
+    breakpoints: List[EdgeBreakPoint]
 
     @property
     def n_breakpoints(self) -> int:
         """Number of break points in the edge."""
         return len(self.breakpoints)
-
-    @property
-    def length(self) -> float:
-        """Length of edge."""
-        return self._length
-
-    @property
-    def start(self) -> NetworkNode:
-        """Starting node of the edge."""
-        return self._start
-
-    @property
-    def end(self) -> NetworkNode:
-        """Ending node of the edge."""
-        return self._end
-
-    @property
-    def id(self) -> str:
-        """Id of edge."""
-        return self._id
 
 
 class EdgeCollection:
