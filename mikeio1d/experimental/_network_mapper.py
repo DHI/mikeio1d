@@ -9,11 +9,20 @@ import xarray as xr
 
 from pathlib import Path
 from enum import Enum
-from typing import Any
+from typing import Any, Callable
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
 from mikeio1d.experimental._network_protocol import NetworkEdge, NetworkNode, EdgeBreakPoint
+
+
+class NetworkBackend(Enum):
+    """Backend of network."""
+
+    RES1D = 1
+    EPANET = 2
+    SWMM = 3
+    CUSTOM = 4
 
 
 def node_id_generator(node: str | int | None = None, **kwargs) -> str:
@@ -78,16 +87,24 @@ def parse_node_id(node_id: str) -> dict[str, Any]:
         raise ValueError(f"Unknown node ID format: {node_id}")
 
 
-class NetworkBackend(Enum):
-    """Backend of network."""
+def read_res1d_network(res: Any) -> Res1D:
+    if isinstance(res, (str, Path)):
+        path = Path(res)
+        if path.suffix.lower() == ".res1d":
+            return Res1D(res)
+        else:
+            raise NotImplementedError(
+                f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
+            )
+    elif isinstance(res, Res1D):
+        return res
+    else:
+        raise NotImplementedError(
+            f"Unsupported type '{type(res)}'. Only Res1D files are supported."
+        )
 
-    RES1D = 1
-    EPANET = 2
-    SWMM = 3
-    CUSTOM = 4
 
-
-def parse_res1d_network(network: Res1D) -> dict[str, NetworkEdge]:
+def parse_res1d_network(res: Any) -> dict[str, NetworkEdge]:
 
     def simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
         # We remove suffixes and indexes so the columns contain only the quantities
@@ -137,38 +154,8 @@ def parse_res1d_network(network: Res1D) -> dict[str, NetworkEdge]:
             parse_gridpoints(reach),
         )
 
+    network = read_res1d_network(res)
     return {reach_id: parse_reach(reach) for reach_id, reach in network.reaches.items()}
-
-
-class EdgeCollection(dict):
-    """Collection of edges."""
-
-    def __init__(self, network: Any):
-        self._backend = self._identify_backend(network)
-        edges_collection = self._load_network_as_dict(network)
-        super().__init__(edges_collection)
-
-    def _load_network_as_dict(self, network: Any) -> dict[str, NetworkEdge]:
-        if self._backend == NetworkBackend.RES1D:
-            return parse_res1d_network(network)
-        else:
-            raise NotImplementedError(
-                f"Invalid backend {self._backend.name} for network of type {type(network)}"
-            )
-
-    @staticmethod
-    def _identify_backend(res: Any) -> NetworkBackend:
-        if isinstance(res, Res1D):
-            return NetworkBackend.RES1D
-        else:
-            raise NotImplementedError(
-                f"Only Res1D can be parsed, and network is of type {type(res)}"
-            )
-
-    @property
-    def backend(self) -> NetworkBackend:
-        """Backend of network."""
-        return self._backend
 
 
 class GenericNetwork:
@@ -251,20 +238,7 @@ class NetworkMapper:
 
     def __init__(self, res: Any):
         self._alias_map: dict[int, str] = {}
-        res = self._read_network(res)
-        self._edges = EdgeCollection(res)
-
-    def _read_network(self, res: Any) -> Any:
-        if isinstance(res, (str, Path)):
-            path = Path(res)
-            if path.suffix.lower() == ".res1d":
-                return Res1D(res)
-            else:
-                raise NotImplementedError(
-                    f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
-                )
-        else:
-            return res
+        self._edges = parse_res1d_network(res)
 
     def map_network(self) -> GenericNetwork:
         """Return generic network object.
