@@ -101,11 +101,7 @@ class NetworkNode:
 
     id: str
     data: pd.DataFrame
-    boundary: Dict[str, Any] | None = None
-
-    def __post_init__(self):
-        if self.boundary is None:
-            self.boundary = {}
+    boundary: Dict[str, Any]
 
     @property
     def quantities(self) -> List[str]:
