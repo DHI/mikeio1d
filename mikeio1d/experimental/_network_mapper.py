@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import networkx as nx
 import pandas as pd
-import xarray as xr
 
 from pathlib import Path
 from enum import Enum
@@ -31,11 +30,11 @@ class NetworkBackend(Enum):
 
 
 def node_id_generator(node: str | int | None = None, **kwargs) -> str:
-    """Generate the id of a network node.
+    """Generate a unique id for a res1d element.
 
     Parameters
     ----------
-    node : Optional[str  |  int], optional
+    node : str  |  int, optional
         node id in the original network, by default None
 
     Returns
@@ -109,7 +108,7 @@ def read_res1d_network(res: Any) -> Res1D:
         )
 
 
-def parse_res1d_network(res: Any) -> dict[str, NetworkEdge]:
+def parse_res1d_network(res: Any, id_gen: Callable[..., str]) -> dict[str, NetworkEdge]:
 
     def simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
         # We remove suffixes and indexes so the columns contain only the quantities
@@ -133,7 +132,7 @@ def parse_res1d_network(res: Any) -> dict[str, NetworkEdge]:
         # the start and end nodes in a 1d representation.
         gridpoint = reach.gridpoints[idx]
         return NetworkNode(
-            node_id_generator(node.id),
+            id_gen(node.id),
             simplify_colnames(node),
             boundary={reach.name: simplify_colnames(gridpoint)},
         )
@@ -142,7 +141,7 @@ def parse_res1d_network(res: Any) -> dict[str, NetworkEdge]:
         intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
         return [
             EdgeBreakPoint(
-                node_id_generator(edge=gridpoint.reach_name, distance=gridpoint.chainage),
+                id_gen(edge=gridpoint.reach_name, distance=gridpoint.chainage),
                 simplify_colnames(gridpoint),
                 gridpoint.chainage,
             )
@@ -166,9 +165,13 @@ def parse_res1d_network(res: Any) -> dict[str, NetworkEdge]:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, res: Any):
+    def __init__(self, edges_dict: dict[str, NetworkEdge], id_generator: Callable[..., str]):
         self._alias_map: dict[int, str] = {}
-        self._edges = parse_res1d_network(res)
+        # We include id_generator because we need a way to generate unique ids
+        # of elements with arbitrary architecture. For instance, here we might pass
+        # a function that depends on 'node' and 'reach' from res1d
+        self._id_generator = id_generator
+        self._edges = edges_dict
 
     def map_network(self) -> GenericNetwork:
         """Return generic network object.
@@ -268,7 +271,7 @@ class NetworkMapper:
             # Handle node lookup
             if not isinstance(node, list):
                 node = [node]
-            ids = [node_id_generator(node_i) for node_i in node]
+            ids = [self._id_generator(node_i) for node_i in node]
 
         else:
             # Handle breakpoint/edge endpoint lookup
@@ -306,7 +309,7 @@ class NetworkMapper:
                         ids.append(network_edge.end.id)
                 else:
                     # Handle breakpoint lookup
-                    ids.append(node_id_generator(edge=edge_i, distance=distance_i))
+                    ids.append(self._id_generator(edge=edge_i, distance=distance_i))
 
         # Check if all ids exist in the network
         alias_set = set(self._alias_map.keys())
