@@ -1,11 +1,12 @@
 """Testing network mapper."""
 
 import pytest
-import networkx as nx
 from pathlib import Path
 
 from mikeio1d import Res1D
 from mikeio1d.experimental import NetworkMapper, GenericNetwork
+
+nx = pytest.importorskip("networkx")
 
 
 @pytest.fixture
