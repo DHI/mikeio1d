@@ -20,7 +20,7 @@ class NetworkNodeIdGenerator(Protocol):
 
 
 @dataclass
-class NetworkNode:
+class NetworkNode(Protocol):
     """Node in the simplified network."""
 
     id: str
@@ -29,26 +29,24 @@ class NetworkNode:
 
     @property
     def quantities(self) -> list[str]:
-        """Quantities that are present in the node.
-
-        Returns
-        -------
-        List[str]
-        """
         return list(self.data.columns)
 
 
 @dataclass
-class EdgeBreakPoint:
+class EdgeBreakPoint(Protocol):
     """Edge break point."""
 
     id: str
     data: pd.DataFrame
     distance: float
 
+    @property
+    def quantities(self) -> list[str]:
+        return list(self.data.columns)
+
 
 @dataclass
-class NetworkEdge:
+class NetworkEdge(Protocol):
     """Edge of a network."""
 
     id: str

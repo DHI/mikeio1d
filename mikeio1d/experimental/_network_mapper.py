@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-
+from dataclasses import dataclass
 import pandas as pd
 
 from pathlib import Path
-from enum import Enum
 from typing import Any
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
+
+# from modelskill.model.protocols.network import
 from mikeio1d.experimental._network_protocol import (
     NetworkEdge,
     NetworkNode,
@@ -20,13 +21,29 @@ from mikeio1d.experimental._network_protocol import (
 )
 
 
-class NetworkBackend(Enum):
-    """Backend of network."""
+@dataclass
+class Res1dNode(NetworkNode):
+    id: str
+    data: pd.DataFrame
+    boundary: dict[str, Any]
 
-    RES1D = 1
-    EPANET = 2
-    SWMM = 3
-    CUSTOM = 4
+
+@dataclass
+class GridPoint(EdgeBreakPoint):
+    id: str
+    data: pd.DataFrame
+    distance: float
+
+
+@dataclass
+class Res1dReach(NetworkEdge):
+    """Edge of a network."""
+
+    id: str
+    start: NetworkNode
+    end: NetworkNode
+    length: float
+    breakpoints: list[GridPoint]
 
 
 class Res1DIdGenerator(NetworkNodeIdGenerator):
@@ -141,23 +158,23 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
             renamer_dict[relevant_columns[0]] = quantity
         return df.rename(columns=renamer_dict, copy=True)
 
-    def parse_end(reach: ResultReach, idx: int) -> NetworkNode:
+    def parse_end(reach: ResultReach, idx: int) -> Res1dNode:
         ends = (reach.start_node, reach.end_node)
         node: ResultNode = network.nodes[ends[idx]]
         # By definition, the first and last gridpoint in a reach are at distance
         # 0 and 'length' from the start and end node respectively, effectively overlapping with
         # the start and end nodes in a 1d representation.
         gridpoint = reach.gridpoints[idx]
-        return NetworkNode(
+        return Res1dNode(
             idgen.generate(node.id),
             simplify_colnames(node),
             boundary={reach.name: simplify_colnames(gridpoint)},
         )
 
-    def parse_gridpoints(reach: ResultReach) -> list[EdgeBreakPoint]:
+    def parse_gridpoints(reach: ResultReach) -> list[GridPoint]:
         intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
         return [
-            EdgeBreakPoint(
+            GridPoint(
                 idgen.generate(edge=gridpoint.reach_name, distance=gridpoint.chainage),
                 simplify_colnames(gridpoint),
                 gridpoint.chainage,
@@ -165,9 +182,9 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
             for gridpoint in intermediate_gridpoints
         ]
 
-    def parse_reach(reach: ResultReach) -> NetworkEdge:
+    def parse_reach(reach: ResultReach) -> Res1dReach:
 
-        return NetworkEdge(
+        return Res1dReach(
             reach.name,
             parse_end(reach, 0),
             parse_end(reach, -1),
