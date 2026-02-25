@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import networkx as nx
 import pandas as pd
 import xarray as xr
@@ -93,13 +95,13 @@ class NetworkBackend(Enum):
     CUSTOM = 4
 
 
+@dataclass
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, id: str, data: pd.DataFrame, *, boundary: Optional[Dict[str, Any]] = {}):
-        self._id = id
-        self._data = data
-        self._boundary = boundary
+    id: str
+    data: pd.DataFrame
+    boundary: Dict[str, Any] = {}
 
     @property
     def quantities(self) -> List[str]:
@@ -109,45 +111,16 @@ class NetworkNode:
         -------
         List[str]
         """
-        return list(self._data.columns)
-
-    @property
-    def id(self) -> str:
-        """Id of the node.
-
-        Returns
-        -------
-        str
-        """
-        return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        """Data in the node.
-
-        Returns
-        -------
-        DataFrame
-        """
-        return self._data
-
-    @property
-    def boundary(self) -> Dict[str, pd.DataFrame]:
-        """Boundary of node."""
-        return self._boundary
+        return list(self.data.columns)
 
 
-class EdgeBreakPoint(NetworkNode):
+@dataclass
+class EdgeBreakPoint:
     """Edge break point."""
 
-    def __init__(self, id: str, distance: float, data: pd.DataFrame):
-        super().__init__(id, data)  # Call parent constructor
-        self._distance = distance
-
-    @property
-    def distance(self) -> float:
-        """Distance to beginning of the edge."""
-        return self._distance
+    id: str
+    data: pd.DataFrame
+    distance: float
 
 
 class NetworkEdge:
@@ -243,8 +216,8 @@ class EdgeCollection:
             return [
                 EdgeBreakPoint(
                     node_id_generator(edge=gridpoint.reach_name, distance=gridpoint.chainage),
-                    gridpoint.chainage,
                     simplify_colnames(gridpoint),
+                    gridpoint.chainage,
                 )
                 for gridpoint in intermediate_gridpoints
             ]
