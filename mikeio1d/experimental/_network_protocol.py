@@ -19,41 +19,57 @@ class NetworkNodeIdGenerator(Protocol):
     def parse(self, node_id: str) -> dict[str, Any]: ...
 
 
-@dataclass
 class NetworkNode(Protocol):
     """Node in the simplified network."""
 
-    id: str
-    data: pd.DataFrame
-    boundary: dict[str, Any]
+    @property
+    def id(self) -> str: ...
+
+    @property
+    def data(self) -> pd.DataFrame: ...
+
+    @property
+    def boundary(self) -> dict[str, Any]: ...
 
     @property
     def quantities(self) -> list[str]:
         return list(self.data.columns)
 
 
-@dataclass
 class EdgeBreakPoint(Protocol):
     """Edge break point."""
 
-    id: str
-    data: pd.DataFrame
-    distance: float
+    @property
+    def id(self) -> str: ...
+
+    @property
+    def data(self) -> pd.DataFrame: ...
+
+    @property
+    def distance(self) -> float: ...
 
     @property
     def quantities(self) -> list[str]:
         return list(self.data.columns)
 
 
-@dataclass
 class NetworkEdge(Protocol):
     """Edge of a network."""
 
-    id: str
-    start: NetworkNode
-    end: NetworkNode
-    length: float
-    breakpoints: list[EdgeBreakPoint]
+    @property
+    def id(self) -> str: ...
+
+    @property
+    def start(self) -> NetworkNode: ...
+
+    @property
+    def end(self) -> NetworkNode: ...
+
+    @property
+    def length(self) -> float: ...
+
+    @property
+    def breakpoints(self) -> list[EdgeBreakPoint]: ...
 
     @property
     def n_breakpoints(self) -> int:
