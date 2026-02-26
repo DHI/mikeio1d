@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import pandas as pd
 
 from pathlib import Path
@@ -33,7 +32,7 @@ def _simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
                 f"There must be exactly one column per quantity, found {relevant_columns}."
             )
         renamer_dict[relevant_columns[0]] = quantity
-    return df.rename(columns=renamer_dict, copy=True)
+    return df.rename(columns=renamer_dict).copy()
 
 
 class Res1DIdGenerator(NetworkNodeIdGenerator):
@@ -137,7 +136,6 @@ class Res1dNode(NetworkNode):
         return self._boundary
 
 
-@dataclass
 class GridPoint(EdgeBreakPoint):
     def __init__(self, point: ResultGridPoint):
 
@@ -225,5 +223,5 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
 
 if __name__ == "__main__":
     path_to_res1d = "./tests/testdata/network.res1d"
-    res1d_mapper = create_res1d_mapper(path_to_res1d)
+    mapper = create_res1d_mapper(path_to_res1d)
     print("Mapper was created!")
