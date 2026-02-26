@@ -119,7 +119,7 @@ idgen = Res1DIdGenerator()
 class Res1dNode(NetworkNode):
     def __init__(self, node: ResultNode, boundary: dict[str, ResultGridPoint]):
 
-        self._id = idgen.generate(node.id)
+        self._id = node.id
         self._data = _simplify_colnames(node)
         self._boundary = {key: _simplify_colnames(point) for key, point in boundary.items()}
 
@@ -139,7 +139,7 @@ class Res1dNode(NetworkNode):
 class GridPoint(EdgeBreakPoint):
     def __init__(self, point: ResultGridPoint):
 
-        self._id = idgen.generate(edge=point.reach_name, distance=point.chainage)
+        self._id = point.reach_name
         self._data = _simplify_colnames(point)
         self.__distance = point.chainage
 

@@ -261,7 +261,7 @@ class NetworkMapper:
             # Handle node lookup
             if not isinstance(node, list):
                 node = [node]
-            ids = [self._id_generator(node_i) for node_i in node]
+            ids = [self._id_generator.generate(node_i) for node_i in node]
 
         else:
             # Handle breakpoint/edge endpoint lookup
@@ -299,7 +299,7 @@ class NetworkMapper:
                         ids.append(network_edge.end.id)
                 else:
                     # Handle breakpoint lookup
-                    ids.append(self._id_generator(edge=edge_i, distance=distance_i))
+                    ids.append(self._id_generator.generate(edge=edge_i, distance=distance_i))
 
         # Check if all ids exist in the network
         alias_set = set(self._alias_map.keys())
