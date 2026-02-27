@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import pandas as pd
 import networkx as nx
 import xarray as xr
@@ -181,14 +179,20 @@ class NetworkMapper:
                     g0.add_node(bp_key, data=bp.data)
 
                 g0.add_edge(start_key, bp_keys[0], length=edge.breakpoints[0].distance)
-                g0.add_edge(bp_keys[-1], end_key, length=edge.length - edge.breakpoints[-1].distance)
+                g0.add_edge(
+                    bp_keys[-1], end_key, length=edge.length - edge.breakpoints[-1].distance
+                )
 
             # 3) Connect consecutive intermediate breakpoints
             for i in range(edge.n_breakpoints - 1):
                 current_ = edge.breakpoints[i]
                 next_ = edge.breakpoints[i + 1]
                 length = next_.distance - current_.distance
-                g0.add_edge(("breakpoint", current_.id, current_.distance), ("breakpoint", next_.id, next_.distance), length=length)
+                g0.add_edge(
+                    ("breakpoint", current_.id, current_.distance),
+                    ("breakpoint", next_.id, next_.distance),
+                    length=length,
+                )
 
         return nx.convert_node_labels_to_integers(g0, label_attribute="alias")
 
@@ -279,17 +283,27 @@ class NetworkMapper:
                     ids.append(("breakpoint", edge_i, distance_i))
 
         # Check if all ids exist in the network
-        alias_set = set(self._alias_map.keys())
-        if all([id in alias_set for id in ids]):
-            if len(ids) == 1:
-                return self._alias_map[ids[0]]
-            else:
-                return [self._alias_map[id] for id in ids]
-        else:
-            missing_ids = [id for id in ids if id not in alias_set]
+        _CHAINAGE_TOLERANCE = 1e-3
+
+        def _resolve_id(id):
+            if id in self._alias_map:
+                return self._alias_map[id]
+            if id[0] == "breakpoint":
+                edge_id, distance = id[1], id[2]
+                for key, val in self._alias_map.items():
+                    if key[0] == "breakpoint" and key[1] == edge_id and abs(key[2] - distance) <= _CHAINAGE_TOLERANCE:
+                        return val
+            return None
+
+        resolved = [_resolve_id(id) for id in ids]
+        missing_ids = [ids[i] for i, v in enumerate(resolved) if v is None]
+        if missing_ids:
             raise KeyError(
-                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {alias_set}"
+                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {set(self._alias_map.keys())}"
             )
+        if len(resolved) == 1:
+            return resolved[0]
+        return resolved
 
     def recall(self, id: int | list[int]) -> dict[str, Any] | list[dict[str, Any]]:
         """Recall the original coordinates from generic network node id(s).
