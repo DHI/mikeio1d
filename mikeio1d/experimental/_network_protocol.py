@@ -7,18 +7,6 @@ import xarray as xr
 from typing import Any, Protocol
 
 
-class NetworkNodeIdGenerator(Protocol):
-    """Bidirectional mapping between network coordinates and string IDs.
-
-    Handles conversion from network element coordinates (node ID or edge + distance)
-    to unique string identifiers and vice versa.
-    """
-
-    def generate(self, node: str | int | None = None, **kwargs) -> str: ...
-
-    def parse(self, node_id: str) -> dict[str, Any]: ...
-
-
 class NetworkNode(Protocol):
     """Node in the simplified network."""
 
@@ -155,12 +143,8 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, edges_dict: dict[str, NetworkEdge], id_generator: NetworkNodeIdGenerator):
-        self._alias_map: dict[int, str] = {}
-        # We include id_generator because we need a way to generate unique ids
-        # of elements with arbitrary architecture. For instance, here we might pass
-        # a function that depends on 'node' and 'reach' from res1d
-        self._id_generator = id_generator
+    def __init__(self, edges_dict: dict[str, NetworkEdge]):
+        self._alias_map: dict[tuple, int] = {}
         self._edges = edges_dict
 
     def map_network(self) -> GenericNetwork:
@@ -180,38 +164,31 @@ class NetworkMapper:
         for edge in self._edges.values():
             # 1) Add start and end nodes
             for node in [edge.start, edge.end]:
-                if node.id in g0.nodes:
-                    g0.nodes[node.id]["boundary"].update(node.boundary)
+                node_key = ("node", node.id)
+                if node_key in g0.nodes:
+                    g0.nodes[node_key]["boundary"].update(node.boundary)
                 else:
-                    g0.add_node(
-                        node.id,
-                        data=node.data,
-                        boundary=node.boundary,
-                    )
+                    g0.add_node(node_key, data=node.data, boundary=node.boundary)
 
             # 2) Add edges connecting start/end nodes to their adjacent breakpoints
+            start_key = ("node", edge.start.id)
+            end_key = ("node", edge.end.id)
             if edge.n_breakpoints == 0:
-                g0.add_edge(edge.start.id, edge.end.id, length=edge.length)
+                g0.add_edge(start_key, end_key, length=edge.length)
             else:
-                for breakpoint in edge.breakpoints:
-                    g0.add_node(breakpoint.id, data=breakpoint.data)
+                bp_keys = [("breakpoint", bp.id, bp.distance) for bp in edge.breakpoints]
+                for bp, bp_key in zip(edge.breakpoints, bp_keys):
+                    g0.add_node(bp_key, data=bp.data)
 
-                g0.add_edge(
-                    edge.start.id, edge.breakpoints[0].id, length=edge.breakpoints[0].distance
-                )
-
-                g0.add_edge(
-                    edge.breakpoints[-1].id,
-                    edge.end.id,
-                    length=edge.length - edge.breakpoints[-1].distance,
-                )
+                g0.add_edge(start_key, bp_keys[0], length=edge.breakpoints[0].distance)
+                g0.add_edge(bp_keys[-1], end_key, length=edge.length - edge.breakpoints[-1].distance)
 
             # 3) Connect consecutive intermediate breakpoints
             for i in range(edge.n_breakpoints - 1):
                 current_ = edge.breakpoints[i]
                 next_ = edge.breakpoints[i + 1]
                 length = next_.distance - current_.distance
-                g0.add_edge(current_.id, next_.id, length=length)
+                g0.add_edge(("breakpoint", current_.id, current_.distance), ("breakpoint", next_.id, next_.distance), length=length)
 
         return nx.convert_node_labels_to_integers(g0, label_attribute="alias")
 
@@ -261,7 +238,7 @@ class NetworkMapper:
             # Handle node lookup
             if not isinstance(node, list):
                 node = [node]
-            ids = [self._id_generator.generate(node_i) for node_i in node]
+            ids = [("node", node_i) for node_i in node]
 
         else:
             # Handle breakpoint/edge endpoint lookup
@@ -294,12 +271,12 @@ class NetworkMapper:
 
                     network_edge = self._edges[edge_i]
                     if distance_i == "start":
-                        ids.append(network_edge.start.id)
+                        ids.append(("node", network_edge.start.id))
                     else:  # distance_i == "end"
-                        ids.append(network_edge.end.id)
+                        ids.append(("node", network_edge.end.id))
                 else:
                     # Handle breakpoint lookup
-                    ids.append(self._id_generator.generate(edge=edge_i, distance=distance_i))
+                    ids.append(("breakpoint", edge_i, distance_i))
 
         # Check if all ids exist in the network
         alias_set = set(self._alias_map.keys())
@@ -349,9 +326,11 @@ class NetworkMapper:
             if node_id not in reverse_alias_map:
                 raise KeyError(f"Node ID {node_id} not found in the network.")
 
-            string_id = reverse_alias_map[node_id]
-            coordinates = self._id_generator.parse(string_id)
-            results.append(coordinates)
+            key = reverse_alias_map[node_id]
+            if key[0] == "node":
+                results.append({"node": key[1]})
+            else:  # "breakpoint"
+                results.append({"edge": key[1], "distance": key[2]})
 
         # Return single dict if single input, list otherwise
         if len(results) == 1:
