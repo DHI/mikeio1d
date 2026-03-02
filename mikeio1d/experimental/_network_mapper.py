@@ -14,7 +14,7 @@ from mikeio1d.experimental._network_protocol import (
     NetworkEdge,
     NetworkNode,
     EdgeBreakPoint,
-    NetworkMapper,
+    Network,
 )
 
 
@@ -109,8 +109,8 @@ class Res1DReach(NetworkEdge):
         return self._breakpoints
 
 
-def create_res1d_mapper(res: Any) -> NetworkMapper:
-    """Create a network mapper to transform a Res1D network to a generic network.
+def create_res1d_mapper(res: Any) -> Network:
+    """Create a network from a Res1D file or object.
 
     Parameters
     ----------
@@ -119,8 +119,8 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
 
     Returns
     -------
-    NetworkMapper
-        mapper to create a generic network.
+    Network
+        Network with coordinate lookup and data access.
     """
     if isinstance(res, (str, Path)):
         path = Path(res)
@@ -141,4 +141,4 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
         Res1DReach(reach, network.nodes[reach.start_node], network.nodes[reach.end_node])
         for reach in network.reaches.values()
     ]
-    return NetworkMapper(edges)
+    return Network(edges)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from mikeio1d import Res1D
 from mikeio1d.experimental import create_res1d_mapper
-from mikeio1d.experimental._network_protocol import NetworkMapper, GenericNetwork
+from mikeio1d.experimental._network_protocol import Network
 
 
 @pytest.fixture
@@ -23,29 +23,29 @@ def res1d_object(res1d_file):
 
 @pytest.fixture
 def mapper(res1d_file):
-    """Fixture providing NetworkMapper instance."""
+    """Fixture providing Network instance."""
     return create_res1d_mapper(res1d_file)
 
 
 @pytest.fixture
 def network(mapper):
-    """Fixture providing mapped GenericNetwork."""
-    return mapper.network
+    """Fixture providing Network instance (alias for mapper)."""
+    return mapper
 
 
 class TestNetworkMapper:
-    """Test NetworkMapper functionality."""
+    """Test Network functionality."""
 
     def test_mapper_initialization(self, res1d_file):
-        """Test that NetworkMapper initializes correctly."""
+        """Test that Network initializes correctly."""
         mapper = create_res1d_mapper(res1d_file)
         assert mapper is not None
         assert hasattr(mapper, "_edges")
 
     def test_map_network_returns_generic_network(self, mapper):
-        """Test that mapper.network returns a GenericNetwork instance."""
-        assert isinstance(mapper.network, GenericNetwork)
-        assert isinstance(mapper.network.graph, nx.Graph)
+        """Test that create_res1d_mapper returns a Network instance with a graph."""
+        assert isinstance(mapper, Network)
+        assert isinstance(mapper.graph, nx.Graph)
 
     @pytest.mark.skip("Need to fix the test after relabeling nodes to int")
     def test_all_res1d_nodes_mapped(self, res1d_object, network):

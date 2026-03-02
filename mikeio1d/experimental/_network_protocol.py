@@ -64,11 +64,16 @@ class NetworkEdge(Protocol):
         return len(self.breakpoints)
 
 
-class GenericNetwork:
-    """Generic network structure."""
+class Network:
+    """Network built from a set of edges, with coordinate lookup and data access."""
 
-    def __init__(self, graph: nx.Graph):
-        self._graph = graph.copy()
+    def __init__(self, edges: list[NetworkEdge]):
+        self._edges: dict[str, NetworkEdge] = {e.id: e for e in edges}
+        g0 = self._initialize_graph()
+        self._alias_map: dict[str | tuple[str, float], int] = {
+            g0.nodes[id]["alias"]: id for id in g0.nodes()
+        }
+        self._graph = g0.copy()
         self._df = self._build_dataframe()
 
     def _build_dataframe(self) -> pd.DataFrame:
@@ -137,18 +142,6 @@ class GenericNetwork:
             List of quantities
         """
         return list(self.to_dataframe().columns.get_level_values(1).unique())
-
-
-class NetworkMapper:
-    """Mapper class to transform Res1D to a general network coord system."""
-
-    def __init__(self, edges: list[NetworkEdge]):
-        self._edges: dict[str, NetworkEdge] = {e.id: e for e in edges}
-        g0 = self._initialize_graph()
-        self._alias_map: dict[str | tuple[str, float], int] = {
-            g0.nodes[id]["alias"]: id for id in g0.nodes()
-        }
-        self.network = GenericNetwork(g0)
 
     def _initialize_graph(self) -> nx.Graph:
         g0 = nx.Graph()
