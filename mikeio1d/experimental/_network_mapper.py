@@ -33,7 +33,7 @@ def _simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
     return df.rename(columns=renamer_dict).copy()
 
 
-class Res1dNode(NetworkNode):
+class Res1DNode(NetworkNode):
     def __init__(self, node: ResultNode, boundary: dict[str, ResultGridPoint]):
 
         self._id = node.id
@@ -68,7 +68,7 @@ class GridPoint(EdgeBreakPoint):
         return self._data
 
 
-class Res1dReach(NetworkEdge):
+class Res1DReach(NetworkEdge):
     """Edge of a network."""
 
     def __init__(self, reach: ResultReach, start_node: ResultNode, end_node: ResultNode):
@@ -81,8 +81,8 @@ class Res1dReach(NetworkEdge):
         end_gridpoint = reach.gridpoints[-1]
         intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
 
-        self._start = Res1dNode(start_node, {reach.name: start_gridpoint})
-        self._end = Res1dNode(end_node, {reach.name: end_gridpoint})
+        self._start = Res1DNode(start_node, {reach.name: start_gridpoint})
+        self._end = Res1DNode(end_node, {reach.name: end_gridpoint})
         self._length = reach.length
         self._breakpoints = [GridPoint(gridpoint) for gridpoint in intermediate_gridpoints]
 
@@ -91,11 +91,11 @@ class Res1dReach(NetworkEdge):
         return self._id
 
     @property
-    def start(self) -> Res1dNode:
+    def start(self) -> Res1DNode:
         return self._start
 
     @property
-    def end(self) -> Res1dNode:
+    def end(self) -> Res1DNode:
         return self._end
 
     @property
@@ -136,7 +136,7 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
         )
 
     edges = [
-        Res1dReach(reach, network.nodes[reach.start_node], network.nodes[reach.end_node])
+        Res1DReach(reach, network.nodes[reach.start_node], network.nodes[reach.end_node])
         for reach in network.reaches.values()
     ]
     return NetworkMapper(edges)
