@@ -5,7 +5,7 @@ import networkx as nx
 from pathlib import Path
 
 from mikeio1d import Res1D
-from mikeio1d.experimental import create_res1d_mapper
+from mikeio1d.experimental import map_res1d_network
 from mikeio1d.experimental._network_protocol import Network
 
 
@@ -24,7 +24,7 @@ def res1d_object(res1d_file):
 @pytest.fixture
 def mapper(res1d_file):
     """Fixture providing Network instance."""
-    return create_res1d_mapper(res1d_file)
+    return map_res1d_network(res1d_file)
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ class TestNetworkMapper:
 
     def test_mapper_initialization(self, res1d_file):
         """Test that Network initializes correctly."""
-        mapper = create_res1d_mapper(res1d_file)
+        mapper = map_res1d_network(res1d_file)
         assert mapper is not None
         assert hasattr(mapper, "_edges")
 

@@ -109,7 +109,7 @@ class Res1DReach(NetworkEdge):
         return self._breakpoints
 
 
-def create_res1d_mapper(res: Any) -> Network:
+def map_res1d_network(res: Any) -> Network:
     """Create a network from a Res1D file or object.
 
     Parameters
