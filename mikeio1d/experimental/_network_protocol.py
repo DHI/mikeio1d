@@ -281,6 +281,11 @@ class NetworkMapper:
                         ids.append(network_edge.end.id)
                 else:
                     # Handle breakpoint lookup
+                    if not isinstance(distance_i, (int, float)):
+                        raise ValueError(
+                            "Invalid 'distance' value for breakpoint lookup: "
+                            f"{distance_i!r}. Expected a numeric value or 'start'/'end'."
+                        )
                     ids.append((edge_i, distance_i))
 
         # Check if all ids exist in the network
@@ -292,7 +297,11 @@ class NetworkMapper:
             if isinstance(id, tuple):
                 edge_id, distance = id
                 for key, val in self._alias_map.items():
-                    if isinstance(key, tuple) and key[0] == edge_id and abs(key[1] - distance) <= _CHAINAGE_TOLERANCE:
+                    if (
+                        isinstance(key, tuple)
+                        and key[0] == edge_id
+                        and abs(key[1] - distance) <= _CHAINAGE_TOLERANCE
+                    ):
                         return val
             return None
 
