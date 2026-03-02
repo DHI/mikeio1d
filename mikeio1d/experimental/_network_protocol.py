@@ -26,13 +26,14 @@ class EdgeBreakPoint(Protocol):
     """Edge break point."""
 
     @property
-    def id(self) -> str: ...
+    def id(self) -> tuple[str, float]: ...
 
     @property
     def data(self) -> pd.DataFrame: ...
 
     @property
-    def distance(self) -> float: ...
+    def distance(self) -> float:
+        return self.id[1]
 
     @property
     def quantities(self) -> list[str]:
@@ -142,7 +143,7 @@ class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
     def __init__(self, edges_dict: dict[str, NetworkEdge]):
-        self._alias_map: dict[tuple, int] = {}
+        self._alias_map: dict[str | tuple[str, float], int] = {}
         self._edges = edges_dict
 
     def map_network(self) -> GenericNetwork:
@@ -162,19 +163,19 @@ class NetworkMapper:
         for edge in self._edges.values():
             # 1) Add start and end nodes
             for node in [edge.start, edge.end]:
-                node_key = ("node", node.id)
+                node_key = node.id
                 if node_key in g0.nodes:
                     g0.nodes[node_key]["boundary"].update(node.boundary)
                 else:
                     g0.add_node(node_key, data=node.data, boundary=node.boundary)
 
             # 2) Add edges connecting start/end nodes to their adjacent breakpoints
-            start_key = ("node", edge.start.id)
-            end_key = ("node", edge.end.id)
+            start_key = edge.start.id
+            end_key = edge.end.id
             if edge.n_breakpoints == 0:
                 g0.add_edge(start_key, end_key, length=edge.length)
             else:
-                bp_keys = [("breakpoint", bp.id, bp.distance) for bp in edge.breakpoints]
+                bp_keys = [bp.id for bp in edge.breakpoints]
                 for bp, bp_key in zip(edge.breakpoints, bp_keys):
                     g0.add_node(bp_key, data=bp.data)
 
@@ -189,8 +190,8 @@ class NetworkMapper:
                 next_ = edge.breakpoints[i + 1]
                 length = next_.distance - current_.distance
                 g0.add_edge(
-                    ("breakpoint", current_.id, current_.distance),
-                    ("breakpoint", next_.id, next_.distance),
+                    current_.id,
+                    next_.id,
                     length=length,
                 )
 
@@ -242,7 +243,7 @@ class NetworkMapper:
             # Handle node lookup
             if not isinstance(node, list):
                 node = [node]
-            ids = [("node", node_i) for node_i in node]
+            ids = list(node)
 
         else:
             # Handle breakpoint/edge endpoint lookup
@@ -275,12 +276,12 @@ class NetworkMapper:
 
                     network_edge = self._edges[edge_i]
                     if distance_i == "start":
-                        ids.append(("node", network_edge.start.id))
+                        ids.append(network_edge.start.id)
                     else:  # distance_i == "end"
-                        ids.append(("node", network_edge.end.id))
+                        ids.append(network_edge.end.id)
                 else:
                     # Handle breakpoint lookup
-                    ids.append(("breakpoint", edge_i, distance_i))
+                    ids.append((edge_i, distance_i))
 
         # Check if all ids exist in the network
         _CHAINAGE_TOLERANCE = 1e-3
@@ -288,10 +289,10 @@ class NetworkMapper:
         def _resolve_id(id):
             if id in self._alias_map:
                 return self._alias_map[id]
-            if id[0] == "breakpoint":
-                edge_id, distance = id[1], id[2]
+            if isinstance(id, tuple):
+                edge_id, distance = id
                 for key, val in self._alias_map.items():
-                    if key[0] == "breakpoint" and key[1] == edge_id and abs(key[2] - distance) <= _CHAINAGE_TOLERANCE:
+                    if isinstance(key, tuple) and key[0] == edge_id and abs(key[1] - distance) <= _CHAINAGE_TOLERANCE:
                         return val
             return None
 
@@ -341,10 +342,10 @@ class NetworkMapper:
                 raise KeyError(f"Node ID {node_id} not found in the network.")
 
             key = reverse_alias_map[node_id]
-            if key[0] == "node":
-                results.append({"node": key[1]})
-            else:  # "breakpoint"
-                results.append({"edge": key[1], "distance": key[2]})
+            if isinstance(key, str):
+                results.append({"node": key})
+            else:  # tuple[str, float]
+                results.append({"edge": key[0], "distance": key[1]})
 
         # Return single dict if single input, list otherwise
         if len(results) == 1:

@@ -19,7 +19,7 @@ from mikeio1d.experimental._network_protocol import (
 
 
 def _simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
-    # We remove suffixes and indexes so the columns contain only the quantities
+    # We remove suffixes and indexes so the columns contain only the quantity names
     df = node.to_dataframe()
     quantities = node.quantities
     renamer_dict = {}
@@ -56,21 +56,16 @@ class Res1dNode(NetworkNode):
 class GridPoint(EdgeBreakPoint):
     def __init__(self, point: ResultGridPoint):
 
-        self._id = point.reach_name
+        self._id = (point.reach_name, point.chainage)
         self._data = _simplify_colnames(point)
-        self.__distance = point.chainage
 
     @property
-    def id(self) -> str:
+    def id(self) -> tuple[str, float]:
         return self._id
 
     @property
     def data(self) -> pd.DataFrame:
         return self._data
-
-    @property
-    def distance(self) -> float:
-        return self.__distance
 
 
 class Res1dReach(NetworkEdge):
@@ -113,6 +108,18 @@ class Res1dReach(NetworkEdge):
 
 
 def create_res1d_mapper(res: Any) -> NetworkMapper:
+    """Create a network mapper to transform a Res1D network to a generic network.
+
+    Parameters
+    ----------
+    res : Any
+        Res1D object or path to a Res1D.
+
+    Returns
+    -------
+    NetworkMapper
+        mapper to create a generic network.
+    """
 
     def read_res1d_network(res: Any) -> Res1D:
         if isinstance(res, (str, Path)):
