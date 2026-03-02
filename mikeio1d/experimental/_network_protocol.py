@@ -142,9 +142,9 @@ class GenericNetwork:
 class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
-    def __init__(self, edges_dict: dict[str, NetworkEdge]):
+    def __init__(self, edges: list[NetworkEdge]):
         self._alias_map: dict[str | tuple[str, float], int] = {}
-        self._edges = edges_dict
+        self._edges: dict[str, NetworkEdge] = {e.id: e for e in edges}
 
     def map_network(self) -> GenericNetwork:
         """Return generic network object.

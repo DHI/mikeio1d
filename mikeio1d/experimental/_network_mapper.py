@@ -138,11 +138,11 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
             )
 
     network = read_res1d_network(res)
-    edges_dict = {
-        reach_id: Res1dReach(reach, network.nodes[reach.start_node], network.nodes[reach.end_node])
-        for reach_id, reach in network.reaches.items()
-    }
-    return NetworkMapper(edges_dict)
+    edges = [
+        Res1dReach(reach, network.nodes[reach.start_node], network.nodes[reach.end_node])
+        for reach in network.reaches.values()
+    ]
+    return NetworkMapper(edges)
 
 
 if __name__ == "__main__":
