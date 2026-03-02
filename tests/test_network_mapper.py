@@ -33,6 +33,13 @@ def network(mapper):
     return mapper.map_network()
 
 
+@pytest.fixture
+def mapped_mapper(mapper):
+    """Fixture providing NetworkMapper instance with map_network() already called."""
+    mapper.map_network()
+    return mapper
+
+
 class TestNetworkMapper:
     """Test NetworkMapper functionality."""
 
@@ -96,3 +103,66 @@ class TestNetworkMapper:
         graph = network.graph
         if len(graph.nodes()) > 0:
             assert nx.is_connected(graph), "Graph should be connected"
+
+    # reach '100l1': start='100', end='99', intermediate breakpoint at chainage ~23.84
+
+    def test_find_node(self, mapped_mapper):
+        """Test that find returns an integer id for a node lookup."""
+        result = mapped_mapper.find(node="1")
+        assert isinstance(result, int)
+
+    def test_find_multiple_nodes(self, mapped_mapper):
+        """Test that find returns a list of distinct integer ids for multiple nodes."""
+        results = mapped_mapper.find(node=["1", "2"])
+        assert isinstance(results, list)
+        assert len(results) == 2
+        assert all(isinstance(r, int) for r in results)
+        assert results[0] != results[1]
+
+    def test_find_breakpoint(self, mapped_mapper):
+        """Test that find returns an integer id for a breakpoint lookup."""
+        result = mapped_mapper.find(edge="100l1", distance=23.8413574216414)
+        assert isinstance(result, int)
+
+    def test_find_edge_start(self, mapped_mapper):
+        """Test that find with distance='start' returns the start node id."""
+        result = mapped_mapper.find(edge="100l1", distance="start")
+        assert result == mapped_mapper.find(node="100")
+
+    def test_find_edge_end(self, mapped_mapper):
+        """Test that find with distance='end' returns the end node id."""
+        result = mapped_mapper.find(edge="100l1", distance="end")
+        assert result == mapped_mapper.find(node="99")
+
+    def test_recall_node(self, mapped_mapper):
+        """Test that recall returns the original node coordinates."""
+        node_id = mapped_mapper.find(node="1")
+        result = mapped_mapper.recall(node_id)
+        assert result == {"node": "1"}
+
+    def test_recall_breakpoint(self, mapped_mapper):
+        """Test that recall returns the original edge and distance for a breakpoint."""
+        bp_id = mapped_mapper.find(edge="100l1", distance=23.8413574216414)
+        result = mapped_mapper.recall(bp_id)
+        assert result["edge"] == "100l1"
+        assert abs(result["distance"] - 23.8413574216414) < 1e-3
+
+    def test_roundtrip_node(self, mapped_mapper):
+        """Test that find -> recall round-trips correctly for a node."""
+        original = {"node": "1"}
+        recalled = mapped_mapper.recall(mapped_mapper.find(node=original["node"]))
+        assert recalled == original
+
+    def test_roundtrip_breakpoint(self, mapped_mapper):
+        """Test that find -> recall round-trips correctly for a breakpoint."""
+        original = {"edge": "100l1", "distance": 23.8413574216414}
+        recalled = mapped_mapper.recall(mapped_mapper.find(edge=original["edge"], distance=original["distance"]))
+        assert recalled["edge"] == original["edge"]
+        assert abs(recalled["distance"] - original["distance"]) < 1e-3
+
+    def test_roundtrip_multiple_nodes(self, mapped_mapper):
+        """Test that find -> recall round-trips correctly for multiple nodes."""
+        node_ids = ["1", "2", "3"]
+        results = mapped_mapper.find(node=node_ids)
+        recalled = mapped_mapper.recall(results)
+        assert [r["node"] for r in recalled] == node_ids
