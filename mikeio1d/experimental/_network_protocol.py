@@ -69,12 +69,12 @@ class Network:
 
     def __init__(self, edges: list[NetworkEdge]):
         self._edges: dict[str, NetworkEdge] = {e.id: e for e in edges}
-        g0 = self._initialize_graph()
-        self._alias_map: dict[str | tuple[str, float], int] = {
-            g0.nodes[id]["alias"]: id for id in g0.nodes()
-        }
-        self._graph = g0.copy()
+        self._graph = self._initialize_graph()
+        self._alias_map = self._initialize_alias_map()
         self._df = self._build_dataframe()
+
+    def _initialize_alias_map(self) -> dict[str | tuple[str, float], int]:
+        return {self.graph.nodes[id]["alias"]: id for id in self.graph.nodes()}
 
     def _build_dataframe(self) -> pd.DataFrame:
         df = pd.concat({k: v["data"] for k, v in self._graph.nodes.items()}, axis=1)
