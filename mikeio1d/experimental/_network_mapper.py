@@ -120,24 +120,21 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
     NetworkMapper
         mapper to create a generic network.
     """
-
-    def read_res1d_network(res: Any) -> Res1D:
-        if isinstance(res, (str, Path)):
-            path = Path(res)
-            if path.suffix.lower() == ".res1d":
-                return Res1D(res)
-            else:
-                raise NotImplementedError(
-                    f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
-                )
-        elif isinstance(res, Res1D):
-            return res
+    if isinstance(res, (str, Path)):
+        path = Path(res)
+        if path.suffix.lower() == ".res1d":
+            network = Res1D(res)
         else:
             raise NotImplementedError(
-                f"Unsupported type '{type(res)}'. Only Res1D files are supported."
+                f"Unsupported file extension '{path.suffix}'. Only .res1d files are supported."
             )
+    elif isinstance(res, Res1D):
+        network = res
+    else:
+        raise NotImplementedError(
+            f"Unsupported type '{type(res)}'. Only Res1D files are supported."
+        )
 
-    network = read_res1d_network(res)
     edges = [
         Res1dReach(reach, network.nodes[reach.start_node], network.nodes[reach.end_node])
         for reach in network.reaches.values()
