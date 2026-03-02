@@ -5,7 +5,8 @@ import networkx as nx
 from pathlib import Path
 
 from mikeio1d import Res1D
-from mikeio1d.experimental import NetworkMapper, GenericNetwork, create_res1d_mapper
+from mikeio1d.experimental import create_res1d_mapper
+from mikeio1d.experimental._network_protocol import NetworkMapper, GenericNetwork
 
 
 @pytest.fixture

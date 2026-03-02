@@ -10,6 +10,5 @@ from ._networkx import to_networkx
 from ._xarray import to_dataarray
 from ._xvec import to_dataarray_xvec
 from ._network_mapper import create_res1d_mapper
-from ._network_protocol import NetworkMapper, GenericNetwork
 
-__all__ = ["create_res1d_mapper", "NetworkMapper", "GenericNetwork"]
+__all__ = ["create_res1d_mapper"]
