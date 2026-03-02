@@ -74,8 +74,10 @@ class Res1DReach(NetworkEdge):
     def __init__(self, reach: ResultReach, start_node: ResultNode, end_node: ResultNode):
         self._id = reach.name
 
-        assert start_node.id == reach.start_node, "Incorrect starting node."
-        assert end_node.id == reach.end_node, "Incorrect ending node."
+        if start_node.id != reach.start_node:
+            raise ValueError("Incorrect starting node.")
+        if end_node.id != reach.end_node:
+            raise ValueError("Incorrect ending node.")
 
         start_gridpoint = reach.gridpoints[0]
         end_gridpoint = reach.gridpoints[-1]
