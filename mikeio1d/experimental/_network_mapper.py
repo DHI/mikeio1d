@@ -142,9 +142,3 @@ def create_res1d_mapper(res: Any) -> NetworkMapper:
         for reach in network.reaches.values()
     ]
     return NetworkMapper(edges)
-
-
-if __name__ == "__main__":
-    path_to_res1d = "./tests/testdata/network.res1d"
-    mapper = create_res1d_mapper(path_to_res1d)
-    print("Mapper was created!")
