@@ -23,7 +23,7 @@ pip install mikeio1d
 
 ::: {.callout-note collapse="true" title="Requirements"}
 -   Windows, Linux
--   Python x64 3.10 - 3.13
+-   Python x64 3.10 - 3.14
 -   (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads%3E) (already installed if you have MIKE)
 -   (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
 :::
