@@ -14,8 +14,8 @@ exclude = ["notebooks", "tests", "images"]
 [tool.hatch.build.targets.sdist.force-include]
 "mikeio1d/bin" = "mikeio1d/bin"
 
-[tool.hatch.build.targets.wheel.force-include]
-"mikeio1d/bin" = "mikeio1d/bin"
+[tool.hatch.build.targets.wheel]
+include = ["mikeio1d"]
 
 [project]
 name = "mikeio1d"
