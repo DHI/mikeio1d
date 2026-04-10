@@ -32,7 +32,11 @@ class LibraryLoader:
 
     def load(self):
         """Add a reference of a relevant library to Python.NET (CLR) and also add a reference to the MIKE.NET."""
-        clr.AddReference(self.library_name)
+        try:
+            clr.AddReference(self.library_name)
+        except Exception as e:
+            warn(f"Could not add .NET library reference {self.library_name}: {e}")
+            return
 
         try:
             mikenet_dict = self.mikenet_module.__dict__
