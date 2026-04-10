@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Overview – MIKE IO 1D</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -68,15 +71,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../user-guide/network.html" rel="next">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c2184ee79b4189700a07fecab5507ffb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d22b584035f135c269abed1b239a31db.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
@@ -299,11 +301,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#res1d" id="toc-res1d" class="nav-link active" data-scroll-target="#res1d"><i class="fa-solid fa-circle-nodes" aria-label="circle-nodes"></i> Res1D</a></li>
-  <li><a href="#locations" id="toc-locations" class="nav-link" data-scroll-target="#locations"><i class="fa-solid fa-map-pin" aria-label="map-pin"></i> Locations</a></li>
-  <li><a href="#quantities" id="toc-quantities" class="nav-link" data-scroll-target="#quantities"><i class="fa-solid fa-chart-line" aria-label="chart-line"></i> Quantities</a></li>
-  <li><a href="#xns11" id="toc-xns11" class="nav-link" data-scroll-target="#xns11"><i class="fa-solid fa-bridge-water" aria-label="bridge-water"></i> Xns11</a></li>
-  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources"><i class="fa-solid fa-book" aria-label="book"></i> Additional resources</a></li>
+  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d" class="nav-link active" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d"><i class="fa-solid fa-circle-nodes" aria-label="circle-nodes"></i> Res1D</a></li>
+  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations"><i class="fa-solid fa-map-pin" aria-label="map-pin"></i> Locations</a></li>
+  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities"><i class="fa-solid fa-chart-line" aria-label="chart-line"></i> Quantities</a></li>
+  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11"><i class="fa-solid fa-bridge-water" aria-label="bridge-water"></i> Xns11</a></li>
+  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources"><i class="fa-solid fa-book" aria-label="book"></i> Additional resources</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/overview.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="overview.ipynb" download="overview.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -329,10 +331,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="res1d" class="level2">
-<h2 class="anchored" data-anchor-id="res1d"><i class="fa-solid fa-circle-nodes" aria-label="circle-nodes"></i> Res1D</h2>
+<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d" class="level2">
+<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d"><i class="fa-solid fa-circle-nodes" aria-label="circle-nodes"></i> Res1D</h2>
 <p><a href="../user-guide/res1d.html">Res1D</a> is the main interface for accessing data on a <a href="../user-guide/network.html">Network</a>.</p>
-<div id="898850f8" class="cell" data-execution_count="1">
+<div id="b5cc738d" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mikeio1d</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">'../data/network.res1d'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -341,10 +343,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="locations" class="level2">
-<h2 class="anchored" data-anchor-id="locations"><i class="fa-solid fa-map-pin" aria-label="map-pin"></i> Locations</h2>
+<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations" class="level2">
+<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations"><i class="fa-solid fa-map-pin" aria-label="map-pin"></i> Locations</h2>
 <p><a href="../user-guide/locations.html">Locations</a> are where model results exist in the network. The main location types are <a href="../api/result_network.ResultNodes.html#mikeio1d.result_network.ResultNodes">nodes</a>, <a href="../api/result_network.ResultReaches.html#mikeio1d.result_network.ResultReaches">reaches</a>, and <a href="../api/result_network.ResultCatchments.html#mikeio1d.result_network.ResultCatchments">catchments</a>. Each of these location types are accessible via a <a href="../api/Res1D.html#mikeio1d.Res1D"><code>Res1D</code></a> object.</p>
-<div id="e536adf3" class="cell" data-execution_count="2">
+<div id="3f896228" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 &lt;ResultNodes&gt; (119)
@@ -359,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Specific <a href="../api/result_network.ResultLocation.html#mikeio1d.result_network.ResultLocation">locations</a> are accessible via their unique ID.</p>
-<div id="6a6d77e0" class="cell" data-execution_count="3">
+<div id="711456bb" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 &lt;Manhole: 101&gt;
@@ -374,10 +376,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="quantities" class="level2">
-<h2 class="anchored" data-anchor-id="quantities"><i class="fa-solid fa-chart-line" aria-label="chart-line"></i> Quantities</h2>
+<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities" class="level2">
+<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities"><i class="fa-solid fa-chart-line" aria-label="chart-line"></i> Quantities</h2>
 <p><a href="../user-guide/quantities.html">Quantities</a> are the actual model results, which can be read into a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a> or plotted directly.</p>
-<div id="13830db2" class="cell" data-execution_count="4">
+<div id="f64041d9" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -418,7 +420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="6a32acdb" class="cell" data-execution_count="5">
+<div id="7f127946" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -429,7 +431,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><a href="../api/result_network.ResultQuantityCollection.html#mikeio1d.result_network.ResultQuantityCollection">Quantity collections</a> enable reading a specific quantity for many locations at once.</p>
-<div id="b89424a2" class="cell" data-execution_count="6">
+<div id="4b6119b3" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches.Discharge.read()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.describe().T.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -513,10 +515,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="xns11" class="level2">
-<h2 class="anchored" data-anchor-id="xns11"><i class="fa-solid fa-bridge-water" aria-label="bridge-water"></i> Xns11</h2>
+<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11" class="level2">
+<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11"><i class="fa-solid fa-bridge-water" aria-label="bridge-water"></i> Xns11</h2>
 <p><a href="../user-guide/xns11.html">Xns11</a> is the main interface for accessing cross section data.</p>
-<div id="f4fefed9" class="cell" data-execution_count="7">
+<div id="473ed64b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>xns <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">'../data/mikep_cs_demo.xns11'</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>xns[<span class="st">'basin_left1'</span>,<span class="st">'122.042'</span>,<span class="st">'1'</span>].plot(with_marker_labels<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
@@ -528,7 +530,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Access a cross section’s <a href="../api/cross_sections.CrossSection.html#mikeio1d.cross_sections.CrossSection.raw"><code>raw</code></a> info as a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a>.</p>
-<div id="dc48920b" class="cell" data-execution_count="8">
+<div id="276e38b9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> xns[<span class="st">'basin_left1'</span>,<span class="st">'122.042'</span>,<span class="st">'1'</span>].raw</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -552,7 +554,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 <td></td>
 <td>0.000</td>
-<td>4059.508</td>
+<td>6059.508</td>
 <td>25.0</td>
 </tr>
 <tr class="even">
@@ -560,7 +562,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 <td></td>
 <td>2.062</td>
-<td>4059.624</td>
+<td>6059.624</td>
 <td>25.0</td>
 </tr>
 <tr class="odd">
@@ -568,7 +570,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>1</td>
 <td>Left Levee Bank (1)</td>
 <td>4.124</td>
-<td>4059.754</td>
+<td>6059.754</td>
 <td>25.0</td>
 </tr>
 <tr class="even">
@@ -576,7 +578,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 <td></td>
 <td>6.186</td>
-<td>4059.607</td>
+<td>6059.607</td>
 <td>25.0</td>
 </tr>
 <tr class="odd">
@@ -584,7 +586,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 <td></td>
 <td>14.435</td>
-<td>4058.882</td>
+<td>6058.882</td>
 <td>25.0</td>
 </tr>
 </tbody>
@@ -594,7 +596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Access a cross section’s <a href="../api/cross_sections.CrossSection.html#mikeio1d.cross_sections.CrossSection.processed"><code>processed</code></a> info as a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a>.</p>
-<div id="7fb2a207" class="cell" data-execution_count="9">
+<div id="5277865f" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> xns[<span class="st">'basin_left1'</span>,<span class="st">'122.042'</span>,<span class="st">'1'</span>].processed</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -617,7 +619,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">0</th>
-<td>4052.803000</td>
+<td>6052.803000</td>
 <td>0.000000</td>
 <td>0.000000</td>
 <td>0.000000</td>
@@ -627,7 +629,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">1</th>
-<td>4052.944857</td>
+<td>6052.944857</td>
 <td>0.160191</td>
 <td>0.075978</td>
 <td>2.743476</td>
@@ -637,7 +639,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">2</th>
-<td>4053.086714</td>
+<td>6053.086714</td>
 <td>0.790062</td>
 <td>0.165315</td>
 <td>6.136873</td>
@@ -647,7 +649,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">3</th>
-<td>4053.228571</td>
+<td>6053.228571</td>
 <td>3.633195</td>
 <td>0.172199</td>
 <td>29.866016</td>
@@ -657,7 +659,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">4</th>
-<td>4053.370429</td>
+<td>6053.370429</td>
 <td>9.264321</td>
 <td>0.251109</td>
 <td>50.128968</td>
@@ -672,8 +674,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="additional-resources" class="level2">
-<h2 class="anchored" data-anchor-id="additional-resources"><i class="fa-solid fa-book" aria-label="book"></i> Additional resources</h2>
+<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources" class="level2">
+<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources"><i class="fa-solid fa-book" aria-label="book"></i> Additional resources</h2>
 <ul>
 <li><a href="https://nbviewer.jupyter.org/github/DHI/mikeio1d/tree/main/notebooks/">Example notebooks</a></li>
 <li><a href="https://github.com/DHI/mikeio1d/tree/main/tests">Unit tests</a></li>
