@@ -172,3 +172,6 @@ tests/testdata/NetworkNodeWaterLevel.dfs0
 
 # uv
 uv.lock
+
+# Claude Code
+.claude/settings.local.json
