@@ -28,7 +28,7 @@ from .mikepath import MikePath
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "1.2.1a3"
+__version__ = "1.2.1a4"
 
 # UV may ignore requires-python upper bounds for local installs, potentially causing
 # compatibility issues with dependencies like 'pythonnet'. Adding this warning to help
