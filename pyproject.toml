@@ -15,7 +15,7 @@ exclude = ["notebooks", "tests", "images"]
 "mikeio1d/bin" = "mikeio1d/bin"
 
 [tool.hatch.build.targets.wheel]
-include = ["mikeio1d"]
+packages = ["mikeio1d"]
 
 [project]
 name = "mikeio1d"

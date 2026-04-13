@@ -18,6 +18,14 @@ class BuildHook(BuildHookInterface):
     def update_build_data(self, build_data):
         tag = build_data.get("tag", None)
         build_data["tag"] = self.update_tag_platform(tag)
+        build_data["artifacts"] = [
+            "mikeio1d/bin/**/*.dll",
+            "mikeio1d/bin/**/*.pfs",
+            "mikeio1d/bin/**/*.ubg",
+            "mikeio1d/bin/**/*.xml",
+            "mikeio1d/bin/**/*so.5",
+            "mikeio1d/bin/DHI.Mike1D.MikeIO/**/*",
+        ]
 
     def update_tag_platform(self, tag: str | None) -> str:
         DEFAULT_TAG = "py3-none-any"
