@@ -14,45 +14,52 @@ exclude = ["notebooks", "tests", "images"]
 [tool.hatch.build.targets.sdist.force-include]
 "mikeio1d/bin" = "mikeio1d/bin"
 
-[tool.hatch.build.targets.wheel.force-include]
-"mikeio1d/bin" = "mikeio1d/bin"
+[tool.hatch.build.targets.wheel]
+packages = ["mikeio1d"]
 
 [project]
 name = "mikeio1d"
-version = "1.2.0"
+version = "1.2.1"
 description = "A package that uses the DHI MIKE1D .NET libraries to read res1d and xns11 files."
 readme = "README.md"
-requires-python = ">=3.9"
-license = {file = "LICENSE"}
-authors = [
-    {name = "Gediminas Kirsanskas", email = "geki@dhigroup.com"}
-]
+requires-python = ">=3.10,<3.14"
+license = { file = "LICENSE" }
+authors = [{ name = "Gediminas Kirsanskas", email = "geki@dhigroup.com" }]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
-    "Topic :: Scientific/Engineering"
+    "Topic :: Scientific/Engineering",
 ]
 dependencies = [
     "pythonnet>=3.0.0",
     "numpy",
     "pandas>=2.1.0",
     "matplotlib",
-    'mikecore; platform_system=="Linux"'
+    'mikecore; platform_system=="Linux"',
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+    "matplotlib",
+    "pyarrow",
+    "nbformat",
+    "nbconvert",
+    "ipykernel",
+]
+all = ["matplotlib", "geopandas"]
 dev = [
-    "hatch",
+    "hatchling",
     "pytest",
     "pytest-cov",
     "ruff",
@@ -60,7 +67,7 @@ dev = [
     "jupyterlab",
     "geopandas",
     "folium",
-    "mapclassify"
+    "mapclassify",
 ]
 notebooks = [
     "matplotlib",
@@ -71,24 +78,8 @@ notebooks = [
     "folium",
     "mapclassify",
 ]
-docs = [
-    "quarto-cli==1.6.37",
-    "quartodoc==0.9.1",
-    "griffe==1.5.1",
-]
-test = [
-    "pytest",
-    "pytest-cov",
-    "matplotlib",
-    "pyarrow",
-    "nbformat",
-    "nbconvert",
-    "ipykernel"
-]
-all = [
-    "matplotlib",
-    "geopandas"
-]
+docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1"]
+experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 
 [project.urls]
 "Homepage" = "https://github.com/DHI/mikeio1d"
@@ -99,8 +90,8 @@ include = ["pyproject.toml", "mikeio1d/**/*.py"]
 line-length = 100
 lint.extend-select = ["D", "PD", "NPY", "FA"]
 lint.ignore = [
-    "E402", # ignore for now
-    "F401", # ignore for now
-    "PD901" # allow using 'df' for pd.DataFrame type
+    "E402",  # ignore for now
+    "F401",  # ignore for now
+    "PD901", # allow using 'df' for pd.DataFrame type
 ]
 lint.pydocstyle.convention = "numpy"
