@@ -22,7 +22,7 @@ name = "mikeio1d"
 version = "1.2.1a3"
 description = "A package that uses the DHI MIKE1D .NET libraries to read res1d and xns11 files."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10,<3.14"
 license = { file = "LICENSE" }
 authors = [{ name = "Gediminas Kirsanskas", email = "geki@dhigroup.com" }]
 classifiers = [
@@ -31,7 +31,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -48,9 +47,19 @@ dependencies = [
     'mikecore; platform_system=="Linux"',
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+    "matplotlib",
+    "pyarrow",
+    "nbformat",
+    "nbconvert",
+    "ipykernel",
+]
+all = ["matplotlib", "geopandas"]
 dev = [
-    "hatch",
+    "hatchling",
     "pytest",
     "pytest-cov",
     "ruff",
@@ -69,17 +78,8 @@ notebooks = [
     "folium",
     "mapclassify",
 ]
-docs = ["quarto-cli==1.6.37", "quartodoc==0.9.1", "griffe==1.5.1"]
-test = [
-    "pytest",
-    "pytest-cov",
-    "matplotlib",
-    "pyarrow",
-    "nbformat",
-    "nbconvert",
-    "ipykernel",
-]
-all = ["matplotlib", "geopandas"]
+docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1"]
+experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 
 [project.urls]
 "Homepage" = "https://github.com/DHI/mikeio1d"

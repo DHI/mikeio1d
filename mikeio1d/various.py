@@ -18,6 +18,7 @@ from DHI.Mike1D.Generic import PredefinedQuantity
 
 NAME_DELIMITER = ":"
 DELETE_VALUE = -1e-30
+DATETIME_DTYPE = "datetime64[ns]"  # We fix the datetime dtype since, after pandas 3.0, it is inferred causing tests to fail due to time resolution mismatch (ns and us). More info: https://pandas.pydata.org/docs/whatsnew/v3.0.0.html#datetime-timedelta-resolution-inference
 
 
 def mike1d_quantities():

@@ -125,4 +125,3 @@ def test_mikeio1d_network_res1d_using_time_filters(time, helpers):
         if len(df.index) != len(df_expected):
             df_expected = df_expected.loc[df.index]
         assert_frame_equal(df_expected, df)
-

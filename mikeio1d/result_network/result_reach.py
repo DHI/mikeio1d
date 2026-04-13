@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 import numpy as np
 
-from ..various import try_import_shapely
+from ..various import try_import_shapely, DELETE_VALUE
 from ..quantities import TimeSeriesId
 from ..quantities import TimeSeriesIdGroup
 from ..dotnet import pythonnet_implementation as impl
@@ -60,40 +60,62 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         """Return a string representation of ResultReach."""
         return f"<Reach: {self.name}>"
 
+    def _format_chainage_index_error_message(self, key) -> str:
+        """Format a consistent error message for chainage not found errors."""
+        key_desc = f"Index {key}" if isinstance(key, int) else f"Chainage '{key}'"
+        return (
+            f"{key_desc} not found in reach. "
+            f"Available chainages: {self.chainages}. "
+            "Integer indices (e.g., reach[10]) access by position like a list, while "
+            "float indices (e.g., reach[10.0]) access by chainage value."
+        )
+
     def __getitem__(self, key: str | int | float) -> ResultGridPoint:
         """Get a ResultGridPoint object by chainage.
-        
+
         Parameters
         ----------
         key : str | int | float
             If int: index in gridpoints list
             If str: chainage as string
             If float: chainage as float, will be converted to string
-            
+
         Returns
         -------
         ResultGridPoint
             The grid point at the specified chainage or index
         """
         if isinstance(key, int):
-            return self.gridpoints[key]
-        elif isinstance(key, float):          
-            key_str = str(key)
-            if key_str in self:
-                return super().__getitem__(key_str)
-            
-            for chainage_str in self.chainages:
-                try:
-                    chainage_float = float(chainage_str)
-                    epsilon = 1e-1
-                    if abs(chainage_float - key) < epsilon:
-                        return super().__getitem__(chainage_str)
-                except ValueError:
-                    continue
+            try:
+                return self.gridpoints[key]
+            except IndexError:
+                result = self._get_by_chainage(float(key))
+                warnings.warn(
+                    f"Index {key} not found, using chainage {float(key)} instead.",
+                    stacklevel=2,
+                )
+                return result
 
-            raise KeyError(f"Chainage {key} not found in reach. Available chainages: {self.chainages}\nNote: Integer indices (e.g., reach[10]) access by position, while float indices (e.g., reach[10.0]) access by chainage value.")
-            
-        return super().__getitem__(key)
+        # Handle float/string indexing (chainage access)
+        return self._get_by_chainage(key)
+
+    def _get_by_chainage(self, key: str | float) -> ResultGridPoint:
+        if isinstance(key, str):
+            if key.replace(".", "", 1).isnumeric():  # Check if key is numeric (including decimals)
+                key = float(key)
+            else:
+                if key in self:
+                    return super().__getitem__(key)
+                else:
+                    raise KeyError(self._format_chainage_index_error_message(key)) from None
+
+        # Fuzzy matching
+        tolerance = 1e-1
+        for chainage in self.chainages:
+            if abs(float(chainage) - key) < tolerance:
+                return super().__getitem__(chainage)
+
+        raise KeyError(self._format_chainage_index_error_message(key)) from None
 
     @property
     def res1d_reaches(self) -> List[IRes1DReach]:
@@ -124,19 +146,25 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         return self.res1d_reaches[0].Name
 
     @property
-    def length(self) -> float | None:
-        """Length of the reach."""
+    def length(self) -> float:
+        """Length of the reach. If no length is available, returns zero."""
         return self._creator._get_total_length()
 
     @property
     def start_chainage(self) -> float:
-        """Start chainage of the reach."""
-        return self.res1d_reaches[0].LocationSpan.StartChainage
+        """Start chainage of the reach or a DELETE_VALUE=-1e-30 in case it is not available."""
+        try:
+            return self.res1d_reaches[0].LocationSpan.StartChainage
+        except Exception as _:
+            return DELETE_VALUE
 
     @property
     def end_chainage(self) -> float:
-        """End chainage of the reach."""
-        return self.res1d_reaches[-1].LocationSpan.EndChainage
+        """End chainage of the reach or a DELETE_VALUE=-1e-30 in case it is not available."""
+        try:
+            return self.res1d_reaches[-1].LocationSpan.EndChainage
+        except Exception as _:
+            return DELETE_VALUE
 
     @property
     def n_gridpoints(self) -> int:
@@ -152,7 +180,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         return self._creator._get_start_node()
 
     @property
-    def end_node(self) -> str:
+    def end_node(self) -> str | None:
         """End node of the reach."""
         # For resx files, the start and end node indices are not available
         if self.res1d.file_path.endswith(".resx"):
@@ -405,11 +433,12 @@ class ResultReachCreator(ResultLocationCreator):
 
     def _get_total_length(self) -> float:
         total_length = 0
-        for reach in self.reaches:
-            if not hasattr(reach, "Length"):
-                return None
-            total_length += reach.Length
-        return total_length
+        try:
+            for reach in self.reaches:
+                total_length += reach.Length
+            return total_length
+        except Exception as _:
+            return total_length
 
     def _get_total_gridpoints(self) -> int:
         return sum([len(gp_list) for gp_list in self.result_gridpoints])
