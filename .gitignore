@@ -175,3 +175,6 @@ uv.lock
 
 # Claude Code
 .claude/settings.local.json
+
+# Worktrees
+.trees
