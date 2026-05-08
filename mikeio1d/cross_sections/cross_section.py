@@ -549,8 +549,7 @@ class CrossSection:
             if column_name not in df.columns:
                 raise ValueError(f"Column '{column_name}' is missing from the provided DataFrame.")
 
-        if self.resistance_distribution != ResistanceDistribution.DISTRIBUTED:
-            self._check_resistance_not_modified(df, raw_current)
+        self._update_resistance_distribution_from_raw(df, raw_current)
 
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.Points.Clear()
@@ -559,6 +558,9 @@ class CrossSection:
             point = CrossSectionPoint(x, z)
             point.DistributedResistance = resistance
             base_xs.Points.Add(point)
+
+        if self.resistance_distribution == ResistanceDistribution.UNIFORM:
+            base_xs.FlowResistance.ResistanceValue = float(df.resistance.iloc[0])
 
         markers_seen = set()
         for i, point in enumerate(base_xs.Points):
@@ -575,30 +577,39 @@ class CrossSection:
 
         self.recompute_processed()
 
-    def _check_resistance_not_modified(self, df: pd.DataFrame, raw_current: pd.DataFrame):
-        """Raise ValueError if resistance values were modified for non-DISTRIBUTED modes.
+    def _update_resistance_distribution_from_raw(
+        self, df: pd.DataFrame, raw_current: pd.DataFrame
+    ):
+        """Update resistance distribution type if resistance values were modified in the raw setter.
 
-        For UNIFORM, ZONES, CONSTANT, and EXPONENT_VARYING distributions, resistance
-        is controlled by FlowResistance properties on the cross section, not by per-point
-        values. The per-point DistributedResistance values are derived and overwritten
-        during processing. Modifying them via the raw setter would be silently lost.
+        If resistance values are unchanged, no distribution change is made.
+        If all new resistance values are the same, distribution is set to UNIFORM.
+        If resistance values vary, distribution is set to DISTRIBUTED with a warning
+        if it was previously a different type.
         """
+        resistance_changed = self._resistance_values_changed(df, raw_current)
+        if not resistance_changed:
+            return
+
+        unique_resistances = df.resistance.nunique()
+        if unique_resistances <= 1:
+            self.resistance_distribution = ResistanceDistribution.UNIFORM
+        else:
+            prev = self.resistance_distribution
+            if prev != ResistanceDistribution.DISTRIBUTED:
+                warn(
+                    f"Resistance distribution changed from {prev.name} to DISTRIBUTED "
+                    f"because non-uniform resistance values were set via the raw setter."
+                )
+            self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
+
+    def _resistance_values_changed(
+        self, df: pd.DataFrame, raw_current: pd.DataFrame
+    ) -> bool:
+        """Check whether resistance values differ between the new and current raw DataFrames."""
         if len(df) != len(raw_current):
-            return
-
-        if np.allclose(df.resistance.values, raw_current.resistance.values):
-            return
-
-        distribution = self.resistance_distribution
-        raise ValueError(
-            f"Cannot modify resistance values through the raw setter when "
-            f"resistance_distribution is {distribution.name}. "
-            f"For UNIFORM, set the resistance value via "
-            f"the FlowResistance object on the underlying .NET cross section. "
-            f"For ZONES, use the resistance_left_high_flow, resistance_low_flow, "
-            f"and resistance_right_high_flow properties. "
-            f"For per-point control, set resistance_distribution to DISTRIBUTED first."
-        )
+            return True
+        return not np.array_equal(df.resistance.values, raw_current.resistance.values)
 
     def _update_marker(self, marker: int | Marker, point_index: int):
         """Update the marker of the specified point_index."""

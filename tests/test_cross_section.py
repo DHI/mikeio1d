@@ -406,16 +406,16 @@ class TestCrossSectionUnits:
         assert cs_dummy.raw.markers.iloc[0] == ""
         assert cs_dummy.raw.markers.iloc[1] == str(Marker.LEFT_LEVEE_BANK.value)
 
-    def test_raw_set_resistance_error_uniform(self, cs_dummy):
-        """Test that modifying resistance via raw setter raises error for UNIFORM distribution."""
+    def test_raw_set_resistance_uniform_cast(self, cs_dummy):
+        """Test that setting uniform resistance via raw setter casts to UNIFORM."""
         assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
         df = cs_dummy.raw
-        df.resistance *= 10
-        with pytest.raises(ValueError, match="Cannot modify resistance"):
-            cs_dummy.raw = df
+        df.resistance = 50.0
+        cs_dummy.raw = df
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
 
-    def test_raw_set_resistance_error_zones(self, xns_basic):
-        """Test that modifying resistance via raw setter raises error for ZONES distribution."""
+    def test_raw_set_resistance_warns_zones_to_distributed(self, xns_basic):
+        """Test that modifying resistance on ZONES cross section warns and casts to DISTRIBUTED."""
         zones_css = [
             cs for cs in xns_basic.values()
             if cs.resistance_distribution == ResistanceDistribution.ZONES
@@ -423,17 +423,27 @@ class TestCrossSectionUnits:
         assert len(zones_css) > 0, "No ZONES cross sections found in testdata"
         cs = zones_css[0]
         df = cs.raw
-        df.resistance *= 10
-        with pytest.raises(ValueError, match="Cannot modify resistance"):
+        df.resistance = np.arange(1, len(df) + 1, dtype=float)
+        with pytest.warns(match="Resistance distribution changed from ZONES to DISTRIBUTED"):
             cs.raw = df
+        assert cs.resistance_distribution == ResistanceDistribution.DISTRIBUTED
+
+    def test_raw_set_resistance_uniform_value_persists(self, cs_dummy):
+        """Test that setting uniform resistance via raw setter persists the value."""
+        df = cs_dummy.raw
+        df.resistance = 42.0
+        cs_dummy.raw = df
+        result = cs_dummy.raw
+        np.testing.assert_allclose(result.resistance.values, 42.0)
 
     def test_raw_set_resistance_unchanged_uniform(self, cs_dummy):
-        """Test that setting raw with unchanged resistance works for UNIFORM distribution."""
+        """Test that setting raw with unchanged resistance preserves UNIFORM distribution."""
         df = cs_dummy.raw
         original_resistance = df.resistance.copy()
         df.z += 100
         cs_dummy.raw = df
         result = cs_dummy.raw
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
         np.testing.assert_allclose(result.resistance.values, original_resistance.values)
         np.testing.assert_allclose(result.z.values, df.z.values)
 
@@ -451,11 +461,20 @@ class TestCrossSectionUnits:
         np.testing.assert_array_almost_equal(result.resistance.values, df.resistance.values)
 
     def test_raw_set_preserves_distribution_type(self, cs_dummy):
-        """Test that the raw setter preserves the resistance distribution type."""
+        """Test that the raw setter preserves the resistance distribution type when unchanged."""
         cs_dummy.resistance_distribution = ResistanceDistribution.UNIFORM
         df = cs_dummy.raw
         cs_dummy.raw = df
         assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+
+    def test_raw_set_warns_uniform_to_distributed(self, cs_dummy):
+        """Test that non-uniform resistance on a UNIFORM cross section warns and casts."""
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+        df = cs_dummy.raw
+        df.resistance = np.arange(1, len(df) + 1, dtype=float)
+        with pytest.warns(match="Resistance distribution changed from UNIFORM to DISTRIBUTED"):
+            cs_dummy.raw = df
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.DISTRIBUTED
 
     def test_raw_set_geometry_change_allows_resistance_column(self, cs_dummy):
         """Test that adding/removing points doesn't error on resistance even for UNIFORM."""
