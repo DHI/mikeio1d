@@ -553,11 +553,15 @@ class CrossSection:
         base_xs.Points.Clear()
 
         unique_resistances = df.resistance.nunique()
-        if unique_resistances == 1:
-            self.resistance_distribution == ResistanceDistribution.UNIFORM
+        if self.resistance_distribution == ResistanceDistribution.ZONES and unique_resistances <= 3:
+            self._set_zone_resistances_from_raw(df)
+        elif unique_resistances == 1:
+            self.resistance_distribution = ResistanceDistribution.UNIFORM
             base_xs.FlowResistance.ResistanceValue = float(df.resistance.iloc[0])
-
-        if unique_resistances > 3:
+        elif unique_resistances <= 3:
+            self.resistance_distribution = ResistanceDistribution.ZONES
+            self._set_zone_resistances_from_raw(df)
+        else:
             self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
 
         for x, z, resistance in zip(df.x, df.z, df.resistance):
@@ -579,6 +583,28 @@ class CrossSection:
                 self._update_marker(marker, i)
 
         self.recompute_processed()
+
+    def _set_zone_resistances_from_raw(self, df: pd.DataFrame):
+        """Update zone resistance properties from raw DataFrame resistance values."""
+        fr = self._m1d_cross_section.BaseCrossSection.FlowResistance
+
+        left_idx = 0
+        right_idx = len(df) - 1
+
+        for i, markers_str in enumerate(df.markers):
+            if not markers_str:
+                continue
+            markers = Marker.list_from_string(markers_str)
+            if Marker.LEFT_LEVEE_BANK in markers:
+                left_idx = i
+            if Marker.RIGHT_LEVEE_BANK in markers:
+                right_idx = i
+
+        fr.ResistanceLeftHighFlow = float(df.resistance.iloc[left_idx])
+        fr.ResistanceRightHighFlow = float(df.resistance.iloc[right_idx])
+
+        low_flow_idx = left_idx + 1 if right_idx > left_idx else left_idx
+        fr.ResistanceLowFlow = float(df.resistance.iloc[low_flow_idx])
 
     def _update_marker(self, marker: int | Marker, point_index: int):
         """Update the marker of the specified point_index."""
