@@ -406,16 +406,36 @@ class TestCrossSectionUnits:
         assert cs_dummy.raw.markers.iloc[0] == ""
         assert cs_dummy.raw.markers.iloc[1] == str(Marker.LEFT_LEVEE_BANK.value)
 
-    def test_raw_set_resistance_uniform(self, cs_dummy):
-        """Test that modifying uniform resistance via raw setter persists correctly."""
-        factor = 10
+    def test_raw_set_resistance_error_uniform(self, cs_dummy):
+        """Test that modifying resistance via raw setter raises error for UNIFORM distribution."""
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
         df = cs_dummy.raw
-        original_resistance = df.resistance.iloc[0]
-        df.resistance *= factor
+        df.resistance *= 10
+        with pytest.raises(ValueError, match="Cannot modify resistance"):
+            cs_dummy.raw = df
+
+    def test_raw_set_resistance_error_zones(self, xns_basic):
+        """Test that modifying resistance via raw setter raises error for ZONES distribution."""
+        zones_css = [
+            cs for cs in xns_basic.values()
+            if cs.resistance_distribution == ResistanceDistribution.ZONES
+        ]
+        assert len(zones_css) > 0, "No ZONES cross sections found in testdata"
+        cs = zones_css[0]
+        df = cs.raw
+        df.resistance *= 10
+        with pytest.raises(ValueError, match="Cannot modify resistance"):
+            cs.raw = df
+
+    def test_raw_set_resistance_unchanged_uniform(self, cs_dummy):
+        """Test that setting raw with unchanged resistance works for UNIFORM distribution."""
+        df = cs_dummy.raw
+        original_resistance = df.resistance.copy()
+        df.z += 100
         cs_dummy.raw = df
         result = cs_dummy.raw
-        expected_resistance = original_resistance * factor
-        np.testing.assert_allclose(result.resistance.values, expected_resistance)
+        np.testing.assert_allclose(result.resistance.values, original_resistance.values)
+        np.testing.assert_allclose(result.z.values, df.z.values)
 
     def test_raw_set_resistance_distributed(self, xz_data):
         """Test that modifying distributed resistance via raw setter persists correctly."""
@@ -423,110 +443,26 @@ class TestCrossSectionUnits:
         cs = CrossSection.from_xz(
             x=x, z=z, location_id="loc1", chainage=100, topo_id="topo1"
         )
+        cs.resistance_distribution = ResistanceDistribution.DISTRIBUTED
         df = cs.raw
         df.resistance = np.arange(1, len(df) + 1, dtype=float)
         cs.raw = df
         result = cs.raw
         np.testing.assert_array_almost_equal(result.resistance.values, df.resistance.values)
 
-    def test_raw_set_resistance_distribution_type_uniform(self, cs_dummy):
-        """Test that the raw setter correctly sets resistance_distribution to UNIFORM."""
-        cs_dummy.resistance_distribution = ResistanceDistribution.DISTRIBUTED
+    def test_raw_set_preserves_distribution_type(self, cs_dummy):
+        """Test that the raw setter preserves the resistance distribution type."""
+        cs_dummy.resistance_distribution = ResistanceDistribution.UNIFORM
         df = cs_dummy.raw
-        df.resistance = 42.0
         cs_dummy.raw = df
         assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
 
-    def test_raw_set_resistance_file_roundtrip(self, tmp_path, xns_basic):
-        """Test that modifying resistance via raw setter persists to file correctly."""
-        factor = 10
-        cs = list(xns_basic.values())[0]
-        original_distribution = cs.resistance_distribution
-
-        df = cs.raw
-        original_resistance = df.resistance.copy()
-        df.resistance *= factor
-        cs.raw = df
-
-        modified_file = tmp_path / "modified.xns11"
-        xns_basic.write(str(modified_file))
-
-        xns_result = Xns11(str(modified_file))
-        result_cs = list(xns_result.values())[0]
-        result_df = result_cs.raw
-        np.testing.assert_allclose(
-            result_df.resistance.values, (original_resistance * factor).values
-        )
-
-    def test_raw_set_resistance_zones_roundtrip(self, tmp_path, xns_basic):
-        """Test that modifying resistance via raw setter works for ZONES distribution."""
-        factor = 10
-        zones_css = [
-            cs for cs in xns_basic.values()
-            if cs.resistance_distribution == ResistanceDistribution.ZONES
-        ]
-        assert len(zones_css) > 0, "No ZONES cross sections found in testdata"
-        cs = zones_css[0]
-        assert cs.resistance_distribution == ResistanceDistribution.ZONES
-
-        df = cs.raw
-        original_resistance = df.resistance.copy()
-        assert original_resistance.sum() > 0, "Original resistance should be non-zero"
-        df.resistance *= factor
-        cs.raw = df
-
-        # Verify in memory
-        result = cs.raw
-        np.testing.assert_allclose(
-            result.resistance.values, (original_resistance * factor).values
-        )
-
-    def test_raw_set_resistance_zones_file_roundtrip(self, tmp_path, xns_basic):
-        """Test that modifying resistance for ZONES distribution persists to file."""
-        factor = 10
-        zones_css = [
-            cs for cs in xns_basic.values()
-            if cs.resistance_distribution == ResistanceDistribution.ZONES
-        ]
-        assert len(zones_css) > 0
-        cs = zones_css[0]
-
-        df = cs.raw
-        original_resistance = df.resistance.copy()
-        df.resistance *= factor
-        cs.raw = df
-
-        modified_file = tmp_path / "modified.xns11"
-        xns_basic.write(str(modified_file))
-
-        xns_result = Xns11(str(modified_file))
-        zones_result = [
-            cs for cs in xns_result.values()
-            if cs.resistance_distribution == ResistanceDistribution.ZONES
-        ]
-        result_df = zones_result[0].raw
-        np.testing.assert_allclose(
-            result_df.resistance.values, (original_resistance * factor).values
-        )
-
-    def test_raw_set_resistance_xns11_file_roundtrip(self, tmp_path, xns_basic):
-        """Test resistance modification roundtrip using actual xns11 testdata."""
-        factor = 10
-        cs = list(xns_basic.values())[0]
-        df = cs.raw
-        original_resistance = df.resistance.copy()
-        df.resistance *= factor
-        cs.raw = df
-
-        modified_file = tmp_path / "modified.xns11"
-        xns_basic.write(str(modified_file))
-
-        xns_result = Xns11(str(modified_file))
-        result_cs = list(xns_result.values())[0]
-        result_df = result_cs.raw
-        np.testing.assert_allclose(
-            result_df.resistance.values, (original_resistance * factor).values
-        )
+    def test_raw_set_geometry_change_allows_resistance_column(self, cs_dummy):
+        """Test that adding/removing points doesn't error on resistance even for UNIFORM."""
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+        df = cs_dummy.raw
+        df = df.iloc[2:-2].reset_index(drop=True)
+        cs_dummy.raw = df
 
     def test_markers_get(self, cs_dummy):
         markers = cs_dummy.markers

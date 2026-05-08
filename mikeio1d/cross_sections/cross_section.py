@@ -549,20 +549,11 @@ class CrossSection:
             if column_name not in df.columns:
                 raise ValueError(f"Column '{column_name}' is missing from the provided DataFrame.")
 
+        if self.resistance_distribution != ResistanceDistribution.DISTRIBUTED:
+            self._check_resistance_not_modified(df, raw_current)
+
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.Points.Clear()
-
-        unique_resistances = df.resistance.nunique()
-        if self.resistance_distribution == ResistanceDistribution.ZONES and unique_resistances <= 3:
-            self._set_zone_resistances_from_raw(df)
-        elif unique_resistances == 1:
-            self.resistance_distribution = ResistanceDistribution.UNIFORM
-            base_xs.FlowResistance.ResistanceValue = float(df.resistance.iloc[0])
-        elif unique_resistances <= 3:
-            self.resistance_distribution = ResistanceDistribution.ZONES
-            self._set_zone_resistances_from_raw(df)
-        else:
-            self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
 
         for x, z, resistance in zip(df.x, df.z, df.resistance):
             point = CrossSectionPoint(x, z)
@@ -584,27 +575,30 @@ class CrossSection:
 
         self.recompute_processed()
 
-    def _set_zone_resistances_from_raw(self, df: pd.DataFrame):
-        """Update zone resistance properties from raw DataFrame resistance values."""
-        fr = self._m1d_cross_section.BaseCrossSection.FlowResistance
+    def _check_resistance_not_modified(self, df: pd.DataFrame, raw_current: pd.DataFrame):
+        """Raise ValueError if resistance values were modified for non-DISTRIBUTED modes.
 
-        left_idx = 0
-        right_idx = len(df) - 1
+        For UNIFORM, ZONES, CONSTANT, and EXPONENT_VARYING distributions, resistance
+        is controlled by FlowResistance properties on the cross section, not by per-point
+        values. The per-point DistributedResistance values are derived and overwritten
+        during processing. Modifying them via the raw setter would be silently lost.
+        """
+        if len(df) != len(raw_current):
+            return
 
-        for i, markers_str in enumerate(df.markers):
-            if not markers_str:
-                continue
-            markers = Marker.list_from_string(markers_str)
-            if Marker.LEFT_LEVEE_BANK in markers:
-                left_idx = i
-            if Marker.RIGHT_LEVEE_BANK in markers:
-                right_idx = i
+        if np.allclose(df.resistance.values, raw_current.resistance.values):
+            return
 
-        fr.ResistanceLeftHighFlow = float(df.resistance.iloc[left_idx])
-        fr.ResistanceRightHighFlow = float(df.resistance.iloc[right_idx])
-
-        low_flow_idx = left_idx + 1 if right_idx > left_idx else left_idx
-        fr.ResistanceLowFlow = float(df.resistance.iloc[low_flow_idx])
+        distribution = self.resistance_distribution
+        raise ValueError(
+            f"Cannot modify resistance values through the raw setter when "
+            f"resistance_distribution is {distribution.name}. "
+            f"For UNIFORM, set the resistance value via "
+            f"the FlowResistance object on the underlying .NET cross section. "
+            f"For ZONES, use the resistance_left_high_flow, resistance_low_flow, "
+            f"and resistance_right_high_flow properties. "
+            f"For per-point control, set resistance_distribution to DISTRIBUTED first."
+        )
 
     def _update_marker(self, marker: int | Marker, point_index: int):
         """Update the marker of the specified point_index."""
