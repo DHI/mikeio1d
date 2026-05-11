@@ -10,6 +10,13 @@ def install_nuget_packages():
         raise e
         
 def build_and_install_mikeio_util():
+    import os
+    scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.normpath(os.path.join(scripts_dir, ".."))
+    util_dir = os.path.join(repo_root, "util")
+    if not os.path.isdir(util_dir):
+        print("  Skipping utility build: 'util/' directory not found (building from sdist).")
+        return
     try:
         UtilBuilder.build_and_install()
     except Exception as e:
