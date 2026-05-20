@@ -11,13 +11,27 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from install_dependencies import main
 
 class BuildHook(BuildHookInterface):
+    BIN_DIR = os.path.join(os.path.dirname(__file__), "..", "mikeio1d", "bin")
+
     def initialize(self, version, build_data):
-        main()
+        if not self._binaries_exist():
+            main()
         self.update_build_data(build_data)
+
+    def _binaries_exist(self):
+        return any(f.endswith(".dll") for f in os.listdir(self.BIN_DIR) if os.path.isfile(os.path.join(self.BIN_DIR, f)))
 
     def update_build_data(self, build_data):
         tag = build_data.get("tag", None)
         build_data["tag"] = self.update_tag_platform(tag)
+        build_data["artifacts"] = [
+            "mikeio1d/bin/**/*.dll",
+            "mikeio1d/bin/**/*.pfs",
+            "mikeio1d/bin/**/*.ubg",
+            "mikeio1d/bin/**/*.xml",
+            "mikeio1d/bin/**/*so.5",
+            "mikeio1d/bin/DHI.Mike1D.MikeIO/**/*",
+        ]
 
     def update_tag_platform(self, tag: str | None) -> str:
         DEFAULT_TAG = "py3-none-any"
