@@ -10,9 +10,7 @@
 
 ### Removed
 
-- Support for Python 3.9 (end of service life)
-
-## [1.2.0] - 2025-10-23
+## [1.2.0] - 2026-05-20
 
 ### Added
 - More helpful error messages when indexing reach gridpoints.
@@ -22,8 +20,18 @@
 - Export to XVec DataArray (experimental - see mikeio1d.experimental)
 
 ### Fixed
+- Pandas 3.0 compatibility
+- Some static properties failing for EPANET result files
 - Quantity filter for not predefined MIKE 1D quantities
 - Filtering on opening Res1D no longer requires single values to be in list.
+
+### Changed
+- xarray and networkx are now optional dependencies (install separately for experimental features)
+- Relaxed pythonnet version upper boundary
+
+### Removed
+- Support for Python 3.9 (end of service life)
+
 
 ## [1.1.1] - 2025-06-02
 
@@ -287,7 +295,12 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.0.2...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.2.0
+[1.1.1]: https://github.com/DHI/mikeio1d/releases/tag/v1.1.1
+[1.1.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.1.0
+[1.0.4]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.4
+[1.0.3]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.3
 [1.0.2]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.2
 [1.0.1]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.1
 [1.0.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.0.0
