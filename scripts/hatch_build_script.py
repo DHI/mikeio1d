@@ -29,6 +29,7 @@ class BuildHook(BuildHookInterface):
             "mikeio1d/bin/**/*.pfs",
             "mikeio1d/bin/**/*.ubg",
             "mikeio1d/bin/**/*.xml",
+            "mikeio1d/bin/**/*.so",
             "mikeio1d/bin/**/*so.5",
             "mikeio1d/bin/DHI.Mike1D.MikeIO/**/*",
         ]
