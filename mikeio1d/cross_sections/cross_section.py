@@ -486,7 +486,7 @@ class CrossSection:
 
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.SetAllProcessedValues(
-            df.level.values - self.datum,
+            df.level.to_numpy() - self.datum,
             df.storage_width.values,
             df.flow_area.values,
             df.radius.values,
