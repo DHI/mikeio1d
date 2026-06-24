@@ -128,6 +128,15 @@ class CrossSection:
         return self._m1d_cross_section.Location
 
     @property
+    def datum(self) -> float:
+        """Datum of the cross section, added to the raw levels to get the absolute processed levels."""
+        return self._m1d_cross_section.Location.Z
+
+    @datum.setter
+    def datum(self, value: float):
+        self._m1d_cross_section.UpdateDatum(value)
+
+    @property
     def bottom_level(self) -> float:
         """Bottom level of the cross section."""
         return self._m1d_cross_section.BottomLevel
@@ -354,13 +363,17 @@ class CrossSection:
         Setting this will recalculate the processed data using only the specified levels.
         The minimum and maximum levels will be automatically added if not already present.
         """
-        return tuple(self._m1d_cross_section.BaseCrossSection.ProcessedLevels)
+        datum = self.datum
+        return tuple(
+            level + datum for level in self._m1d_cross_section.BaseCrossSection.ProcessedLevels
+        )
 
     @processing_levels.setter
     def processing_levels(self, levels: Iterable[float]):
+        datum = self.datum
         pls = self._m1d_cross_section.BaseCrossSection.ProcessingLevelsSpecs
         pls.Option = ProcessingOption.UserDefinedLevels
-        pls.UserDefLevels = tuple(levels)
+        pls.UserDefLevels = tuple(level - datum for level in levels)
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
@@ -437,7 +450,8 @@ class CrossSection:
         """
         xs = self._m1d_cross_section
         base_xs = xs.BaseCrossSection
-        levels = tuple(base_xs.ProcessedLevels)
+        datum = self.datum
+        levels = tuple(level + datum for level in base_xs.ProcessedLevels)
         flow_area = tuple(base_xs.ProcessedFlowAreas)
         radius = tuple(base_xs.ProcessedRadii)
         storage_width = tuple(base_xs.ProcessedStorageWidths)
@@ -472,7 +486,7 @@ class CrossSection:
 
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.SetAllProcessedValues(
-            df.level.values,
+            df.level.to_numpy() - self.datum,
             df.storage_width.values,
             df.flow_area.values,
             df.radius.values,

@@ -99,6 +99,55 @@ class TestCrossSectionUnits:
     def test_zmin(self, cs_dummy):
         assert cs_dummy.zmin == 10
 
+    def test_datum_get(self, cs_dummy):
+        assert cs_dummy.datum == 0.0
+
+    def test_datum_set(self, cs_dummy):
+        raw_z = cs_dummy.raw.z.copy()
+        zmin, zmax = cs_dummy.zmin, cs_dummy.zmax
+
+        cs_dummy.datum = 5.0
+        assert cs_dummy.datum == 5.0
+
+        # zmin/zmax and processed levels are absolute, so they shift with the datum.
+        np.testing.assert_allclose(cs_dummy.zmin, zmin + 5.0)
+        np.testing.assert_allclose(cs_dummy.zmax, zmax + 5.0)
+        assert min(cs_dummy.processing_levels) == cs_dummy.zmin
+        assert max(cs_dummy.processing_levels) == cs_dummy.zmax
+
+        # Raw data is stored relative to the datum and must be unaffected.
+        np.testing.assert_array_equal(cs_dummy.raw.z, raw_z)
+
+    def test_processed_levels_are_absolute(self, cs_sample):
+        """Processed levels include the datum and agree with the datum-aware .NET getters.
+
+        The located cross section's getters take an absolute water level. The processed
+        table must agree with them at every level for every quantity, otherwise the
+        levels are in the wrong reference frame.
+        """
+        for cs in cs_sample:
+            proc = cs.processed
+            m1d = cs._m1d_cross_section
+
+            assert proc.level.min() == cs.zmin, cs
+            assert proc.level.max() == cs.zmax, cs
+
+            for level, flow_area, radius, storage_width in zip(
+                proc.level, proc.flow_area, proc.radius, proc.storage_width
+            ):
+                np.testing.assert_allclose(m1d.GetFlowArea(level), flow_area, rtol=1e-4, atol=1e-4)
+                np.testing.assert_allclose(
+                    m1d.GetHydraulicRadius(level), radius, rtol=1e-4, atol=1e-4
+                )
+                np.testing.assert_allclose(
+                    m1d.GetStorageWidth(level), storage_width, rtol=1e-4, atol=1e-4
+                )
+
+            water_level = cs.zmin + 0.3 * (cs.zmax - cs.zmin)
+            interpolated_area = np.interp(water_level, proc.level.values, proc.flow_area.values)
+            np.testing.assert_allclose(interpolated_area, m1d.GetFlowArea(water_level), rtol=1e-3)
+            assert interpolated_area > 0, cs
+
     def test_coords_get(self, cs_basic):
         coords = cs_basic.coords
         assert len(coords) == 2
@@ -251,7 +300,8 @@ class TestCrossSectionUnits:
             set(df.columns) == expected_columns
             base_xs = cs._m1d_cross_section.BaseCrossSection
             expected_vs_actual = [
-                (np.array(base_xs.ProcessedLevels), df.level),
+                # Base levels are relative to the datum; mikeio1d exposes them as absolute.
+                (np.array(base_xs.ProcessedLevels) + cs.datum, df.level),
                 (np.array(base_xs.ProcessedFlowAreas), df.flow_area),
                 (np.array(base_xs.ProcessedRadii), df.radius),
                 (np.array(base_xs.ProcessedStorageWidths), df.storage_width),
