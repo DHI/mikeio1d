@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-83d6731c42c83706f5616676628995c1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-51ec0baac84c74459878fd0df95b10e6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -384,102 +384,106 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Get the geographical coordinates of the cross section line.</td>
 </tr>
 <tr class="even">
+<td><a href="#mikeio1d.cross_sections.CrossSection.datum">datum</a></td>
+<td>Datum of the cross section, added to the raw levels to get the absolute processed levels.</td>
+</tr>
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.geometry">geometry</a></td>
 <td>The geographical geometry of the cross section line.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.height">height</a></td>
 <td>Height of the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.interpolated">interpolated</a></td>
 <td>Is the cross section interpolated? (i.e.&nbsp;not measured).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.is_open">is_open</a></td>
 <td>Is the cross section open? (i.e.&nbsp;not closed).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.location">location</a></td>
 <td>Location of the cross section (DHI.Mike1D.Generic.ZLocation object).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.location_id">location_id</a></td>
 <td>Location ID of the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.m1d_cross_section">m1d_cross_section</a></td>
 <td>The DHI.Mike1D.CrossSectionModule.ICrossSection object that CrossSection wraps.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.markers">markers</a></td>
 <td>pandas.DataFrame: The markers of the cross section as a pandas DataFrame.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.max_width">max_width</a></td>
 <td>Maximum width of the cross section.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.min_water_depth">min_water_depth</a></td>
 <td>Minimum water depth of the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.number_of_processing_levels">number_of_processing_levels</a></td>
 <td>int: The number of levels used in the processed data.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.processed">processed</a></td>
 <td>pandas.DataFrame: The processed cross section data as a pandas DataFrame.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.processed_allow_recompute">processed_allow_recompute</a></td>
 <td>bool: Whether the processed data can be recomputed (e.g.&nbsp;if the raw data has changed).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.processing_levels">processing_levels</a></td>
 <td>tuple[float]: A tuple of the level elevations used in the processed data.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.processing_levels_method">processing_levels_method</a></td>
 <td>int, ProcessLevelMethod: The method used to generate processing levels.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.radius_type">radius_type</a></td>
 <td>int, RadiusType: The type of hydraulic radius used in the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.raw">raw</a></td>
 <td>pandas.DataFrame: The raw cross section data as a pandas DataFrame.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.resistance_distribution">resistance_distribution</a></td>
 <td>int, ResistanceDistribution: The distribution of resistance used in the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.resistance_left_high_flow">resistance_left_high_flow</a></td>
 <td>float: Resistance for the left high flow zone.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.resistance_low_flow">resistance_low_flow</a></td>
 <td>float: Resistance for the low flow zone.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.resistance_right_high_flow">resistance_right_high_flow</a></td>
 <td>float: Resistance for the right high flow zone.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.resistance_type">resistance_type</a></td>
 <td>int, ResistanceType: The type of resistance used by the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.topo_id">topo_id</a></td>
 <td>Topo ID of the cross section.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.cross_sections.CrossSection.zmax">zmax</a></td>
 <td>Maximum elevation of the cross section.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.cross_sections.CrossSection.zmin">zmin</a></td>
 <td>Minimum elevation of the cross section.</td>
 </tr>
