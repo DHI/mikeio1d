@@ -435,21 +435,45 @@ class CrossSection:
         FlowResistance.ConvertToStandardResistances method with the processed radii. Reusing
         the .NET conversion keeps the formulation handling in sync with the engine rather than
         re-implementing the resistance conversions in Python.
+
+        The .NET signature is:
+
+            bool ConvertToStandardResistances(
+                ResistanceFormulation currentFormulation,
+                out ResistanceFormulation newFormulation,
+                double[] currentResistances,
+                ref double[] newResistances,
+                double[] hydraulicRadii)
+
+        It returns True only when a conversion actually takes place (currently just
+        Manning's n -> Manning's M); otherwise it returns False and leaves ``newResistances``
+        pointing at ``currentResistances``. Via pythonnet, the ``out``/``ref`` parameters are
+        appended to the return value, so the call returns the tuple
+        ``(converted, newFormulation, newResistances)``. We only need ``converted`` and the
+        resulting ``newResistances`` -- the standardized formulation is discarded.
         """
         if len(resistance) == 0:
             return tuple()
 
-        fr = self._m1d_cross_section.BaseCrossSection.FlowResistance
-        from_formulation = m1d_ResistanceFormulation(int(self.resistance_type))
-        resistance_array = System.Array[System.Double](list(resistance))
-        radius_array = System.Array[System.Double](list(radius))
-        standard_resistance = System.Array[System.Double](len(resistance))
-        converted, _, standard_resistance = fr.ConvertToStandardResistances(
-            from_formulation, from_formulation, resistance_array, standard_resistance, radius_array
+        flow_resistance = self._m1d_cross_section.BaseCrossSection.FlowResistance
+        current_formulation = m1d_ResistanceFormulation(int(self.resistance_type))
+        current_resistances = System.Array[System.Double](list(resistance))
+        hydraulic_radii = System.Array[System.Double](list(radius))
+        # ``newResistances`` is a ref parameter, so an array must be passed in; the engine
+        # overwrites it (and rebinds it in the returned tuple) when a conversion happens. The
+        # second argument is the ``out newFormulation`` placeholder -- its input value is
+        # ignored by pythonnet, so we just pass the current formulation again.
+        new_resistances = System.Array[System.Double](len(resistance))
+        converted, _new_formulation, new_resistances = flow_resistance.ConvertToStandardResistances(
+            current_formulation,
+            current_formulation,
+            current_resistances,
+            new_resistances,
+            hydraulic_radii,
         )
         if not converted:
             return tuple(resistance)
-        return tuple(standard_resistance)
+        return tuple(new_resistances)
 
     def _calculate_conveyance_factor(
         self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
@@ -617,9 +641,7 @@ class CrossSection:
 
         self.recompute_processed()
 
-    def _update_resistance_distribution_from_raw(
-        self, df: pd.DataFrame, raw_current: pd.DataFrame
-    ):
+    def _update_resistance_distribution_from_raw(self, df: pd.DataFrame, raw_current: pd.DataFrame):
         """Update resistance distribution type if resistance values were modified in the raw setter.
 
         If resistance values are unchanged, no distribution change is made.
@@ -643,9 +665,7 @@ class CrossSection:
                 )
             self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
 
-    def _resistance_values_changed(
-        self, df: pd.DataFrame, raw_current: pd.DataFrame
-    ) -> bool:
+    def _resistance_values_changed(self, df: pd.DataFrame, raw_current: pd.DataFrame) -> bool:
         """Check whether resistance values differ between the new and current raw DataFrames."""
         if len(df) != len(raw_current):
             return True
