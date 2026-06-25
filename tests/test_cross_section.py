@@ -283,6 +283,38 @@ class TestCrossSectionUnits:
         )
         np.testing.assert_array_equal(conveyances, df.conveyance_factor)
 
+    def test_conveyance_factor_respects_resistance_type(self, xz_data):
+        """Conveyance factor must account for the resistance formulation (issue #229).
+
+        Manning's n = 0.02 and Manning's M = 50 are hydraulically equivalent
+        (M = 1/n), so they must yield identical processed conveyance factors.
+        Conversely, Manning's n = 50 and Manning's M = 50 are NOT equivalent and
+        must yield different conveyance factors. The bug is that the conveyance
+        factor is computed directly from the raw resistance number as if it were
+        always Manning's M, ignoring the actual formulation.
+        """
+        x, z = xz_data
+
+        def conveyance_for(resistance_type, value):
+            cs = CrossSection.from_xz(
+                x=x, z=z, location_id="loc", chainage=100, topo_id="topo"
+            )
+            cs.resistance_type = resistance_type
+            df = cs.raw
+            df["resistance"] = value
+            cs.raw = df  # uniform distribution, triggers recompute
+            return cs.processed.conveyance_factor
+
+        mannings_n_002 = conveyance_for(ResistanceType.MANNINGS_N, 0.02)
+        mannings_m_50 = conveyance_for(ResistanceType.MANNINGS_M, 50.0)
+        mannings_n_50 = conveyance_for(ResistanceType.MANNINGS_N, 50.0)
+
+        # Equivalent resistances -> equal conveyance.
+        np.testing.assert_allclose(mannings_n_002, mannings_m_50, rtol=1e-9)
+
+        # Non-equivalent resistances -> different conveyance.
+        assert not np.allclose(mannings_n_50, mannings_m_50)
+
     def test_processed_get(self, cs_sample):
         for cs in cs_sample:
             df = cs.processed

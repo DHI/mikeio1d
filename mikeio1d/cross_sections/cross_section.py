@@ -419,6 +419,38 @@ class CrossSection:
         """
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
+    def _convert_resistance_to_standard(
+        self, resistance: Tuple[float], radius: Tuple[float]
+    ) -> Tuple[float]:
+        """Convert processed resistance factors to the standard (Manning's M) formulation.
+
+        MIKE 1D stores processed resistance factors in the cross section's own formulation
+        (e.g. Manning's n), but the conveyance factor formula expects Manning's M. This
+        converts the factors so that, for example, Manning's n = 0.02 is treated as its
+        equivalent Manning's M = 50. Formulations that need no conversion (e.g. Manning's M,
+        Chezy, Relative) are returned unchanged. See issue #229.
+
+        This mirrors the .NET engine's own standardization step
+        (XSBase.ConvertModifiedResistanceFactorsIfNecessary), which calls the same
+        FlowResistance.ConvertToStandardResistances method with the processed radii. Reusing
+        the .NET conversion keeps the formulation handling in sync with the engine rather than
+        re-implementing the resistance conversions in Python.
+        """
+        if len(resistance) == 0:
+            return tuple()
+
+        fr = self._m1d_cross_section.BaseCrossSection.FlowResistance
+        from_formulation = m1d_ResistanceFormulation(int(self.resistance_type))
+        resistance_array = System.Array[System.Double](list(resistance))
+        radius_array = System.Array[System.Double](list(radius))
+        standard_resistance = System.Array[System.Double](len(resistance))
+        converted, _, standard_resistance = fr.ConvertToStandardResistances(
+            from_formulation, from_formulation, resistance_array, standard_resistance, radius_array
+        )
+        if not converted:
+            return tuple(resistance)
+        return tuple(standard_resistance)
+
     def _calculate_conveyance_factor(
         self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
     ) -> Tuple[float]:
@@ -429,7 +461,15 @@ class CrossSection:
         that conveyance values will be monotonically increasing. For more info, see
         the MIKE+ documentation:
         https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
+
+        The resistance factors are first converted to the standard Manning's M formulation
+        (see _convert_resistance_to_standard) so that the conveyance reflects the cross section's
+        resistance type (see issue #229). The simplified resistance * area * radius**(2/3) form is
+        kept rather than calling the engine's CalculateSpecificConveyance directly: the latter
+        raises for Relative resistance (and other non-standard formulations), whereas the cross
+        section editor's processed-data table must still display a monotonicity indicator for them.
         """
+        resistance = self._convert_resistance_to_standard(resistance, radius)
         return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
 
     @property
