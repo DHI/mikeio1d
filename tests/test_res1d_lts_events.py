@@ -118,6 +118,18 @@ def test_read_node(test_file, quantity, node_id, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
+def test_update_time_quantities_with_nonzero_times(test_file):
+    # Regression for #232: LTS event-time columns hold seconds-since-start as float32.
+    # The fixture's times are all 0, so feed realistic non-zero values to ensure the
+    # datetime conversion replaces the float column instead of an in-place (lossy) set.
+    df = pd.DataFrame(
+        np.array([[3.15e9], [1.94e9]], dtype="float32"),
+        columns=["WaterLevelMaximumTime:B858"],
+    )
+    test_file.reader.update_time_quantities(df)
+    assert df["WaterLevelMaximumTime:B858"].dtype == "datetime64[ns]"
+
+
 def test_time_index(test_file):
     assert len(test_file.time_index) == 10
 
