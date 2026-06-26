@@ -10,6 +10,24 @@
 
 ### Removed
 
+## [1.3.0] - 2026-06-26
+
+This is primarily a maintenance release, bundling a few cross-section bug fixes and updated Python version support.
+
+### Added
+- Support for Python 3.14
+
+### Fixed
+- Cross-section conveyance now respects the resistance type, deferring computation to the MIKE 1D engine with a MIKE+ consistent fallback (#229).
+- Resistance values now persist correctly when set via the raw setter, including ZONES distribution (#233).
+- Datum is now applied to processed cross-section levels (#236).
+
+### Changed
+- Restructured package into a src/ layout (#243).
+
+### Removed
+- Support for Python 3.10 and 3.11. MIKE IO 1D now follows [Scientific Python SPEC 0](https://scientific-python.org/specs/spec-0000/) for the supported Python range (#238).
+
 ## [1.2.0] - 2026-05-20
 
 ### Added
@@ -296,7 +314,8 @@
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.3.0
 [1.2.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.2.0
 [1.1.1]: https://github.com/DHI/mikeio1d/releases/tag/v1.1.1
 [1.1.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.1.0
