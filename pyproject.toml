@@ -12,10 +12,10 @@ post-install = "scripts/install_dependencies.py" # for editable installs
 exclude = ["notebooks", "tests", "images", "util"]
 
 [tool.hatch.build.targets.sdist.force-include]
-"mikeio1d/bin" = "mikeio1d/bin"
+"src/mikeio1d/bin" = "src/mikeio1d/bin"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mikeio1d"]
+packages = ["src/mikeio1d"]
 
 [project]
 name = "mikeio1d"
@@ -87,7 +87,7 @@ experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 "Bug Tracker" = "https://github.com/DHI/mikeio1d/issues"
 
 [tool.ruff]
-include = ["pyproject.toml", "mikeio1d/**/*.py"]
+include = ["pyproject.toml", "src/mikeio1d/**/*.py"]
 line-length = 100
 lint.extend-select = ["D", "PD", "NPY", "FA"]
 lint.ignore = [
