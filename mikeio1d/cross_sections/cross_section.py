@@ -24,8 +24,8 @@ from .enums import ProcessLevelsMethod
 
 from ..various import try_import_shapely
 
-import System
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions
 from DHI.Mike1D.CrossSectionModule import ICrossSection
 from DHI.Mike1D.Generic import ProcessingOption
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
@@ -419,38 +419,6 @@ class CrossSection:
         """
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
-    def _convert_resistance_to_standard(
-        self, resistance: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float]:
-        """Convert processed resistance factors to the standard (Manning's M) formulation.
-
-        MIKE 1D stores processed resistance factors in the cross section's own formulation
-        (e.g. Manning's n), but the conveyance factor formula expects Manning's M. This
-        converts the factors so that, for example, Manning's n = 0.02 is treated as its
-        equivalent Manning's M = 50. Formulations that need no conversion (e.g. Manning's M,
-        Chezy, Relative) are returned unchanged. See issue #229.
-
-        This mirrors the .NET engine's own standardization step
-        (XSBase.ConvertModifiedResistanceFactorsIfNecessary), which calls the same
-        FlowResistance.ConvertToStandardResistances method with the processed radii. Reusing
-        the .NET conversion keeps the formulation handling in sync with the engine rather than
-        re-implementing the resistance conversions in Python.
-        """
-        if len(resistance) == 0:
-            return tuple()
-
-        fr = self._m1d_cross_section.BaseCrossSection.FlowResistance
-        from_formulation = m1d_ResistanceFormulation(int(self.resistance_type))
-        resistance_array = System.Array[System.Double](list(resistance))
-        radius_array = System.Array[System.Double](list(radius))
-        standard_resistance = System.Array[System.Double](len(resistance))
-        converted, _, standard_resistance = fr.ConvertToStandardResistances(
-            from_formulation, from_formulation, resistance_array, standard_resistance, radius_array
-        )
-        if not converted:
-            return tuple(resistance)
-        return tuple(standard_resistance)
-
     def _calculate_conveyance_factor(
         self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
     ) -> Tuple[float]:
@@ -462,15 +430,63 @@ class CrossSection:
         the MIKE+ documentation:
         https://doc.mikepoweredbydhi.help/webhelp/2024/MIKEPlus/MIKEPlus/RiverNetwork_HydrModel/Processed_Data.htm#XREF_52990_Processed_Data:~:text=Note%3A%20The%20conveyance,from%20the%20simulations.
 
-        The resistance factors are first converted to the standard Manning's M formulation
-        (see _convert_resistance_to_standard) so that the conveyance reflects the cross section's
-        resistance type (see issue #229). The simplified resistance * area * radius**(2/3) form is
-        kept rather than calling the engine's CalculateSpecificConveyance directly: the latter
-        raises for Relative resistance (and other non-standard formulations), whereas the cross
-        section editor's processed-data table must still display a monotonicity indicator for them.
+        The MIKE 1D engine's CalculateSpecificConveyance is tried first so that the conveyance stays
+        in sync with the engine and automatically benefits from any future support for additional
+        resistance formulations. It currently raises for formulations it does not handle (e.g.
+        Relative, Manning's n); in that case we fall back to a Python implementation that mirrors the
+        MIKE+ cross section editor's processed-data table (see issue #229).
         """
-        resistance = self._convert_resistance_to_standard(resistance, radius)
-        return tuple(r * A * R ** (2.0 / 3) for r, A, R in zip(resistance, flow_area, radius))
+        conveyance = self._calculate_conveyance_factor_dotnet(resistance, flow_area, radius)
+        if conveyance is not None:
+            return conveyance
+        return self._calculate_conveyance_factor_python(resistance, flow_area, radius)
+
+    def _calculate_conveyance_factor_dotnet(
+        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
+    ) -> Tuple[float] | None:
+        """Calculate the conveyance factor using the MIKE 1D engine.
+
+        CalculateSpecificConveyance returns the specific conveyance (conveyance per unit area), so
+        each value is multiplied by the flow area to obtain the conveyance factor. The slope is left
+        at its default (-1), which selects the engine's slope-independent "design" conveyance for the
+        formulations that would otherwise need one (Colebrook-White, Hazen-Williams), and a null
+        HDParameterData lets the engine use its defaults.
+
+        Returns None if the engine does not support the cross section's resistance formulation (it
+        raises in that case), signalling the caller to fall back to the Python implementation.
+        """
+        formulation = m1d_ResistanceFormulation(int(self.resistance_type))
+        try:
+            return tuple(
+                A
+                * CrossSectionExtensions.CalculateSpecificConveyance(formulation, r, R, None, -1.0)
+                for r, A, R in zip(resistance, flow_area, radius)
+            )
+        except Exception:
+            # The engine raises for formulations it does not handle; fall back to Python.
+            return None
+
+    def _calculate_conveyance_factor_python(
+        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
+    ) -> Tuple[float]:
+        """Calculate the conveyance factor in Python, mirroring the MIKE+ cross section editor.
+
+        The formula depends on the cross section's resistance type (see issue #229). Formulations the
+        editor does not display a value for (Colebrook-White, Hazen-Williams, Manning's M relative)
+        return the editor's -999 sentinel.
+        """
+        rt = self.resistance_type
+        if rt in (ResistanceType.MANNINGS_M, ResistanceType.RELATIVE):
+            return tuple(A * R ** (2.0 / 3) * r for r, A, R in zip(resistance, flow_area, radius))
+        elif rt == ResistanceType.MANNINGS_N:
+            return tuple(
+                A * R ** (2.0 / 3) / r if r > 1e-6 else -1.0
+                for r, A, R in zip(resistance, flow_area, radius)
+            )
+        elif rt in (ResistanceType.CHEZY, ResistanceType.DARCY_WEISBACH):
+            return tuple(A * R**0.5 * r for r, A, R in zip(resistance, flow_area, radius))
+        else:
+            return tuple(-999.0 for _ in resistance)
 
     @property
     def processed(self) -> pd.DataFrame:
@@ -617,9 +633,7 @@ class CrossSection:
 
         self.recompute_processed()
 
-    def _update_resistance_distribution_from_raw(
-        self, df: pd.DataFrame, raw_current: pd.DataFrame
-    ):
+    def _update_resistance_distribution_from_raw(self, df: pd.DataFrame, raw_current: pd.DataFrame):
         """Update resistance distribution type if resistance values were modified in the raw setter.
 
         If resistance values are unchanged, no distribution change is made.
@@ -643,9 +657,7 @@ class CrossSection:
                 )
             self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
 
-    def _resistance_values_changed(
-        self, df: pd.DataFrame, raw_current: pd.DataFrame
-    ) -> bool:
+    def _resistance_values_changed(self, df: pd.DataFrame, raw_current: pd.DataFrame) -> bool:
         """Check whether resistance values differ between the new and current raw DataFrames."""
         if len(df) != len(raw_current):
             return True
