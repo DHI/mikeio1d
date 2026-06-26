@@ -13,8 +13,17 @@ This project uses [`uv`](https://docs.astral.sh/uv/) as the package manager. If 
    ```bash
    uv sync --extra dev --extra test --extra notebooks --python 3.XX
    ```
-   Replace `XX` with your Python version (3.10 through 3.14 are supported).
+   Replace `XX` with your Python version (3.12 through 3.14 are supported).
 3. **Verify installation** with `uv run pytest`
+
+## Supported Python versions
+
+MIKE IO 1D follows the [Scientific Python SPEC 0](https://scientific-python.org/specs/spec-0000/)
+recommendation for dropping support of older Python versions. In short, support for a Python
+minor version is dropped 3 years after its initial release. When bumping the minimum supported
+Python version, remember to update it in `pyproject.toml` (`requires-python` and the
+`Programming Language :: Python` classifiers), the CI matrix in `.github/workflows/full_test.yml`,
+and the requirements listed in `README.md` and `docs/index.qmd`.
 
 ## Making Contributions
 

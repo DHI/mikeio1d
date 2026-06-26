@@ -8,7 +8,7 @@ MIKE IO 1D is a Python package for reading and manipulating MIKE 1D result files
 
 The package is fundamentally a Python wrapper around the [DHI MIKE 1D .NET library](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/). The key .NET namespaces are `DHI.Mike1D.ResultDataAccess`, `DHI.Mike1D.Generic`, and `DHI.Mike1D.CrossSectionModule`. The .NET assemblies (version 23.0.3) are downloaded from NuGet at install time and placed in `mikeio1d/bin/`.
 
-**Requirements:** Python 3.10–3.13 (64-bit only), `uv` package manager, .NET 8.0 Runtime (Linux) or VC++ redistributables (Windows).
+**Requirements:** Python 3.12–3.14 (64-bit only), `uv` package manager, .NET 8.0 Runtime (Linux) or VC++ redistributables (Windows).
 
 ## Commands
 
@@ -21,7 +21,7 @@ uv sync --reinstall --group dev --group test --group notebooks --python 3.13
 ```
 
 ```bash
-# Install dev dependencies (use highest supported version, currently 3.13 — pythonnet doesn't support 3.14+)
+# Install dev dependencies (use highest supported version, currently 3.14)
 # Uses --group (PEP 735 dependency-groups), not --extra
 uv sync --group dev --group test --group notebooks --python 3.13
 
@@ -126,4 +126,4 @@ python scripts/install_dependencies.py  # copies DLL to correct location
 
 **pythonnet / Python version issues**
 
-pythonnet does not support Python 3.14+. Use Python 3.10–3.13 (64-bit). Check `pythonnet>=3.0.0` is installed.
+Use Python 3.12–3.14 (64-bit). Check `pythonnet>=3.0.0` is installed.
