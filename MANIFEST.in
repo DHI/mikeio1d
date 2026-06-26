@@ -1,2 +1,2 @@
-graft mikeio1d/bin
+graft src/mikeio1d/bin
 include LICENSE

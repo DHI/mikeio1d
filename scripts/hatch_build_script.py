@@ -11,7 +11,7 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from install_dependencies import main
 
 class BuildHook(BuildHookInterface):
-    BIN_DIR = os.path.join(os.path.dirname(__file__), "..", "mikeio1d", "bin")
+    BIN_DIR = os.path.join(os.path.dirname(__file__), "..", "src", "mikeio1d", "bin")
 
     def initialize(self, version, build_data):
         if not self._binaries_exist():
@@ -25,13 +25,13 @@ class BuildHook(BuildHookInterface):
         tag = build_data.get("tag", None)
         build_data["tag"] = self.update_tag_platform(tag)
         build_data["artifacts"] = [
-            "mikeio1d/bin/**/*.dll",
-            "mikeio1d/bin/**/*.pfs",
-            "mikeio1d/bin/**/*.ubg",
-            "mikeio1d/bin/**/*.xml",
-            "mikeio1d/bin/**/*.so",
-            "mikeio1d/bin/**/*so.5",
-            "mikeio1d/bin/DHI.Mike1D.MikeIO/**/*",
+            "src/mikeio1d/bin/**/*.dll",
+            "src/mikeio1d/bin/**/*.pfs",
+            "src/mikeio1d/bin/**/*.ubg",
+            "src/mikeio1d/bin/**/*.xml",
+            "src/mikeio1d/bin/**/*.so",
+            "src/mikeio1d/bin/**/*so.5",
+            "src/mikeio1d/bin/DHI.Mike1D.MikeIO/**/*",
         ]
 
     def update_tag_platform(self, tag: str | None) -> str:

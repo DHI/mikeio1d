@@ -4,17 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MIKE IO 1D is a Python package for reading and manipulating MIKE 1D result files (res1d, res, resx, out, xns11 formats). It uses .NET interoperability via `pythonnet` to access DHI MIKE 1D libraries bundled in `mikeio1d/bin/`.
+MIKE IO 1D is a Python package for reading and manipulating MIKE 1D result files (res1d, res, resx, out, xns11 formats). It uses .NET interoperability via `pythonnet` to access DHI MIKE 1D libraries bundled in `src/mikeio1d/bin/`.
 
-The package is fundamentally a Python wrapper around the [DHI MIKE 1D .NET library](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/). The key .NET namespaces are `DHI.Mike1D.ResultDataAccess`, `DHI.Mike1D.Generic`, and `DHI.Mike1D.CrossSectionModule`. The .NET assemblies (version 23.0.3) are downloaded from NuGet at install time and placed in `mikeio1d/bin/`.
+The package is fundamentally a Python wrapper around the [DHI MIKE 1D .NET library](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/). The key .NET namespaces are `DHI.Mike1D.ResultDataAccess`, `DHI.Mike1D.Generic`, and `DHI.Mike1D.CrossSectionModule`. The .NET assemblies (version 23.0.3) are downloaded from NuGet at install time and placed in `src/mikeio1d/bin/`.
 
 **Requirements:** Python 3.12–3.14 (64-bit only), `uv` package manager, .NET 8.0 Runtime (Linux) or VC++ redistributables (Windows).
 
 ## Commands
 
-**Always run `uv sync` first** before running tests or other commands. This triggers the hatch build hook that downloads the DHI .NET DLLs into `mikeio1d/bin/`.
+**Always run `uv sync` first** before running tests or other commands. This triggers the hatch build hook that downloads the DHI .NET DLLs into `src/mikeio1d/bin/`.
 
-If the binaries have been removed (e.g. via `git clean -dxf mikeio1d/bin`), `uv sync` alone won't re-download them — use `--reinstall` to force the hook to run again:
+If the binaries have been removed (e.g. via `git clean -dxf src/mikeio1d/bin`), `uv sync` alone won't re-download them — use `--reinstall` to force the hook to run again:
 
 ```bash
 uv sync --reinstall --group dev --group test --group notebooks --python 3.13
@@ -76,7 +76,7 @@ The local `.pytest.ini` excludes slow tests and experimental tests by default. C
 
 ### C# Utility Library (`util/DHI.Mike1D.MikeIO/`)
 
-A small C# project that is compiled during `uv sync` (via `scripts/util_builder.py`) and placed at `mikeio1d/bin/DHI.Mike1D.MikeIO/DHI.Mike1D.MikeIO.dll`. It provides utilities that are awkward to implement purely in Python against the .NET API:
+A small C# project that is compiled during `uv sync` (via `scripts/util_builder.py`) and placed at `src/mikeio1d/bin/DHI.Mike1D.MikeIO/DHI.Mike1D.MikeIO.dll`. It provides utilities that are awkward to implement purely in Python against the .NET API:
 
 | Class | Purpose |
 |---|---|
@@ -89,7 +89,7 @@ A small C# project that is compiled during `uv sync` (via `scripts/util_builder.
 **To rebuild manually** (e.g. after changing the C# source or upgrading .NET SDK):
 
 ```bash
-# NuGet assemblies must already be in mikeio1d/bin/ first
+# NuGet assemblies must already be in src/mikeio1d/bin/ first
 dotnet build --configuration Release util/DHI.Mike1D.MikeIO/DHI.Mike1D.MikeIO.csproj
 # Then copy the output (or just re-run the full install):
 python scripts/install_dependencies.py
@@ -109,7 +109,7 @@ Tests use fixtures from `tests/testdata/` (accessed via a generated `testdata` m
 
 **CLR / `BadImageFormatException` when loading DLLs**
 
-Some files in `mikeio1d/bin/` (e.g. `DHI.Chart.Map.dll`) are native (non-.NET) DLLs. `mikenet.load_all()` skips them with a warning; individual `load_*` calls on a native DLL will also warn and skip. If a _managed_ assembly fails to load, the most common cause is stale or mismatched DLLs — force a clean reinstall:
+Some files in `src/mikeio1d/bin/` (e.g. `DHI.Chart.Map.dll`) are native (non-.NET) DLLs. `mikenet.load_all()` skips them with a warning; individual `load_*` calls on a native DLL will also warn and skip. If a _managed_ assembly fails to load, the most common cause is stale or mismatched DLLs — force a clean reinstall:
 
 ```bash
 uv sync --reinstall --group dev --group test --python 3.13
@@ -117,7 +117,7 @@ uv sync --reinstall --group dev --group test --python 3.13
 
 **`DHI.Mike1D.MikeIO` import error**
 
-The internal C# utility DLL at `mikeio1d/bin/DHI.Mike1D.MikeIO/` is built from source at install time. If it's missing or was compiled against a different assembly version, rebuild it:
+The internal C# utility DLL at `src/mikeio1d/bin/DHI.Mike1D.MikeIO/` is built from source at install time. If it's missing or was compiled against a different assembly version, rebuild it:
 
 ```bash
 dotnet build --configuration Release util/DHI.Mike1D.MikeIO/DHI.Mike1D.MikeIO.csproj

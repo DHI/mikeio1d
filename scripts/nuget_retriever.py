@@ -37,7 +37,7 @@ class NuGetRetriever:
     nuget_dir_name = "nuget"
 
     # Directory where libraries will be installed
-    bin_dir_name = os.path.join("mikeio1d", "bin")
+    bin_dir_name = os.path.join("src", "mikeio1d", "bin")
 
     # Default version of DHI NuGet packages to retrieve
     version_default = "23.0.3"
@@ -178,7 +178,7 @@ class NuGetRetriever:
 
     @staticmethod
     def install(version=version_default):
-        """Installs NuGet packages into mikeio1d/bin folder."""
+        """Installs NuGet packages into src/mikeio1d/bin folder."""
         cwd = os.getcwd()
         path, _ = os.path.split(os.path.join(cwd, __file__))
         path = os.path.normpath(os.path.join(path, ".."))

@@ -1,4 +1,4 @@
-LIB = mikeio1d
+LIB = src/mikeio1d
 
 docs: FORCE
 	set -e; \
