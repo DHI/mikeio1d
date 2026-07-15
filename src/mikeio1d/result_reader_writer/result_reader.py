@@ -28,6 +28,7 @@ from ..various import NAME_DELIMITER, DATETIME_DTYPE
 from ..quantities import TimeSeriesId
 from ..result_network import ResultNetwork
 
+from DHI.Mike1D.ResultDataAccess import Filter
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
 from DHI.Mike1D.ResultDataAccess import ResultDataSearch
@@ -136,6 +137,13 @@ class ResultReader(ABC):
         # IMPORTANT: The filter must be applied after the header is loaded. Applying the filter before loading the header
         #            causes unexpected results due to a bug in MIKE 1D.
         self.filter.apply(self.data)
+
+        # Patch:
+        # PRF files can contain pumps whose IDs differ only by case (e.g. my_pump and MY_PUMP). Loading with MIKE 1D
+        # unfiltered causes a crash. Using an empty filter results in one of the pumps being dropped in the end result,
+        # consistent with the experience in MIKE+ Result Viewer. Worth noting that both pumps show in MIKE View.
+        if self.data.Parameters.Filter is None:
+            self.data.Parameters.Filter = Filter()
 
     def _load_file(self):
         if self.file_extension.lower() in [".resx", ".crf", ".prf", ".xrf"]:
