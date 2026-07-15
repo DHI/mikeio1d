@@ -10,6 +10,11 @@
 
 ### Removed
 
+## [1.3.1] - 2026-07-15
+
+### Fixed
+- Reading PRF files containing pumps with IDs differing only by case (e.g. `my_pump` and `MY_PUMP`) no longer crashes (#245).
+
 ## [1.3.0] - 2026-06-26
 
 This is primarily a maintenance release, bundling a few cross-section bug fixes and updated Python version support.
@@ -314,7 +319,8 @@ This is primarily a maintenance release, bundling a few cross-section bug fixes 
 - Reading of res1d and xns11 files into pandas data frames
 
 
-[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/DHI/mikeio1d/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/DHI/mikeio1d/releases/tag/v1.3.1
 [1.3.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.3.0
 [1.2.0]: https://github.com/DHI/mikeio1d/releases/tag/v1.2.0
 [1.1.1]: https://github.com/DHI/mikeio1d/releases/tag/v1.1.1
