@@ -167,7 +167,7 @@ class ResultLocationsCreator(ABC):
         self.quantity_label = "q_"
         self.data: ResultData = res1d.result_data
         self.data_items: IDataItems = res1d.result_data.DataItems
-        self.result_quantity_map: dict[str : list[ResultQuantity]] = {}
+        self.result_quantity_map: dict[str, list[ResultQuantity]] = {}
         self.result_quantity_derived_map: dict[str, list[ResultQuantityDerived]] = {}
 
     @abstractmethod
