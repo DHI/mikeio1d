@@ -101,3 +101,14 @@ lint.ignore = [
     "DTZ001", # MIKE result timestamps are naive by design
 ]
 lint.pydocstyle.convention = "numpy"
+
+# The .NET assemblies are loaded through pythonnet, so isort would otherwise file
+# DHI and System alongside numpy and pandas. Keeping them in a trailing section of
+# their own preserves the convention the package has always followed: Python
+# imports first, MIKE 1D interop last.
+[tool.ruff.lint.isort]
+force-single-line = true
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder", "dhi"]
+
+[tool.ruff.lint.isort.sections]
+dhi = ["DHI", "System"]
