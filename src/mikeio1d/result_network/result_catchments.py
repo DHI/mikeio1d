@@ -1,24 +1,23 @@
 """ResultCatchments class."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Callable
     from typing import Dict
-    from typing import Callable
+
+    from DHI.Mike1D.ResultDataAccess import Res1DCatchment
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
-    from DHI.Mike1D.ResultDataAccess import Res1DCatchment
-
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
-
-from .result_locations import ResultLocations
-from .result_locations import ResultLocationsCreator
 from .result_catchment import ResultCatchment
+from .result_locations import ResultLocations, ResultLocationsCreator
 from .various import make_proper_variable_name
 
 
@@ -47,7 +46,7 @@ class ResultCatchments(ResultLocations):
     def to_geopandas(
         self,
         agg: str | Callable = None,
-        agg_kwargs: Dict[str : str | Callable] = {},
+        agg_kwargs: dict[str : str | Callable] = {},
     ) -> GeoDataFrame:
         """Convert catchments to a geopandas.GeoDataFrame object.
 

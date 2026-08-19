@@ -1,10 +1,9 @@
 """ExtractorTxt class."""
 
-from .extractor import Extractor
-
 import System
-
 from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
+
+from .extractor import Extractor
 
 
 class ExtractorTxt(Extractor):

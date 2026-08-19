@@ -5,7 +5,6 @@ import sys
 from glob import glob
 
 from ..mikepath import MikePath
-
 from .library_loader import LibraryLoader
 
 
@@ -39,8 +38,8 @@ class LibraryLoaders:
                 self.library_loader_dict[library_loader.library_name] = library_loader
                 self.library_loader_dict[library_loader.library_alias] = library_loader
 
-        setattr(mikenet_module, "load_all", self.load_all)
-        setattr(mikenet_module, "load", self.load)
+        mikenet_module.load_all = self.load_all
+        mikenet_module.load = self.load
 
     def load_all(self):
         """Load all libraries present in library_loader_list."""

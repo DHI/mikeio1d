@@ -1,9 +1,10 @@
 """Various helper functions for the result network module."""
 
 from __future__ import annotations
+
 import re
-from typing import List, Tuple, Dict
 from html import escape
+from typing import Dict, List, Tuple
 
 
 class ValidPythonIdentifierTranslatorTable:
@@ -54,7 +55,7 @@ def make_proper_variable_name(string: str, extra_string_before_digit="_"):
     return string
 
 
-def build_html_repr_from_sections(header: str, sections: List[Tuple[str, List | Dict]]):
+def build_html_repr_from_sections(header: str, sections: list[tuple[str, list | dict]]):
     """Build an html representation from a list of sections.
 
     Parameters

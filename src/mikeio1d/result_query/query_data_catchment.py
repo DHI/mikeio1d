@@ -7,9 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
 
+from ..quantities import TimeSeriesId, TimeSeriesIdGroup
 from .query_data import QueryData
-from ..quantities import TimeSeriesId
-from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataCatchment(QueryData):

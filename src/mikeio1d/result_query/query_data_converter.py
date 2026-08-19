@@ -47,7 +47,7 @@ class QueryDataConverter:
     @staticmethod
     def convert_queries_to_time_series_ids(
         res1d: Res1D, queries: list[QueryData]
-    ) -> List[TimeSeriesId]:
+    ) -> list[TimeSeriesId]:
         """Convert queries to TimeSeriesId objects.
 
         Parameters

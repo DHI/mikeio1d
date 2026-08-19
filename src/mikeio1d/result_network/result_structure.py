@@ -5,23 +5,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Dict
+    from typing import Dict, List
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DReach
 
     from ..res1d import Res1D
     from .result_quantity import ResultQuantity
 
-    from DHI.Mike1D.ResultDataAccess import IDataItem
-    from DHI.Mike1D.ResultDataAccess import IRes1DReach
-
 from warnings import warn
 
 from ..dotnet import pythonnet_implementation as impl
-from ..query import QueryDataStructure
 from ..quantities import TimeSeriesIdGroup
-
-from .result_location import ResultLocation
-from .result_location import ResultLocationCreator
+from ..query import QueryDataStructure
+from .result_location import ResultLocation, ResultLocationCreator
 
 
 class ResultStructure(ResultLocation):
@@ -51,7 +47,7 @@ class ResultStructure(ResultLocation):
         self,
         structure_id: str,
         reach: IRes1DReach,
-        data_items: List[IDataItem],
+        data_items: list[IDataItem],
         res1d: Res1D,
     ):
         ResultLocation.__init__(self)
@@ -156,15 +152,15 @@ class ResultStructureCreator(ResultLocationCreator):
         self,
         result_location: ResultStructure,
         reach: IRes1DReach,
-        data_items: List[IDataItem],
+        data_items: list[IDataItem],
         res1d: Res1D,
     ):
-        empty_data_item_list: List[IDataItem] = []
+        empty_data_item_list: list[IDataItem] = []
         ResultLocationCreator.__init__(self, result_location, empty_data_item_list, res1d)
 
         self.data_items_intial = data_items
         self.reach = reach
-        self.data_items_dict: Dict[str, IDataItem] = {}
+        self.data_items_dict: dict[str, IDataItem] = {}
 
     def create(self):
         """Perform ResultGridPoint creation steps."""

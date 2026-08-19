@@ -2,40 +2,28 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from typing import Dict
-from typing import Tuple
-from typing import List
-from typing import Set
+from typing import TYPE_CHECKING, Dict, List, Set, Tuple
 
 if TYPE_CHECKING:
     import geopandas as gpd
 
+from collections.abc import Collection, MutableMapping
+from pathlib import Path
 from warnings import warn
 
-from collections.abc import MutableMapping
-from collections.abc import Collection
-from pathlib import Path
-
 import pandas as pd
-
-from .cross_section import CrossSection
-from .cross_section import Marker
+from DHI.Mike1D.CrossSectionModule import CrossSectionData, CrossSectionDataFactory
+from DHI.Mike1D.Generic import Connection, Diagnostics
 
 from ..various import try_import_geopandas
-
-from DHI.Mike1D.Generic import Connection
-from DHI.Mike1D.Generic import Diagnostics
-from DHI.Mike1D.CrossSectionModule import CrossSectionData
-from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
+from .cross_section import CrossSection, Marker
 
 LocationId = str
 Chainage = str
 TopoId = str
 
 
-class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId], CrossSection]):
+class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId], CrossSection]):
     """A collection of CrossSection objects.
 
     The collection is a dict-like object where the keys are tuples of location ID, chainage and topo ID.
@@ -128,7 +116,7 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         return f"<mikeio1d.{type(self).__name__} ({len(self)})>"
 
     def __getitem__(
-        self, key: Tuple[LocationId, Chainage, TopoId]
+        self, key: tuple[LocationId, Chainage, TopoId]
     ) -> CrossSection | list[CrossSection]:
         """Get a cross section or a collection of cross sections."""
         if isinstance(key, str):
@@ -145,8 +133,8 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
             return self._cross_section_map.__getitem__(key)
 
     def _validate_key(
-        self, key: Tuple[LocationId, Chainage, TopoId]
-    ) -> Tuple[LocationId, Chainage, TopoId]:
+        self, key: tuple[LocationId, Chainage, TopoId]
+    ) -> tuple[LocationId, Chainage, TopoId]:
         """Validate a key."""
         if len(key) != 3:
             raise ValueError("Key must be a tuple of Location ID, Chainage and Topo ID.")
@@ -158,7 +146,7 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
 
         return (location_id, chainage, topo_id)
 
-    def _slice_collection(self, key: Tuple[LocationId, Chainage, TopoId]) -> list[CrossSection]:
+    def _slice_collection(self, key: tuple[LocationId, Chainage, TopoId]) -> list[CrossSection]:
         return [
             xs
             for k, xs in self._cross_section_map.items()
@@ -167,7 +155,7 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
             )
         ]
 
-    def __setitem__(self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection):
+    def __setitem__(self, key: tuple[LocationId, Chainage, TopoId], value: CrossSection):
         """Set a cross section in the collection."""
         key = self._validate_key_value_pair(key, value)
         if key in self._cross_section_map:
@@ -176,8 +164,8 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         return self._cross_section_map.__setitem__(key, value)
 
     def _validate_key_value_pair(
-        self, key: Tuple[LocationId, Chainage, TopoId], value: CrossSection
-    ) -> Tuple[LocationId, Chainage, TopoId]:
+        self, key: tuple[LocationId, Chainage, TopoId], value: CrossSection
+    ) -> tuple[LocationId, Chainage, TopoId]:
         """Validate a key and CrossSection pair."""
         location_id, chainage, topo_id = self._validate_key(key)
         if not isinstance(value, CrossSection):
@@ -197,11 +185,11 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
             )
         return (location_id, chainage, topo_id)
 
-    def _convert_chainage_to_str(self, chainage: float | int) -> str:
+    def _convert_chainage_to_str(self, chainage: float) -> str:
         """Convert a chainage to a string with 3 decimals."""
         return f"{float(chainage):.3f}"
 
-    def __delitem__(self, key: Tuple[LocationId, Chainage, TopoId]):
+    def __delitem__(self, key: tuple[LocationId, Chainage, TopoId]):
         """Delete a cross section from the collection."""
         key = self._validate_key(key)
         xs = self.get(key)
@@ -271,17 +259,17 @@ class CrossSectionCollection(MutableMapping[Tuple[LocationId, Chainage, TopoId],
         del self[location_id, chainage, topo_id]
 
     @property
-    def location_ids(self) -> Set[str]:
+    def location_ids(self) -> set[str]:
         """Unique location IDs in the collection."""
         return set([k[0] for k in self.keys()])
 
     @property
-    def chainages(self) -> Set[str]:
+    def chainages(self) -> set[str]:
         """Unique chainages in the collection (as string with 3 decimals)."""
         return set([k[1] for k in self.keys()])
 
     @property
-    def topo_ids(self) -> Set[str]:
+    def topo_ids(self) -> set[str]:
         """Unique topo IDs in the collection."""
         return set([k[2] for k in self.keys()])
 

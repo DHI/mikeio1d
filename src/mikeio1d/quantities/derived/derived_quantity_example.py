@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
+
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
 
-from mikeio1d.quantities import DerivedQuantity
-from mikeio1d.quantities import TimeSeriesIdGroup
+from mikeio1d.quantities import DerivedQuantity, TimeSeriesIdGroup
 
 
 class ExampleDerivedQuantity(DerivedQuantity):
@@ -29,7 +29,7 @@ class ExampleDerivedQuantity(DerivedQuantity):
     # Replace with the source quantity that the derived quantity is derived from
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]) -> pd.DataFrame:
         """Transform the source quantities into the derived quantity.
 
         Parameters

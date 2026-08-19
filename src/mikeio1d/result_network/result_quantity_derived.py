@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Optional
 
-    from .result_location import ResultLocation
+    import pandas as pd
+
     from ..res1d import Res1D
     from ..result_reader_writer.result_reader import ColumnMode
-
-    import pandas as pd
+    from .result_location import ResultLocation
 
 from ..quantities import DerivedQuantity
 
@@ -42,7 +42,7 @@ class ResultQuantityDerived:
         """Add a ResultQuantity to ResultNetwork.read_queue."""
         raise NotImplementedError("Derived quantities cannot be added to a network.")
 
-    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Parameters
@@ -59,7 +59,7 @@ class ResultQuantityDerived:
         df_derived = self.derived_quantity.generate(df_source)
         return df_derived.droplevel("derived", axis=1)
 
-    def to_dataframe(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def to_dataframe(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Alias for read() method.

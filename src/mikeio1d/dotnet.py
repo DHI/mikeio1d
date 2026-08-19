@@ -1,9 +1,9 @@
 """Utilities for interfacing with .NET objects."""
 
-import datetime
-import numpy as np
 import ctypes
+import datetime
 
+import numpy as np
 import System
 from System.Runtime.InteropServices import GCHandle, GCHandleType
 
@@ -87,7 +87,7 @@ def asNumpyArray(x):
         npArray = np.empty(dims, order="C", dtype=_MAP_NET_NP[netType])
     except KeyError:
         raise NotImplementedError(
-            "asNumpyArray does not yet support System type {}".format(netType)
+            f"asNumpyArray does not yet support System type {netType}"
         )
 
     try:  # Memmove
@@ -128,7 +128,7 @@ def to_dotnet_array(x):
     try:
         netArray = System.Array.CreateInstance(_MAP_NP_NET[dtype], dims)
     except KeyError:
-        raise NotImplementedError("asNetArray does not yet support dtype {}".format(dtype))
+        raise NotImplementedError(f"asNetArray does not yet support dtype {dtype}")
 
     try:  # Memmove
         destHandle = GCHandle.Alloc(netArray, GCHandleType.Pinned)

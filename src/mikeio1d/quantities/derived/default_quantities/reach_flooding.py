@@ -9,13 +9,12 @@ if TYPE_CHECKING:  # pragma: no cover
 
     import pandas as pd
 
-    from mikeio1d.result_network import ResultLocation
-    from mikeio1d.result_network import ResultGridPoint
+    from mikeio1d.result_network import ResultGridPoint, ResultLocation
 
 import numpy as np
 
-from ..derived_quantity import DerivedQuantity
 from ...timeseries_id import TimeSeriesIdGroup
+from ..derived_quantity import DerivedQuantity
 
 
 class ReachFlooding(DerivedQuantity):
@@ -25,7 +24,7 @@ class ReachFlooding(DerivedQuantity):
     _GROUPS = {TimeSeriesIdGroup.REACH}
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]):
         """Derive the flooding in a reach."""
         dtype = df_source.dtypes.iloc[0]
         ground_levels = np.fromiter(self.get_ground_levels(locations), dtype=dtype)
@@ -36,6 +35,6 @@ class ReachFlooding(DerivedQuantity):
         """Get the ground level for a gridpoint."""
         return gridpoint.result_reach.interpolate_reach_ground_level(gridpoint.chainage)
 
-    def get_ground_levels(self, gridpoints: List[ResultGridPoint]):
+    def get_ground_levels(self, gridpoints: list[ResultGridPoint]):
         """Get the ground levels for a list of gridpoints."""
         yield from (self.get_ground_level(location) for location in gridpoints)

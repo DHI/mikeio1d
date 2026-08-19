@@ -9,11 +9,9 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from math import isnan
 
-from ..various import NAME_DELIMITER
-from ..various import DELETE_VALUE
+from ..quantities import TimeSeriesId, TimeSeriesIdGroup
+from ..various import DELETE_VALUE, NAME_DELIMITER
 from .query_data import QueryData
-from ..quantities import TimeSeriesId
-from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataReach(QueryData):

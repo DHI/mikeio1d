@@ -5,11 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List
-    from typing import Tuple
+    from typing import List, Tuple
 
-from shapely.geometry.base import BaseGeometry
 from shapely.geometry import LineString
+from shapely.geometry.base import BaseGeometry
 
 
 class CrossSectionGeometry:
@@ -26,7 +25,7 @@ class CrossSectionGeometry:
         self._m1d_cross_section = m1d_cross_section
 
     @property
-    def coords(self) -> List[Tuple[float, float]]:
+    def coords(self) -> list[tuple[float, float]]:
         """Get the coordinates of the cross section.
 
         Returns

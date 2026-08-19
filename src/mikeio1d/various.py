@@ -7,14 +7,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type
 
-import clr
-import warnings
 import sys
-
+import warnings
 from collections.abc import Iterable
 
-from System import Enum
+import clr
 from DHI.Mike1D.Generic import PredefinedQuantity
+from System import Enum
 
 NAME_DELIMITER = ":"
 DELETE_VALUE = -1e-30
@@ -89,7 +88,7 @@ def make_list_if_not_iterable(obj) -> list:
     return obj
 
 
-def allow_nested_autocompletion_for_ipython(cls: Type):
+def allow_nested_autocompletion_for_ipython(cls: type):
     """Configure IPython to allow nested autocompletion for a class.
 
     See https://github.com/ipython/ipython/pull/13852

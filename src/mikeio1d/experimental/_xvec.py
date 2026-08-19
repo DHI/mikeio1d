@@ -19,9 +19,8 @@ Implementation notes
   remains consistent.
 """
 import sys
-
 from operator import ge
-from typing import Any, List, Optional, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Optional, cast
 
 # TypeIs was introduced in 'typing' since Python 3.13 (https://peps.python.org/pep-0742/)
 # Otherwise, it is found in 'typing_extensions' (>= 4.10)
@@ -33,25 +32,26 @@ else:
 
 if TYPE_CHECKING:
     import shapely
-    from shapely.geometry.base import BaseGeometry
     import xarray as xr
+    from shapely.geometry.base import BaseGeometry
 
 import math
+
 import pandas as pd
 
+from ..quantities import TimeSeriesIdGroup
 from ..res1d import Res1D
 from ..result_network import (
-    ResultGridPoint,
-    ResultReach,
-    ResultReaches,
-    ResultNode,
-    ResultNodes,
     ResultCatchment,
     ResultCatchments,
+    ResultGridPoint,
     ResultLocations,
+    ResultNode,
+    ResultNodes,
+    ResultReach,
+    ResultReaches,
 )
 from ._xarray import to_dataarray as _to_dataarray_xarray
-from ..quantities import TimeSeriesIdGroup
 
 
 def to_dataarray_xvec(res: Res1D) -> xr.DataArray:
@@ -94,9 +94,9 @@ def to_dataarray_xvec(res: Res1D) -> xr.DataArray:
     >>> da.xvec.query("geometry", [point], predicate="intersects")
     """
     import shapely
-    from shapely.geometry import GeometryCollection
     import xarray as xr
     import xvec
+    from shapely.geometry import GeometryCollection
 
     da = _to_dataarray_xarray(res)
 

@@ -5,27 +5,22 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Any
-    from typing import Optional
-    from typing import List
-    from typing import Tuple
-    from ..res1d import Res1D
-    from ..result_network.result_quantity import ResultQuantity
+    from typing import Any, List, Optional, Tuple
+
     from ..query import QueryData
-    from ..result_network.data_entry import DataEntry
+    from ..res1d import Res1D
     from ..result_network import ResultLocation
+    from ..result_network.data_entry import DataEntry
+    from ..result_network.result_quantity import ResultQuantity
 
 import dataclasses
-from dataclasses import dataclass
-from dataclasses import fields
-
+from dataclasses import dataclass, fields
 from enum import Enum
+
 import pandas as pd
-
-from ..various import NAME_DELIMITER
-from ..various import DELETE_VALUE
-
 from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
+
+from ..various import DELETE_VALUE, NAME_DELIMITER
 
 
 class TimeSeriesIdGroup(str, Enum):
@@ -157,7 +152,7 @@ class TimeSeriesId:
         result_quantity = quantity_map.get(self, None)
         return result_quantity is not None
 
-    def astuple(self) -> Tuple:
+    def astuple(self) -> tuple:
         """Convert a TimeSeriesId to a tuple."""
         return dataclasses.astuple(self)
 
@@ -263,7 +258,7 @@ class TimeSeriesId:
         return query.to_timeseries_id()
 
     @staticmethod
-    def from_tuple(t: Tuple, column_level_names: Optional[List[str]] = None) -> TimeSeriesId:
+    def from_tuple(t: tuple, column_level_names: list[str] | None = None) -> TimeSeriesId:
         """Convert a tuple to a TimeSeriesId object."""
         if not column_level_names:
             return TimeSeriesId(
@@ -279,7 +274,7 @@ class TimeSeriesId:
             return TimeSeriesId(**dict(zip(column_level_names, t)))
 
     @staticmethod
-    def to_multiindex(timeseries_ids: List[TimeSeriesId], compact=False) -> pd.MultiIndex:
+    def to_multiindex(timeseries_ids: list[TimeSeriesId], compact=False) -> pd.MultiIndex:
         """Convert a list of TimeSeriesId objects to a pandas MultiIndex.
 
         Parameters
@@ -318,7 +313,7 @@ class TimeSeriesId:
         return index
 
     @staticmethod
-    def from_multiindex(index: pd.MultiIndex) -> List[TimeSeriesId]:
+    def from_multiindex(index: pd.MultiIndex) -> list[TimeSeriesId]:
         """Convert a pandas MultiIndex to a list of TimeSeriesId objects."""
         if isinstance(index[0], tuple):
             if TimeSeriesId._is_multiindex_complete(index):
@@ -347,7 +342,7 @@ class TimeSeriesId:
             )
 
     @staticmethod
-    def _get_multiindex_as_list_of_dicts(index: pd.MultiIndex) -> List[dict]:
+    def _get_multiindex_as_list_of_dicts(index: pd.MultiIndex) -> list[dict]:
         """Convert a pandas MultiIndex to a list of dicts, where keys are the level name and values are the column names."""
         return [dict(zip(index.names, col)) for col in index.to_numpy()]
 

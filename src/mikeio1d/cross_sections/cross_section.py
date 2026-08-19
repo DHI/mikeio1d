@@ -1,39 +1,30 @@
 """CrossSection class."""
 
 from __future__ import annotations
-from warnings import warn
 
 from typing import TYPE_CHECKING
+from warnings import warn
 
 if TYPE_CHECKING:
-    from typing import Iterable
-    from typing import Tuple
-    from typing import List
+    from collections.abc import Iterable
+    from typing import List, Tuple
+
     from ..geometry import CrossSectionGeometry
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from .cross_section_factory import CrossSectionFactory
-from .marker import Marker
-from .enums import RadiusType
-from .enums import ResistanceType
-from .enums import ResistanceDistribution
-from .enums import ProcessLevelsMethod
-
-from ..various import try_import_shapely
-
-from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
-from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions
-from DHI.Mike1D.CrossSectionModule import ICrossSection
-from DHI.Mike1D.Generic import ProcessingOption
+from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions, CrossSectionPoint, ICrossSection
+from DHI.Mike1D.Generic import ProcessingOption, ZLocation
+from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
-from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
-from DHI.Mike1D.Generic import ZLocation
-from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate
-from DHI.Mike1D.Generic.Spatial.Geometry import CoordinateList
+from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate, CoordinateList
+
+from ..various import try_import_shapely
+from .cross_section_factory import CrossSectionFactory
+from .enums import ProcessLevelsMethod, RadiusType, ResistanceDistribution, ResistanceType
+from .marker import Marker
 
 
 class CrossSection:
@@ -190,7 +181,7 @@ class CrossSection:
         return CrossSectionGeometry(self._m1d_cross_section)
 
     @property
-    def coords(self) -> Tuple[Tuple[float, float]]:
+    def coords(self) -> tuple[tuple[float, float]]:
         """Get the geographical coordinates of the cross section line.
 
         If the cross section has no coordinates, an empty tuple will be returned.
@@ -206,7 +197,7 @@ class CrossSection:
         return tuple((p.X, p.Y) for p in self._m1d_cross_section.Coordinates)
 
     @coords.setter
-    def coords(self, coords: List[Tuple[float, float]]):
+    def coords(self, coords: list[tuple[float, float]]):
         """Set the geographical coordinates of the cross section line.
 
         Parameters
@@ -355,7 +346,7 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
-    def processing_levels(self) -> Tuple[float]:
+    def processing_levels(self) -> tuple[float]:
         """tuple[float]: A tuple of the level elevations used in the processed data.
 
         Notes
@@ -420,8 +411,8 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     def _calculate_conveyance_factor(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float]:
+        self, resistance: tuple[float], flow_area: tuple[float], radius: tuple[float]
+    ) -> tuple[float]:
         """Calculate the conveyance factor from resistance, flow area and radius.
 
         Note that this is not the true conveyance factor since resistance could be relative. However,
@@ -442,8 +433,8 @@ class CrossSection:
         return self._calculate_conveyance_factor_python(resistance, flow_area, radius)
 
     def _calculate_conveyance_factor_dotnet(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float] | None:
+        self, resistance: tuple[float], flow_area: tuple[float], radius: tuple[float]
+    ) -> tuple[float] | None:
         """Calculate the conveyance factor using the MIKE 1D engine.
 
         CalculateSpecificConveyance returns the specific conveyance (conveyance per unit area), so
@@ -467,8 +458,8 @@ class CrossSection:
             return None
 
     def _calculate_conveyance_factor_python(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float]:
+        self, resistance: tuple[float], flow_area: tuple[float], radius: tuple[float]
+    ) -> tuple[float]:
         """Calculate the conveyance factor in Python, mirroring the MIKE+ cross section editor.
 
         The formula depends on the cross section's resistance type (see issue #229). Formulations the

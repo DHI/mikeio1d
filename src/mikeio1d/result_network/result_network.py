@@ -5,27 +5,23 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Dict
+    from typing import Dict, List
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem, ResultData
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
-    from DHI.Mike1D.ResultDataAccess import ResultData
-    from DHI.Mike1D.ResultDataAccess import IDataItem
-
 import pandas as pd
 
+from ..quantities import DerivedQuantity, TimeSeriesId
 from ..various import try_import_geopandas
-
-from .result_nodes import ResultNodes
-from .result_reaches import ResultReaches
 from .result_catchments import ResultCatchments
 from .result_global_datas import ResultGlobalDatas
-from .result_structures import ResultStructures
+from .result_nodes import ResultNodes
 from .result_quantity import ResultQuantity
-from ..quantities import TimeSeriesId
-from ..quantities import DerivedQuantity
+from .result_reaches import ResultReaches
+from .result_structures import ResultStructures
 
 
 class ResultNetwork:
@@ -80,11 +76,11 @@ class ResultNetwork:
     def __init__(self, res1d: Res1D):
         self.res1d = res1d
         self.data: ResultData = res1d.result_data
-        self.data_items: List[IDataItem] = res1d.result_data.DataItems
+        self.data_items: list[IDataItem] = res1d.result_data.DataItems
 
-        self.queue: List[TimeSeriesId] = []
+        self.queue: list[TimeSeriesId] = []
 
-        self.result_quantity_map: Dict[TimeSeriesId, ResultQuantity] = {}
+        self.result_quantity_map: dict[TimeSeriesId, ResultQuantity] = {}
 
         self.res1d.network = self
         self._set_result_locations()

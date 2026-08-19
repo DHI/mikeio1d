@@ -1,23 +1,21 @@
 """ResultCatchment class."""
 
 from __future__ import annotations
-from warnings import warn
+
 from typing import TYPE_CHECKING
+from warnings import warn
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..res1d import Res1D
+    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DCatchment
+
     from ..geometry import CatchmentGeometry
+    from ..res1d import Res1D
     from .result_quantity import ResultQuantity
 
-    from DHI.Mike1D.ResultDataAccess import IDataItem
-    from DHI.Mike1D.ResultDataAccess import IRes1DCatchment
-
+from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataCatchment
 from ..various import try_import_shapely
-from ..quantities import TimeSeriesIdGroup
-
-from .result_location import ResultLocation
-from .result_location import ResultLocationCreator
+from .result_location import ResultLocation, ResultLocationCreator
 
 
 class ResultCatchment(ResultLocation):

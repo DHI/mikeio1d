@@ -8,15 +8,14 @@ if TYPE_CHECKING:  # pragma: no cover
     from geopandas import GeoDataFrame
     from shapely.geometry.base import BaseGeometry
 
-    from mikeio1d.result_network import ResultReach
-    from mikeio1d.result_network import ResultReaches
+    from mikeio1d.result_network import ResultReach, ResultReaches
 
 from geopandas import GeoDataFrame
 
-from .geopandas_converter import GeoPandasConverter
-from ..reach_geometry import ReachGeometry
-
 from mikeio1d.quantities import TimeSeriesIdGroup
+
+from ..reach_geometry import ReachGeometry
+from .geopandas_converter import GeoPandasConverter
 
 
 class GeoPandasReachesConverter(GeoPandasConverter):

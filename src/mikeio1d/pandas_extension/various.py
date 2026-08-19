@@ -7,7 +7,6 @@ from dataclasses import fields
 import pandas as pd
 
 from ..quantities import TimeSeriesId
-
 from .transposed_groupby import TransposedGroupBy
 
 

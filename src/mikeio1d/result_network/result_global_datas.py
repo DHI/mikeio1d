@@ -1,21 +1,20 @@
 """ResultGlobalDatas class."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
 
-    from ..res1d import Res1D
-
     from DHI.Mike1D.ResultDataAccess import IDataItem
+
+    from ..res1d import Res1D
 
 from ..dotnet import pythonnet_implementation as impl
 from ..quantities import TimeSeriesIdGroup
-
-from .result_locations import ResultLocations
-from .result_locations import ResultLocationsCreator
 from .result_global_data import ResultGlobalData
+from .result_locations import ResultLocations, ResultLocationsCreator
 
 
 class ResultGlobalDatas(ResultLocations):
@@ -60,7 +59,7 @@ class ResultGlobalDatasCreator(ResultLocationsCreator):
 
     def __init__(self, result_locations: ResultGlobalDatas, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
-        self.result_global_data_list: List[ResultGlobalData] = []
+        self.result_global_data_list: list[ResultGlobalData] = []
 
     def create(self):
         """Perform ResultCatchments creation steps."""

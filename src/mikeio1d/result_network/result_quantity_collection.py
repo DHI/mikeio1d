@@ -5,13 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Optional
-    from typing import List
-
-    from ..result_reader_writer.result_reader import ColumnMode
-    from ..quantities import TimeSeriesId
+    from typing import List, Optional
 
     import pandas as pd
+
+    from ..quantities import TimeSeriesId
+    from ..result_reader_writer.result_reader import ColumnMode
 
 from .result_quantity import ResultQuantity
 
@@ -53,7 +52,7 @@ class ResultQuantityCollection(ResultQuantity):
         for result_quantity in self.result_quantities:
             result_quantity.add()
 
-    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Parameters
@@ -69,7 +68,7 @@ class ResultQuantityCollection(ResultQuantity):
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
         return self.res1d.read(timeseries_ids, column_mode=column_mode)
 
-    def to_dataframe(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def to_dataframe(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Alias for read() method.
@@ -108,7 +107,7 @@ class ResultQuantityCollection(ResultQuantity):
         self.data_item = self.result_quantities[0].data_item
         return ResultQuantity.plot(self, ax=ax, **kwargs)
 
-    def get_timeseries_ids(self) -> List[TimeSeriesId]:
+    def get_timeseries_ids(self) -> list[TimeSeriesId]:
         """Get TimeSeriesId objects corresponding to ResultQuantityCollection."""
         timeseries_ids = [q.timeseries_id for q in self.result_quantities]
         return timeseries_ids

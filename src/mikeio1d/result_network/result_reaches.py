@@ -5,21 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Callable
-    from typing import List
-    from typing import Dict
+    from collections.abc import Callable
+    from typing import Dict, List
+
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
-    from DHI.Mike1D.ResultDataAccess import IRes1DReach
-
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
-
-from .result_locations import ResultLocations
-from .result_locations import ResultLocationsCreator
+from .result_locations import ResultLocations, ResultLocationsCreator
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
 
@@ -51,7 +48,7 @@ class ResultReaches(ResultLocations):
     def to_geopandas(
         self,
         agg: str | Callable = None,
-        agg_kwargs: Dict[str : str | Callable] = {},
+        agg_kwargs: dict[str : str | Callable] = {},
         segmented: bool = True,
         include_derived: bool = False,
     ) -> GeoDataFrame:
@@ -93,8 +90,10 @@ class ResultReaches(ResultLocations):
         >>> gdf = res1d.reaches.to_geopandas(agg='mean')
 
         """
-        from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
-        from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented
+        from mikeio1d.geometry.geopandas import (
+            GeoPandasReachesConverter,
+            GeoPandasReachesConverterSegmented,
+        )
 
         if segmented:
             gpd_converter = GeoPandasReachesConverterSegmented()
@@ -145,7 +144,7 @@ class ResultReachesCreator(ResultLocationsCreator):
     def __init__(self, result_locations: ResultReaches, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.reach_label = "r_"
-        self.result_reach_map: Dict[str : List[ResultReach]] = {}
+        self.result_reach_map: dict[str : list[ResultReach]] = {}
 
     def create(self):
         """Perform ResultReaches creation steps."""

@@ -1,8 +1,9 @@
 """Module for handling MIKE binary paths."""
 
 import os
-import sys
 import platform
+import sys
+
 import pythonnet
 
 

@@ -6,15 +6,16 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from mikeio1d.quantities import TimeSeriesId
+
     from .query_data import QueryData
 
+from mikeio1d.quantities import TimeSeriesIdGroup
+
+from .query_data_catchment import QueryDataCatchment
 from .query_data_global import QueryDataGlobal
 from .query_data_node import QueryDataNode
 from .query_data_reach import QueryDataReach
 from .query_data_structure import QueryDataStructure
-from .query_data_catchment import QueryDataCatchment
-
-from mikeio1d.quantities import TimeSeriesIdGroup
 
 
 class QueryDataCreator:

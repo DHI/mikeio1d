@@ -5,18 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Iterable
+    from collections.abc import Iterable
+
     import pandas as pd
 
 
-from DHI.Mike1D.Generic import ZLocation
-from DHI.Mike1D.Generic import RadiusType
-from DHI.Mike1D.Generic import ResistanceDistribution
-from DHI.Mike1D.Generic import ResistanceFormulation
 from DHI.Mike1D.CrossSectionModule import CrossSectionFactory as M1DCrossSectionFactory
-from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
-from DHI.Mike1D.CrossSectionModule import CrossSectionPointList
-from DHI.Mike1D.CrossSectionModule import FlowResistance
+from DHI.Mike1D.CrossSectionModule import CrossSectionPoint, CrossSectionPointList, FlowResistance
+from DHI.Mike1D.Generic import RadiusType, ResistanceDistribution, ResistanceFormulation, ZLocation
 
 
 class CrossSectionFactory:

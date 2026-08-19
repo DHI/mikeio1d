@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Protocol
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import ResultData
-    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IDataItem, ResultData
 
 from DHI.Mike1D.ResultDataAccess import Filter
 
@@ -49,11 +47,9 @@ class ResultSubFilter(Protocol):
 
     def apply(self, filter: Filter, result_data: ResultData | None) -> None:
         """Apply the filter to the provided Filter object."""
-        pass
 
     def use_filter(self) -> bool:
         """Check if the filter should be used."""
-        pass
 
     def _box_inputs_to_str_list(self, value: str | list[str] | None) -> list[str]:
         if value is None:

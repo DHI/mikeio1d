@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
+    from ..quantities import DerivedQuantity
     from ..res1d import Res1D
     from ..result_network import ResultLocations
-    from ..quantities import DerivedQuantity
 
 from .result_quantity_derived import ResultQuantityDerived
 

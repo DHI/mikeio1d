@@ -7,10 +7,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
 
-from System.Collections.Generic import List as DotNetList
-from System import String
-
 from DHI.Mike1D.MikeIO import ResultMerger as Res1DResultMerger
+from System import String
+from System.Collections.Generic import List as DotNetList
 
 
 class ResultMerger:
@@ -23,7 +22,7 @@ class ResultMerger:
 
     """
 
-    def __init__(self, file_names: List[str]):
+    def __init__(self, file_names: list[str]):
         self.file_names = file_names
 
     def merge(self, merged_file_name: str):

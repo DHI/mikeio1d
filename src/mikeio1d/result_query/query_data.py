@@ -7,15 +7,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
 
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 import numpy as np
 
-from ..custom_exceptions import NoDataForQuery
-from ..custom_exceptions import InvalidQuantity
-from ..various import NAME_DELIMITER
+from ..custom_exceptions import InvalidQuantity, NoDataForQuery
 from ..quantities import TimeSeriesId
+from ..various import NAME_DELIMITER
 
 
 class QueryData(ABC):

@@ -2,11 +2,9 @@
 
 import pandas as pd
 
+from .result_reaches_helpers import agg_chainage, groupby_chainage
 from .transposed_groupby import TransposedGroupBy
-from .result_reaches_helpers import agg_chainage
-from .result_reaches_helpers import groupby_chainage
-from .various import compact_dataframe
-from .various import groupby_level
+from .various import compact_dataframe, groupby_level
 
 
 @pd.api.extensions.register_dataframe_accessor("m1d")

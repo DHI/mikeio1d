@@ -11,10 +11,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from mikeio1d.result_network import ResultLocation
 
-from ..derived_quantity import DerivedQuantity
-from ...timeseries_id import TimeSeriesIdGroup
-
 import numpy as np
+
+from ...timeseries_id import TimeSeriesIdGroup
+from ..derived_quantity import DerivedQuantity
 
 
 class NodeWaterLevelAboveCritical(DerivedQuantity):
@@ -24,7 +24,7 @@ class NodeWaterLevelAboveCritical(DerivedQuantity):
     _GROUPS = {TimeSeriesIdGroup.NODE}
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]) -> pd.DataFrame:
         """Derive the water level above critical level in a node."""
         dtype = df_source.dtypes.iloc[0]
         levels = np.fromiter(self.get_critical_levels(locations), dtype=dtype)
@@ -36,6 +36,6 @@ class NodeWaterLevelAboveCritical(DerivedQuantity):
         """Get the critical level for a location."""
         return getattr(location, "critical_level", np.nan)
 
-    def get_critical_levels(self, locations: List[ResultLocation]):
+    def get_critical_levels(self, locations: list[ResultLocation]):
         """Get the critical levels for a list of locations."""
         yield from (self.get_critical_level(location) for location in locations)

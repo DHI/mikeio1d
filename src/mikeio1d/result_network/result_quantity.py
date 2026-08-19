@@ -6,18 +6,19 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Optional
+
+    import pandas as pd
+
     from ..res1d import Res1D
     from ..result_network import ResultLocation
     from ..result_reader_writer.result_reader import ColumnMode
 
-    import pandas as pd
+from DHI.Mike1D.Generic import IQuantity
+from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
-from .data_entry import DataEntry
 from ..quantities import TimeSeriesId
 from ..result_query import QueryDataCreator
-
-from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
-from DHI.Mike1D.Generic import IQuantity
+from .data_entry import DataEntry
 
 
 class ResultQuantity:
@@ -110,7 +111,7 @@ class ResultQuantity:
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
         self.res1d.network.queue.append(self.timeseries_id)
 
-    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Parameters

@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 
-from shapely.geometry.base import BaseGeometry
 from shapely.geometry import Polygon
+from shapely.geometry.base import BaseGeometry
 
 
 @dataclass(frozen=True)
@@ -21,7 +20,7 @@ class CatchmentGeometry:
 
     """
 
-    points: List[Tuple[float, float]]
+    points: list[tuple[float, float]]
 
     @staticmethod
     def from_res1d_catchment(res1d_catchment) -> CatchmentGeometry:

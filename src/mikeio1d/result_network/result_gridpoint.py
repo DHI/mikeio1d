@@ -7,19 +7,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from typing import List
 
+    from DHI.Mike1D.ResultDataAccess import IDataItem, IDataItems, IRes1DGridPoint, IRes1DReach
+
     from ..res1d import Res1D
     from .result_reach import ResultReach
 
-    from DHI.Mike1D.ResultDataAccess import IDataItem
-    from DHI.Mike1D.ResultDataAccess import IDataItems
-    from DHI.Mike1D.ResultDataAccess import IRes1DReach
-    from DHI.Mike1D.ResultDataAccess import IRes1DGridPoint
-
-from ..query import QueryDataReach
 from ..quantities import TimeSeriesIdGroup
-
-from .result_location import ResultLocation
-from .result_location import ResultLocationCreator
+from ..query import QueryDataReach
+from .result_location import ResultLocation, ResultLocationCreator
 
 
 class ResultGridPoint(ResultLocation):
@@ -182,7 +177,7 @@ class ResultGridPointCreator(ResultLocationCreator):
         result_reach: ResultReach,
         res1d: Res1D,
     ):
-        empty_data_item_list: List[IDataItem] = []
+        empty_data_item_list: list[IDataItem] = []
         ResultLocationCreator.__init__(self, result_location, empty_data_item_list, res1d)
 
         self.reach = reach
