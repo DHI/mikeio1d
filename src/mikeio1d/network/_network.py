@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Any, overload
 
 import networkx as nx
+import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 
@@ -271,25 +273,76 @@ class Network:
             df.attrs["quantity"] = sel
             return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
 
+    def _identity_coords(self, nodes: npt.ArrayLike) -> dict[str, tuple[str, np.ndarray]]:
+        """Describe each node by the name it had before it became an integer.
+
+        Parameters
+        ----------
+        nodes : array-like of int
+            The integer ids to describe, in the order they appear.
+
+        Returns
+        -------
+        dict
+            ``name``, ``reach`` and ``distance`` arrays along the ``node``
+            dimension. A node fills in ``name`` and leaves the other two empty; a
+            breakpoint fills in ``reach`` and ``distance`` and leaves ``name``
+            empty. Nothing carries both, so the empty half says which it is.
+        """
+        aliases = {node_id: alias for alias, node_id in self._alias_map.items()}
+
+        names, reaches, distances = [], [], []
+        for node in np.asarray(nodes):
+            alias = aliases[int(node)]
+            if isinstance(alias, tuple):
+                reach, distance = alias
+                names.append("")
+                reaches.append(reach)
+                distances.append(np.nan if distance is None else distance)
+            else:
+                names.append(alias)
+                reaches.append("")
+                distances.append(np.nan)
+
+        return {
+            "name": ("node", np.array(names, dtype=str)),
+            "reach": ("node", np.array(reaches, dtype=str)),
+            "distance": ("node", np.array(distances, dtype=float)),
+        }
+
     def to_dataset(self) -> xr.Dataset:
-        """Dataset using node ids as coords.
+        """Dataset of the timeseries, with each node's original identity alongside.
 
         Returns
         -------
         xr.Dataset
-            Timeseries contained in graph nodes
+            One variable per quantity over ``(time, node)``. ``node`` is the
+            integer index the graph uses, and the ``name``, ``reach`` and
+            ``distance`` coordinates carry the names the model gave the same
+            locations, so a consumer never has to hold on to the network to know
+            what a column is::
+
+                Coordinates:
+                  * time      datetime64
+                  * node      int64     0 1 2 3 ...
+                    name      <U16      'J1' 'J2' '' ''
+                    reach     <U16      '' '' 'r1' 'r1'
+                    distance  float64   nan nan 0.0 24.5
+
+            Empty when no location carries data.
         """
         df_raw = self.to_dataframe()
         if len(df_raw.columns) == 0:
             return xr.Dataset()
         df = df_raw.reorder_levels(["quantity", "node"], axis=1)
         quantities = df.columns.get_level_values("quantity").unique()
-        return xr.Dataset(
+        ds = xr.Dataset(
             {
                 q: xr.DataArray(df[q], dims=["time", "node"], attrs={"long_name": str(q)})
                 for q in quantities
             }
         )
+        return ds.assign_coords(self._identity_coords(ds.node.values))
 
     @property
     def graph(self) -> nx.Graph:
