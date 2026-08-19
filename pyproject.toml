@@ -85,12 +85,19 @@ experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 "Bug Tracker" = "https://github.com/DHI/mikeio1d/issues"
 
 [tool.ruff]
+# Pinned: ruff 0.16 grew its default rule set substantially, so an unpinned
+# upgrade silently changes what CI enforces. Bump this and the version in
+# .github/workflows/full_test.yml together.
+required-version = ">=0.16,<0.17"
 include = ["pyproject.toml", "src/mikeio1d/**/*.py"]
 line-length = 100
-lint.extend-select = ["D", "PD", "NPY", "FA"]
+lint.extend-select = ["D", "PD", "NPY", "FA", "I"]
 lint.ignore = [
-    "E402",  # ignore for now
-    "F401",  # ignore for now
-    "PD901", # allow using 'df' for pd.DataFrame type
+    "E402",   # ignore for now
+    "F401",   # ignore for now
+    "TRY004", # ValueError -> TypeError on type checks would break callers
+    "BLE001", # the broad catches wrap .NET interop, where the type is unknowable
+    "S102",   # exec is how mikenet binds .NET namespaces into the module
+    "DTZ001", # MIKE result timestamps are naive by design
 ]
 lint.pydocstyle.convention = "numpy"
