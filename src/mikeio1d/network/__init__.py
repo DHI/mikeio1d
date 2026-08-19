@@ -13,7 +13,7 @@ The module is provisional. It needs ``networkx`` and ``xarray``, which the
 Examples
 --------
 >>> from mikeio1d.network import Network
->>> network = Network.from_mike("tests/testdata/network.res1d")  # doctest: +SKIP
+>>> network = Network.open("tests/testdata/network.res1d")  # doctest: +SKIP
 >>> node = network.find(node="101")  # doctest: +SKIP
 >>> network.to_dataframe()  # doctest: +SKIP
 """

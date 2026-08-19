@@ -139,8 +139,7 @@ def _describe_graph(network: Any) -> dict[str, Any]:
         "edges": edges,
         "nodes": nodes,
         "alias_map": {
-            _alias_key(alias): int(node_id)
-            for alias, node_id in network._alias_map.items()
+            _alias_key(alias): int(node_id) for alias, node_id in network._alias_map.items()
         },
     }
 
@@ -201,8 +200,7 @@ def _describe_dataframe(network: Any) -> dict[str, Any]:
             "n": int(len(index)),
         },
         "columns": {
-            f"{node}|{quantity}": _digest(df[(node, quantity)])
-            for node, quantity in df.columns
+            f"{node}|{quantity}": _digest(df[(node, quantity)]) for node, quantity in df.columns
         },
     }
 
@@ -237,9 +235,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     endpoints = {}
     for reach_id in network._reaches:
         for where in ("start", "end"):
-            endpoints[f"{reach_id}@{where}"] = int(
-                network.find(reach=reach_id, distance=where)
-            )
+            endpoints[f"{reach_id}@{where}"] = int(network.find(reach=reach_id, distance=where))
 
     recalled = {}
     for node_id in sorted(network._alias_map.values()):
