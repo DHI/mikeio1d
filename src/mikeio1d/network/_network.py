@@ -8,7 +8,6 @@ translate between them.
 
 from __future__ import annotations
 
-import sys
 from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
@@ -19,20 +18,10 @@ import pandas as pd
 import xarray as xr
 
 from ..res1d import Res1D
-from ._companions import (
-    _Companion,
-    _find_epanet_companions,
-    _open_companion_result,
-    _read_companion_lengths,
-)
+from ._companions import _companion_paths, _read_companions
 from ._graph import _CHAINAGE_TOLERANCE, _build_dataframe, _generate_alias_map, _generate_graph
-from ._policy import (
-    _EPANET_EXTENSIONS,
-    _EXTENSION_CONSTRUCTORS,
-    _MIKE_EXTENSIONS,
-    _validate_extension,
-)
-from ._res1d import _check_file_path_is_str, _load_res1d_network
+from ._policy import _validate_extension
+from ._res1d import _load_res1d_network
 from ._types import NetworkReach
 
 
@@ -62,28 +51,45 @@ class Network:
         return "\n".join(out)
 
     @classmethod
-    def from_mike(
+    def open(
         cls,
         res: str | Path | Res1D,
         *,
+        companions: Sequence[str | Path | Res1D] | None = None,
         nodes: str | list[str] | None = None,
         reaches: str | list[str] | None = None,
         quantities: str | list[str] | None = None,
     ) -> Network:
-        """Create a Network from a MIKE 1D or MIKE 11 result file.
+        """Read a network from a result file.
 
         Parameters
         ----------
         res : str, Path or Res1D
-            Path to a ``.res1d`` or ``.res11`` file, or an already-opened
-            :class:`mikeio1d.Res1D` object.
+            Path to a ``.res1d``, ``.res11`` or ``.res`` result file, or an
+            already-opened :class:`~mikeio1d.Res1D`.
+        companions : sequence of str, Path or Res1D, or None, optional
+            Files read alongside the result and recognised by their extension:
+
+            * ``.resx`` -- extra EPANET results for the same network. Its node
+              quantities (tank ``Volume`` and ``Volume Percentage``) are merged
+              onto the matching nodes, and its reach quantities (pump
+              ``efficiency``, ``energy`` and ``energy costs``) onto the matching
+              reach's breakpoints.
+            * ``.inp`` -- the EPANET input file, read for its ``[PIPES]``
+              lengths. No result file carries a reach length, so without this one
+              no reach has one.
+
+            ``None`` *(default)* looks for them beside the result file, matching
+            its folder and stem; ``[]`` reads none; a list reads exactly those.
+            Only EPANET results are looked for, since no other product writes
+            companions this reader knows.
         nodes : str, list of str, or None, optional
             Controls which nodes have their timeseries data loaded into memory.
 
-            * ``None`` *(default)* — data is loaded for every node.
-            * A single node ID or a list of node IDs — only those nodes get
+            * ``None`` *(default)* -- data is loaded for every node.
+            * A single node ID or a list of node IDs -- only those nodes get
               data; others are topology-only.
-            * ``[]`` (empty list) — no node data is loaded at all.
+            * ``[]`` (empty list) -- no node data is loaded at all.
 
             The full network topology is always constructed regardless of this
             setting, so ``find()`` and ``recall()`` still work on all nodes.
@@ -91,16 +97,20 @@ class Network:
             Controls which reaches have their intermediate gridpoint data
             populated.
 
-            * ``None`` *(default)* — gridpoints are populated for every reach.
-            * A single reach name or a list of reach names — only those reaches
+            * ``None`` *(default)* -- gridpoints are populated for every reach.
+            * A single reach name or a list of reach names -- only those reaches
               get gridpoint data; others are topology-only.
-            * ``[]`` (empty list) — no gridpoint data is loaded at all.
+            * ``[]`` (empty list) -- no gridpoint data is loaded at all.
+
+            EPANET reaches have at most one gridpoint (see Notes), but this
+            argument still governs whether its data, and any matching ``.resx``
+            reach quantities, are populated.
         quantities : str, list of str, or None, optional
             Controls which quantities are read at each selected location.
 
-            * ``None`` *(default)* — every quantity is read.
-            * A single quantity name or a list of names — only those are read.
-            * ``[]`` (empty list) — no data is read at all.
+            * ``None`` *(default)* -- every quantity is read.
+            * A single quantity name or a list of names -- only those are read.
+            * ``[]`` (empty list) -- no data is read at all.
 
             A location that does not carry a requested quantity becomes
             topology-only rather than an error, so this composes with ``nodes``
@@ -114,38 +124,37 @@ class Network:
         Raises
         ------
         NotImplementedError
-            If the file extension is not one modelskill can read.
+            If no network can be built from the file's extension.
         ValueError
-            If the extension belongs to another constructor, such as EPANET.
+            If a companion has an extension this reader does not know, if two
+            companions of the same kind are given, or if a ``.resx`` does not
+            come from the same run as the result file.
 
         Examples
         --------
-        Load everything (default behaviour):
+        >>> from mikeio1d.network import Network
+        >>> network = Network.open("model.res1d")  # doctest: +SKIP
 
-        >>> from modelskill.network import Network
-        >>> network = Network.from_mike("model.res1d")
+        Load data only for the two nodes where observations exist, and skip all
+        intermediate gridpoint data to keep memory usage low:
 
-        Load data only for the two nodes where observations exist, and skip
-        all intermediate gridpoint data to keep memory usage low:
-
-        >>> network = Network.from_mike(
+        >>> network = Network.open(  # doctest: +SKIP
         ...     "model.res1d",
         ...     nodes=["node_a", "node_b"],
         ...     reaches=[],
         ... )
 
-        Load data for selected nodes and gridpoints for one specific reach:
-
-        >>> network = Network.from_mike(
-        ...     "model.res1d",
-        ...     nodes=["node_a", "node_b"],
-        ...     reaches=["reach_1"],
-        ... )
-
         Read a single quantity, for a calibration loop that only scores
         discharge:
 
-        >>> network = Network.from_mike("model.res1d", quantities="Discharge")
+        >>> network = Network.open("model.res1d", quantities="Discharge")  # doctest: +SKIP
+
+        Name the companions rather than letting them be found:
+
+        >>> network = Network.open(  # doctest: +SKIP
+        ...     "model.res",
+        ...     companions=["other.resx", "other.inp"],
+        ... )
 
         Notes
         -----
@@ -153,173 +162,34 @@ class Network:
         so the nodes of a ``.res11`` network carry no data of their own. Pass
         ``reaches`` rather than ``nodes`` to control what gets loaded.
 
-        See Also
-        --------
-        from_epanet : Read an EPANET result file.
-        """
-        return cls._from_mikeio1d(
-            res,
-            nodes=nodes,
-            reaches=reaches,
-            quantities=quantities,
-            allowed=_MIKE_EXTENSIONS,
-            caller="from_mike",
-        )
-
-    @classmethod
-    def from_epanet(
-        cls,
-        res: str | Path | Res1D,
-        *,
-        resx: str | Path | Res1D | None = None,
-        inp: str | Path | None = None,
-        nodes: str | list[str] | None = None,
-        reaches: str | list[str] | None = None,
-        quantities: str | list[str] | None = None,
-    ) -> Network:
-        """Create a Network from an EPANET result file and its companions.
-
-        An EPANET run writes up to three files that modelskill can use. The
-        ``.res`` holds the network and its main timeseries; the optional
-        ``.resx`` holds extra results; and the optional ``.inp`` is the input
-        file, which is the only one of the three carrying reach lengths.
-
-        Parameters
-        ----------
-        res : str, Path or Res1D
-            Path to a ``.res`` file, or an already-opened
-            :class:`mikeio1d.Res1D` object.
-        resx : str, Path, Res1D or None, optional
-            Companion ``.resx`` file from the same run. Its extra node
-            quantities (tank ``Volume`` and ``Volume Percentage``) are merged
-            onto the matching nodes, and its extra reach quantities (e.g. pump
-            ``efficiency``, ``energy`` and ``energy costs``) are merged onto
-            the matching reach's breakpoints. By default None, and those
-            quantities are simply absent.
-        inp : str, Path or None, optional
-            EPANET ``.inp`` input file for the same model, read for its
-            ``[PIPES]`` lengths. By default None, and reach lengths are
-            undefined.
-        nodes : str, list of str, or None, optional
-            Which nodes get their timeseries loaded. See :meth:`from_mike`.
-        reaches : str, list of str, or None, optional
-            Which reaches get their breakpoint data loaded. See
-            :meth:`from_mike`. EPANET reaches have at most one gridpoint (see
-            Notes), but this argument still governs whether its data - and
-            any matching ``resx`` reach quantities - are populated.
-        quantities : str, list of str, or None, optional
-            Which quantities are read at each selected location. See
-            :meth:`from_mike`.
-
-        Returns
-        -------
-        Network
-
-        Raises
-        ------
-        NotImplementedError
-            If the file extension is not one modelskill can read.
-        ValueError
-            If the extension belongs to another constructor, such as MIKE, if a
-            companion file has the wrong extension, or if ``resx`` does not come
-            from the same run as ``res``.
-
-        Examples
-        --------
-        >>> from modelskill.network import Network
-        >>> network = Network.from_epanet("model.res")
-
-        With both companions, for real edge lengths and the extra quantities:
-
-        >>> network = Network.from_epanet(
-        ...     "model.res",
-        ...     resx="model.resx",
-        ...     inp="model.inp",
-        ... )
-
-        Notes
-        -----
         EPANET is a link-node model, and mikeio1d reports a single synthetic
         gridpoint for each reach, not tied to either end. That gridpoint is
         duplicated into two breakpoints, one at each end of the reach, so its
         own quantities (``Flow``, ``Velocity``, ...) are reachable through
-        :meth:`find`, :meth:`recall` and
-        :class:`~modelskill.obs.ReachObservation` the same way a MIKE reach's
-        end data already is. As a result:
+        :meth:`find` and :meth:`recall` the same way a MIKE reach's end data
+        already is. As a result:
 
-        * without ``inp``, a reach's length is unknown, so only its first
-          breakpoint (``distance=0.0``) is real; the second is not
-          addressable by distance at all — ``find(reach=..., distance=...)``
-          resolves it only via ``distance="start"``/``"end"`` (which return
-          the node, not the breakpoint), or not at all by a number. The
-          corresponding edges of :attr:`graph` are ``length=None``
-        * with ``inp``, a pipe's second breakpoint sits at its full length —
-          both breakpoints are then addressable by distance, and the edge
-          between them carries the pipe's real length. Pumps and valves keep
-          an unaddressable second breakpoint even with ``inp``, since
-          ``[PIPES]`` is the only section carrying lengths
-
-        ``resx``'s reach-level quantities (pump ``efficiency``, ``energy`` and
-        ``energy costs``) merge onto the matching reach's breakpoints the same
-        way its node quantities merge onto nodes.
+        * without the ``.inp``, a reach's length is unknown, so only its first
+          breakpoint (``distance=0.0``) is real; the second is not addressable
+          by distance at all -- ``find(reach=..., distance=...)`` resolves it
+          only via ``distance="start"``/``"end"`` (which return the node, not
+          the breakpoint), or not at all by a number. The corresponding edges of
+          :attr:`graph` are ``length=None``
+        * with the ``.inp``, a pipe's second breakpoint sits at its full length
+          -- both breakpoints are then addressable by distance, and the edge
+          between them carries the pipe's real length. Pumps and valves keep an
+          unaddressable second breakpoint even so, since ``[PIPES]`` is the only
+          section carrying lengths
 
         Node timeseries, :meth:`to_dataframe`, :meth:`to_dataset`,
         ``find(node=...)`` and :meth:`recall` are unaffected.
-
-        See Also
-        --------
-        from_mike : Read a MIKE 1D or MIKE 11 result file.
         """
-        return cls._from_mikeio1d(
-            res,
-            nodes=nodes,
-            reaches=reaches,
-            quantities=quantities,
-            allowed=_EPANET_EXTENSIONS,
-            caller="from_epanet",
-            resx=resx,
-            inp=inp,
-        )
-
-    @classmethod
-    def _from_mikeio1d(
-        cls,
-        res: str | Path | Res1D,
-        *,
-        nodes: str | list[str] | None,
-        reaches: str | list[str] | None,
-        allowed: frozenset[str],
-        caller: str,
-        quantities: str | list[str] | None = None,
-        resx: str | Path | Res1D | None = None,
-        inp: str | Path | None = None,
-    ) -> Network:
-        """Shared implementation behind the public ``from_*`` constructors.
-
-        Parameters
-        ----------
-        allowed : frozenset of str
-            Extensions this constructor accepts.
-        caller : str
-            Name of the public method, used in error messages.
-        resx : str, Path, Res1D or None, optional
-            Companion result file whose node quantities are merged in.
-        inp : str, Path or None, optional
-            Companion input file read for reach lengths.
-        """
-        if sys.version_info >= (3, 14):
-            raise NotImplementedError(
-                f"Current version of 'mikeio1d' requires python < 3.14 and {sys.version} is being used."
-            )
-
         if isinstance(res, (str, Path)):
             path = Path(res)
-            _validate_extension(path.suffix, allowed=allowed, caller=caller)
+            _validate_extension(path.suffix)
             res = Res1D(str(path))
         elif isinstance(res, Res1D):
-            _check_file_path_is_str(res)
-            suffix = Path(res.file_path).suffix
-            _validate_extension(suffix, allowed=allowed, caller=caller)
+            _validate_extension(Path(res.file_path).suffix)
         else:
             raise TypeError(f"Expected a str, Path or Res1D object, got {type(res).__name__!r}")
 
@@ -337,9 +207,6 @@ class Network:
         else:
             reaches_list = list(reaches)
 
-        extra = None if resx is None else _open_companion_result(res, resx)
-        lengths = None if inp is None else _read_companion_lengths(inp)
-
         # None is threaded through as "read everything" rather than expanded to
         # res.quantities, which would only cost a lookup for the same result.
         if quantities is None:
@@ -349,14 +216,31 @@ class Network:
         else:
             quantities_set = set(quantities)
 
-        list_of_reaches = _load_res1d_network(
-            res,
-            nodes_list,
-            reaches_list,
-            extra=extra,
-            lengths=lengths,
-            quantities=quantities_set,
-        )
+        found, discovered = _companion_paths(res, companions)
+
+        try:
+            extra, lengths = _read_companions(res, found)
+            list_of_reaches = _load_res1d_network(
+                res,
+                nodes_list,
+                reaches_list,
+                extra=extra,
+                lengths=lengths,
+                quantities=quantities_set,
+            )
+        except ValueError as err:
+            if not discovered:
+                raise
+            # A companion nobody asked for must be named when it fails, or the
+            # error points at files the caller did not know were being read.
+            names = ", ".join(f"'{Path(str(companion)).name}'" for companion in found)
+            raise ValueError(
+                f"Failed to build a network from '{Path(str(res.file_path)).name}': {err}\n"
+                f"Companion files read alongside it, because they share its folder: "
+                f"{names}. Pass companions=[] to read the result file on its own, or "
+                "name the companions you want."
+            ) from err
+
         return cls(list_of_reaches)
 
     @staticmethod

@@ -164,14 +164,14 @@ def _build_reach_breakpoints(
     Reaches with more than 2 gridpoints have real, independently-measured
     start/end points, so every gridpoint becomes a break point at its own
     chainage (the first/last ones end up coincident with the reach's own
-    start_node/end_node - Network._generate_graph connects them with a
-    zero-length edge).
+    start_node/end_node - the graph builder connects them with a zero-length
+    edge).
 
     Reaches with 2 or fewer gridpoints are link-node models (e.g. EPANET),
     whose single synthetic gridpoint belongs to neither end - it is
     duplicated into two break points, one at each end (distance 0.0, and
     distance `length` if known or None otherwise), so the reach's own
-    quantities (e.g. Flow) are reachable the same way MIKE's are. See
+    quantities (e.g. Flow) are reachable the same way MIKE's are. Decided in
     https://github.com/DHI/modelskill/issues/680.
 
     A companion ``.resx`` result (``extra``) contributes its own reach-level
@@ -313,20 +313,3 @@ def _load_res1d_network(
         )
 
     return [_build_reach(reach) for reach in res.reaches.values()]
-
-
-def _check_file_path_is_str(res: Res1D) -> None:
-    """Reject a Res1D opened with a path object rather than a string.
-
-    mikeio1d resolves reach topology with ``str.endswith`` on
-    ``Res1D.file_path``, which raises ``AttributeError`` from deep inside the
-    load when that attribute is a ``Path``. Fail here instead, where the cause
-    can be named.
-    """
-    file_path = getattr(res, "file_path", None)
-    if file_path is not None and not isinstance(file_path, str):
-        raise TypeError(
-            f"This Res1D was opened with a {type(file_path).__name__} file_path, "
-            "which mikeio1d cannot resolve reach topology from. Re-open it as "
-            "Res1D(str(path)), or pass the path to the constructor directly."
-        )

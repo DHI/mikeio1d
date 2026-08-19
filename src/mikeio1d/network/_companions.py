@@ -8,12 +8,15 @@ lengths. A companion is found by sharing the result file's folder and stem.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ..res1d import Res1D
 from ._inp import read_pipe_lengths
-from ._res1d import _check_file_path_is_str
+
+_COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
+"""Result extensions whose companions can be found by folder and stem."""
 
 # The encodings a companion file's text is worth re-reading as. mikeio1d hands
 # back '.res' names decoded as UTF-8 but '.resx' names decoded with the Windows
@@ -122,7 +125,6 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
             raise ValueError(f"Expected an EPANET '.resx' companion file, got '{path.suffix}'.")
         extra = Res1D(str(path))
     elif isinstance(resx, Res1D):
-        _check_file_path_is_str(resx)
         if Path(resx.file_path).suffix.lower() != ".resx":
             raise ValueError(
                 f"Expected an EPANET '.resx' companion file, got '{Path(resx.file_path).suffix}'."
@@ -188,3 +190,103 @@ def _find_epanet_companions(res: Path) -> tuple[Path | None, Path | None]:
         return None
 
     return sibling(".resx"), sibling(".inp")
+
+
+def _suffix_of(companion: str | Path | Res1D) -> str:
+    """Return a companion's lower-case extension, whatever form it arrives in.
+
+    Parameters
+    ----------
+    companion : str, Path or Res1D
+        A companion file, or one already opened.
+
+    Returns
+    -------
+    str
+        The extension, including its dot.
+    """
+    if isinstance(companion, Res1D):
+        return Path(str(companion.file_path)).suffix.lower()
+    return Path(companion).suffix.lower()
+
+
+def _companion_paths(
+    res: Res1D, companions: Sequence[str | Path | Res1D] | None
+) -> tuple[list[str | Path | Res1D], bool]:
+    """Decide which companions to read: the ones asked for, or the ones found.
+
+    Parameters
+    ----------
+    res : Res1D
+        The result file the companions belong to.
+    companions : sequence of str, Path or Res1D, or None
+        What the caller asked for. ``None`` means look beside the result file,
+        an empty sequence means read none.
+
+    Returns
+    -------
+    tuple of (list, bool)
+        The companions to read, and whether they were found rather than named.
+        The flag matters for error reporting: a file the caller never mentioned
+        has to be named when it turns out to be the problem.
+
+    Notes
+    -----
+    Only an EPANET ``.res`` is looked beside. A ``.res1d`` sitting next to an
+    unrelated ``.inp`` of the same stem would otherwise take its reach lengths
+    from another model's input file.
+    """
+    if companions is not None:
+        return list(companions), False
+
+    file_path = res.file_path
+    if file_path is None or _suffix_of(str(file_path)) not in _COMPANION_SEARCH_EXTENSIONS:
+        return [], False
+
+    found = [path for path in _find_epanet_companions(Path(file_path)) if path is not None]
+    return list(found), bool(found)
+
+
+def _read_companions(
+    res: Res1D, companions: Sequence[str | Path | Res1D]
+) -> tuple[_Companion | None, dict[str, float] | None]:
+    """Read the companions, sorting them by what each contributes.
+
+    Parameters
+    ----------
+    res : Res1D
+        The result file the companions belong to.
+    companions : sequence of str, Path or Res1D
+        The companions to read.
+
+    Returns
+    -------
+    tuple of (_Companion or None, dict or None)
+        Extra results and reach lengths, each None when no companion supplied it.
+
+    Raises
+    ------
+    ValueError
+        If an extension is not one a companion can have, or if two companions
+        would supply the same thing.
+    """
+    extra: _Companion | None = None
+    lengths: dict[str, float] | None = None
+
+    for companion in companions:
+        suffix = _suffix_of(companion)
+        if suffix == ".resx":
+            if extra is not None:
+                raise ValueError("Two '.resx' companions were given; a network can read one.")
+            extra = _open_companion_result(res, companion)
+        elif suffix == ".inp":
+            if lengths is not None:
+                raise ValueError("Two '.inp' companions were given; a network can read one.")
+            lengths = _read_companion_lengths(companion)
+        else:
+            raise ValueError(
+                f"'{suffix}' is not a companion a network can read. Expected '.resx' for "
+                "extra results or '.inp' for reach lengths."
+            )
+
+    return extra, lengths
