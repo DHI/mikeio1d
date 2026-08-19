@@ -5,17 +5,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DReach
-
     from ..res1d import Res1D
     from .result_quantity import ResultQuantity
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
 
 from warnings import warn
 
 from ..dotnet import pythonnet_implementation as impl
 from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataStructure
-from .result_location import ResultLocation, ResultLocationCreator
+from .result_location import ResultLocation
+from .result_location import ResultLocationCreator
 
 
 class ResultStructure(ResultLocation):

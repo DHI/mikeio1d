@@ -2,7 +2,10 @@
 
 from .cross_section import CrossSection
 from .cross_section_collection import CrossSectionCollection
-from .enums import ProcessLevelsMethod, RadiusType, ResistanceDistribution, ResistanceType
+from .enums import ProcessLevelsMethod
+from .enums import RadiusType
+from .enums import ResistanceDistribution
+from .enums import ResistanceType
 from .marker import Marker
 
 __all__ = [

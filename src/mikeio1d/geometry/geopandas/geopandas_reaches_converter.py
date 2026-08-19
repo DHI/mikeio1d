@@ -8,7 +8,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from geopandas import GeoDataFrame
     from shapely.geometry.base import BaseGeometry
 
-    from mikeio1d.result_network import ResultReach, ResultReaches
+    from mikeio1d.result_network import ResultReach
+    from mikeio1d.result_network import ResultReaches
 
 from geopandas import GeoDataFrame
 

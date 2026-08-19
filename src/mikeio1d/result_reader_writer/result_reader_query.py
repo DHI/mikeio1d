@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..query import QueryData
-    from .result_reader import ColumnMode, ResultReader
+    from .result_reader import ColumnMode
+    from .result_reader import ResultReader
 
 
 import pandas as pd

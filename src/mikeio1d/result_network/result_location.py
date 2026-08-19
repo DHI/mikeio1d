@@ -6,18 +6,24 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
-    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DDataSet
 
     from ..query import QueryData
     from ..res1d import Res1D
     from ..result_reader_writer.result_reader import ColumnMode
 
-from abc import ABC, abstractmethod
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DDataSet
 
-from ..quantities import DerivedQuantity, TimeSeriesId, TimeSeriesIdGroup
+from abc import ABC
+from abc import abstractmethod
+
+from ..quantities import DerivedQuantity
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 from .result_quantity import ResultQuantity
 from .result_quantity_derived import ResultQuantityDerived
-from .various import build_html_repr_from_sections, make_proper_variable_name
+from .various import build_html_repr_from_sections
+from .various import make_proper_variable_name
 
 
 class ResultLocation(ABC):

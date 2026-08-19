@@ -6,27 +6,32 @@ import warnings
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DGridPoint, IRes1DReach
-
     from ..geometry import ReachGeometry
     from ..res1d import Res1D
     from .result_quantity import ResultQuantity
 
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DGridPoint
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
+
 import numpy as np
-from DHI.Mike1D.Generic import PredefinedQuantity, Quantity
-from DHI.Mike1D.ResultDataAccess import (
-    Res1DCircularCrossSection,
-    Res1DEggshapedCrossSection,
-    Res1DGridPoint,
-    Res1DRectangularCrossSection,
-)
 
 from ..dotnet import pythonnet_implementation as impl
-from ..quantities import TimeSeriesId, TimeSeriesIdGroup
-from ..various import DELETE_VALUE, try_import_shapely
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
+from ..various import DELETE_VALUE
+from ..various import try_import_shapely
 from .result_gridpoint import ResultGridPoint
-from .result_location import ResultLocation, ResultLocationCreator
+from .result_location import ResultLocation
+from .result_location import ResultLocationCreator
 from .various import make_proper_variable_name
+
+from DHI.Mike1D.Generic import PredefinedQuantity
+from DHI.Mike1D.Generic import Quantity
+from DHI.Mike1D.ResultDataAccess import Res1DCircularCrossSection
+from DHI.Mike1D.ResultDataAccess import Res1DEggshapedCrossSection
+from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
+from DHI.Mike1D.ResultDataAccess import Res1DRectangularCrossSection
 
 
 class ResultReach(ResultLocation, dict[str, ResultGridPoint]):

@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from mikeio1d.res1d import Res1D
 
-from ..quantities import TimeSeriesId, TimeSeriesIdGroup
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 from .query_data import QueryData
 
 

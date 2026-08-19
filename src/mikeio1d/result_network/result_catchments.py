@@ -7,16 +7,18 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
-    from DHI.Mike1D.ResultDataAccess import Res1DCatchment
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
+
+    from DHI.Mike1D.ResultDataAccess import Res1DCatchment
 
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
 from .result_catchment import ResultCatchment
-from .result_locations import ResultLocations, ResultLocationsCreator
+from .result_locations import ResultLocations
+from .result_locations import ResultLocationsCreator
 from .various import make_proper_variable_name
 
 

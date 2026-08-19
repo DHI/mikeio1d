@@ -9,8 +9,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from math import isnan
 
-from ..quantities import TimeSeriesId, TimeSeriesIdGroup
-from ..various import DELETE_VALUE, NAME_DELIMITER
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
+from ..various import DELETE_VALUE
+from ..various import NAME_DELIMITER
 from .query_data import QueryData
 
 

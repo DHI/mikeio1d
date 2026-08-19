@@ -13,17 +13,25 @@ if TYPE_CHECKING:
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions, CrossSectionPoint, ICrossSection
-from DHI.Mike1D.Generic import ProcessingOption, ZLocation
-from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
-from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
-from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
-from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate, CoordinateList
 
 from ..various import try_import_shapely
 from .cross_section_factory import CrossSectionFactory
-from .enums import ProcessLevelsMethod, RadiusType, ResistanceDistribution, ResistanceType
+from .enums import ProcessLevelsMethod
+from .enums import RadiusType
+from .enums import ResistanceDistribution
+from .enums import ResistanceType
 from .marker import Marker
+
+from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions
+from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.CrossSectionModule import ICrossSection
+from DHI.Mike1D.Generic import ProcessingOption
+from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
+from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
+from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
+from DHI.Mike1D.Generic import ZLocation
+from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate
+from DHI.Mike1D.Generic.Spatial.Geometry import CoordinateList
 
 
 class CrossSection:

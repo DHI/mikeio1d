@@ -11,12 +11,12 @@ if TYPE_CHECKING:  # pragma: no cover
     from ..result_network import ResultLocation
     from ..result_reader_writer.result_reader import ColumnMode
 
-from DHI.Mike1D.Generic import IQuantity
-from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
-
 from ..quantities import TimeSeriesId
 from ..result_query import QueryDataCreator
 from .data_entry import DataEntry
+
+from DHI.Mike1D.Generic import IQuantity
+from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
 
 class ResultQuantity:

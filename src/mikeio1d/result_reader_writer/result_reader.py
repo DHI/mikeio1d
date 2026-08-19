@@ -11,26 +11,28 @@ if TYPE_CHECKING:  # pragma: no cover
 import datetime
 import os.path
 import warnings
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from enum import Enum
 from pathlib import Path
 
 import pandas as pd
-from DHI.Mike1D.Generic import Connection, Diagnostics
-from DHI.Mike1D.ResultDataAccess import (
-    DataItemFilterName,
-    Filter,
-    ResultData,
-    ResultDataQuery,
-    ResultDataSearch,
-    ResultTypes,
-)
 
 from ..dotnet import from_dotnet_datetime
 from ..dotnet import pythonnet_implementation as impl
 from ..quantities import TimeSeriesId
 from ..result_network import ResultNetwork
-from ..various import DATETIME_DTYPE, NAME_DELIMITER
+from ..various import DATETIME_DTYPE
+from ..various import NAME_DELIMITER
+
+from DHI.Mike1D.Generic import Connection
+from DHI.Mike1D.Generic import Diagnostics
+from DHI.Mike1D.ResultDataAccess import DataItemFilterName
+from DHI.Mike1D.ResultDataAccess import Filter
+from DHI.Mike1D.ResultDataAccess import ResultData
+from DHI.Mike1D.ResultDataAccess import ResultDataQuery
+from DHI.Mike1D.ResultDataAccess import ResultDataSearch
+from DHI.Mike1D.ResultDataAccess import ResultTypes
 
 
 class ColumnMode(str, Enum):

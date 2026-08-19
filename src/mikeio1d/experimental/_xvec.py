@@ -20,7 +20,9 @@ Implementation notes
 """
 import sys
 from operator import ge
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import cast
 
 # TypeIs was introduced in 'typing' since Python 3.13 (https://peps.python.org/pep-0742/)
 # Otherwise, it is found in 'typing_extensions' (>= 4.10)
@@ -41,16 +43,14 @@ import pandas as pd
 
 from ..quantities import TimeSeriesIdGroup
 from ..res1d import Res1D
-from ..result_network import (
-    ResultCatchment,
-    ResultCatchments,
-    ResultGridPoint,
-    ResultLocations,
-    ResultNode,
-    ResultNodes,
-    ResultReach,
-    ResultReaches,
-)
+from ..result_network import ResultCatchment
+from ..result_network import ResultCatchments
+from ..result_network import ResultGridPoint
+from ..result_network import ResultLocations
+from ..result_network import ResultNode
+from ..result_network import ResultNodes
+from ..result_network import ResultReach
+from ..result_network import ResultReaches
 from ._xarray import to_dataarray as _to_dataarray_xarray
 
 

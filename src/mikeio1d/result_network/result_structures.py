@@ -5,14 +5,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DReach
-
     from ..res1d import Res1D
     from .result_quantity import ResultQuantity
 
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
+
 from ..quantities import TimeSeriesIdGroup
-from .result_locations import ResultLocations, ResultLocationsCreator
-from .result_structure import ResultStructure, ResultStructureCreator
+from .result_locations import ResultLocations
+from .result_locations import ResultLocationsCreator
+from .result_structure import ResultStructure
+from .result_structure import ResultStructureCreator
 from .various import make_proper_variable_name
 
 

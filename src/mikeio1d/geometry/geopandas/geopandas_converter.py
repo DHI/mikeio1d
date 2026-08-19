@@ -11,7 +11,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from mikeio1d import Res1D
     from mikeio1d.result_network import ResultLocations
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 
 from mikeio1d.various import pyproj_crs_from_projection_string
 

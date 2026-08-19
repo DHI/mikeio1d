@@ -4,8 +4,10 @@ import ctypes
 import datetime
 
 import numpy as np
+
 import System
-from System.Runtime.InteropServices import GCHandle, GCHandleType
+from System.Runtime.InteropServices import GCHandle
+from System.Runtime.InteropServices import GCHandleType
 
 _MAP_NP_NET = {
     np.dtype("float32"): System.Single,

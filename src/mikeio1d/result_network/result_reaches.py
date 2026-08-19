@@ -7,15 +7,17 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
-    from DHI.Mike1D.ResultDataAccess import IRes1DReach
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
+
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
-from .result_locations import ResultLocations, ResultLocationsCreator
+from .result_locations import ResultLocations
+from .result_locations import ResultLocationsCreator
 from .result_reach import ResultReach
 from .various import make_proper_variable_name
 
@@ -89,10 +91,8 @@ class ResultReaches(ResultLocations):
         >>> gdf = res1d.reaches.to_geopandas(agg='mean')
 
         """
-        from mikeio1d.geometry.geopandas import (
-            GeoPandasReachesConverter,
-            GeoPandasReachesConverterSegmented,
-        )
+        from mikeio1d.geometry.geopandas import GeoPandasReachesConverter
+        from mikeio1d.geometry.geopandas import GeoPandasReachesConverterSegmented
 
         if segmented:
             gpd_converter = GeoPandasReachesConverterSegmented()

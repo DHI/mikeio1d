@@ -2,18 +2,22 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
     from mikeio1d.res1d import Res1D
-    from mikeio1d.result_network import ResultLocation, ResultLocations
+    from mikeio1d.result_network import ResultLocation
+    from mikeio1d.result_network import ResultLocations
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import replace
 
 import pandas as pd
 
-from ..timeseries_id import TimeSeriesId, TimeSeriesIdGroup
+from ..timeseries_id import TimeSeriesId
+from ..timeseries_id import TimeSeriesIdGroup
 
 
 class DerivedQuantity(ABC):

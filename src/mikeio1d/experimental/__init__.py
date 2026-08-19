@@ -6,7 +6,8 @@ Note:
     Use at your own risk. Functionality and interfaces may change or be removed at any time.
 """
 
-from ._network_mapper import GenericNetwork, NetworkMapper
+from ._network_mapper import GenericNetwork
+from ._network_mapper import NetworkMapper
 from ._networkx import to_networkx
 from ._xarray import to_dataarray
 from ._xvec import to_dataarray_xvec

@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+from collections import namedtuple
 from pathlib import Path
 from warnings import warn
 
 import pandas as pd
-from DHI.Mike1D.Generic import Location
 
-from .cross_sections import CrossSection, CrossSectionCollection
+from .cross_sections import CrossSection
+from .cross_sections import CrossSectionCollection
+
+from DHI.Mike1D.Generic import Location
 
 
 class Xns11(CrossSectionCollection):

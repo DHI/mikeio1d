@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
-    from DHI.Mike1D.ResultDataAccess import IDataItems, ResultData
 
     from ..quantities import TimeSeriesIdGroup
     from ..res1d import Res1D
@@ -15,7 +14,11 @@ if TYPE_CHECKING:  # pragma: no cover
     from .result_quantity import ResultQuantity
     from .result_quantity_derived import ResultQuantityDerived
 
-from abc import ABC, abstractmethod
+    from DHI.Mike1D.ResultDataAccess import IDataItems
+    from DHI.Mike1D.ResultDataAccess import ResultData
+
+from abc import ABC
+from abc import abstractmethod
 
 import pandas as pd
 
@@ -25,7 +28,8 @@ from .result_location import ResultLocation
 from .result_quantity import ResultQuantity
 from .result_quantity_collection import ResultQuantityCollection
 from .result_quantity_derived_collection import ResultQuantityDerivedCollection
-from .various import build_html_repr_from_sections, make_proper_variable_name
+from .various import build_html_repr_from_sections
+from .various import make_proper_variable_name
 
 
 class ResultLocations(ABC, dict[str, ResultLocation]):

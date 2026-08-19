@@ -5,14 +5,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import IDataItem, ResultData
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import ResultData
+
 import pandas as pd
 
-from ..quantities import DerivedQuantity, TimeSeriesId
+from ..quantities import DerivedQuantity
+from ..quantities import TimeSeriesId
 from ..various import try_import_geopandas
 from .result_catchments import ResultCatchments
 from .result_global_datas import ResultGlobalDatas

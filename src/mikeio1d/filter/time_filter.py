@@ -5,16 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import Filter, ResultData
+    from DHI.Mike1D.ResultDataAccess import Filter
+    from DHI.Mike1D.ResultDataAccess import ResultData
 
 from datetime import datetime
 
 import pandas as pd
-from DHI.Mike1D.ResultDataAccess import Period
-from System import DateTime
 
 from ..dotnet import to_dotnet_datetime
 from .result_filter import ResultSubFilter
+
+from DHI.Mike1D.ResultDataAccess import Period
+from System import DateTime
 
 
 class TimeFilter(ResultSubFilter):

@@ -5,14 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import IDataItem, IDataItems, IRes1DGridPoint, IRes1DReach
-
     from ..res1d import Res1D
     from .result_reach import ResultReach
 
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IDataItems
+    from DHI.Mike1D.ResultDataAccess import IRes1DGridPoint
+    from DHI.Mike1D.ResultDataAccess import IRes1DReach
+
 from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataReach
-from .result_location import ResultLocation, ResultLocationCreator
+from .result_location import ResultLocation
+from .result_location import ResultLocationCreator
 
 
 class ResultGridPoint(ResultLocation):

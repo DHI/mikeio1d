@@ -11,8 +11,13 @@ if TYPE_CHECKING:
 
 
 from DHI.Mike1D.CrossSectionModule import CrossSectionFactory as M1DCrossSectionFactory
-from DHI.Mike1D.CrossSectionModule import CrossSectionPoint, CrossSectionPointList, FlowResistance
-from DHI.Mike1D.Generic import RadiusType, ResistanceDistribution, ResistanceFormulation, ZLocation
+from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.CrossSectionModule import CrossSectionPointList
+from DHI.Mike1D.CrossSectionModule import FlowResistance
+from DHI.Mike1D.Generic import RadiusType
+from DHI.Mike1D.Generic import ResistanceDistribution
+from DHI.Mike1D.Generic import ResistanceFormulation
+from DHI.Mike1D.Generic import ZLocation
 
 
 class CrossSectionFactory:

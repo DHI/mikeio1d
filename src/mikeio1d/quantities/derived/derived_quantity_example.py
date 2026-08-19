@@ -5,14 +5,16 @@ This module contains the ExampleDerivedQuantity class, which is an example of ho
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
 
-from mikeio1d.quantities import DerivedQuantity, TimeSeriesIdGroup
+from mikeio1d.quantities import DerivedQuantity
+from mikeio1d.quantities import TimeSeriesIdGroup
 
 
 class ExampleDerivedQuantity(DerivedQuantity):

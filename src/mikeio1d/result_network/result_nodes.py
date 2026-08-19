@@ -14,7 +14,8 @@ if TYPE_CHECKING:  # pragma: no cover
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
-from .result_locations import ResultLocations, ResultLocationsCreator
+from .result_locations import ResultLocations
+from .result_locations import ResultLocationsCreator
 from .result_node import ResultNode
 from .various import make_proper_variable_name
 

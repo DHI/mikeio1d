@@ -14,13 +14,16 @@ if TYPE_CHECKING:  # pragma: no cover
     from ..result_network.result_quantity import ResultQuantity
 
 import dataclasses
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
+from dataclasses import fields
 from enum import Enum
 
 import pandas as pd
-from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
-from ..various import DELETE_VALUE, NAME_DELIMITER
+from ..various import DELETE_VALUE
+from ..various import NAME_DELIMITER
+
+from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
 
 class TimeSeriesIdGroup(str, Enum):

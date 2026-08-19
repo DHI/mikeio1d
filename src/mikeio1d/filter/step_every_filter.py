@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import Filter, ResultData
+    from DHI.Mike1D.ResultDataAccess import Filter
+    from DHI.Mike1D.ResultDataAccess import ResultData
 
 
 class StepEveryFilter:

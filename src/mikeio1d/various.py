@@ -7,6 +7,7 @@ import warnings
 from collections.abc import Iterable
 
 import clr
+
 from DHI.Mike1D.Generic import PredefinedQuantity
 from System import Enum
 

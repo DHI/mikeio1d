@@ -1,6 +1,7 @@
 """Package for converting ResultLocations to GeoPandas objects."""
 
-from mikeio1d.various import try_import_geopandas, try_import_shapely
+from mikeio1d.various import try_import_geopandas
+from mikeio1d.various import try_import_shapely
 
 # check if geopandas and shapely are available
 try_import_geopandas()

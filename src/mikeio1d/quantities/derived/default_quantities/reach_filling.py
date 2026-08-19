@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
-    from mikeio1d.result_network import ResultGridPoint, ResultLocation, ResultReach
+    from mikeio1d.result_network import ResultGridPoint
+    from mikeio1d.result_network import ResultLocation
+    from mikeio1d.result_network import ResultReach
 
 import numpy as np
 

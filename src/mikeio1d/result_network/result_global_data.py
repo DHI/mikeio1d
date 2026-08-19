@@ -5,15 +5,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DGlobalData
-
     from ..res1d import Res1D
     from .result_global_datas import ResultGlobalDatas
     from .result_quantity import ResultQuantity
 
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DGlobalData
+
 from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataGlobal
-from .result_location import ResultLocation, ResultLocationCreator
+from .result_location import ResultLocation
+from .result_location import ResultLocationCreator
 
 
 class ResultGlobalData(ResultLocation):
