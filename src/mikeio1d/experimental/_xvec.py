@@ -20,7 +20,7 @@ Implementation notes
 """
 import sys
 from operator import ge
-from typing import TYPE_CHECKING, Any, List, Optional, cast
+from typing import TYPE_CHECKING, Any, cast
 
 # TypeIs was introduced in 'typing' since Python 3.13 (https://peps.python.org/pep-0742/)
 # Otherwise, it is found in 'typing_extensions' (>= 4.10)

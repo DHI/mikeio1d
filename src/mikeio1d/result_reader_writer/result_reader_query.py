@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List, Optional
-
     from ..query import QueryData
     from .result_reader import ColumnMode, ResultReader
 

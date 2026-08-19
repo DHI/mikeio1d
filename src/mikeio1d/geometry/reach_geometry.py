@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from functools import cache, lru_cache
-from typing import List
 
 import numpy as np
 from shapely.geometry import LineString
@@ -25,7 +24,7 @@ class ReachGeometry:
 
         Parameters
         ----------
-        res1d_reaches : IRes1DReach | List[IRes1DReach]
+        res1d_reaches : IRes1DReach | list[IRes1DReach]
 
         Returns
         -------

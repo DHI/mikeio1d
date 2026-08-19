@@ -7,7 +7,6 @@ from warnings import warn
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from typing import List, Tuple
 
     from ..geometry import CrossSectionGeometry
 
@@ -188,7 +187,7 @@ class CrossSection:
 
         Returns
         -------
-        coords : Tuple[Tuple[float, float]]
+        coords : tuple[tuple[float, float]]
             A tuple of (x, y) coordinates.
 
         """
@@ -202,7 +201,7 @@ class CrossSection:
 
         Parameters
         ----------
-        coords : List[Tuple[float, float]]
+        coords : list[tuple[float, float]]
             A list of (x, y) coordinates.
 
         """

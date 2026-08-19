@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict
-
     from ..filter import ResultFilter
     from .result_reader import ResultReader
 

@@ -8,8 +8,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
@@ -36,7 +34,7 @@ class ExampleDerivedQuantity(DerivedQuantity):
         ----------
         df_source : pd.DataFrame
             A DataFrame containing all the required sournce quantities.
-        locations : List[ResultLocation]
+        locations : list[ResultLocation]
             A list of ResultLocation objects associated with each column of df_source.
 
         Returns

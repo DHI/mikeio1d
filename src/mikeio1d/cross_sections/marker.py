@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import List
 
 
 class Marker(IntEnum):

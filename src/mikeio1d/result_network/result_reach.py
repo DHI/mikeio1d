@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DGridPoint, IRes1DReach
 
     from ..geometry import ReachGeometry

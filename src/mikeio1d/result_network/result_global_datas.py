@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     from DHI.Mike1D.ResultDataAccess import IDataItem
 
     from ..res1d import Res1D

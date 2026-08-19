@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from datetime import datetime
-    from typing import List, Optional, Set, Type
 
     import pandas as pd
     from DHI.Mike1D.ResultDataAccess import ResultData, ResultDataQuery, ResultDataSearcher
@@ -480,7 +479,7 @@ class Res1D:
 
         Parameters
         ----------
-        derived_quantity : str | Type[DerivedQuantity]
+        derived_quantity : str | type[DerivedQuantity]
             Derived quantity to be added
         """
         derived_quantity = derived_quantity(self)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pandas as pd
+
 try:
     import networkx as nx
     import xarray as xr
@@ -14,26 +15,19 @@ except ImportError as e:
 
 from pathlib import Path
 from enum import Enum
-from typing import (
-    Optional,
-    List,
-    Dict,
-    Any,
-    KeysView,
-    ValuesView,
-    ItemsView,
-)
+from typing import Any
+from collections.abc import KeysView, ValuesView, ItemsView
 
 from mikeio1d import Res1D
 from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
 
 
-def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
+def node_id_generator(node: str | int | None = None, **kwargs) -> str:
     """Generate the id of a network node.
 
     Parameters
     ----------
-    node : Optional[str  |  int], optional
+    node : str  |  int | None, optional
         node id in the original network, by default None
 
     Returns
@@ -61,7 +55,7 @@ def node_id_generator(node: Optional[str | int] = None, **kwargs) -> str:
     raise ValueError("Unexpected code path reached")
 
 
-def parse_node_id(node_id: str) -> Dict[str, Any]:
+def parse_node_id(node_id: str) -> dict[str, Any]:
     """Parse a node ID string back to its original coordinates.
 
     Parameters
@@ -71,7 +65,7 @@ def parse_node_id(node_id: str) -> Dict[str, Any]:
 
     Returns
     -------
-    Dict[str, Any]
+    dict[str, Any]
         Dictionary containing the original coordinates
     """
     if node_id.startswith("node-"):
@@ -102,18 +96,18 @@ class NetworkBackend(Enum):
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, id: str, data: pd.DataFrame, *, boundary: Optional[Dict[str, Any]] = {}):
+    def __init__(self, id: str, data: pd.DataFrame, *, boundary: dict[str, Any] | None = {}):
         self._id = id
         self._data = data
         self._boundary = boundary
 
     @property
-    def quantities(self) -> List[str]:
+    def quantities(self) -> list[str]:
         """Quantities that are present in the node.
 
         Returns
         -------
-        List[str]
+        list[str]
         """
         return list(self._data.columns)
 
@@ -138,7 +132,7 @@ class NetworkNode:
         return self._data
 
     @property
-    def boundary(self) -> Dict[str, pd.DataFrame]:
+    def boundary(self) -> dict[str, pd.DataFrame]:
         """Boundary of node."""
         return self._boundary
 
@@ -165,7 +159,7 @@ class NetworkEdge:
         start: NetworkNode,
         end: NetworkNode,
         length: float,
-        breaks: List[EdgeBreakPoint],
+        breaks: list[EdgeBreakPoint],
     ):
         self._id = id
         self._start = start
@@ -206,7 +200,7 @@ class EdgeCollection:
         self._backend = self._identify_backend(network)
         self._dict = self._load_network_as_dict(network)
 
-    def _load_network_as_dict(self, network: Any) -> Dict[str, NetworkEdge]:
+    def _load_network_as_dict(self, network: Any) -> dict[str, NetworkEdge]:
         if self._backend == NetworkBackend.RES1D:
             return self._parse_res1d_network(network)
         else:
@@ -215,7 +209,7 @@ class EdgeCollection:
             )
 
     @staticmethod
-    def _parse_res1d_network(network: Res1D) -> Dict[str, NetworkEdge]:
+    def _parse_res1d_network(network: Res1D) -> dict[str, NetworkEdge]:
 
         def simplify_colnames(node: ResultNode | ResultGridPoint) -> pd.DataFrame:
             # We remove suffixes and indexes so the columns contain only the quantities
@@ -244,7 +238,7 @@ class EdgeCollection:
                 boundary={reach.name: simplify_colnames(gridpoint)},
             )
 
-        def parse_gridpoints(reach: ResultReach) -> List[EdgeBreakPoint]:
+        def parse_gridpoints(reach: ResultReach) -> list[EdgeBreakPoint]:
             intermediate_gridpoints = reach.gridpoints[1:-1] if len(reach.gridpoints) > 2 else []
             return [
                 EdgeBreakPoint(
@@ -319,14 +313,14 @@ class GenericNetwork:
         df.index.name = "time"
         return df.copy()
 
-    def to_dataframe(self, sel: Optional[str] = None) -> pd.DataFrame:
+    def to_dataframe(self, sel: str | None = None) -> pd.DataFrame:
         """Dataframe using node ids as column names.
 
         It will be multiindex unless 'sel' is passed.
 
         Parameters
         ----------
-        sel : Optional[str], optional
+        sel : str | None, optional
             Quantity to select, by default None
 
         Returns
@@ -370,12 +364,12 @@ class GenericNetwork:
         return self._graph
 
     @property
-    def quantities(self) -> List[str]:
+    def quantities(self) -> list[str]:
         """Quantities present in data.
 
         Returns
         -------
-        List[str]
+        list[str]
             List of quantities
         """
         return list(self.to_dataframe().columns.get_level_values(1).unique())
@@ -385,7 +379,7 @@ class NetworkMapper:
     """Mapper class to transform Res1D to a general network coord system."""
 
     def __init__(self, res: Any):
-        self._alias_map: Dict[int, str] = {}
+        self._alias_map: dict[int, str] = {}
         res = self._read_network(res)
         self._edges = EdgeCollection(res)
 
@@ -455,25 +449,25 @@ class NetworkMapper:
 
     def find(
         self,
-        node: Optional[str | List[str]] = None,
-        edge: Optional[str | List[str]] = None,
-        distance: Optional[str | float | List[str | float]] = None,
-    ) -> int | List[int]:
+        node: str | list[str] | None = None,
+        edge: str | list[str] | None = None,
+        distance: str | float | list[str | float] | None = None,
+    ) -> int | list[int]:
         """Find node or breakpoint id in the generic network.
 
         Parameters
         ----------
-        node : Optional[str | List[str]], optional
+        node : str | list[str] | None, optional
             Node id(s) in the original network, by default None
-        edge : Optional[str | List[str]], optional
+        edge : str | list[str] | None, optional
             Edge id(s) for breakpoint lookup or edge endpoint lookup, by default None
-        distance : Optional[str | float | List[str | float]], optional
+        distance : str | float | list[str | float] | None, optional
             Distance(s) along edge for breakpoint lookup, or "start"/"end"
             for edge endpoints, by default None
 
         Returns
         -------
-        int | List[int]
+        int | list[int]
             Node or breakpoint id(s) in the generic network
 
         Raises
@@ -552,17 +546,17 @@ class NetworkMapper:
                 f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {alias_set}"
             )
 
-    def recall(self, id: int | List[int]) -> Dict[str, Any] | List[Dict[str, Any]]:
+    def recall(self, id: int | list[int]) -> dict[str, Any] | list[dict[str, Any]]:
         """Recall the original coordinates from generic network node id(s).
 
         Parameters
         ----------
-        id : int | List[int]
+        id : int | list[int]
             Node id(s) in the generic network
 
         Returns
         -------
-        Dict[str, Any] | List[Dict[str, Any]]
+        dict[str, Any] | list[dict[str, Any]]
             Original coordinates. For single input returns dict, for multiple inputs returns list of dicts.
             Dict contains coordinates:
             - For nodes: 'node' key with node id

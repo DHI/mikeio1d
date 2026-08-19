@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List, Set
-
     from mikeio1d.res1d import Res1D
     from mikeio1d.result_network import ResultLocation, ResultLocations
 
@@ -77,7 +75,7 @@ class DerivedQuantity(ABC):
         ----------
         df : pd.DataFrame
             DataFrame with source quantities for all relevant groups.
-        locations : List[ResultLocation]
+        locations : list[ResultLocation]
             List of ResultLocation objects (e.g. ResultNode) associated with each column in df_source.
 
         Returns

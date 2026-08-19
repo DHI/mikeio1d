@@ -86,9 +86,7 @@ def asNumpyArray(x):
     try:
         npArray = np.empty(dims, order="C", dtype=_MAP_NET_NP[netType])
     except KeyError:
-        raise NotImplementedError(
-            f"asNumpyArray does not yet support System type {netType}"
-        )
+        raise NotImplementedError(f"asNumpyArray does not yet support System type {netType}")
 
     try:  # Memmove
         sourceHandle = GCHandle.Alloc(x, GCHandleType.Pinned)

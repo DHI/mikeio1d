@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, List, Optional
-
     import pandas as pd
     from DHI.Mike1D.ResultDataAccess import IDataItem, IRes1DDataSet
 
@@ -235,7 +233,10 @@ class ResultLocationCreator(ABC):
     def can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
         """Check if a derived quantity can be added to the result locations."""
         result_location = self.result_location
-        if result_location.group not in derived_quantity.groups or derived_quantity.source_quantity not in result_location.quantities:
+        if (
+            result_location.group not in derived_quantity.groups
+            or derived_quantity.source_quantity not in result_location.quantities
+        ):
             return False
         return True
 

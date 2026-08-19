@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, List
-
     from mikeio1d.res1d import Res1D
 
 from .default_quantities import default_derived_quantities

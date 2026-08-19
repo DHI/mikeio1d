@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Any, List, Optional, Tuple
+    from typing import Any
 
     from ..query import QueryData
     from ..res1d import Res1D
@@ -279,7 +279,7 @@ class TimeSeriesId:
 
         Parameters
         ----------
-        timeseries_ids : List[TimeSeriesId]
+        timeseries_ids : list[TimeSeriesId]
             The list of TimeSeriesId objects to convert.
         compact : bool, optional
             Whether to compact the MultiIndex by removing redundant levels, by default False

@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
-    from typing import Dict, List
 
     from DHI.Mike1D.ResultDataAccess import IRes1DReach
     from geopandas import GeoDataFrame

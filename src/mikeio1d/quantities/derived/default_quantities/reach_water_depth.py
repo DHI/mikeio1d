@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     import pandas as pd
 
     from mikeio1d.result_network import ResultGridPoint, ResultLocation

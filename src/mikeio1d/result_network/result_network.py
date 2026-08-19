@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, List
-
     from DHI.Mike1D.ResultDataAccess import IDataItem, ResultData
     from geopandas import GeoDataFrame
 
@@ -128,7 +126,7 @@ class ResultNetwork:
 
         Parameters
         ----------
-        derived_quantity : Type[ResultQuantity]
+        derived_quantity : type[ResultQuantity]
             Derived quantity to be added to the result network.
 
         """
