@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
     from mikeio1d.res1d import Res1D
@@ -20,7 +20,7 @@ class DerivedQuantity(ABC):
     """Abstract base class for derived quantities."""
 
     _NAME = None
-    _GROUPS = None
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup] | None] = None
     _SOURCE_QUANTITY = None
 
     def __init__(self, res1d: Res1D):

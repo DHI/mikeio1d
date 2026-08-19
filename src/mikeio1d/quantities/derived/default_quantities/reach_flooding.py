@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
@@ -19,7 +19,7 @@ class ReachFlooding(DerivedQuantity):
     """Derived quantity for flooding in a reach."""
 
     _NAME = "ReachFlooding"
-    _GROUPS = {TimeSeriesIdGroup.REACH}
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup]] = {TimeSeriesIdGroup.REACH}
     _SOURCE_QUANTITY = "WaterLevel"
 
     def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]):

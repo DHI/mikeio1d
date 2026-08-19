@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 from DHI.Mike1D.MikeIO import ResultMerger as Res1DResultMerger
 from System import String
 from System.Collections.Generic import List as DotNetList

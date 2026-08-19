@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 import sys
 import warnings
 from collections.abc import Iterable

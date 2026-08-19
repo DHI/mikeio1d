@@ -5,7 +5,7 @@ This module contains the ExampleDerivedQuantity class, which is an example of ho
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
@@ -22,7 +22,7 @@ class ExampleDerivedQuantity(DerivedQuantity):
     _NAME = "WaterLevelPlusOne"
 
     # Replace with the groups that the derived quantity can be applied to
-    _GROUPS = {TimeSeriesIdGroup.NODE, TimeSeriesIdGroup.REACH}
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup]] = {TimeSeriesIdGroup.NODE, TimeSeriesIdGroup.REACH}
 
     # Replace with the source quantity that the derived quantity is derived from
     _SOURCE_QUANTITY = "WaterLevel"

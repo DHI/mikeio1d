@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 import numpy as np
 import pandas as pd
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
