@@ -143,7 +143,7 @@ class ResultReachesCreator(ResultLocationsCreator):
     def __init__(self, result_locations: ResultReaches, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.reach_label = "r_"
-        self.result_reach_map: dict[str : list[ResultReach]] = {}
+        self.result_reach_map: dict[str, list[ResultReach]] = {}
 
     def create(self):
         """Perform ResultReaches creation steps."""
