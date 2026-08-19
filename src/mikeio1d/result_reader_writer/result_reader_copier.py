@@ -40,7 +40,7 @@ class ResultReaderCopier(ResultReader):
 
     def read(
         self,
-        timeseries_ids: list[TimeSeriesId] = None,
+        timeseries_ids: list[TimeSeriesId] | None = None,
         column_mode: str | ColumnMode | None = None,
     ) -> pd.DataFrame:
         """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""

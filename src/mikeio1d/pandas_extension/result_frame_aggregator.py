@@ -80,7 +80,9 @@ class ResultFrameAggregator:
 
     """
 
-    def __init__(self, agg: str | Callable = None, override_name: str = None, **kwargs):
+    def __init__(
+        self, agg: str | Callable | None = None, override_name: str | None = None, **kwargs
+    ):
         kwargs.setdefault("time", agg)
         if kwargs["time"] is None:
             raise ValueError("Must specify an aggregation function for time.")

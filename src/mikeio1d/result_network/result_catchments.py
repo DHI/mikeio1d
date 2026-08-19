@@ -44,8 +44,8 @@ class ResultCatchments(ResultLocations):
 
     def to_geopandas(
         self,
-        agg: str | Callable = None,
-        agg_kwargs: dict[str : str | Callable] = {},
+        agg: str | Callable | None = None,
+        agg_kwargs: dict[str, str | Callable] | None = None,
     ) -> GeoDataFrame:
         """Convert catchments to a geopandas.GeoDataFrame object.
 
@@ -63,7 +63,7 @@ class ResultCatchments(ResultLocations):
             - 'max'   : maximum value of all quantities
             -  np.max : maximum value of all quantities
 
-        agg_kwargs : dict, default {}
+        agg_kwargs : dict, default None
             Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
 
         Returns
@@ -80,7 +80,7 @@ class ResultCatchments(ResultLocations):
         if agg is None:
             return gdf
 
-        rfa = ResultFrameAggregator(agg, **agg_kwargs)
+        rfa = ResultFrameAggregator(agg, **(agg_kwargs or {}))
 
         df_quantities = self.read(column_mode="compact")
         df_quantities = rfa.aggregate(df_quantities)

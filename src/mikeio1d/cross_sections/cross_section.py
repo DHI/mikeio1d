@@ -719,7 +719,7 @@ class CrossSection:
             marker, x, z = row.marker, row.x, row.z
             self.set_marker(marker, x, z)
 
-    def set_marker(self, marker: int | Marker, x: float, z: float = None):
+    def set_marker(self, marker: int | Marker, x: float, z: float | None = None):
         """Set a marker at the point nearest to the specified x, z coordinates.
 
         Note: if z is not provided, the nearest point in the x direction will be found.
@@ -767,7 +767,7 @@ class CrossSection:
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.SetMarkerAt(marker, -1)
 
-    def _find_nearest_point_index(self, x: float, z: float = None) -> int:
+    def _find_nearest_point_index(self, x: float, z: float | None = None) -> int:
         """Find the XSBaseRaw.points index of the nearest point for the given x, z coordinates.
 
         If z is not provided, the nearest point in the x direction will be found.

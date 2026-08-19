@@ -77,10 +77,10 @@ class ResultReader(ABC):
     def __init__(
         self,
         res1d,
-        file_path: str | Path = None,
+        file_path: str | Path | None = None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        filter: ResultFilter = None,
+        filter: ResultFilter | None = None,
     ):
         self.res1d: Res1D = res1d
 
@@ -158,7 +158,7 @@ class ResultReader(ABC):
     @abstractmethod
     def read(
         self,
-        timeseries_ids: list[TimeSeriesId] = None,
+        timeseries_ids: list[TimeSeriesId] | None = None,
         column_mode: str | ColumnMode | None = None,
     ) -> pd.DataFrame:
         """Read the time series data into a data frame.

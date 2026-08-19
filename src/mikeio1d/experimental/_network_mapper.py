@@ -96,10 +96,10 @@ class NetworkBackend(Enum):
 class NetworkNode:
     """Node in the simplified network."""
 
-    def __init__(self, id: str, data: pd.DataFrame, *, boundary: dict[str, Any] | None = {}):
+    def __init__(self, id: str, data: pd.DataFrame, *, boundary: dict[str, Any] | None = None):
         self._id = id
         self._data = data
-        self._boundary = boundary
+        self._boundary = {} if boundary is None else boundary
 
     @property
     def quantities(self) -> list[str]:

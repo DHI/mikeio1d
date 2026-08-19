@@ -46,7 +46,7 @@ class LibraryLoaders:
         for library_loader in self.library_loader_list:
             library_loader.load()
 
-    def load(self, libraries=[]):
+    def load(self, libraries=None):
         """Load all libraries specified by the list `libraries`.
 
         Parameters
@@ -57,7 +57,9 @@ class LibraryLoaders:
             library to load.
 
         """
-        if isinstance(libraries, str):
+        if libraries is None:
+            libraries = []
+        elif isinstance(libraries, str):
             libraries = [libraries]
 
         for library in libraries:

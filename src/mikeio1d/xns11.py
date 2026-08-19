@@ -49,7 +49,7 @@ class Xns11(CrossSectionCollection):
 
     """
 
-    def __init__(self, file_path: str | Path = None, *args, **kwargs):
+    def __init__(self, file_path: str | Path | None = None, *args, **kwargs):
         if file_path and not isinstance(file_path, (str, Path)):
             self._file_path = None
             first_arg = file_path
@@ -81,7 +81,7 @@ class Xns11(CrossSectionCollection):
         """Full path and file name to the xns11 file."""
         return self._file_path
 
-    def write(self, file_path: str | Path = None) -> None:
+    def write(self, file_path: str | Path | None = None) -> None:
         """Write cross section data to an xns11 file.
 
         Parameters
