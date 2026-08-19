@@ -49,9 +49,11 @@ class ResultSubFilter(Protocol):
 
     def apply(self, filter: Filter, result_data: ResultData | None) -> None:
         """Apply the filter to the provided Filter object."""
+        ...
 
     def use_filter(self) -> bool:
         """Check if the filter should be used."""
+        ...
 
     def _box_inputs_to_str_list(self, value: str | list[str] | None) -> list[str]:
         if value is None:
