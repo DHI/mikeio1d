@@ -20,5 +20,5 @@ class ExtractorCsv(ExtractorTxt):
     def write_item_type(self):
         """Write item type."""
         # Write CSV separator type
-        self.f.write("sep=%s\n" % self.separator)
+        self.f.write(f"sep={self.separator}\n")
         ExtractorTxt.write_item_type(self)

@@ -65,7 +65,7 @@ class TimeFilter(ResultSubFilter):
         if isinstance(time_interval, slice):
             start = time_interval.start
             end = time_interval.stop
-        elif isinstance(time_interval, tuple) or isinstance(time_interval, list):
+        elif isinstance(time_interval, (tuple, list)):
             start, end = time_interval
         else:
             raise ValueError("time parameter must be a slice, tuple or list")

@@ -535,7 +535,7 @@ class NetworkMapper:
 
         # Check if all ids exist in the network
         alias_set = set(self._alias_map.keys())
-        if all([id in alias_set for id in ids]):
+        if all(id in alias_set for id in ids):
             if len(ids) == 1:
                 return self._alias_map[ids[0]]
             else:

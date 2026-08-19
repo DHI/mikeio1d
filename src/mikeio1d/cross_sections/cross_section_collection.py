@@ -69,7 +69,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
 
         if isinstance(cross_sections, CrossSectionData):
             self._init_from_cross_section_data(cross_sections)
-        elif isinstance(cross_sections, Path) or isinstance(cross_sections, str):
+        elif isinstance(cross_sections, (Path, str)):
             self._init_from_xns11(cross_sections)
         elif isinstance(cross_sections, Collection):
             self._init_from_cross_section_list(cross_sections)
@@ -261,17 +261,17 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
     @property
     def location_ids(self) -> set[str]:
         """Unique location IDs in the collection."""
-        return set([k[0] for k in self.keys()])
+        return {k[0] for k in self.keys()}
 
     @property
     def chainages(self) -> set[str]:
         """Unique chainages in the collection (as string with 3 decimals)."""
-        return set([k[1] for k in self.keys()])
+        return {k[1] for k in self.keys()}
 
     @property
     def topo_ids(self) -> set[str]:
         """Unique topo IDs in the collection."""
-        return set([k[2] for k in self.keys()])
+        return {k[2] for k in self.keys()}
 
     def sel(
         self, location_id: str = ..., chainage: str | float = ..., topo_id: str = ...
@@ -294,7 +294,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
             Provinding partial arguments will always return a list, even if it only includes one CrossSection.
 
         """
-        if isinstance(chainage, int) or isinstance(chainage, float):
+        if isinstance(chainage, (int, float)):
             chainage = self._convert_chainage_to_str(chainage)
         return self[location_id, chainage, topo_id]
 

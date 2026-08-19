@@ -22,7 +22,7 @@ class ResultFilter:
 
     def use_filter(self) -> bool:
         """Whether the filter should be applied."""
-        return any([f.use_filter() for f in self.sub_filters])
+        return any(f.use_filter() for f in self.sub_filters)
 
     def apply(self, result_data: ResultData):
         """Apply filter."""

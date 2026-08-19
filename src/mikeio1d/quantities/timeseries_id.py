@@ -305,7 +305,7 @@ class TimeSeriesId:
                 continue
             level_value = level_values[0]
             is_all_default_values = (level_value == field.default) or (
-                level_value != level_value and field.default != field.default
+                pd.isna(level_value) and pd.isna(field.default)
             )
             if is_all_default_values:
                 index = index.droplevel(field.name)
@@ -350,7 +350,7 @@ class TimeSeriesId:
     def _is_multiindex_complete(index: pd.MultiIndex) -> bool:
         """Check whether the levels of a MultiIndex match the fields of TimeSeriesId."""
         index_fields = set(index.names)
-        timeseries_id_fields = set([field.name for field in fields(TimeSeriesId)])
+        timeseries_id_fields = {field.name for field in fields(TimeSeriesId)}
         return index_fields == timeseries_id_fields
 
     @staticmethod

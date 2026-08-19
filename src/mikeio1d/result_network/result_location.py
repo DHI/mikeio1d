@@ -233,12 +233,10 @@ class ResultLocationCreator(ABC):
     def can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
         """Check if a derived quantity can be added to the result locations."""
         result_location = self.result_location
-        if (
-            result_location.group not in derived_quantity.groups
-            or derived_quantity.source_quantity not in result_location.quantities
-        ):
-            return False
-        return True
+        return (
+            result_location.group in derived_quantity.groups
+            and derived_quantity.source_quantity in result_location.quantities
+        )
 
     def add_derived_quantity(self, derived_quantity: DerivedQuantity):
         """Add a derived quantity to the result location."""

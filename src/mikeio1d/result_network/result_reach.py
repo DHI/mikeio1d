@@ -213,9 +213,8 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         for res1d_reach in self.res1d_reaches:
             if res1d_reach.DataItems.Contains(m1d_dataitem):
                 return res1d_reach
-        raise Exception(
-            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
-            m1d_dataitem,
+        raise ValueError(
+            f"No IRes1DDataSet found on reach for specified IRes1DDataItem: {m1d_dataitem}"
         )
 
     def get_query(self, data_item: IDataItem):
@@ -444,7 +443,7 @@ class ResultReachCreator(ResultLocationCreator):
         else:
             cs = None
 
-        if isinstance(cs, Res1DCircularCrossSection) or isinstance(cs, Res1DEggshapedCrossSection):
+        if isinstance(cs, (Res1DCircularCrossSection, Res1DEggshapedCrossSection)):
             return cs.Diameter
         elif isinstance(cs, Res1DRectangularCrossSection) or hasattr(cs, "Height"):
             return cs.Height

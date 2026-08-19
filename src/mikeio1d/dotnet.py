@@ -140,7 +140,7 @@ def to_dotnet_array(x):
 
 
 def _asnetarray_v2(x):
-    if any([type(xi) is list for xi in x]):
+    if any(type(xi) is list for xi in x):
         # Array of array
         return _asnetarray_v2([_asnetarray_v2(xi) for xi in x])
     else:

@@ -97,7 +97,7 @@ class ReachGeometry:
     @cache
     def _get_unique_points(self) -> list[ReachPoint]:
         """Remove points sharing the same chainage and coordinates."""
-        return sorted(list(set(self._points)))
+        return sorted(set(self._points))
 
     @cache
     def _get_distances(self) -> list[float]:

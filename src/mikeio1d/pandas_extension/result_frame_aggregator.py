@@ -135,7 +135,7 @@ class ResultFrameAggregator:
         ):
             raise ValueError("Entity, quantity, and agg levels must be mutually exclusive sets.")
 
-        timeseries_id_fields = set(f.name for f in fields(TimeSeriesId))
+        timeseries_id_fields = {f.name for f in fields(TimeSeriesId)}
 
         agg_levels.discard("time")  # time is not a field in TimeSeriesId
 

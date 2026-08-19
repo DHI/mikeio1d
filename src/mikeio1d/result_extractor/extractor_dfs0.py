@@ -59,18 +59,18 @@ class ExtractorDfs0(Extractor):
                 gridpoint_index = data_item.IndexList[element_index]
                 gridpoints = list(reach.GridPoints)
                 chainage = gridpoints[gridpoint_index].Chainage
-                item_name = "reach:%s:%s:%.3f" % (quantity.Id, reach.Name, chainage)
+                item_name = f"reach:{quantity.Id}:{reach.Name}:{chainage:.3f}"
 
             elif item_type_group == ItemTypeGroup.NodeItem:
                 node = nodes[number_within_group]
-                item_name = "node:%s:%s" % (quantity.Id, node.Id)
+                item_name = f"node:{quantity.Id}:{node.Id}"
 
             elif item_type_group == ItemTypeGroup.CatchmentItem:
                 catchment = catchments[number_within_group]
-                item_name = "catchment:%s:%s" % (quantity.Id, catchment.Id)
+                item_name = f"catchment:{quantity.Id}:{catchment.Id}"
 
             else:
-                item_name = "%s:%s:%s" % (item_type_group, quantity.Id, data_item.Id)
+                item_name = f"{item_type_group}:{quantity.Id}:{data_item.Id}"
 
             item = builder.CreateDynamicItemBuilder()
             item.Set(item_name, data_item.Quantity.EumQuantity, DfsSimpleType.Float)

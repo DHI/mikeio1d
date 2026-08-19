@@ -192,7 +192,7 @@ class CrossSection:
 
         """
         if self._m1d_cross_section.Coordinates is None:
-            return tuple()
+            return ()
         return tuple((p.X, p.Y) for p in self._m1d_cross_section.Coordinates)
 
     @coords.setter
