@@ -18,6 +18,10 @@ def quantity_outside_a_network():
 
 
 def test_timeseries_id_raises_when_not_added_to_a_network(quantity_outside_a_network):
-    """The error used to be built and dropped, so None came back instead."""
+    """Accessing timeseries_id off a network must raise, not return None.
+
+    The guard constructed the ValueError but never raised it, so the property
+    fell through to `return self._timeseries_id` and handed back None.
+    """
     with pytest.raises(ValueError, match="must be added to a ResultNetwork"):
         quantity_outside_a_network.timeseries_id
