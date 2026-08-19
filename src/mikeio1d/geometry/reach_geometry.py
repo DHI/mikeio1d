@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from functools import cache, lru_cache
 
 import numpy as np
 from shapely.geometry import LineString
@@ -17,6 +16,8 @@ class ReachGeometry:
 
     def __init__(self, points: list[ReachPoint]):
         self._points = sorted(points)
+        self._unique_points: list[ReachPoint] | None = None
+        self._distances: list[float] | None = None
 
     @staticmethod
     def from_res1d_reaches(res1d_reaches) -> ReachGeometry:
@@ -94,14 +95,16 @@ class ReachGeometry:
         chainage = float(np.interp(geometric_distance, distances, chainages))
         return chainage
 
-    @cache
     def _get_unique_points(self) -> list[ReachPoint]:
         """Remove points sharing the same chainage and coordinates."""
-        return sorted(set(self._points))
+        if self._unique_points is None:
+            self._unique_points = sorted(set(self._points))
+        return self._unique_points
 
-    @cache
     def _get_distances(self) -> list[float]:
         """Return a list of geometric distances between all unique points."""
+        if self._distances is not None:
+            return self._distances
         points = self._get_unique_points()
         distances = []
         total_distance = 0.0
@@ -111,4 +114,5 @@ class ReachGeometry:
             total_distance += distance
             distances.append(total_distance)
             prev_point = point
+        self._distances = distances
         return distances
