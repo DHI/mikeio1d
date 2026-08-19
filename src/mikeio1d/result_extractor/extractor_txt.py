@@ -3,6 +3,7 @@
 from .extractor import Extractor
 
 import System
+
 from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
 

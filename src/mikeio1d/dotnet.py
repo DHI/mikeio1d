@@ -1,13 +1,11 @@
 """Utilities for interfacing with .NET objects."""
 
-import ctypes
 import datetime
-
 import numpy as np
+import ctypes
 
 import System
-from System.Runtime.InteropServices import GCHandle
-from System.Runtime.InteropServices import GCHandleType
+from System.Runtime.InteropServices import GCHandle, GCHandleType
 
 _MAP_NP_NET = {
     np.dtype("float32"): System.Single,

@@ -6,16 +6,15 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from geopandas import GeoDataFrame
-
     from mikeio1d.result_network import ResultReaches
 
 from geopandas import GeoDataFrame
 
+from .geopandas_converter import GeoPandasConverter
+from ..reach_geometry import ReachGeometry
+
 from mikeio1d.quantities import TimeSeriesId
 from mikeio1d.quantities import TimeSeriesIdGroup
-
-from ..reach_geometry import ReachGeometry
-from .geopandas_converter import GeoPandasConverter
 
 
 class GeoPandasReachesConverterSegmented(GeoPandasConverter):

@@ -1,11 +1,10 @@
 """Module for handling MIKE binary paths."""
 
 import os
-import platform
 import sys
-from typing import ClassVar
-
+import platform
 import pythonnet
+from typing import ClassVar
 
 
 class MikePath:

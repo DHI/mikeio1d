@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from mikeio1d.res1d import Res1D
 
-from .default_quantities import default_derived_quantities
 from .derived_quantity import DerivedQuantity
+from .default_quantities import default_derived_quantities
 
 DerivedQuantityName = str
 

@@ -5,18 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    import pandas as pd
-
     from ..res1d import Res1D
     from ..result_network import ResultLocation
     from ..result_reader_writer.result_reader import ColumnMode
 
+    import pandas as pd
+
+from .data_entry import DataEntry
 from ..quantities import TimeSeriesId
 from ..result_query import QueryDataCreator
-from .data_entry import DataEntry
 
-from DHI.Mike1D.Generic import IQuantity
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
+from DHI.Mike1D.Generic import IQuantity
 
 
 class ResultQuantity:

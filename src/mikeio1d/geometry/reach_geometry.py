@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 import numpy as np
-from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
+from shapely.geometry import LineString
 
 from .reach_point import ReachPoint
+from collections.abc import Iterable
 
 
 class ReachGeometry:

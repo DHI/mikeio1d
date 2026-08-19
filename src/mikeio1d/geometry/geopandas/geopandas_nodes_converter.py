@@ -11,10 +11,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from geopandas import GeoDataFrame
 
-from mikeio1d.quantities import TimeSeriesIdGroup
-
-from ..node_point import NodePoint
 from .geopandas_converter import GeoPandasConverter
+from ..node_point import NodePoint
+
+from mikeio1d.quantities import TimeSeriesIdGroup
 
 
 class GeoPandasNodesConverter(GeoPandasConverter):

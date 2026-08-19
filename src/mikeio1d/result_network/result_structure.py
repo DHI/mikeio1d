@@ -14,8 +14,9 @@ if TYPE_CHECKING:  # pragma: no cover
 from warnings import warn
 
 from ..dotnet import pythonnet_implementation as impl
-from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataStructure
+from ..quantities import TimeSeriesIdGroup
+
 from .result_location import ResultLocation
 from .result_location import ResultLocationCreator
 

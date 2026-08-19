@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import platform
 import sys
 import warnings
-from importlib.metadata import metadata
+import platform
 from pathlib import Path
-
 from packaging.specifiers import SpecifierSet
+
+from importlib.metadata import metadata
 
 from .mikepath import MikePath
 
@@ -63,9 +63,10 @@ clr.AddReference("DHI.Mike1D.CrossSectionModule")
 clr.AddReference("DHI.Mike1D.MikeIO")
 
 from .res1d import Res1D
-from .top_level import open
-from .various import allow_nested_autocompletion_for_ipython
 from .xns11 import Xns11
+from .top_level import open
+
+from .various import allow_nested_autocompletion_for_ipython
 
 allow_nested_autocompletion_for_ipython(Res1D)
 allow_nested_autocompletion_for_ipython(Xns11)

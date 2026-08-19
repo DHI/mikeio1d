@@ -12,8 +12,9 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IRes1DGlobalData
 
-from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataGlobal
+from ..quantities import TimeSeriesIdGroup
+
 from .result_location import ResultLocation
 from .result_location import ResultLocationCreator
 

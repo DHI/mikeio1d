@@ -5,17 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..query import QueryData
-    from .result_reader import ColumnMode
     from .result_reader import ResultReader
+    from .result_reader import ColumnMode
+
+    from ..query import QueryData
 
 
 import pandas as pd
 
 from ..dotnet import pythonnet_implementation as impl
+from .result_reader import ResultReader
 from ..quantities import TimeSeriesId
 from ..result_query import QueryDataCreator
-from .result_reader import ResultReader
 
 
 class ResultReaderQuery(ResultReader):

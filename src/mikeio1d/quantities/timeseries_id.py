@@ -6,22 +6,21 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any
-
-    from ..query import QueryData
     from ..res1d import Res1D
-    from ..result_network import ResultLocation
-    from ..result_network.data_entry import DataEntry
     from ..result_network.result_quantity import ResultQuantity
+    from ..query import QueryData
+    from ..result_network.data_entry import DataEntry
+    from ..result_network import ResultLocation
 
 import dataclasses
 from dataclasses import dataclass
 from dataclasses import fields
-from enum import Enum
 
+from enum import Enum
 import pandas as pd
 
-from ..various import DELETE_VALUE
 from ..various import NAME_DELIMITER
+from ..various import DELETE_VALUE
 
 from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 

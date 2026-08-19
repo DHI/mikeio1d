@@ -1,7 +1,7 @@
 """ExtractorAll class."""
 
-from .extractor_csv import ExtractorCsv
 from .extractor_dfs0 import ExtractorDfs0
+from .extractor_csv import ExtractorCsv
 from .extractor_txt import ExtractorTxt
 
 

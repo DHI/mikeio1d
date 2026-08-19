@@ -8,14 +8,14 @@ from typing import ClassVar
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
-    from mikeio1d.result_network import ResultGridPoint
     from mikeio1d.result_network import ResultLocation
+    from mikeio1d.result_network import ResultGridPoint
     from mikeio1d.result_network import ResultReach
 
 import numpy as np
 
-from ...timeseries_id import TimeSeriesIdGroup
 from ..derived_quantity import DerivedQuantity
+from ...timeseries_id import TimeSeriesIdGroup
 
 
 class ReachFilling(DerivedQuantity):

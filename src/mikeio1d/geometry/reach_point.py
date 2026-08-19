@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
 
-from shapely.geometry import Point
 from shapely.geometry.base import BaseGeometry
+from shapely.geometry import Point
 
 
 class ReachPointType(Enum):

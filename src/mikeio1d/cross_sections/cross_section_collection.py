@@ -7,21 +7,23 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import geopandas as gpd
 
-from collections.abc import Collection
-from collections.abc import MutableMapping
-from pathlib import Path
 from warnings import warn
+
+from collections.abc import MutableMapping
+from collections.abc import Collection
+from pathlib import Path
 
 import pandas as pd
 
-from ..various import try_import_geopandas
 from .cross_section import CrossSection
 from .cross_section import Marker
 
-from DHI.Mike1D.CrossSectionModule import CrossSectionData
-from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
+from ..various import try_import_geopandas
+
 from DHI.Mike1D.Generic import Connection
 from DHI.Mike1D.Generic import Diagnostics
+from DHI.Mike1D.CrossSectionModule import CrossSectionData
+from DHI.Mike1D.CrossSectionModule import CrossSectionDataFactory
 
 LocationId = str
 Chainage = str

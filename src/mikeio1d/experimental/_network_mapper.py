@@ -13,17 +13,15 @@ except ImportError as e:
         "Install with: pip install 'mikeio1d[experimental]'"
     ) from e
 
-from collections.abc import ItemsView
+from pathlib import Path
+from enum import Enum
+from typing import Any
 from collections.abc import KeysView
 from collections.abc import ValuesView
-from enum import Enum
-from pathlib import Path
-from typing import Any
+from collections.abc import ItemsView
 
 from mikeio1d import Res1D
-from mikeio1d.result_network import ResultGridPoint
-from mikeio1d.result_network import ResultNode
-from mikeio1d.result_network import ResultReach
+from mikeio1d.result_network import ResultNode, ResultReach, ResultGridPoint
 
 
 def node_id_generator(node: str | int | None = None, **kwargs) -> str:

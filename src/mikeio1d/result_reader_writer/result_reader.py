@@ -5,34 +5,36 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..filter import ResultFilter
     from ..res1d import Res1D
+    from ..filter import ResultFilter
 
-import datetime
-import os.path
 import warnings
+
+from enum import Enum
 from abc import ABC
 from abc import abstractmethod
-from enum import Enum
+
+import os.path
 from pathlib import Path
 
 import pandas as pd
+import datetime
 
 from ..dotnet import from_dotnet_datetime
 from ..dotnet import pythonnet_implementation as impl
+from ..various import NAME_DELIMITER, DATETIME_DTYPE
 from ..quantities import TimeSeriesId
 from ..result_network import ResultNetwork
-from ..various import DATETIME_DTYPE
-from ..various import NAME_DELIMITER
 
-from DHI.Mike1D.Generic import Connection
-from DHI.Mike1D.Generic import Diagnostics
-from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 from DHI.Mike1D.ResultDataAccess import Filter
 from DHI.Mike1D.ResultDataAccess import ResultData
 from DHI.Mike1D.ResultDataAccess import ResultDataQuery
 from DHI.Mike1D.ResultDataAccess import ResultDataSearch
+from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 from DHI.Mike1D.ResultDataAccess import ResultTypes
+
+from DHI.Mike1D.Generic import Connection
+from DHI.Mike1D.Generic import Diagnostics
 
 
 class ColumnMode(str, Enum):

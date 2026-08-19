@@ -5,10 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..filter import ResultFilter
     from .result_reader import ResultReader
+    from ..filter import ResultFilter
 
 from ..various import NAME_DELIMITER
+
 from .result_reader_copier import ResultReaderCopier
 from .result_reader_query import ResultReaderQuery
 

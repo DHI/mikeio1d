@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING
+from collections.abc import Callable
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any
@@ -12,9 +12,9 @@ from dataclasses import fields
 
 import pandas as pd
 
-from mikeio1d.quantities import TimeSeriesId
-
 from . import groupby_level
+
+from mikeio1d.quantities import TimeSeriesId
 
 
 class ResultFrameAggregator:

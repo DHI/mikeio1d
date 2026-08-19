@@ -2,33 +2,34 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 from warnings import warn
 
+from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
+    from ..geometry import CrossSectionGeometry
     from collections.abc import Iterable
 
-    from ..geometry import CrossSectionGeometry
-
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
+from .cross_section_factory import CrossSectionFactory
+from .marker import Marker
+from .enums import RadiusType
+from .enums import ResistanceType
+from .enums import ResistanceDistribution
+from .enums import ProcessLevelsMethod
 
 from ..various import try_import_shapely
-from .cross_section_factory import CrossSectionFactory
-from .enums import ProcessLevelsMethod
-from .enums import RadiusType
-from .enums import ResistanceDistribution
-from .enums import ResistanceType
-from .marker import Marker
 
-from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions
 from DHI.Mike1D.CrossSectionModule import CrossSectionPoint
+from DHI.Mike1D.CrossSectionModule import CrossSectionExtensions
 from DHI.Mike1D.CrossSectionModule import ICrossSection
 from DHI.Mike1D.Generic import ProcessingOption
-from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
 from DHI.Mike1D.Generic import ResistanceDistribution as m1d_ResistanceDistribution
 from DHI.Mike1D.Generic import ResistanceFormulation as m1d_ResistanceFormulation
+from DHI.Mike1D.Generic import RadiusType as m1d_RadiusType
 from DHI.Mike1D.Generic import ZLocation
 from DHI.Mike1D.Generic.Spatial.Geometry import Coordinate
 from DHI.Mike1D.Generic.Spatial.Geometry import CoordinateList

@@ -3,14 +3,16 @@
 from .extractor import Extractor
 
 import System
-from DHI.Generic.MikeZero import eumUnit
-from DHI.Generic.MikeZero.DFS import DataValueType
-from DHI.Generic.MikeZero.DFS import DfsBuilder
-from DHI.Generic.MikeZero.DFS import DfsFactory
-from DHI.Generic.MikeZero.DFS import DfsSimpleType
-from DHI.Generic.MikeZero.DFS import StatType
-from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 from System import Array
+
+from DHI.Generic.MikeZero import eumUnit
+from DHI.Generic.MikeZero.DFS import DfsFactory
+from DHI.Generic.MikeZero.DFS import DfsBuilder
+from DHI.Generic.MikeZero.DFS import DfsSimpleType
+from DHI.Generic.MikeZero.DFS import DataValueType
+from DHI.Generic.MikeZero.DFS import StatType
+
+from DHI.Mike1D.ResultDataAccess import ItemTypeGroup
 
 
 class ExtractorDfs0(Extractor):

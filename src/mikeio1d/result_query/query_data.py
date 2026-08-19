@@ -12,10 +12,10 @@ from abc import abstractmethod
 
 import numpy as np
 
-from ..custom_exceptions import InvalidQuantity
 from ..custom_exceptions import NoDataForQuery
-from ..quantities import TimeSeriesId
+from ..custom_exceptions import InvalidQuantity
 from ..various import NAME_DELIMITER
+from ..quantities import TimeSeriesId
 
 
 class QueryData(ABC):

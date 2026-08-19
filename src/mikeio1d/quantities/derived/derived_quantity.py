@@ -12,6 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from abc import ABC
 from abc import abstractmethod
+
 from dataclasses import replace
 
 import pandas as pd

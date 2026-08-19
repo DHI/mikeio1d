@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Literal
-
 from .. import Res1D
+from typing import Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import networkx as nx

@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..geometry import NodePoint
     from ..res1d import Res1D
+    from ..geometry import NodePoint
     from .result_quantity import ResultQuantity
 
     from DHI.Mike1D.ResultDataAccess import IDataItem
@@ -14,9 +14,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from warnings import warn
 
-from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataNode
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesIdGroup
+
 from .result_location import ResultLocation
 from .result_location import ResultLocationCreator
 

@@ -13,51 +13,58 @@ if TYPE_CHECKING:  # pragma: no cover
     from .result_reader_writer.result_reader import ColumnMode
 
     from DHI.Mike1D.ResultDataAccess import ResultData
-    from DHI.Mike1D.ResultDataAccess import ResultDataQuery
     from DHI.Mike1D.ResultDataAccess import ResultDataSearcher
+    from DHI.Mike1D.ResultDataAccess import ResultDataQuery
 
 import os.path
 import warnings
+
 from pathlib import Path
 
 from .dotnet import from_dotnet_datetime
 from .dotnet import to_dotnet_datetime
 from .dotnet import to_numpy
-from .filter import NameFilter
-from .filter import QuantityFilter
-from .filter import ResultFilter
-from .filter import StepEveryFilter
-from .filter import TimeFilter
-from .pandas_extension import Mikeio1dAccessor
-from .quantities import DerivedQuantity
-from .quantities import TimeSeriesId
-from .quantities import get_default_derived_quantity_classes
-from .query import QueryDataCatchment
-from .query import QueryDataGlobal
-from .query import QueryDataNode
-from .query import QueryDataReach
-from .query import QueryDataStructure
+
 from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
-from .result_network import ResultCatchments
-from .result_network import ResultGlobalDatas
 from .result_network import ResultNetwork
-from .result_network import ResultNodes
 from .result_network import ResultQuantity
+from .result_network import ResultCatchments
+from .result_network import ResultNodes
 from .result_network import ResultReaches
 from .result_network import ResultStructures
-from .result_query.query_data_converter import QueryDataConverter
+from .result_network import ResultGlobalDatas
 from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
 from .result_reader_writer import ResultWriter
+from .filter import ResultFilter
+from .filter import TimeFilter
+from .filter import NameFilter
+from .filter import StepEveryFilter
+from .filter import QuantityFilter
+
+from .query import QueryDataCatchment
+from .query import QueryDataNode
+from .query import QueryDataReach
+from .query import QueryDataStructure
+from .query import QueryDataGlobal
+
+from .result_query.query_data_converter import QueryDataConverter
+
+from .various import mike1d_quantities
 from .various import NAME_DELIMITER
 from .various import make_list_if_not_iterable
-from .various import mike1d_quantities
 
+from .quantities import TimeSeriesId
+from .quantities import get_default_derived_quantity_classes
+from .quantities import DerivedQuantity
+
+from .pandas_extension import Mikeio1dAccessor
+
+from System import DateTime
 from DHI.Mike1D.Generic import Connection
 from DHI.Mike1D.ResultDataAccess import Res1DExtensions
-from System import DateTime
 
 
 class Res1D:

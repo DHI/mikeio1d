@@ -5,15 +5,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Callable
-
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
+    from collections.abc import Callable
 
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
 from ..quantities import TimeSeriesIdGroup
+
 from .result_locations import ResultLocations
 from .result_locations import ResultLocationsCreator
 from .result_node import ResultNode

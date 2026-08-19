@@ -2,20 +2,21 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 from warnings import warn
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from ..geometry import CatchmentGeometry
     from ..res1d import Res1D
+    from ..geometry import CatchmentGeometry
     from .result_quantity import ResultQuantity
 
     from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IRes1DCatchment
 
-from ..quantities import TimeSeriesIdGroup
 from ..query import QueryDataCatchment
 from ..various import try_import_shapely
+from ..quantities import TimeSeriesIdGroup
+
 from .result_location import ResultLocation
 from .result_location import ResultLocationCreator
 

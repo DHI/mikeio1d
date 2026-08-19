@@ -10,10 +10,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from mikeio1d.result_network import ResultLocation
 
-import numpy as np
-
-from ...timeseries_id import TimeSeriesIdGroup
 from ..derived_quantity import DerivedQuantity
+from ...timeseries_id import TimeSeriesIdGroup
+
+import numpy as np
 
 
 class NodeWaterLevelAboveCritical(DerivedQuantity):

@@ -2,9 +2,9 @@
 
 import pandas as pd
 
+from .transposed_groupby import TransposedGroupBy
 from .result_reaches_helpers import agg_chainage
 from .result_reaches_helpers import groupby_chainage
-from .transposed_groupby import TransposedGroupBy
 from .various import compact_dataframe
 from .various import groupby_level
 

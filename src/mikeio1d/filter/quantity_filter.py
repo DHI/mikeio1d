@@ -5,16 +5,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from DHI.Mike1D.ResultDataAccess import Filter
     from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import Filter
 
 
-from .result_filter import ResultSubFilter
-
+from DHI.Mike1D.ResultDataAccess import DataItemFilterQuantity
+from DHI.Mike1D.Generic import Quantity
 from DHI.Mike1D.Generic import PredefinedQuantity
 from DHI.Mike1D.Generic import PredefinedQuantityTable
-from DHI.Mike1D.Generic import Quantity
-from DHI.Mike1D.ResultDataAccess import DataItemFilterQuantity
+from .result_filter import ResultSubFilter
 
 
 class QuantityFilter(ResultSubFilter):

@@ -11,10 +11,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from geopandas import GeoDataFrame
 
-from mikeio1d.quantities import TimeSeriesIdGroup
-
-from ..catchment_geometry import CatchmentGeometry
 from .geopandas_converter import GeoPandasConverter
+from ..catchment_geometry import CatchmentGeometry
+
+from mikeio1d.quantities import TimeSeriesIdGroup
 
 
 class GeoPandasCatchmentsConverter(GeoPandasConverter):

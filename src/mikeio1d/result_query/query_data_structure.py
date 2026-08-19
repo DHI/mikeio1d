@@ -11,10 +11,10 @@ from math import isnan
 
 from ..custom_exceptions import InvalidQuantity
 from ..custom_exceptions import InvalidStructure
-from ..quantities import TimeSeriesId
-from ..quantities import TimeSeriesIdGroup
 from ..various import NAME_DELIMITER
 from .query_data_reach import QueryDataReach
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
 
 
 class QueryDataStructure(QueryDataReach):

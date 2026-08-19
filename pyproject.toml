@@ -91,10 +91,11 @@ experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 required-version = ">=0.16,<0.17"
 include = ["pyproject.toml", "src/mikeio1d/**/*.py"]
 line-length = 100
-lint.extend-select = ["D", "PD", "NPY", "FA", "I"]
+lint.extend-select = ["D", "PD", "NPY", "FA"]
 lint.ignore = [
     "E402",   # ignore for now
     "F401",   # ignore for now
+    "I",      # the import grouping documented below is kept by hand, not by isort
     "TRY004", # ValueError -> TypeError on type checks would break callers
     "BLE001", # the broad catches wrap .NET interop, where the type is unknowable
     "S102",   # exec is how mikenet binds .NET namespaces into the module
@@ -102,13 +103,8 @@ lint.ignore = [
 ]
 lint.pydocstyle.convention = "numpy"
 
-# The .NET assemblies are loaded through pythonnet, so isort would otherwise file
-# DHI and System alongside numpy and pandas. Keeping them in a trailing section of
-# their own preserves the convention the package has always followed: Python
-# imports first, MIKE 1D interop last.
-[tool.ruff.lint.isort]
-force-single-line = true
-section-order = ["future", "standard-library", "third-party", "first-party", "local-folder", "dhi"]
-
-[tool.ruff.lint.isort.sections]
-dhi = ["DHI", "System"]
+# Import convention, enforced by review rather than by isort: one name per line,
+# Python imports first, then the DHI and System interop in a trailing group of
+# their own. Ruff 0.16 turns I001 on by default and sorts alphabetically within
+# each group, which loses the ordering the modules are actually read in, so the
+# rule is ignored above.

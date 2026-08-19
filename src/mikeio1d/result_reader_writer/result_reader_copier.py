@@ -6,15 +6,16 @@ import numpy as np
 import pandas as pd
 
 from ..dotnet import pythonnet_implementation as impl
+from ..various import NAME_DELIMITER
+from .result_reader import ResultReader
+from .result_reader import ColumnMode
 from ..quantities import TimeSeriesId
 from ..result_query import QueryDataCreator
-from ..various import NAME_DELIMITER
-from .result_reader import ColumnMode
-from .result_reader import ResultReader
 
-from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
-from DHI.Mike1D.MikeIO import ResultDataCopier
 from System import IntPtr
+
+from DHI.Mike1D.MikeIO import ResultDataCopier
+from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
 
 class ResultReaderCopier(ResultReader):

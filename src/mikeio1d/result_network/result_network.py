@@ -9,20 +9,21 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from ..res1d import Res1D
 
-    from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import ResultData
+    from DHI.Mike1D.ResultDataAccess import IDataItem
 
 import pandas as pd
 
-from ..quantities import DerivedQuantity
-from ..quantities import TimeSeriesId
 from ..various import try_import_geopandas
+
+from .result_nodes import ResultNodes
+from .result_reaches import ResultReaches
 from .result_catchments import ResultCatchments
 from .result_global_datas import ResultGlobalDatas
-from .result_nodes import ResultNodes
-from .result_quantity import ResultQuantity
-from .result_reaches import ResultReaches
 from .result_structures import ResultStructures
+from .result_quantity import ResultQuantity
+from ..quantities import TimeSeriesId
+from ..quantities import DerivedQuantity
 
 
 class ResultNetwork:

@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import sys
+import clr
 import warnings
+import sys
+
 from collections.abc import Iterable
 
-import clr
-
-from DHI.Mike1D.Generic import PredefinedQuantity
 from System import Enum
+from DHI.Mike1D.Generic import PredefinedQuantity
 
 NAME_DELIMITER = ":"
 DELETE_VALUE = -1e-30

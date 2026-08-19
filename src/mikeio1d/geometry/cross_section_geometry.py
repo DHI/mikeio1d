@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
+from shapely.geometry import LineString
 
 
 class CrossSectionGeometry:

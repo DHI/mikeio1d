@@ -1,9 +1,8 @@
 """LibraryLoader class."""
 
+import clr
 from pathlib import Path
 from warnings import warn
-
-import clr
 
 
 class LibraryLoader:

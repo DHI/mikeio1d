@@ -5,11 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    import pandas as pd
-
+    from .result_location import ResultLocation
     from ..res1d import Res1D
     from ..result_reader_writer.result_reader import ColumnMode
-    from .result_location import ResultLocation
+
+    import pandas as pd
 
 from ..quantities import DerivedQuantity
 
