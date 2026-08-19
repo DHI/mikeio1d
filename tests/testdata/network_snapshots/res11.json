@@ -1,0 +1,2377 @@
+{
+ "counts": {
+  "graph_edges": 76,
+  "graph_nodes": 77,
+  "reaches": 3
+ },
+ "dataframe": {
+  "columns": {
+   "10|Water Level": {
+    "first": 41.827908,
+    "last": 42.389793,
+    "max": 44.388107,
+    "min": 41.625431,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 19161.800861
+   },
+   "11|Discharge": {
+    "first": 271.5,
+    "last": 444.744843,
+    "max": 2056.636475,
+    "min": 219.92337,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 397862.546982
+   },
+   "12|Water Level": {
+    "first": 38.67144,
+    "last": 39.146545,
+    "max": 41.047058,
+    "min": 38.50452,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 17671.695473
+   },
+   "13|Discharge": {
+    "first": 271.5,
+    "last": 441.585602,
+    "max": 2051.858887,
+    "min": 225.248764,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 397408.039047
+   },
+   "14|Water Level": {
+    "first": 35.400455,
+    "last": 35.717983,
+    "max": 37.522369,
+    "min": 35.278019,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 16136.316727
+   },
+   "15|Discharge": {
+    "first": 271.5,
+    "last": 439.091187,
+    "max": 2049.086426,
+    "min": 230.025452,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 397015.254852
+   },
+   "16|Water Level": {
+    "first": 32.017822,
+    "last": 32.328907,
+    "max": 34.146851,
+    "min": 31.955135,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 14632.4398
+   },
+   "17|Discharge": {
+    "first": 271.5,
+    "last": 437.964325,
+    "max": 2046.791748,
+    "min": 231.9785,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 396602.17662
+   },
+   "18|Water Level": {
+    "first": 28.905003,
+    "last": 29.201654,
+    "max": 30.967106,
+    "min": 28.838684,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 13234.712275
+   },
+   "19|Discharge": {
+    "first": 271.5,
+    "last": 437.973907,
+    "max": 2045.403809,
+    "min": 234.277618,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 396248.197128
+   },
+   "20|Water Level": {
+    "first": 25.660845,
+    "last": 26.058107,
+    "max": 27.834938,
+    "min": 25.550402,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 11822.997761
+   },
+   "21|Discharge": {
+    "first": 271.5,
+    "last": 438.471619,
+    "max": 2043.039185,
+    "min": 238.894455,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 395833.886612
+   },
+   "22|Water Level": {
+    "first": 22.509184,
+    "last": 22.968981,
+    "max": 24.828333,
+    "min": 22.414457,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 10445.172092
+   },
+   "23|Discharge": {
+    "first": 271.5,
+    "last": 439.29364,
+    "max": 2039.823975,
+    "min": 241.501129,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 395419.047318
+   },
+   "24|Water Level": {
+    "first": 18.9697,
+    "last": 19.500635,
+    "max": 21.905676,
+    "min": 18.894203,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 8999.97086
+   },
+   "25|Discharge": {
+    "first": 271.5,
+    "last": 440.236176,
+    "max": 2037.259766,
+    "min": 244.204224,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 395035.869202
+   },
+   "26|Water Level": {
+    "first": 16.757212,
+    "last": 17.138817,
+    "max": 18.978287,
+    "min": 16.698212,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 7890.308327
+   },
+   "28|Water Level": {
+    "first": 16.757212,
+    "last": 17.138817,
+    "max": 18.978287,
+    "min": 16.698212,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 7890.308327
+   },
+   "29|Discharge": {
+    "first": 15.422733,
+    "last": 33.985527,
+    "max": 297.012451,
+    "min": 13.552356,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47528.592957
+   },
+   "2|Water Level": {
+    "first": 56.452774,
+    "last": 56.737003,
+    "max": 58.430206,
+    "min": 56.264717,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 25477.885479
+   },
+   "30|Water Level": {
+    "first": 14.430054,
+    "last": 14.768208,
+    "max": 16.734594,
+    "min": 14.399652,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 6860.839357
+   },
+   "31|Discharge": {
+    "first": 15.465261,
+    "last": 33.968975,
+    "max": 296.551514,
+    "min": 13.680606,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47493.147767
+   },
+   "32|Water Level": {
+    "first": 12.064747,
+    "last": 12.424656,
+    "max": 14.40406,
+    "min": 12.046089,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 5817.058696
+   },
+   "33|Discharge": {
+    "first": 15.465261,
+    "last": 33.973156,
+    "max": 296.133514,
+    "min": 13.71724,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47458.829719
+   },
+   "34|Water Level": {
+    "first": 9.796795,
+    "last": 10.177901,
+    "max": 11.999608,
+    "min": 9.763228,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 4794.725788
+   },
+   "35|Discharge": {
+    "first": 15.465261,
+    "last": 34.083755,
+    "max": 295.871826,
+    "min": 13.780602,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47420.588088
+   },
+   "36|Water Level": {
+    "first": 7.476845,
+    "last": 7.839377,
+    "max": 9.556982,
+    "min": 7.469448,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 3741.407683
+   },
+   "37|Discharge": {
+    "first": 15.465261,
+    "last": 34.288605,
+    "max": 295.657532,
+    "min": 13.624828,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47390.742572
+   },
+   "38|Water Level": {
+    "first": 5.392348,
+    "last": 5.787206,
+    "max": 7.596592,
+    "min": 5.362165,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 2834.037385
+   },
+   "39|Discharge": {
+    "first": 15.465261,
+    "last": 34.678165,
+    "max": 295.376709,
+    "min": 13.906792,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47358.601991
+   },
+   "3|Discharge": {
+    "first": 271.5,
+    "last": 438.974792,
+    "max": 2081.081787,
+    "min": 182.512817,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 399936.714828
+   },
+   "40|Water Level": {
+    "first": 4.018881,
+    "last": 4.400671,
+    "max": 6.180909,
+    "min": 3.979917,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 2205.951533
+   },
+   "41|Discharge": {
+    "first": 15.465261,
+    "last": 35.403141,
+    "max": 294.941101,
+    "min": 13.964622,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47323.610989
+   },
+   "42|Water Level": {
+    "first": 2.63697,
+    "last": 3.084471,
+    "max": 4.80789,
+    "min": 2.607107,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 1595.958303
+   },
+   "43|Discharge": {
+    "first": 15.465261,
+    "last": 36.63681,
+    "max": 294.403778,
+    "min": 14.110864,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47278.450189
+   },
+   "44|Water Level": {
+    "first": 1.290602,
+    "last": 1.641709,
+    "max": 3.438291,
+    "min": 1.259439,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 962.215398
+   },
+   "45|Discharge": {
+    "first": 15.465261,
+    "last": 37.953735,
+    "max": 294.095245,
+    "min": 14.213288,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47241.306254
+   },
+   "46|Water Level": {
+    "first": 1.007171,
+    "last": 1.038263,
+    "max": 1.934333,
+    "min": 1.005456,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 566.716221
+   },
+   "47|Discharge": {
+    "first": 15.465261,
+    "last": 38.451294,
+    "max": 293.895447,
+    "min": 14.193844,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47231.717795
+   },
+   "48|Water Level": {
+    "first": 1.00045,
+    "last": 1.00241,
+    "max": 1.144924,
+    "min": 1.000274,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 460.026035
+   },
+   "49|Discharge": {
+    "first": 15.422733,
+    "last": 38.486511,
+    "max": 293.838898,
+    "min": 14.182378,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 47230.889018
+   },
+   "4|Water Level": {
+    "first": 52.926216,
+    "last": 53.261978,
+    "max": 54.777355,
+    "min": 52.731319,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 23903.293739
+   },
+   "50|Water Level": {
+    "first": 1.0,
+    "last": 1.0,
+    "max": 1.0,
+    "min": 1.0,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 445.0
+   },
+   "52|Water Level": {
+    "first": 16.757212,
+    "last": 17.138817,
+    "max": 18.978287,
+    "min": 16.698212,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 7890.308327
+   },
+   "53|Discharge": {
+    "first": 256.342407,
+    "last": 406.852631,
+    "max": 1738.708862,
+    "min": 231.671127,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 347171.823318
+   },
+   "54|Water Level": {
+    "first": 14.53336,
+    "last": 14.873979,
+    "max": 16.686169,
+    "min": 14.462024,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 6879.793537
+   },
+   "55|Discharge": {
+    "first": 256.565002,
+    "last": 407.280487,
+    "max": 1736.716064,
+    "min": 233.34462,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 346905.530914
+   },
+   "56|Water Level": {
+    "first": 12.192156,
+    "last": 12.690842,
+    "max": 14.423528,
+    "min": 12.083405,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 5873.602607
+   },
+   "57|Discharge": {
+    "first": 256.565002,
+    "last": 407.464325,
+    "max": 1734.96521,
+    "min": 236.360062,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 346599.98703
+   },
+   "58|Water Level": {
+    "first": 9.709624,
+    "last": 10.433529,
+    "max": 12.191131,
+    "min": 9.614667,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 4862.656571
+   },
+   "59|Discharge": {
+    "first": 256.565002,
+    "last": 407.708923,
+    "max": 1733.674805,
+    "min": 238.441681,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 346251.761215
+   },
+   "5|Discharge": {
+    "first": 271.5,
+    "last": 447.667999,
+    "max": 2064.948975,
+    "min": 199.015808,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 399360.05011
+   },
+   "60|Water Level": {
+    "first": 7.253607,
+    "last": 7.958841,
+    "max": 10.039846,
+    "min": 7.168707,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 3842.907314
+   },
+   "61|Discharge": {
+    "first": 256.565002,
+    "last": 408.468689,
+    "max": 1732.061157,
+    "min": 239.546677,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345976.674179
+   },
+   "62|Water Level": {
+    "first": 4.723371,
+    "last": 5.454837,
+    "max": 7.984052,
+    "min": 4.648199,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 2808.012168
+   },
+   "63|Discharge": {
+    "first": 256.565002,
+    "last": 409.559723,
+    "max": 1729.742065,
+    "min": 240.548462,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345754.58522
+   },
+   "64|Water Level": {
+    "first": 2.60793,
+    "last": 3.286358,
+    "max": 5.971558,
+    "min": 2.546386,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 1877.606205
+   },
+   "65|Discharge": {
+    "first": 256.565002,
+    "last": 410.881073,
+    "max": 1729.729492,
+    "min": 241.202438,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345591.189697
+   },
+   "66|Water Level": {
+    "first": 1.760044,
+    "last": 2.072687,
+    "max": 4.18049,
+    "min": 1.73486,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 1222.966321
+   },
+   "67|Discharge": {
+    "first": 256.565002,
+    "last": 414.539978,
+    "max": 1729.325562,
+    "min": 242.104324,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345330.624161
+   },
+   "68|Water Level": {
+    "first": 1.541644,
+    "last": 1.606771,
+    "max": 2.577264,
+    "min": 1.537314,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 830.31951
+   },
+   "69|Discharge": {
+    "first": 256.565002,
+    "last": 416.137848,
+    "max": 1726.774658,
+    "min": 242.004776,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345232.704529
+   },
+   "6|Water Level": {
+    "first": 49.296257,
+    "last": 49.753574,
+    "max": 51.227314,
+    "min": 49.085445,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 22342.909145
+   },
+   "70|Water Level": {
+    "first": 1.50603,
+    "last": 1.515654,
+    "max": 1.725229,
+    "min": 1.505278,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 697.303221
+   },
+   "71|Discharge": {
+    "first": 256.565002,
+    "last": 416.506134,
+    "max": 1726.289185,
+    "min": 241.705307,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345201.741531
+   },
+   "72|Water Level": {
+    "first": 1.501001,
+    "last": 1.502488,
+    "max": 1.544865,
+    "min": 1.500782,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 673.020769
+   },
+   "73|Discharge": {
+    "first": 256.565002,
+    "last": 416.48526,
+    "max": 1726.615356,
+    "min": 241.510773,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345195.883408
+   },
+   "74|Water Level": {
+    "first": 1.500224,
+    "last": 1.500523,
+    "max": 1.510276,
+    "min": 1.500147,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 668.746629
+   },
+   "75|Discharge": {
+    "first": 256.342407,
+    "last": 416.448608,
+    "max": 1726.815186,
+    "min": 241.416428,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 345194.311249
+   },
+   "76|Water Level": {
+    "first": 1.5,
+    "last": 1.5,
+    "max": 1.5,
+    "min": 1.5,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 667.5
+   },
+   "7|Discharge": {
+    "first": 271.5,
+    "last": 449.481232,
+    "max": 2060.56958,
+    "min": 208.837479,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 398792.098434
+   },
+   "8|Water Level": {
+    "first": 45.459949,
+    "last": 46.002968,
+    "max": 47.719009,
+    "min": 45.271782,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 20733.962448
+   },
+   "9|Discharge": {
+    "first": 271.5,
+    "last": 447.824463,
+    "max": 2060.166748,
+    "min": 214.508667,
+    "n": 445,
+    "n_nan": 0,
+    "sum": 398317.249832
+   }
+  },
+  "shape": [
+   445,
+   73
+  ],
+  "time": {
+   "first": "1989-07-27 00:00:00",
+   "last": "1989-08-14 12:00:00",
+   "n": 445
+  }
+ },
+ "graph": {
+  "alias_map": {
+   "bp:CALI@0.0": 2,
+   "bp:CALI@103536.0": 25,
+   "bp:CALI@108080.0": 26,
+   "bp:CALI@13207.5": 5,
+   "bp:CALI@17610.0": 6,
+   "bp:CALI@22012.5": 7,
+   "bp:CALI@26415.0": 8,
+   "bp:CALI@30817.5": 9,
+   "bp:CALI@35220.0": 10,
+   "bp:CALI@39790.0": 11,
+   "bp:CALI@4402.5": 3,
+   "bp:CALI@44360.0": 12,
+   "bp:CALI@48930.0": 13,
+   "bp:CALI@53500.0": 14,
+   "bp:CALI@58070.0": 15,
+   "bp:CALI@62640.0": 16,
+   "bp:CALI@67184.0": 17,
+   "bp:CALI@71728.0": 18,
+   "bp:CALI@76272.0": 19,
+   "bp:CALI@80816.0": 20,
+   "bp:CALI@85360.0": 21,
+   "bp:CALI@8805.0": 4,
+   "bp:CALI@89904.0": 22,
+   "bp:CALI@94448.0": 23,
+   "bp:CALI@98992.0": 24,
+   "bp:NEW_CALI@0.0": 52,
+   "bp:NEW_CALI@104039.164062": 74,
+   "bp:NEW_CALI@108970.085938": 75,
+   "bp:NEW_CALI@113901.0": 76,
+   "bp:NEW_CALI@13682.5": 55,
+   "bp:NEW_CALI@18243.333984": 56,
+   "bp:NEW_CALI@22804.166016": 57,
+   "bp:NEW_CALI@27365.0": 58,
+   "bp:NEW_CALI@31925.833984": 59,
+   "bp:NEW_CALI@36486.667969": 60,
+   "bp:NEW_CALI@41047.5": 61,
+   "bp:NEW_CALI@4560.833496": 53,
+   "bp:NEW_CALI@45608.332031": 62,
+   "bp:NEW_CALI@50169.167969": 63,
+   "bp:NEW_CALI@54730.0": 64,
+   "bp:NEW_CALI@59660.917969": 65,
+   "bp:NEW_CALI@64591.832031": 66,
+   "bp:NEW_CALI@69522.75": 67,
+   "bp:NEW_CALI@74453.664062": 68,
+   "bp:NEW_CALI@79384.585938": 69,
+   "bp:NEW_CALI@84315.5": 70,
+   "bp:NEW_CALI@89246.414062": 71,
+   "bp:NEW_CALI@9121.666992": 54,
+   "bp:NEW_CALI@94177.335938": 72,
+   "bp:NEW_CALI@99108.25": 73,
+   "bp:OLD_CALI@0.0": 28,
+   "bp:OLD_CALI@12549.0": 31,
+   "bp:OLD_CALI@16732.0": 32,
+   "bp:OLD_CALI@20915.0": 33,
+   "bp:OLD_CALI@25098.0": 34,
+   "bp:OLD_CALI@29281.0": 35,
+   "bp:OLD_CALI@33464.0": 36,
+   "bp:OLD_CALI@37647.0": 37,
+   "bp:OLD_CALI@4183.0": 29,
+   "bp:OLD_CALI@41830.0": 38,
+   "bp:OLD_CALI@46267.082031": 39,
+   "bp:OLD_CALI@50704.167969": 40,
+   "bp:OLD_CALI@55141.25": 41,
+   "bp:OLD_CALI@59578.332031": 42,
+   "bp:OLD_CALI@64015.417969": 43,
+   "bp:OLD_CALI@68452.5": 44,
+   "bp:OLD_CALI@72889.585938": 45,
+   "bp:OLD_CALI@77326.664062": 46,
+   "bp:OLD_CALI@81763.75": 47,
+   "bp:OLD_CALI@8366.0": 30,
+   "bp:OLD_CALI@86200.835938": 48,
+   "bp:OLD_CALI@90637.914062": 49,
+   "bp:OLD_CALI@95075.0": 50,
+   "node:0 CALI": 0,
+   "node:108080 CALI": 1,
+   "node:113901 NEW_CALI": 51,
+   "node:95075 OLD_CALI": 27
+  },
+  "edges": [
+   [
+    "bp:CALI@0.0",
+    "bp:CALI@4402.5",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@0.0",
+    "node:0 CALI",
+    0.0,
+    true
+   ],
+   [
+    "bp:CALI@103536.0",
+    "bp:CALI@108080.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@103536.0",
+    "bp:CALI@98992.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@108080.0",
+    "node:108080 CALI",
+    0.0,
+    true
+   ],
+   [
+    "bp:CALI@13207.5",
+    "bp:CALI@17610.0",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@13207.5",
+    "bp:CALI@8805.0",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@17610.0",
+    "bp:CALI@22012.5",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@22012.5",
+    "bp:CALI@26415.0",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@26415.0",
+    "bp:CALI@30817.5",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@30817.5",
+    "bp:CALI@35220.0",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@35220.0",
+    "bp:CALI@39790.0",
+    4570.0,
+    false
+   ],
+   [
+    "bp:CALI@39790.0",
+    "bp:CALI@44360.0",
+    4570.0,
+    false
+   ],
+   [
+    "bp:CALI@4402.5",
+    "bp:CALI@8805.0",
+    4402.5,
+    false
+   ],
+   [
+    "bp:CALI@44360.0",
+    "bp:CALI@48930.0",
+    4570.0,
+    false
+   ],
+   [
+    "bp:CALI@48930.0",
+    "bp:CALI@53500.0",
+    4570.0,
+    false
+   ],
+   [
+    "bp:CALI@53500.0",
+    "bp:CALI@58070.0",
+    4570.0,
+    false
+   ],
+   [
+    "bp:CALI@58070.0",
+    "bp:CALI@62640.0",
+    4570.0,
+    false
+   ],
+   [
+    "bp:CALI@62640.0",
+    "bp:CALI@67184.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@67184.0",
+    "bp:CALI@71728.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@71728.0",
+    "bp:CALI@76272.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@76272.0",
+    "bp:CALI@80816.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@80816.0",
+    "bp:CALI@85360.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@85360.0",
+    "bp:CALI@89904.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@89904.0",
+    "bp:CALI@94448.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:CALI@94448.0",
+    "bp:CALI@98992.0",
+    4544.0,
+    false
+   ],
+   [
+    "bp:NEW_CALI@0.0",
+    "bp:NEW_CALI@4560.833496",
+    4560.833496,
+    false
+   ],
+   [
+    "bp:NEW_CALI@0.0",
+    "node:108080 CALI",
+    0.0,
+    true
+   ],
+   [
+    "bp:NEW_CALI@104039.164062",
+    "bp:NEW_CALI@108970.085938",
+    4930.921875,
+    false
+   ],
+   [
+    "bp:NEW_CALI@104039.164062",
+    "bp:NEW_CALI@99108.25",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:NEW_CALI@108970.085938",
+    "bp:NEW_CALI@113901.0",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:NEW_CALI@113901.0",
+    "node:113901 NEW_CALI",
+    0.0,
+    true
+   ],
+   [
+    "bp:NEW_CALI@13682.5",
+    "bp:NEW_CALI@18243.333984",
+    4560.833984,
+    false
+   ],
+   [
+    "bp:NEW_CALI@13682.5",
+    "bp:NEW_CALI@9121.666992",
+    4560.833008,
+    false
+   ],
+   [
+    "bp:NEW_CALI@18243.333984",
+    "bp:NEW_CALI@22804.166016",
+    4560.832031,
+    false
+   ],
+   [
+    "bp:NEW_CALI@22804.166016",
+    "bp:NEW_CALI@27365.0",
+    4560.833984,
+    false
+   ],
+   [
+    "bp:NEW_CALI@27365.0",
+    "bp:NEW_CALI@31925.833984",
+    4560.833984,
+    false
+   ],
+   [
+    "bp:NEW_CALI@31925.833984",
+    "bp:NEW_CALI@36486.667969",
+    4560.833984,
+    false
+   ],
+   [
+    "bp:NEW_CALI@36486.667969",
+    "bp:NEW_CALI@41047.5",
+    4560.832031,
+    false
+   ],
+   [
+    "bp:NEW_CALI@41047.5",
+    "bp:NEW_CALI@45608.332031",
+    4560.832031,
+    false
+   ],
+   [
+    "bp:NEW_CALI@4560.833496",
+    "bp:NEW_CALI@9121.666992",
+    4560.833496,
+    false
+   ],
+   [
+    "bp:NEW_CALI@45608.332031",
+    "bp:NEW_CALI@50169.167969",
+    4560.835938,
+    false
+   ],
+   [
+    "bp:NEW_CALI@50169.167969",
+    "bp:NEW_CALI@54730.0",
+    4560.832031,
+    false
+   ],
+   [
+    "bp:NEW_CALI@54730.0",
+    "bp:NEW_CALI@59660.917969",
+    4930.917969,
+    false
+   ],
+   [
+    "bp:NEW_CALI@59660.917969",
+    "bp:NEW_CALI@64591.832031",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:NEW_CALI@64591.832031",
+    "bp:NEW_CALI@69522.75",
+    4930.917969,
+    false
+   ],
+   [
+    "bp:NEW_CALI@69522.75",
+    "bp:NEW_CALI@74453.664062",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:NEW_CALI@74453.664062",
+    "bp:NEW_CALI@79384.585938",
+    4930.921875,
+    false
+   ],
+   [
+    "bp:NEW_CALI@79384.585938",
+    "bp:NEW_CALI@84315.5",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:NEW_CALI@84315.5",
+    "bp:NEW_CALI@89246.414062",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:NEW_CALI@89246.414062",
+    "bp:NEW_CALI@94177.335938",
+    4930.921875,
+    false
+   ],
+   [
+    "bp:NEW_CALI@94177.335938",
+    "bp:NEW_CALI@99108.25",
+    4930.914062,
+    false
+   ],
+   [
+    "bp:OLD_CALI@0.0",
+    "bp:OLD_CALI@4183.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@0.0",
+    "node:108080 CALI",
+    0.0,
+    true
+   ],
+   [
+    "bp:OLD_CALI@12549.0",
+    "bp:OLD_CALI@16732.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@12549.0",
+    "bp:OLD_CALI@8366.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@16732.0",
+    "bp:OLD_CALI@20915.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@20915.0",
+    "bp:OLD_CALI@25098.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@25098.0",
+    "bp:OLD_CALI@29281.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@29281.0",
+    "bp:OLD_CALI@33464.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@33464.0",
+    "bp:OLD_CALI@37647.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@37647.0",
+    "bp:OLD_CALI@41830.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@4183.0",
+    "bp:OLD_CALI@8366.0",
+    4183.0,
+    false
+   ],
+   [
+    "bp:OLD_CALI@41830.0",
+    "bp:OLD_CALI@46267.082031",
+    4437.082031,
+    false
+   ],
+   [
+    "bp:OLD_CALI@46267.082031",
+    "bp:OLD_CALI@50704.167969",
+    4437.085938,
+    false
+   ],
+   [
+    "bp:OLD_CALI@50704.167969",
+    "bp:OLD_CALI@55141.25",
+    4437.082031,
+    false
+   ],
+   [
+    "bp:OLD_CALI@55141.25",
+    "bp:OLD_CALI@59578.332031",
+    4437.082031,
+    false
+   ],
+   [
+    "bp:OLD_CALI@59578.332031",
+    "bp:OLD_CALI@64015.417969",
+    4437.085938,
+    false
+   ],
+   [
+    "bp:OLD_CALI@64015.417969",
+    "bp:OLD_CALI@68452.5",
+    4437.082031,
+    false
+   ],
+   [
+    "bp:OLD_CALI@68452.5",
+    "bp:OLD_CALI@72889.585938",
+    4437.085938,
+    false
+   ],
+   [
+    "bp:OLD_CALI@72889.585938",
+    "bp:OLD_CALI@77326.664062",
+    4437.078125,
+    false
+   ],
+   [
+    "bp:OLD_CALI@77326.664062",
+    "bp:OLD_CALI@81763.75",
+    4437.085938,
+    false
+   ],
+   [
+    "bp:OLD_CALI@81763.75",
+    "bp:OLD_CALI@86200.835938",
+    4437.085938,
+    false
+   ],
+   [
+    "bp:OLD_CALI@86200.835938",
+    "bp:OLD_CALI@90637.914062",
+    4437.078125,
+    false
+   ],
+   [
+    "bp:OLD_CALI@90637.914062",
+    "bp:OLD_CALI@95075.0",
+    4437.085938,
+    false
+   ],
+   [
+    "bp:OLD_CALI@95075.0",
+    "node:95075 OLD_CALI",
+    0.0,
+    true
+   ]
+  ],
+  "nodes": {
+   "bp:CALI@0.0": [
+    "Water Level"
+   ],
+   "bp:CALI@103536.0": [
+    "Discharge"
+   ],
+   "bp:CALI@108080.0": [
+    "Water Level"
+   ],
+   "bp:CALI@13207.5": [
+    "Discharge"
+   ],
+   "bp:CALI@17610.0": [
+    "Water Level"
+   ],
+   "bp:CALI@22012.5": [
+    "Discharge"
+   ],
+   "bp:CALI@26415.0": [
+    "Water Level"
+   ],
+   "bp:CALI@30817.5": [
+    "Discharge"
+   ],
+   "bp:CALI@35220.0": [
+    "Water Level"
+   ],
+   "bp:CALI@39790.0": [
+    "Discharge"
+   ],
+   "bp:CALI@4402.5": [
+    "Discharge"
+   ],
+   "bp:CALI@44360.0": [
+    "Water Level"
+   ],
+   "bp:CALI@48930.0": [
+    "Discharge"
+   ],
+   "bp:CALI@53500.0": [
+    "Water Level"
+   ],
+   "bp:CALI@58070.0": [
+    "Discharge"
+   ],
+   "bp:CALI@62640.0": [
+    "Water Level"
+   ],
+   "bp:CALI@67184.0": [
+    "Discharge"
+   ],
+   "bp:CALI@71728.0": [
+    "Water Level"
+   ],
+   "bp:CALI@76272.0": [
+    "Discharge"
+   ],
+   "bp:CALI@80816.0": [
+    "Water Level"
+   ],
+   "bp:CALI@85360.0": [
+    "Discharge"
+   ],
+   "bp:CALI@8805.0": [
+    "Water Level"
+   ],
+   "bp:CALI@89904.0": [
+    "Water Level"
+   ],
+   "bp:CALI@94448.0": [
+    "Discharge"
+   ],
+   "bp:CALI@98992.0": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@0.0": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@104039.164062": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@108970.085938": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@113901.0": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@13682.5": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@18243.333984": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@22804.166016": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@27365.0": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@31925.833984": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@36486.667969": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@41047.5": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@4560.833496": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@45608.332031": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@50169.167969": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@54730.0": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@59660.917969": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@64591.832031": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@69522.75": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@74453.664062": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@79384.585938": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@84315.5": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@89246.414062": [
+    "Discharge"
+   ],
+   "bp:NEW_CALI@9121.666992": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@94177.335938": [
+    "Water Level"
+   ],
+   "bp:NEW_CALI@99108.25": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@0.0": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@12549.0": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@16732.0": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@20915.0": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@25098.0": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@29281.0": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@33464.0": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@37647.0": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@4183.0": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@41830.0": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@46267.082031": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@50704.167969": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@55141.25": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@59578.332031": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@64015.417969": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@68452.5": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@72889.585938": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@77326.664062": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@81763.75": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@8366.0": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@86200.835938": [
+    "Water Level"
+   ],
+   "bp:OLD_CALI@90637.914062": [
+    "Discharge"
+   ],
+   "bp:OLD_CALI@95075.0": [
+    "Water Level"
+   ],
+   "node:0 CALI": "empty",
+   "node:108080 CALI": "empty",
+   "node:113901 NEW_CALI": "empty",
+   "node:95075 OLD_CALI": "empty"
+  }
+ },
+ "lookups": {
+  "endpoints": {
+   "CALI@end": 1,
+   "CALI@start": 0,
+   "NEW_CALI@end": 51,
+   "NEW_CALI@start": 1,
+   "OLD_CALI@end": 27,
+   "OLD_CALI@start": 1
+  },
+  "find": {
+   "bp:CALI@0.0": 2,
+   "bp:CALI@103536.0": 25,
+   "bp:CALI@108080.0": 26,
+   "bp:CALI@13207.5": 5,
+   "bp:CALI@17610.0": 6,
+   "bp:CALI@22012.5": 7,
+   "bp:CALI@26415.0": 8,
+   "bp:CALI@30817.5": 9,
+   "bp:CALI@35220.0": 10,
+   "bp:CALI@39790.0": 11,
+   "bp:CALI@4402.5": 3,
+   "bp:CALI@44360.0": 12,
+   "bp:CALI@48930.0": 13,
+   "bp:CALI@53500.0": 14,
+   "bp:CALI@58070.0": 15,
+   "bp:CALI@62640.0": 16,
+   "bp:CALI@67184.0": 17,
+   "bp:CALI@71728.0": 18,
+   "bp:CALI@76272.0": 19,
+   "bp:CALI@80816.0": 20,
+   "bp:CALI@85360.0": 21,
+   "bp:CALI@8805.0": 4,
+   "bp:CALI@89904.0": 22,
+   "bp:CALI@94448.0": 23,
+   "bp:CALI@98992.0": 24,
+   "bp:NEW_CALI@0.0": 52,
+   "bp:NEW_CALI@104039.164062": 74,
+   "bp:NEW_CALI@108970.085938": 75,
+   "bp:NEW_CALI@113901.0": 76,
+   "bp:NEW_CALI@13682.5": 55,
+   "bp:NEW_CALI@18243.333984": 56,
+   "bp:NEW_CALI@22804.166016": 57,
+   "bp:NEW_CALI@27365.0": 58,
+   "bp:NEW_CALI@31925.833984": 59,
+   "bp:NEW_CALI@36486.667969": 60,
+   "bp:NEW_CALI@41047.5": 61,
+   "bp:NEW_CALI@4560.833496": 53,
+   "bp:NEW_CALI@45608.332031": 62,
+   "bp:NEW_CALI@50169.167969": 63,
+   "bp:NEW_CALI@54730.0": 64,
+   "bp:NEW_CALI@59660.917969": 65,
+   "bp:NEW_CALI@64591.832031": 66,
+   "bp:NEW_CALI@69522.75": 67,
+   "bp:NEW_CALI@74453.664062": 68,
+   "bp:NEW_CALI@79384.585938": 69,
+   "bp:NEW_CALI@84315.5": 70,
+   "bp:NEW_CALI@89246.414062": 71,
+   "bp:NEW_CALI@9121.666992": 54,
+   "bp:NEW_CALI@94177.335938": 72,
+   "bp:NEW_CALI@99108.25": 73,
+   "bp:OLD_CALI@0.0": 28,
+   "bp:OLD_CALI@12549.0": 31,
+   "bp:OLD_CALI@16732.0": 32,
+   "bp:OLD_CALI@20915.0": 33,
+   "bp:OLD_CALI@25098.0": 34,
+   "bp:OLD_CALI@29281.0": 35,
+   "bp:OLD_CALI@33464.0": 36,
+   "bp:OLD_CALI@37647.0": 37,
+   "bp:OLD_CALI@4183.0": 29,
+   "bp:OLD_CALI@41830.0": 38,
+   "bp:OLD_CALI@46267.082031": 39,
+   "bp:OLD_CALI@50704.167969": 40,
+   "bp:OLD_CALI@55141.25": 41,
+   "bp:OLD_CALI@59578.332031": 42,
+   "bp:OLD_CALI@64015.417969": 43,
+   "bp:OLD_CALI@68452.5": 44,
+   "bp:OLD_CALI@72889.585938": 45,
+   "bp:OLD_CALI@77326.664062": 46,
+   "bp:OLD_CALI@81763.75": 47,
+   "bp:OLD_CALI@8366.0": 30,
+   "bp:OLD_CALI@86200.835938": 48,
+   "bp:OLD_CALI@90637.914062": 49,
+   "bp:OLD_CALI@95075.0": 50,
+   "node:0 CALI": 0,
+   "node:108080 CALI": 1,
+   "node:113901 NEW_CALI": 51,
+   "node:95075 OLD_CALI": 27
+  },
+  "recall": {
+   "0": {
+    "node": "0 CALI"
+   },
+   "1": {
+    "node": "108080 CALI"
+   },
+   "10": {
+    "distance": 35220.0,
+    "reach": "CALI"
+   },
+   "11": {
+    "distance": 39790.0,
+    "reach": "CALI"
+   },
+   "12": {
+    "distance": 44360.0,
+    "reach": "CALI"
+   },
+   "13": {
+    "distance": 48930.0,
+    "reach": "CALI"
+   },
+   "14": {
+    "distance": 53500.0,
+    "reach": "CALI"
+   },
+   "15": {
+    "distance": 58070.0,
+    "reach": "CALI"
+   },
+   "16": {
+    "distance": 62640.0,
+    "reach": "CALI"
+   },
+   "17": {
+    "distance": 67184.0,
+    "reach": "CALI"
+   },
+   "18": {
+    "distance": 71728.0,
+    "reach": "CALI"
+   },
+   "19": {
+    "distance": 76272.0,
+    "reach": "CALI"
+   },
+   "2": {
+    "distance": 0.0,
+    "reach": "CALI"
+   },
+   "20": {
+    "distance": 80816.0,
+    "reach": "CALI"
+   },
+   "21": {
+    "distance": 85360.0,
+    "reach": "CALI"
+   },
+   "22": {
+    "distance": 89904.0,
+    "reach": "CALI"
+   },
+   "23": {
+    "distance": 94448.0,
+    "reach": "CALI"
+   },
+   "24": {
+    "distance": 98992.0,
+    "reach": "CALI"
+   },
+   "25": {
+    "distance": 103536.0,
+    "reach": "CALI"
+   },
+   "26": {
+    "distance": 108080.0,
+    "reach": "CALI"
+   },
+   "27": {
+    "node": "95075 OLD_CALI"
+   },
+   "28": {
+    "distance": 0.0,
+    "reach": "OLD_CALI"
+   },
+   "29": {
+    "distance": 4183.0,
+    "reach": "OLD_CALI"
+   },
+   "3": {
+    "distance": 4402.5,
+    "reach": "CALI"
+   },
+   "30": {
+    "distance": 8366.0,
+    "reach": "OLD_CALI"
+   },
+   "31": {
+    "distance": 12549.0,
+    "reach": "OLD_CALI"
+   },
+   "32": {
+    "distance": 16732.0,
+    "reach": "OLD_CALI"
+   },
+   "33": {
+    "distance": 20915.0,
+    "reach": "OLD_CALI"
+   },
+   "34": {
+    "distance": 25098.0,
+    "reach": "OLD_CALI"
+   },
+   "35": {
+    "distance": 29281.0,
+    "reach": "OLD_CALI"
+   },
+   "36": {
+    "distance": 33464.0,
+    "reach": "OLD_CALI"
+   },
+   "37": {
+    "distance": 37647.0,
+    "reach": "OLD_CALI"
+   },
+   "38": {
+    "distance": 41830.0,
+    "reach": "OLD_CALI"
+   },
+   "39": {
+    "distance": 46267.082031,
+    "reach": "OLD_CALI"
+   },
+   "4": {
+    "distance": 8805.0,
+    "reach": "CALI"
+   },
+   "40": {
+    "distance": 50704.167969,
+    "reach": "OLD_CALI"
+   },
+   "41": {
+    "distance": 55141.25,
+    "reach": "OLD_CALI"
+   },
+   "42": {
+    "distance": 59578.332031,
+    "reach": "OLD_CALI"
+   },
+   "43": {
+    "distance": 64015.417969,
+    "reach": "OLD_CALI"
+   },
+   "44": {
+    "distance": 68452.5,
+    "reach": "OLD_CALI"
+   },
+   "45": {
+    "distance": 72889.585938,
+    "reach": "OLD_CALI"
+   },
+   "46": {
+    "distance": 77326.664062,
+    "reach": "OLD_CALI"
+   },
+   "47": {
+    "distance": 81763.75,
+    "reach": "OLD_CALI"
+   },
+   "48": {
+    "distance": 86200.835938,
+    "reach": "OLD_CALI"
+   },
+   "49": {
+    "distance": 90637.914062,
+    "reach": "OLD_CALI"
+   },
+   "5": {
+    "distance": 13207.5,
+    "reach": "CALI"
+   },
+   "50": {
+    "distance": 95075.0,
+    "reach": "OLD_CALI"
+   },
+   "51": {
+    "node": "113901 NEW_CALI"
+   },
+   "52": {
+    "distance": 0.0,
+    "reach": "NEW_CALI"
+   },
+   "53": {
+    "distance": 4560.833496,
+    "reach": "NEW_CALI"
+   },
+   "54": {
+    "distance": 9121.666992,
+    "reach": "NEW_CALI"
+   },
+   "55": {
+    "distance": 13682.5,
+    "reach": "NEW_CALI"
+   },
+   "56": {
+    "distance": 18243.333984,
+    "reach": "NEW_CALI"
+   },
+   "57": {
+    "distance": 22804.166016,
+    "reach": "NEW_CALI"
+   },
+   "58": {
+    "distance": 27365.0,
+    "reach": "NEW_CALI"
+   },
+   "59": {
+    "distance": 31925.833984,
+    "reach": "NEW_CALI"
+   },
+   "6": {
+    "distance": 17610.0,
+    "reach": "CALI"
+   },
+   "60": {
+    "distance": 36486.667969,
+    "reach": "NEW_CALI"
+   },
+   "61": {
+    "distance": 41047.5,
+    "reach": "NEW_CALI"
+   },
+   "62": {
+    "distance": 45608.332031,
+    "reach": "NEW_CALI"
+   },
+   "63": {
+    "distance": 50169.167969,
+    "reach": "NEW_CALI"
+   },
+   "64": {
+    "distance": 54730.0,
+    "reach": "NEW_CALI"
+   },
+   "65": {
+    "distance": 59660.917969,
+    "reach": "NEW_CALI"
+   },
+   "66": {
+    "distance": 64591.832031,
+    "reach": "NEW_CALI"
+   },
+   "67": {
+    "distance": 69522.75,
+    "reach": "NEW_CALI"
+   },
+   "68": {
+    "distance": 74453.664062,
+    "reach": "NEW_CALI"
+   },
+   "69": {
+    "distance": 79384.585938,
+    "reach": "NEW_CALI"
+   },
+   "7": {
+    "distance": 22012.5,
+    "reach": "CALI"
+   },
+   "70": {
+    "distance": 84315.5,
+    "reach": "NEW_CALI"
+   },
+   "71": {
+    "distance": 89246.414062,
+    "reach": "NEW_CALI"
+   },
+   "72": {
+    "distance": 94177.335938,
+    "reach": "NEW_CALI"
+   },
+   "73": {
+    "distance": 99108.25,
+    "reach": "NEW_CALI"
+   },
+   "74": {
+    "distance": 104039.164062,
+    "reach": "NEW_CALI"
+   },
+   "75": {
+    "distance": 108970.085938,
+    "reach": "NEW_CALI"
+   },
+   "76": {
+    "distance": 113901.0,
+    "reach": "NEW_CALI"
+   },
+   "8": {
+    "distance": 26415.0,
+    "reach": "CALI"
+   },
+   "9": {
+    "distance": 30817.5,
+    "reach": "CALI"
+   }
+  }
+ },
+ "quantities": [
+  "Discharge",
+  "Water Level"
+ ],
+ "reaches": {
+  "CALI": {
+   "breakpoints": [
+    {
+     "distance": 0.0,
+     "id": "bp:CALI@0.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 4402.5,
+     "id": "bp:CALI@4402.5",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 8805.0,
+     "id": "bp:CALI@8805.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 13207.5,
+     "id": "bp:CALI@13207.5",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 17610.0,
+     "id": "bp:CALI@17610.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 22012.5,
+     "id": "bp:CALI@22012.5",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 26415.0,
+     "id": "bp:CALI@26415.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 30817.5,
+     "id": "bp:CALI@30817.5",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 35220.0,
+     "id": "bp:CALI@35220.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 39790.0,
+     "id": "bp:CALI@39790.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 44360.0,
+     "id": "bp:CALI@44360.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 48930.0,
+     "id": "bp:CALI@48930.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 53500.0,
+     "id": "bp:CALI@53500.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 58070.0,
+     "id": "bp:CALI@58070.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 62640.0,
+     "id": "bp:CALI@62640.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 67184.0,
+     "id": "bp:CALI@67184.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 71728.0,
+     "id": "bp:CALI@71728.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 76272.0,
+     "id": "bp:CALI@76272.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 80816.0,
+     "id": "bp:CALI@80816.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 85360.0,
+     "id": "bp:CALI@85360.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 89904.0,
+     "id": "bp:CALI@89904.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 94448.0,
+     "id": "bp:CALI@94448.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 98992.0,
+     "id": "bp:CALI@98992.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 103536.0,
+     "id": "bp:CALI@103536.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 108080.0,
+     "id": "bp:CALI@108080.0",
+     "quantities": [
+      "Water Level"
+     ]
+    }
+   ],
+   "end": "108080 CALI",
+   "length": 108080.0,
+   "n_breakpoints": 25,
+   "start": "0 CALI"
+  },
+  "NEW_CALI": {
+   "breakpoints": [
+    {
+     "distance": 0.0,
+     "id": "bp:NEW_CALI@0.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 4560.833496,
+     "id": "bp:NEW_CALI@4560.833496",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 9121.666992,
+     "id": "bp:NEW_CALI@9121.666992",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 13682.5,
+     "id": "bp:NEW_CALI@13682.5",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 18243.333984,
+     "id": "bp:NEW_CALI@18243.333984",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 22804.166016,
+     "id": "bp:NEW_CALI@22804.166016",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 27365.0,
+     "id": "bp:NEW_CALI@27365.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 31925.833984,
+     "id": "bp:NEW_CALI@31925.833984",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 36486.667969,
+     "id": "bp:NEW_CALI@36486.667969",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 41047.5,
+     "id": "bp:NEW_CALI@41047.5",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 45608.332031,
+     "id": "bp:NEW_CALI@45608.332031",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 50169.167969,
+     "id": "bp:NEW_CALI@50169.167969",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 54730.0,
+     "id": "bp:NEW_CALI@54730.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 59660.917969,
+     "id": "bp:NEW_CALI@59660.917969",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 64591.832031,
+     "id": "bp:NEW_CALI@64591.832031",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 69522.75,
+     "id": "bp:NEW_CALI@69522.75",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 74453.664062,
+     "id": "bp:NEW_CALI@74453.664062",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 79384.585938,
+     "id": "bp:NEW_CALI@79384.585938",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 84315.5,
+     "id": "bp:NEW_CALI@84315.5",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 89246.414062,
+     "id": "bp:NEW_CALI@89246.414062",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 94177.335938,
+     "id": "bp:NEW_CALI@94177.335938",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 99108.25,
+     "id": "bp:NEW_CALI@99108.25",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 104039.164062,
+     "id": "bp:NEW_CALI@104039.164062",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 108970.085938,
+     "id": "bp:NEW_CALI@108970.085938",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 113901.0,
+     "id": "bp:NEW_CALI@113901.0",
+     "quantities": [
+      "Water Level"
+     ]
+    }
+   ],
+   "end": "113901 NEW_CALI",
+   "length": 113901.0,
+   "n_breakpoints": 25,
+   "start": "108080 CALI"
+  },
+  "OLD_CALI": {
+   "breakpoints": [
+    {
+     "distance": 0.0,
+     "id": "bp:OLD_CALI@0.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 4183.0,
+     "id": "bp:OLD_CALI@4183.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 8366.0,
+     "id": "bp:OLD_CALI@8366.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 12549.0,
+     "id": "bp:OLD_CALI@12549.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 16732.0,
+     "id": "bp:OLD_CALI@16732.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 20915.0,
+     "id": "bp:OLD_CALI@20915.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 25098.0,
+     "id": "bp:OLD_CALI@25098.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 29281.0,
+     "id": "bp:OLD_CALI@29281.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 33464.0,
+     "id": "bp:OLD_CALI@33464.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 37647.0,
+     "id": "bp:OLD_CALI@37647.0",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 41830.0,
+     "id": "bp:OLD_CALI@41830.0",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 46267.082031,
+     "id": "bp:OLD_CALI@46267.082031",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 50704.167969,
+     "id": "bp:OLD_CALI@50704.167969",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 55141.25,
+     "id": "bp:OLD_CALI@55141.25",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 59578.332031,
+     "id": "bp:OLD_CALI@59578.332031",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 64015.417969,
+     "id": "bp:OLD_CALI@64015.417969",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 68452.5,
+     "id": "bp:OLD_CALI@68452.5",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 72889.585938,
+     "id": "bp:OLD_CALI@72889.585938",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 77326.664062,
+     "id": "bp:OLD_CALI@77326.664062",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 81763.75,
+     "id": "bp:OLD_CALI@81763.75",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 86200.835938,
+     "id": "bp:OLD_CALI@86200.835938",
+     "quantities": [
+      "Water Level"
+     ]
+    },
+    {
+     "distance": 90637.914062,
+     "id": "bp:OLD_CALI@90637.914062",
+     "quantities": [
+      "Discharge"
+     ]
+    },
+    {
+     "distance": 95075.0,
+     "id": "bp:OLD_CALI@95075.0",
+     "quantities": [
+      "Water Level"
+     ]
+    }
+   ],
+   "end": "95075 OLD_CALI",
+   "length": 95075.0,
+   "n_breakpoints": 23,
+   "start": "108080 CALI"
+  }
+ }
+}
