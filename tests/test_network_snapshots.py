@@ -36,20 +36,19 @@ _EPANET_RES = str(_TESTDATA / "epanet.res")
 _EPANET_RESX = str(_TESTDATA / "epanet.resx")
 _EPANET_INP = str(_TESTDATA / "epanet.inp")
 
-# Each case is a fixture plus the options it is loaded with. Upstream, the two
-# EPANET cases become companions=[...] and companions=[]; the difference in
-# spelling is the reason a case is named for its options and not its constructor.
+# Each case is a fixture plus the options it is loaded with. The lone EPANET load
+# has to say companions=[] where modelskill said nothing at all: discovery finds
+# the .resx and .inp sitting beside the fixture, and that load is about their
+# absence.
 LOADS = {
-    "res1d": lambda: Network.from_mike(_RES1D),
-    "res1d_nodes_filtered": lambda: Network.from_mike(
-        _RES1D, nodes=["108", "101"], reaches=[]
+    "res1d": lambda: Network.open(_RES1D),
+    "res1d_nodes_filtered": lambda: Network.open(_RES1D, nodes=["108", "101"], reaches=[]),
+    "res1d_one_quantity": lambda: Network.open(_RES1D, quantities="Discharge"),
+    "res11": lambda: Network.open(_RES11),
+    "epanet_with_companions": lambda: Network.open(
+        _EPANET_RES, companions=[_EPANET_RESX, _EPANET_INP]
     ),
-    "res1d_one_quantity": lambda: Network.from_mike(_RES1D, quantities="Discharge"),
-    "res11": lambda: Network.from_mike(_RES11),
-    "epanet_with_companions": lambda: Network.from_epanet(
-        _EPANET_RES, resx=_EPANET_RESX, inp=_EPANET_INP
-    ),
-    "epanet_alone": lambda: Network.from_epanet(_EPANET_RES),
+    "epanet_alone": lambda: Network.open(_EPANET_RES, companions=[]),
 }
 
 
@@ -94,9 +93,7 @@ def _mismatches(actual, expected, where=""):
 
     if isinstance(expected, float) or isinstance(actual, float):
         if actual is None or expected is None:
-            return (
-                [] if actual == expected else [f"{where}: {actual!r} != {expected!r}"]
-            )
+            return [] if actual == expected else [f"{where}: {actual!r} != {expected!r}"]
         if actual == pytest.approx(expected, rel=1e-9, abs=1e-9):
             return []
         return [f"{where}: {actual!r} != {expected!r}"]
@@ -111,9 +108,7 @@ def test_loader_output_is_unchanged(case, update_snapshots):
 
     if update_snapshots:
         snapshot.parent.mkdir(parents=True, exist_ok=True)
-        snapshot.write_text(
-            json.dumps(actual, indent=1, sort_keys=True) + "\n", encoding="utf-8"
-        )
+        snapshot.write_text(json.dumps(actual, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         return
 
     assert snapshot.exists(), f"No snapshot for '{case}'. Run --update-snapshots."
