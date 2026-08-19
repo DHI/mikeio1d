@@ -95,7 +95,7 @@ lint.extend-select = ["D", "PD", "NPY", "FA"]
 lint.ignore = [
     "E402",   # ignore for now
     "F401",   # ignore for now
-    "I",      # the import grouping documented below is kept by hand, not by isort
+    "I",      # import order is semantic, not alphabetical; see the note below
     "TRY004", # ValueError -> TypeError on type checks would break callers
     "BLE001", # the broad catches wrap .NET interop, where the type is unknowable
     "S102",   # exec is how mikenet binds .NET namespaces into the module
@@ -103,8 +103,8 @@ lint.ignore = [
 ]
 lint.pydocstyle.convention = "numpy"
 
-# Import convention, enforced by review rather than by isort: one name per line,
-# Python imports first, then the DHI and System interop in a trailing group of
-# their own. Ruff 0.16 turns I001 on by default and sorts alphabetically within
-# each group, which loses the ordering the modules are actually read in, so the
-# rule is ignored above.
+# Imports are grouped by hand: one name per line, Python first, then the DHI and
+# System interop in a trailing group of its own. Within a group the order is
+# semantic rather than alphabetical, which isort has no sort key for -- every
+# configuration tried reorders around 500 lines. Hence the I ignore above.
+# The convention, with a worked example, is written up in CLAUDE.md.
