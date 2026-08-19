@@ -46,6 +46,9 @@ dependencies = [
     'mikecore; platform_system=="Linux"',
 ]
 
+[project.optional-dependencies]
+network = ["xarray", "networkx"]
+
 [dependency-groups]
 test = [
     "pytest",

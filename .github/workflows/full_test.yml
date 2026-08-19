@@ -37,7 +37,7 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     - name: Install dependencies
-      run: uv sync --group test --group experimental
+      run: uv sync --group test --group experimental --extra network
 
     - name: Test with pytest (basic)
       run: uv run pytest -c .pytest-ci.ini 
