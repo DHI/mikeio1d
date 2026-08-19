@@ -3,12 +3,18 @@
 ## [Unreleased]
 
 ### Added
+- `mikeio1d.network` (provisional): build a graph-shaped `Network` from a result file, with
+  `Network.open`, `find`/`recall` between original and graph names, `to_dataframe`/`to_dataset`,
+  and the EPANET `.resx`/`.inp` companions. Needs the new `network` extra (`pip install
+  mikeio1d[network]`). The shape of what it returns may still change.
 
 ### Fixed
+- Reach `start_node` and `end_node` no longer fail for a `Res1D` opened with a `Path`.
 
 ### Changed
 
 ### Removed
+- `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.
 
 ## [1.3.1] - 2026-07-15
 
