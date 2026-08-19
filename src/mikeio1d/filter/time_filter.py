@@ -14,7 +14,7 @@ from DHI.Mike1D.ResultDataAccess import Period
 from System import DateTime
 
 from ..dotnet import to_dotnet_datetime
-from . import ResultSubFilter
+from .result_filter import ResultSubFilter
 
 
 class TimeFilter(ResultSubFilter):

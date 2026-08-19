@@ -12,13 +12,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import ResultData, ResultDataQuery, ResultDataSearcher
 
     from .query import QueryData
-    from .result_network import (
-        ResultCatchments,
-        ResultGlobalDatas,
-        ResultNodes,
-        ResultReaches,
-        ResultStructures,
-    )
     from .result_reader_writer.result_reader import ColumnMode
 
 import os.path
@@ -41,7 +34,15 @@ from .query import (
     QueryDataStructure,
 )
 from .result_extractor import ExtractorCreator, ExtractorOutputFileType
-from .result_network import ResultNetwork, ResultQuantity
+from .result_network import (
+    ResultCatchments,
+    ResultGlobalDatas,
+    ResultNetwork,
+    ResultNodes,
+    ResultQuantity,
+    ResultReaches,
+    ResultStructures,
+)
 from .result_query.query_data_converter import QueryDataConverter
 from .result_reader_writer import ResultMerger, ResultReaderCreator, ResultReaderType, ResultWriter
 from .various import (

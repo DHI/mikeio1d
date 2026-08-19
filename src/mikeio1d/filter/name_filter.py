@@ -10,7 +10,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from DHI.Mike1D.ResultDataAccess import DataItemFilterName
 
-from . import ResultSubFilter
+from .result_filter import ResultSubFilter
 
 
 class NameFilter(ResultSubFilter):

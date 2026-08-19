@@ -8,9 +8,9 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import List
 
     from ..res1d import Res1D
-    from .query_data import QueryData
 
 from ..quantities import TimeSeriesId
+from .query_data import QueryData
 
 
 class QueryDataConverter:

@@ -184,5 +184,5 @@ class ResultQuantity:
         """TimeSeriesId corresponding to ResultQuantity."""
         if self._timeseries_id is None:
             message = "ResultQuantity must be added to a ResultNetwork before TimeSeriesId can be accessed."
-            ValueError(message)
+            raise ValueError(message)
         return self._timeseries_id
