@@ -186,3 +186,48 @@ class TestTheDefaultFrame:
 
         assert (leading["length"], leading["boundary"]) == (25.0, False)
         assert (trailing["length"], trailing["boundary"]) == (25.0, False)
+
+
+class TestTwoReachesTheGraphCannotTellApart:
+    """A break point is what keeps two reaches between the same nodes distinct."""
+
+    def test_neither_having_one_is_refused(self):
+        a, b = _empty_node("A"), _empty_node("B")
+        reaches = [
+            BasicReach("r0", a, b, length=100.0),
+            BasicReach("r1", a, b, length=250.0),
+        ]
+
+        with pytest.raises(ValueError, match="'r0' and 'r1'"):
+            Network(reaches)
+
+    def test_the_pair_is_the_same_read_backwards(self):
+        """The graph is undirected, so running the other way does not help."""
+        a, b = _empty_node("A"), _empty_node("B")
+        reaches = [
+            BasicReach("r0", a, b, length=100.0),
+            BasicReach("r1", b, a, length=250.0),
+        ]
+
+        with pytest.raises(ValueError, match="'r0' and 'r1'"):
+            Network(reaches)
+
+    def test_a_break_point_each_keeps_them_apart(self):
+        a, b = _empty_node("A"), _empty_node("B")
+        reaches = [
+            BasicReach("r0", a, b, length=100.0, breakpoints=[_Point("r0", 50.0)]),
+            BasicReach("r1", a, b, length=250.0, breakpoints=[_Point("r1", 125.0)]),
+        ]
+
+        assert Network(reaches).graph.number_of_edges() == 4
+
+    def test_sharing_an_id_is_refused(self):
+        """Their break points would interleave into one chain, losing a reach."""
+        a, b = _empty_node("A"), _empty_node("B")
+        reaches = [
+            BasicReach("r0", a, b, length=100.0, breakpoints=[_Point("r0", 50.0)]),
+            BasicReach("r0", a, b, length=250.0, breakpoints=[_Point("r0", 50.0)]),
+        ]
+
+        with pytest.raises(ValueError, match="share the id 'r0'"):
+            Network(reaches)

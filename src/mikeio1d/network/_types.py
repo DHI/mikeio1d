@@ -222,7 +222,14 @@ class NetworkReach(ABC):
     @property
     @abstractmethod
     def breakpoints(self) -> list[ReachBreakPoint]:
-        """Ordered list of intermediate :class:`ReachBreakPoint` objects (may be empty)."""
+        """Ordered list of intermediate :class:`ReachBreakPoint` objects (may be empty).
+
+        A break point is keyed by its reach's id, so a reach that has any gets
+        its own chain of graph nodes and stays distinct from a parallel reach
+        between the same two nodes. A reach with none is a single start-to-end
+        edge instead, and two such reaches between one pair of nodes cannot be
+        told apart - :class:`Network` refuses them rather than dropping one.
+        """
 
     @property
     def n_breakpoints(self) -> int:
@@ -287,6 +294,10 @@ class BasicReach(NetworkReach):
     Where the domain has no reach length, leave it out:
 
     >>> reach = BasicReach("pipe_1", node_a, node_b)
+
+    Two of these between the same two nodes - twin pipes, parallel pumps - need
+    a break point each, or the graph cannot tell them apart. See
+    :attr:`NetworkReach.breakpoints`.
     """
 
     def __init__(

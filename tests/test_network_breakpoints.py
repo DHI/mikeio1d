@@ -15,12 +15,20 @@ import pytest
 pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
+from mikeio1d.network import Network
 from mikeio1d.network._res1d import _build_reach_breakpoints
 from mikeio1d.network._res1d import _has_real_gridpoints
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RIVER = str(_TESTDATA / "network_river.res1d")
 _EPANET_RES = str(_TESTDATA / "epanet.res")
+# The only fixture with reaches running in parallel: five node pairs carry more
+# than one, among them four pumps to the WWTP and a weir beside four orifices.
+_PARALLEL = str(_TESTDATA / "network_sirius_h2s.res1d")
+
+
+def _topology_only(path):
+    return Network.open(path, companions=[], nodes=[], reaches=[], quantities=[])
 
 
 class _Gridpoint:
@@ -120,3 +128,31 @@ class TestWhatTellsTheTwoApart:
         reaches = Res1D(_EPANET_RES).reaches.values()
 
         assert not any(_has_real_gridpoints(reach) for reach in reaches)
+
+
+class TestEveryReachGetsAtLeastOne:
+    """Which is what keeps reaches running in parallel apart in the graph.
+
+    A break point is keyed by its reach's id, so a reach that has any gets a
+    chain of graph nodes to itself. Two reaches with none between the same two
+    nodes would share a single edge, and ``Network`` refuses them - a state no
+    result file can reach, since every reach comes out with break points either
+    way.
+    """
+
+    @pytest.mark.parametrize(
+        "filename",
+        ["network_river.res1d", "epanet.res", "network_sirius_h2s.res1d"],
+    )
+    def test_no_reach_comes_out_without_break_points(self, filename):
+        network = _topology_only(str(_TESTDATA / filename))
+
+        assert [r.id for r in network._reaches.values() if r.n_breakpoints == 0] == []
+
+    def test_parallel_reaches_each_keep_a_chain_of_their_own(self):
+        """A reach of n break points spans n + 1 edges, and shares none of them."""
+        network = _topology_only(_PARALLEL)
+
+        spanned = sum(r.n_breakpoints + 1 for r in network._reaches.values())
+
+        assert network.graph.number_of_edges() == spanned
