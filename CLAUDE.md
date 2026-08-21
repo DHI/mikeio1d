@@ -107,62 +107,21 @@ Tests use fixtures from `tests/testdata/` (accessed via a generated `testdata` m
 
 ### Imports
 
-Import order is maintained by hand. Ruff's `I` (isort) rule is in `lint.ignore`,
-because the order within a group is semantic rather than alphabetical and isort has
-no sort key that reproduces it — every configuration tried reorders around 500 lines.
-When adding an import, follow the file you are editing.
+Import order is maintained by hand — ruff's `I` (isort) rule is in `lint.ignore`,
+because the order within a group is semantic rather than alphabetical. When adding
+an import, follow the file you are editing.
 
-- Usually one name per line. A short combined import is fine — there are eight in the
-  package — but never the parenthesised multi-line form the formatter produces. There
-  are none, and adding one is what tips a whole block into being resorted.
+- One name per line. A short combined import is fine, but not the parenthesised
+  multi-line form: `DHI.*` imports cannot use it, so keeping it out everywhere
+  keeps every import block in the package the same shape.
 - `from __future__ import annotations` first, then a `TYPE_CHECKING` block if the
   module needs one, then stdlib, third-party, and the package's own modules.
 - `DHI.*` and `System` come last, in a group of their own separated by a blank line.
-  They are .NET assemblies loaded through pythonnet rather than ordinary Python
-  packages, and keeping them apart makes a module's interop surface obvious.
+  They are .NET assemblies loaded through pythonnet, and keeping them apart makes a
+  module's interop surface obvious.
 - Within a group, put related modules together and the more central ones first.
 
-`src/mikeio1d/result_network/result_reach.py` is the worked example:
-
-```python
-from __future__ import annotations
-
-import warnings
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:  # pragma: no cover
-    from ..res1d import Res1D
-    from ..geometry import ReachGeometry
-    from .result_quantity import ResultQuantity
-
-    from DHI.Mike1D.ResultDataAccess import IDataItem
-    from DHI.Mike1D.ResultDataAccess import IRes1DReach
-    from DHI.Mike1D.ResultDataAccess import IRes1DGridPoint
-
-import numpy as np
-
-from ..various import try_import_shapely, DELETE_VALUE
-from ..quantities import TimeSeriesId
-from ..quantities import TimeSeriesIdGroup
-from ..dotnet import pythonnet_implementation as impl
-
-from .result_location import ResultLocation
-from .result_location import ResultLocationCreator
-from .result_gridpoint import ResultGridPoint
-from .various import make_proper_variable_name
-
-from DHI.Mike1D.ResultDataAccess import Res1DGridPoint
-from DHI.Mike1D.ResultDataAccess import Res1DCircularCrossSection
-from DHI.Mike1D.ResultDataAccess import Res1DEggshapedCrossSection
-from DHI.Mike1D.ResultDataAccess import Res1DRectangularCrossSection
-from DHI.Mike1D.Generic import Quantity
-from DHI.Mike1D.Generic import PredefinedQuantity
-```
-
-Alphabetical sorting would get three things wrong here: `..various` leads because the
-module is used throughout, `.result_location` precedes `.result_gridpoint` because a
-reach is a location before it is a set of grid points, and `Res1DGridPoint` leads the
-DHI block ahead of the cross-section types.
+`src/mikeio1d/result_network/result_reach.py` is the worked example.
 
 ## Troubleshooting
 
