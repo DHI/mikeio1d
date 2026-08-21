@@ -182,10 +182,12 @@ def _find_epanet_companions(res: Path) -> tuple[Path | None, Path | None]:
     """
 
     def sibling(suffix: str) -> Path | None:
-        # Upper case too, since only Windows matches suffixes case-insensitively.
-        for spelling in (suffix, suffix.upper()):
-            candidate = res.with_suffix(spelling)
-            if candidate.is_file():
+        for candidate in sorted(res.parent.iterdir()):
+            if (
+                candidate.is_file()
+                and candidate.stem == res.stem
+                and candidate.suffix.lower() == suffix
+            ):
                 return candidate
         return None
 
