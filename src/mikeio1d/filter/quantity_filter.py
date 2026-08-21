@@ -9,11 +9,12 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import Filter
 
 
+from .result_filter import ResultSubFilter
+
 from DHI.Mike1D.ResultDataAccess import DataItemFilterQuantity
 from DHI.Mike1D.Generic import Quantity
 from DHI.Mike1D.Generic import PredefinedQuantity
 from DHI.Mike1D.Generic import PredefinedQuantityTable
-from .result_filter import ResultSubFilter
 
 
 class QuantityFilter(ResultSubFilter):

@@ -15,8 +15,8 @@ import pandas as pd
 from System import DateTime
 from DHI.Mike1D.ResultDataAccess import Period
 
-from ..dotnet import to_dotnet_datetime
 from .result_filter import ResultSubFilter
+from ..dotnet import to_dotnet_datetime
 
 
 class TimeFilter(ResultSubFilter):
