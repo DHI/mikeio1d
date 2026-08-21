@@ -8,10 +8,10 @@ from .step_every_filter import StepEveryFilter
 from .quantity_filter import QuantityFilter
 
 __all__ = [
+    "NameFilter",
+    "QuantityFilter",
     "ResultFilter",
     "ResultSubFilter",
-    "NameFilter",
-    "TimeFilter",
     "StepEveryFilter",
-    "QuantityFilter",
+    "TimeFilter",
 ]

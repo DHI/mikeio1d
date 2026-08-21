@@ -12,8 +12,8 @@ __all__ = [
     "CrossSection",
     "CrossSectionCollection",
     "Marker",
-    "ResistanceType",
-    "ResistanceDistribution",
-    "RadiusType",
     "ProcessLevelsMethod",
+    "RadiusType",
+    "ResistanceDistribution",
+    "ResistanceType",
 ]

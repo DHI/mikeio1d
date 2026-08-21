@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
@@ -21,10 +20,10 @@ class NodeWaterDepth(DerivedQuantity):
     """Derived quantity for water depth in a node."""
 
     _NAME = "NodeWaterDepth"
-    _GROUPS = {TimeSeriesIdGroup.NODE}
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup]] = {TimeSeriesIdGroup.NODE}
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]) -> pd.DataFrame:
         """Derive the water depth in a node."""
         dtype = df_source.dtypes.iloc[0]
         bottom_levels = np.fromiter(self.get_bottom_levels(locations), dtype=dtype)
@@ -36,6 +35,6 @@ class NodeWaterDepth(DerivedQuantity):
         """Get the bottom level for a location."""
         return getattr(location, "bottom_level", np.nan)
 
-    def get_bottom_levels(self, locations: List[ResultLocation]):
+    def get_bottom_levels(self, locations: list[ResultLocation]):
         """Get the bottom levels for a list of locations."""
         yield from (self.get_bottom_level(location) for location in locations)

@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
@@ -22,10 +21,10 @@ class ReachWaterDepth(DerivedQuantity):
     """Reach water depth derived quantity."""
 
     _NAME = "ReachWaterDepth"
-    _GROUPS = {TimeSeriesIdGroup.REACH}
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup]] = {TimeSeriesIdGroup.REACH}
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]):
         """Derive the water depth in a reach."""
         dtype = df_source.dtypes.iloc[0]
         bottom_levels = np.fromiter(self.get_bottom_levels(locations), dtype=dtype)
@@ -36,6 +35,6 @@ class ReachWaterDepth(DerivedQuantity):
         """Get the bottom level for a gridpoint."""
         return gridpoint.bottom_level
 
-    def get_bottom_levels(self, gridpoints: List[ResultGridPoint]):
+    def get_bottom_levels(self, gridpoints: list[ResultGridPoint]):
         """Get the bottom levels for a list of gridpoints."""
         yield from (self.get_bottom_level(location) for location in gridpoints)

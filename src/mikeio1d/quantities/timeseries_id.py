@@ -6,9 +6,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any
-    from typing import Optional
-    from typing import List
-    from typing import Tuple
     from ..res1d import Res1D
     from ..result_network.result_quantity import ResultQuantity
     from ..query import QueryData
@@ -157,7 +154,7 @@ class TimeSeriesId:
         result_quantity = quantity_map.get(self, None)
         return result_quantity is not None
 
-    def astuple(self) -> Tuple:
+    def astuple(self) -> tuple:
         """Convert a TimeSeriesId to a tuple."""
         return dataclasses.astuple(self)
 
@@ -263,7 +260,7 @@ class TimeSeriesId:
         return query.to_timeseries_id()
 
     @staticmethod
-    def from_tuple(t: Tuple, column_level_names: Optional[List[str]] = None) -> TimeSeriesId:
+    def from_tuple(t: tuple, column_level_names: list[str] | None = None) -> TimeSeriesId:
         """Convert a tuple to a TimeSeriesId object."""
         if not column_level_names:
             return TimeSeriesId(
@@ -279,12 +276,12 @@ class TimeSeriesId:
             return TimeSeriesId(**dict(zip(column_level_names, t)))
 
     @staticmethod
-    def to_multiindex(timeseries_ids: List[TimeSeriesId], compact=False) -> pd.MultiIndex:
+    def to_multiindex(timeseries_ids: list[TimeSeriesId], compact=False) -> pd.MultiIndex:
         """Convert a list of TimeSeriesId objects to a pandas MultiIndex.
 
         Parameters
         ----------
-        timeseries_ids : List[TimeSeriesId]
+        timeseries_ids : list[TimeSeriesId]
             The list of TimeSeriesId objects to convert.
         compact : bool, optional
             Whether to compact the MultiIndex by removing redundant levels, by default False
@@ -310,7 +307,7 @@ class TimeSeriesId:
                 continue
             level_value = level_values[0]
             is_all_default_values = (level_value == field.default) or (
-                level_value != level_value and field.default != field.default
+                pd.isna(level_value) and pd.isna(field.default)
             )
             if is_all_default_values:
                 index = index.droplevel(field.name)
@@ -318,7 +315,7 @@ class TimeSeriesId:
         return index
 
     @staticmethod
-    def from_multiindex(index: pd.MultiIndex) -> List[TimeSeriesId]:
+    def from_multiindex(index: pd.MultiIndex) -> list[TimeSeriesId]:
         """Convert a pandas MultiIndex to a list of TimeSeriesId objects."""
         if isinstance(index[0], tuple):
             if TimeSeriesId._is_multiindex_complete(index):
@@ -347,7 +344,7 @@ class TimeSeriesId:
             )
 
     @staticmethod
-    def _get_multiindex_as_list_of_dicts(index: pd.MultiIndex) -> List[dict]:
+    def _get_multiindex_as_list_of_dicts(index: pd.MultiIndex) -> list[dict]:
         """Convert a pandas MultiIndex to a list of dicts, where keys are the level name and values are the column names."""
         return [dict(zip(index.names, col)) for col in index.to_numpy()]
 
@@ -355,7 +352,7 @@ class TimeSeriesId:
     def _is_multiindex_complete(index: pd.MultiIndex) -> bool:
         """Check whether the levels of a MultiIndex match the fields of TimeSeriesId."""
         index_fields = set(index.names)
-        timeseries_id_fields = set([field.name for field in fields(TimeSeriesId)])
+        timeseries_id_fields = {field.name for field in fields(TimeSeriesId)}
         return index_fields == timeseries_id_fields
 
     @staticmethod

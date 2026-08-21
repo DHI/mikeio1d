@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict
     from .result_reader import ResultReader
     from ..filter import ResultFilter
 
@@ -35,7 +34,7 @@ class ResultReaderCreator:
         filter: ResultFilter = None,
     ) -> ResultReader:
         """Create a ResultReader object based on the provided type."""
-        reasult_readers: Dict[ResultReaderType, ResultReader] = {
+        reasult_readers: dict[ResultReaderType, ResultReader] = {
             ResultReaderType.COPIER: ResultReaderCopier,
             ResultReaderType.QUERY: ResultReaderQuery,
         }

@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
-from typing import Callable
+from collections.abc import Callable
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any
-    from typing import List
-    from typing import Dict
 
 from dataclasses import fields
 
@@ -83,7 +80,9 @@ class ResultFrameAggregator:
 
     """
 
-    def __init__(self, agg: str | Callable = None, override_name: str = None, **kwargs):
+    def __init__(
+        self, agg: str | Callable | None = None, override_name: str | None = None, **kwargs
+    ):
         kwargs.setdefault("time", agg)
         if kwargs["time"] is None:
             raise ValueError("Must specify an aggregation function for time.")
@@ -101,8 +100,8 @@ class ResultFrameAggregator:
         self._validate()
 
     def _create_agg_functions_dict(
-        self, agg_default: str | Callable, agg_kwargs: Dict
-    ) -> Dict[str, Any]:
+        self, agg_default: str | Callable, agg_kwargs: dict
+    ) -> dict[str, Any]:
         """Create the 'agg_functions' attribute dictionary from the supplied aggregation functions."""
         agg_functions = {level: agg_default for level in self._agg_levels}
         for level, func in agg_kwargs.items():
@@ -136,7 +135,7 @@ class ResultFrameAggregator:
         ):
             raise ValueError("Entity, quantity, and agg levels must be mutually exclusive sets.")
 
-        timeseries_id_fields = set(f.name for f in fields(TimeSeriesId))
+        timeseries_id_fields = {f.name for f in fields(TimeSeriesId)}
 
         agg_levels.discard("time")  # time is not a field in TimeSeriesId
 
@@ -187,22 +186,22 @@ class ResultFrameAggregator:
         return df
 
     @property
-    def entity_levels(self) -> List[str]:
+    def entity_levels(self) -> list[str]:
         """The DataFrame column levels used to uniquely identify an entity. (e.g. ['group','name','tag'])."""
         return self._entity_levels
 
     @property
-    def agg_levels(self) -> List[str]:
+    def agg_levels(self) -> list[str]:
         """The DataFrame column levels that will be aggregated along, in order. (e.g. ['duplicate','chainage','time'])."""
         return self._agg_levels
 
     @property
-    def quantity_levels(self) -> List[str]:
+    def quantity_levels(self) -> list[str]:
         """The DataFrame column levels used to uniquely identify a quantity (e.g. ['quantity','derived'])."""
         return self._quantity_levels
 
     @property
-    def agg_functions(self) -> Dict[str, Any]:
+    def agg_functions(self) -> dict[str, Any]:
         """A dictionary with keys matching agg_levels, and values being the aggregation functions."""
         return self._agg_functions
 

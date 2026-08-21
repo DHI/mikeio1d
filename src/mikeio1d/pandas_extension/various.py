@@ -42,7 +42,7 @@ def compact_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             continue
         level_value = level_values[0]
         is_all_default_values = (level_value == field.default) or (
-            level_value != level_value and field.default != field.default
+            pd.isna(level_value) and pd.isna(field.default)
         )
         if is_all_default_values:
             index = index.droplevel(field.name)

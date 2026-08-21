@@ -1,13 +1,11 @@
 """Module for ResultReach class."""
 
 from __future__ import annotations
+
 import warnings
 from typing import TYPE_CHECKING
-from typing import Dict
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     from ..res1d import Res1D
     from ..geometry import ReachGeometry
     from .result_quantity import ResultQuantity
@@ -36,7 +34,7 @@ from DHI.Mike1D.Generic import Quantity
 from DHI.Mike1D.Generic import PredefinedQuantity
 
 
-class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
+class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
     """Class for wrapping a list of ResultData reaches having the same reach name.
 
     Parameters
@@ -48,7 +46,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
 
     """
 
-    def __init__(self, reaches: List[IRes1DReach], res1d: Res1D):
+    def __init__(self, reaches: list[IRes1DReach], res1d: Res1D):
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.REACH
@@ -70,7 +68,7 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
             "float indices (e.g., reach[10.0]) access by chainage value."
         )
 
-    def __getitem__(self, key: str | int | float) -> ResultGridPoint:
+    def __getitem__(self, key: str | float) -> ResultGridPoint:
         """Get a ResultGridPoint object by chainage.
 
         Parameters
@@ -118,17 +116,17 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         raise KeyError(self._format_chainage_index_error_message(key)) from None
 
     @property
-    def res1d_reaches(self) -> List[IRes1DReach]:
+    def res1d_reaches(self) -> list[IRes1DReach]:
         """List of DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result location."""
         return self._creator.reaches
 
     @property
-    def chainages(self) -> List[str]:
+    def chainages(self) -> list[str]:
         """List of chainages for the reach."""
         return list(self.keys())
 
     @property
-    def gridpoints(self) -> List[ResultGridPoint]:
+    def gridpoints(self) -> list[ResultGridPoint]:
         """List of gridpoints for the reach."""
         return list(self.values())
 
@@ -220,9 +218,8 @@ class ResultReach(ResultLocation, Dict[str, ResultGridPoint]):
         for res1d_reach in self.res1d_reaches:
             if res1d_reach.DataItems.Contains(m1d_dataitem):
                 return res1d_reach
-        raise Exception(
-            "No IRes1DDataSet found on reach for specified IRes1DDataItem: ",
-            m1d_dataitem,
+        raise ValueError(
+            f"No IRes1DDataSet found on reach for specified IRes1DDataItem: {m1d_dataitem}"
         )
 
     def get_query(self, data_item: IDataItem):
@@ -293,7 +290,7 @@ class ResultReachCreator(ResultLocationCreator):
     def __init__(
         self,
         result_location: ResultReach,
-        reaches: List[IRes1DReach],
+        reaches: list[IRes1DReach],
         res1d: Res1D,
     ):
         data_items = []
@@ -302,9 +299,9 @@ class ResultReachCreator(ResultLocationCreator):
         self.reaches_initial = reaches
 
         self.chainage_label = "m_"
-        self.reaches: List[IRes1DReach] = []
-        self.result_gridpoints: List[List[ResultGridPoint]] = []
-        self.current_reach_result_gridpoints: List[ResultGridPoint] = None
+        self.reaches: list[IRes1DReach] = []
+        self.result_gridpoints: list[list[ResultGridPoint]] = []
+        self.current_reach_result_gridpoints: list[ResultGridPoint] = None
 
     def create(self):
         """Perform ResultReach creation steps."""
@@ -350,7 +347,7 @@ class ResultReachCreator(ResultLocationCreator):
             A MIKE 1D IRes1DReach object.
 
         """
-        current_reach_result_gridpoints: List[ResultGridPoint] = []
+        current_reach_result_gridpoints: list[ResultGridPoint] = []
         self.current_reach_result_gridpoints = current_reach_result_gridpoints
         self.result_gridpoints.append(current_reach_result_gridpoints)
 
@@ -361,13 +358,13 @@ class ResultReachCreator(ResultLocationCreator):
             gridpoint = Res1DGridPoint()
             self.set_gridpoint(reach, gridpoint)
 
-        gridpoints: List[IRes1DGridPoint] = list(reach.GridPoints)
+        gridpoints: list[IRes1DGridPoint] = list(reach.GridPoints)
         tag = self.create_reach_span_tag(gridpoints)
         for i in range(gridpoint_count):
             gridpoint = gridpoints[i]
             self.set_gridpoint(reach, gridpoint, tag)
 
-    def create_reach_span_tag(self, gridpoints: List[IRes1DGridPoint]):
+    def create_reach_span_tag(self, gridpoints: list[IRes1DGridPoint]):
         """Create reach span tag to be set on ResultGridPoint."""
         if len(gridpoints) == 0:
             return ""
@@ -451,13 +448,9 @@ class ResultReachCreator(ResultLocationCreator):
         else:
             cs = None
 
-        if isinstance(cs, Res1DCircularCrossSection):
+        if isinstance(cs, (Res1DCircularCrossSection, Res1DEggshapedCrossSection)):
             return cs.Diameter
-        elif isinstance(cs, Res1DEggshapedCrossSection):
-            return cs.Diameter
-        elif isinstance(cs, Res1DRectangularCrossSection):
-            return cs.Height
-        elif hasattr(cs, "Height"):
+        elif isinstance(cs, Res1DRectangularCrossSection) or hasattr(cs, "Height"):
             return cs.Height
         else:
             return np.nan

@@ -5,9 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict
-    from typing import List
-    from typing import Optional
     import pandas as pd
 
     from ..res1d import Res1D
@@ -57,12 +54,12 @@ class ResultLocation(ABC):
         return self._group
 
     @property
-    def quantities(self) -> List[str]:
+    def quantities(self) -> list[str]:
         """A list of available quantities."""
         return list(self._creator.result_quantity_map.keys())
 
     @property
-    def derived_quantities(self) -> List[str]:
+    def derived_quantities(self) -> list[str]:
         """A list of available derived quantities."""
         return list(self._creator.result_quantity_derived_map.keys())
 
@@ -93,7 +90,7 @@ class ResultLocation(ABC):
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
 
-    def read(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data for all quantities at this location into a DataFrame.
 
         Parameters
@@ -112,7 +109,7 @@ class ResultLocation(ABC):
         df = reader.read(timesries_ids, column_mode=column_mode)
         return df
 
-    def to_dataframe(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def to_dataframe(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read the time series data for all quantities at this location into a DataFrame.
 
         Alias for read() method.
@@ -161,7 +158,7 @@ class ResultLocationCreator(ABC):
     def __init__(
         self,
         result_location: ResultLocation,
-        data_items: List[IDataItem],
+        data_items: list[IDataItem],
         res1d: Res1D,
     ):
         self.result_location = result_location
@@ -169,10 +166,10 @@ class ResultLocationCreator(ABC):
         self.res1d = res1d
 
         self.quantity_label = "q_"
-        self.result_quantity_map: Dict[str, List[ResultQuantity]] = {}
-        self.result_quantity_derived_map: Dict[str, ResultQuantityDerived] = {}
-        self.element_indices: List[int] = None
-        self.static_attributes: List[str] = []
+        self.result_quantity_map: dict[str, list[ResultQuantity]] = {}
+        self.result_quantity_derived_map: dict[str, ResultQuantityDerived] = {}
+        self.element_indices: list[int] = None
+        self.static_attributes: list[str] = []
 
     @abstractmethod
     def create(self):
@@ -243,11 +240,10 @@ class ResultLocationCreator(ABC):
     def can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
         """Check if a derived quantity can be added to the result locations."""
         result_location = self.result_location
-        if result_location.group not in derived_quantity.groups:
-            return False
-        elif derived_quantity.source_quantity not in result_location.quantities:
-            return False
-        return True
+        return (
+            result_location.group in derived_quantity.groups
+            and derived_quantity.source_quantity in result_location.quantities
+        )
 
     def add_derived_quantity(self, derived_quantity: DerivedQuantity):
         """Add a derived quantity to the result location."""
@@ -301,7 +297,7 @@ class ResultLocationCreator(ABC):
         self,
         quantity_id: str,
         result_quantity: ResultQuantity,
-        result_quantity_map: Dict[str, List[ResultQuantity]],
+        result_quantity_map: dict[str, list[ResultQuantity]],
     ):
         """Add to a given result quantity map.
 

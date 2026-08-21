@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Set
-    from typing import List
-
     from mikeio1d.res1d import Res1D
     from mikeio1d.result_network import ResultLocation
     from mikeio1d.result_network import ResultLocations
@@ -27,7 +25,7 @@ class DerivedQuantity(ABC):
     """Abstract base class for derived quantities."""
 
     _NAME = None
-    _GROUPS = None
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup] | None] = None
     _SOURCE_QUANTITY = None
 
     def __init__(self, res1d: Res1D):
@@ -65,7 +63,7 @@ class DerivedQuantity(ABC):
         return self._NAME
 
     @property
-    def groups(self) -> Set[TimeSeriesIdGroup]:
+    def groups(self) -> set[TimeSeriesIdGroup]:
         """List of groups that the derived quantity applies to."""
         return self._GROUPS
 
@@ -75,14 +73,14 @@ class DerivedQuantity(ABC):
         return self._SOURCE_QUANTITY
 
     @abstractmethod
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]) -> pd.DataFrame:
         """Calculate the derived quantity based on the source quantity.
 
         Parameters
         ----------
         df : pd.DataFrame
             DataFrame with source quantities for all relevant groups.
-        locations : List[ResultLocation]
+        locations : list[ResultLocation]
             List of ResultLocation objects (e.g. ResultNode) associated with each column in df_source.
 
         Returns
@@ -153,7 +151,7 @@ class DerivedQuantity(ABC):
 
     def get_result_locations_from_source_dataframe(
         self, df_source: pd.DataFrame
-    ) -> List[ResultLocation]:
+    ) -> list[ResultLocation]:
         """Generate a list of ResultLocation objects based on the source DataFrame."""
         tsids = TimeSeriesId.from_multiindex(df_source.columns)
         result_locations = [t.to_result_quantity(self.res1d).result_location for t in tsids]
@@ -165,8 +163,8 @@ class DerivedQuantity(ABC):
         return derived_tsid
 
     def _create_time_series_ids_from_source(
-        self, source_timeseries_ids: List[TimeSeriesId]
-    ) -> List[TimeSeriesId]:
+        self, source_timeseries_ids: list[TimeSeriesId]
+    ) -> list[TimeSeriesId]:
         """Create a list of TimeSeriesId for the derived quantity based on a list of source quantity TimeSeriesId objects."""
         derived_tsids = [
             self._create_time_series_id_from_source(tsid) for tsid in source_timeseries_ids
@@ -182,7 +180,7 @@ class DerivedQuantity(ABC):
 
     def _get_source_timeseries_ids_for_locations(
         self, result_locations: ResultLocations
-    ) -> List[TimeSeriesId]:
+    ) -> list[TimeSeriesId]:
         """Generate a list of TimeSeriesId for the source quantity for a particular ResultLocations object."""
         if result_locations.group not in self.groups:
             return []
@@ -195,7 +193,7 @@ class DerivedQuantity(ABC):
 
     def _get_source_timeseries_ids_for_location(
         self, result_location: ResultLocation
-    ) -> List[TimeSeriesId]:
+    ) -> list[TimeSeriesId]:
         """Generate a list of TimeSeriesId for the source quantity for a particular ResultLocation object."""
         if result_location.group not in self.groups:
             return []

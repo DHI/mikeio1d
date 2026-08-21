@@ -5,14 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Callable
-    from typing import List
-    from typing import Dict
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
     from DHI.Mike1D.ResultDataAccess import IRes1DReach
+    from collections.abc import Callable
 
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
@@ -50,8 +48,8 @@ class ResultReaches(ResultLocations):
 
     def to_geopandas(
         self,
-        agg: str | Callable = None,
-        agg_kwargs: Dict[str : str | Callable] = {},
+        agg: str | Callable | None = None,
+        agg_kwargs: dict[str, str | Callable] | None = None,
         segmented: bool = True,
         include_derived: bool = False,
     ) -> GeoDataFrame:
@@ -71,7 +69,7 @@ class ResultReaches(ResultLocations):
             - 'max'   : maximum value of all quantities
             -  np.max : maximum value of all quantities
 
-        agg_kwargs : dict, default {}
+        agg_kwargs : dict, default None
             Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
         segmented : bool, (default=True)
             True - one LineString per IRes1DReach object.
@@ -106,7 +104,7 @@ class ResultReaches(ResultLocations):
         if agg is None:
             return gdf
 
-        rfa = ResultFrameAggregator(agg, **agg_kwargs)
+        rfa = ResultFrameAggregator(agg, **(agg_kwargs or {}))
 
         df_quantities = self.read(column_mode="compact", include_derived=include_derived)
         df_quantities = rfa.aggregate(df_quantities)
@@ -145,7 +143,7 @@ class ResultReachesCreator(ResultLocationsCreator):
     def __init__(self, result_locations: ResultReaches, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.reach_label = "r_"
-        self.result_reach_map: Dict[str : List[ResultReach]] = {}
+        self.result_reach_map: dict[str, list[ResultReach]] = {}
 
     def create(self):
         """Perform ResultReaches creation steps."""

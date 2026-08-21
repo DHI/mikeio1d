@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from enum import IntEnum
 
-from typing import List
-
 
 class Marker(IntEnum):
     """The standard markers used in cross sections.
@@ -60,6 +58,6 @@ class Marker(IntEnum):
         return marker
 
     @staticmethod
-    def list_from_string(s: str) -> List[int]:
+    def list_from_string(s: str) -> list[int]:
         """Convert a string of comma-separated markers to a list of integers."""
         return [int(m) for m in s.split(",")]

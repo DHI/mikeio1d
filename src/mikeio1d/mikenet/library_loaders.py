@@ -39,15 +39,15 @@ class LibraryLoaders:
                 self.library_loader_dict[library_loader.library_name] = library_loader
                 self.library_loader_dict[library_loader.library_alias] = library_loader
 
-        setattr(mikenet_module, "load_all", self.load_all)
-        setattr(mikenet_module, "load", self.load)
+        mikenet_module.load_all = self.load_all
+        mikenet_module.load = self.load
 
     def load_all(self):
         """Load all libraries present in library_loader_list."""
         for library_loader in self.library_loader_list:
             library_loader.load()
 
-    def load(self, libraries=[]):
+    def load(self, libraries=None):
         """Load all libraries specified by the list `libraries`.
 
         Parameters
@@ -58,7 +58,9 @@ class LibraryLoaders:
             library to load.
 
         """
-        if isinstance(libraries, str):
+        if libraries is None:
+            libraries = []
+        elif isinstance(libraries, str):
             libraries = [libraries]
 
         for library in libraries:

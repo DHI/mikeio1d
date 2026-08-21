@@ -86,9 +86,7 @@ def asNumpyArray(x):
     try:
         npArray = np.empty(dims, order="C", dtype=_MAP_NET_NP[netType])
     except KeyError:
-        raise NotImplementedError(
-            "asNumpyArray does not yet support System type {}".format(netType)
-        )
+        raise NotImplementedError(f"asNumpyArray does not yet support System type {netType}")
 
     try:  # Memmove
         sourceHandle = GCHandle.Alloc(x, GCHandleType.Pinned)
@@ -128,7 +126,7 @@ def to_dotnet_array(x):
     try:
         netArray = System.Array.CreateInstance(_MAP_NP_NET[dtype], dims)
     except KeyError:
-        raise NotImplementedError("asNetArray does not yet support dtype {}".format(dtype))
+        raise NotImplementedError(f"asNetArray does not yet support dtype {dtype}")
 
     try:  # Memmove
         destHandle = GCHandle.Alloc(netArray, GCHandleType.Pinned)
@@ -142,7 +140,7 @@ def to_dotnet_array(x):
 
 
 def _asnetarray_v2(x):
-    if any([type(xi) is list for xi in x]):
+    if any(type(xi) is list for xi in x):
         # Array of array
         return _asnetarray_v2([_asnetarray_v2(xi) for xi in x])
     else:

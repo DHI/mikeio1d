@@ -7,9 +7,9 @@ from .catchment_geometry import CatchmentGeometry
 from .cross_section_geometry import CrossSectionGeometry
 
 __all__ = [
-    "NodePoint",
-    "ReachPoint",
-    "ReachGeometry",
     "CatchmentGeometry",
     "CrossSectionGeometry",
+    "NodePoint",
+    "ReachGeometry",
+    "ReachPoint",
 ]

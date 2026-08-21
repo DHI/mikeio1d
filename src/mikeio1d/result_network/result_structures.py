@@ -5,9 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Dict
-
     from ..res1d import Res1D
     from .result_quantity import ResultQuantity
 
@@ -69,7 +66,7 @@ class ResultStructuresCreator(ResultLocationsCreator):
     def __init__(self, result_locations: ResultStructures, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
         self.structure_label = "s_"
-        self.result_structure_map: Dict[str, ResultStructure] = {}
+        self.result_structure_map: dict[str, ResultStructure] = {}
 
     def create(self):
         """Perform ResultStructures creation steps."""
@@ -106,10 +103,9 @@ class ResultStructuresCreator(ResultLocationsCreator):
         is_data_item_for_single_grid_point = len(list(data_item.IndexList)) == 1
         has_three_grid_points = len(list(reach.GridPoints)) == 3
 
-        if reach.IsStructureReach and has_three_grid_points and is_data_item_for_single_grid_point:
-            return True
-
-        return False
+        return (
+            reach.IsStructureReach and has_three_grid_points and is_data_item_for_single_grid_point
+        )
 
     def get_or_create_result_structure(
         self, reach: IRes1DReach, data_item: IDataItem

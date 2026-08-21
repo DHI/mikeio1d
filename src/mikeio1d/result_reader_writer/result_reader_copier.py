@@ -2,14 +2,6 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Tuple
-    from typing import Set
-    from typing import Optional
-
 import numpy as np
 import pandas as pd
 
@@ -50,8 +42,8 @@ class ResultReaderCopier(ResultReader):
 
     def read(
         self,
-        timeseries_ids: List[TimeSeriesId] = None,
-        column_mode: Optional[str | ColumnMode] = None,
+        timeseries_ids: list[TimeSeriesId] | None = None,
+        column_mode: str | ColumnMode | None = None,
     ) -> pd.DataFrame:
         """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""
         self.load_dynamic_data()
@@ -68,7 +60,7 @@ class ResultReaderCopier(ResultReader):
 
         return df
 
-    def read_all(self, column_mode: Optional[str | ColumnMode] = None) -> pd.DataFrame:
+    def read_all(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
         """Read all TimeData into a Pandas data frame."""
         self.load_dynamic_data()
 
@@ -81,8 +73,8 @@ class ResultReaderCopier(ResultReader):
     def create_data_frame(
         self,
         data_entries,
-        timeseries_ids: List[TimeSeriesId],
-        column_mode: Optional[str | ColumnMode] = None,
+        timeseries_ids: list[TimeSeriesId],
+        column_mode: str | ColumnMode | None = None,
     ):
         """Create a Pandas DataFrame from the given data entries and TimeSeriesIds."""
         if data_entries is None:
@@ -114,8 +106,8 @@ class ResultReaderCopier(ResultReader):
 
     def create_column_index(
         self,
-        timeseries_ids: List[TimeSeriesId],
-        column_mode: Optional[ColumnMode] = None,
+        timeseries_ids: list[TimeSeriesId],
+        column_mode: ColumnMode | None = None,
     ) -> pd.MultiIndex | pd.Index:
         """Create a DataFrame column from a list of TimeSeriesId objects and the current column_mode."""
         if column_mode is None:
@@ -135,10 +127,10 @@ class ResultReaderCopier(ResultReader):
                 raise NotImplementedError(f"The column_mode {column_mode} is not implemented.")
             raise ValueError(f"Unknown column_mode: {column_mode}")
 
-    def get_all_data_entries_and_timeseries_ids(self) -> Tuple[DataEntryNet, List[TimeSeriesId]]:
+    def get_all_data_entries_and_timeseries_ids(self) -> tuple[DataEntryNet, list[TimeSeriesId]]:
         """Get all data entries and TimeSeriesIds from the ResultData object."""
         data_entries = self.result_data_copier.GetEmptyDataEntriesList()
-        timeseries_ids: List[TimeSeriesId] = []
+        timeseries_ids: list[TimeSeriesId] = []
         timeseries_ids_set = set()
         for data_set in self.data.DataSets:
             data_set = impl(data_set)
@@ -160,7 +152,7 @@ class ResultReaderCopier(ResultReader):
 
     def get_unique_timeseries_id(
         self,
-        existing_timeseries_ids: Set[TimeSeriesId],
+        existing_timeseries_ids: set[TimeSeriesId],
         m1d_data_set,
         m1d_data_item,
         i: int,

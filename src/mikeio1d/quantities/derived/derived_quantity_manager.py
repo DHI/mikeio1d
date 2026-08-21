@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Dict
     from mikeio1d.res1d import Res1D
 
 from .derived_quantity import DerivedQuantity
@@ -27,10 +25,10 @@ class DerivedQuantityManager:
         return cls._instance
 
     def __init__(self):
-        self._derived_quantities: Dict[DerivedQuantityName, DerivedQuantity] = {}
+        self._derived_quantities: dict[DerivedQuantityName, DerivedQuantity] = {}
 
     @property
-    def derived_quantities(self) -> Dict[DerivedQuantityName, DerivedQuantity]:
+    def derived_quantities(self) -> dict[DerivedQuantityName, DerivedQuantity]:
         """Get the derived quantities."""
         return self._derived_quantities
 
@@ -48,7 +46,7 @@ class DerivedQuantityManager:
 
     def get_quantity_where(
         self, res1d: Res1D, source_quantity: str, group: str
-    ) -> List[DerivedQuantity]:
+    ) -> list[DerivedQuantity]:
         """Get derived quantities matching criteria."""
         return [
             q(res1d)

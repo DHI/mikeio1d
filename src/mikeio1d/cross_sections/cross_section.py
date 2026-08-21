@@ -1,15 +1,14 @@
 """CrossSection class."""
 
 from __future__ import annotations
+
 from warnings import warn
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Iterable
-    from typing import Tuple
-    from typing import List
     from ..geometry import CrossSectionGeometry
+    from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
@@ -190,28 +189,28 @@ class CrossSection:
         return CrossSectionGeometry(self._m1d_cross_section)
 
     @property
-    def coords(self) -> Tuple[Tuple[float, float]]:
+    def coords(self) -> tuple[tuple[float, float]]:
         """Get the geographical coordinates of the cross section line.
 
         If the cross section has no coordinates, an empty tuple will be returned.
 
         Returns
         -------
-        coords : Tuple[Tuple[float, float]]
+        coords : tuple[tuple[float, float]]
             A tuple of (x, y) coordinates.
 
         """
         if self._m1d_cross_section.Coordinates is None:
-            return tuple()
+            return ()
         return tuple((p.X, p.Y) for p in self._m1d_cross_section.Coordinates)
 
     @coords.setter
-    def coords(self, coords: List[Tuple[float, float]]):
+    def coords(self, coords: list[tuple[float, float]]):
         """Set the geographical coordinates of the cross section line.
 
         Parameters
         ----------
-        coords : List[Tuple[float, float]]
+        coords : list[tuple[float, float]]
             A list of (x, y) coordinates.
 
         """
@@ -355,7 +354,7 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     @property
-    def processing_levels(self) -> Tuple[float]:
+    def processing_levels(self) -> tuple[float]:
         """tuple[float]: A tuple of the level elevations used in the processed data.
 
         Notes
@@ -420,8 +419,8 @@ class CrossSection:
         self._m1d_cross_section.BaseCrossSection.CalculateProcessedData()
 
     def _calculate_conveyance_factor(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float]:
+        self, resistance: tuple[float], flow_area: tuple[float], radius: tuple[float]
+    ) -> tuple[float]:
         """Calculate the conveyance factor from resistance, flow area and radius.
 
         Note that this is not the true conveyance factor since resistance could be relative. However,
@@ -442,8 +441,8 @@ class CrossSection:
         return self._calculate_conveyance_factor_python(resistance, flow_area, radius)
 
     def _calculate_conveyance_factor_dotnet(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float] | None:
+        self, resistance: tuple[float], flow_area: tuple[float], radius: tuple[float]
+    ) -> tuple[float] | None:
         """Calculate the conveyance factor using the MIKE 1D engine.
 
         CalculateSpecificConveyance returns the specific conveyance (conveyance per unit area), so
@@ -467,8 +466,8 @@ class CrossSection:
             return None
 
     def _calculate_conveyance_factor_python(
-        self, resistance: Tuple[float], flow_area: Tuple[float], radius: Tuple[float]
-    ) -> Tuple[float]:
+        self, resistance: tuple[float], flow_area: tuple[float], radius: tuple[float]
+    ) -> tuple[float]:
         """Calculate the conveyance factor in Python, mirroring the MIKE+ cross section editor.
 
         The formula depends on the cross section's resistance type (see issue #229). Formulations the
@@ -729,7 +728,7 @@ class CrossSection:
             marker, x, z = row.marker, row.x, row.z
             self.set_marker(marker, x, z)
 
-    def set_marker(self, marker: int | Marker, x: float, z: float = None):
+    def set_marker(self, marker: int | Marker, x: float, z: float | None = None):
         """Set a marker at the point nearest to the specified x, z coordinates.
 
         Note: if z is not provided, the nearest point in the x direction will be found.
@@ -777,7 +776,7 @@ class CrossSection:
         base_xs = self._m1d_cross_section.BaseCrossSection
         base_xs.SetMarkerAt(marker, -1)
 
-    def _find_nearest_point_index(self, x: float, z: float = None) -> int:
+    def _find_nearest_point_index(self, x: float, z: float | None = None) -> int:
         """Find the XSBaseRaw.points index of the nearest point for the given x, z coordinates.
 
         If z is not provided, the nearest point in the x direction will be found.
