@@ -9,6 +9,5 @@ Note:
 from ._networkx import to_networkx
 from ._xarray import to_dataarray
 from ._xvec import to_dataarray_xvec
-from ._network_mapper import NetworkMapper, GenericNetwork
 
-__all__ = ["GenericNetwork", "NetworkMapper"]
+__all__ = ["to_dataarray", "to_dataarray_xvec", "to_networkx"]

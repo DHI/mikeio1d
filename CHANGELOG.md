@@ -3,14 +3,23 @@
 ## [Unreleased]
 
 ### Added
+- `mikeio1d.network` (provisional): build a graph-shaped `Network` from a result file, with
+  `Network.open`, `find`/`recall` between original and graph names, `to_dataframe`/`to_dataset`,
+  and the EPANET `.resx`/`.inp` companions. Needs the new `network` extra (`pip install
+  mikeio1d[network]`). The shape of what it returns may still change.
 
 ### Fixed
+- Reach `start_node` and `end_node` no longer fail for a `Res1D` opened with a `Path`.
 - `ResultQuantity.timeseries_id` now raises instead of silently returning `None` when the quantity is not attached to a `ResultNetwork` (#248).
+- Reach geometry no longer accumulates for the lifetime of the process; the cached points and
+  distances now live on the `ReachGeometry` object and are freed with it (#248).
+- `Res1D.to_txt` and `Res1D.to_csv` no longer leave the output file open when a write fails (#248).
 
 ### Changed
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 
 ### Removed
+- `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.
 
 ## [1.3.1] - 2026-07-15
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import warnings
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -170,10 +171,20 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         return self._creator._get_total_gridpoints()
 
     @property
+    def _is_resx(self) -> bool:
+        """Whether these results came from a .resx file.
+
+        Res1D accepts its file_path as a str or a Path, so the extension has to
+        be read rather than matched on the end of a string.
+        """
+        file_path = self.res1d.file_path
+        return file_path is not None and Path(file_path).suffix.lower() == ".resx"
+
+    @property
     def start_node(self) -> str | None:
         """Start node of the reach."""
         # For resx files, the start and end node indices are not available
-        if self.res1d.file_path.endswith(".resx"):
+        if self._is_resx:
             return None
         return self._creator._get_start_node()
 
@@ -181,7 +192,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
     def end_node(self) -> str | None:
         """End node of the reach."""
         # For resx files, the start and end node indices are not available
-        if self.res1d.file_path.endswith(".resx"):
+        if self._is_resx:
             return None
         return self._creator._get_end_node()
 

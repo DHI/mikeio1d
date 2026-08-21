@@ -125,6 +125,15 @@ quartodoc:
     contents:
     - cross_sections.CrossSection
     - cross_sections.CrossSectionCollection
+  - title: Network
+    desc: 'Provisional. Needs the network extra, and may still change shape.'
+    contents:
+    - network.Network
+    - network.NetworkNode
+    - network.NetworkReach
+    - network.ReachBreakPoint
+    - network.BasicNode
+    - network.BasicReach
     
 format:
   html:
