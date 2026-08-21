@@ -4,6 +4,10 @@ One reach becomes a chain of edges: start node, its breakpoints in order, end
 node. An edge carries the distance between its ends where that is known, and a
 ``boundary`` flag where the two ends are the same place - a gridpoint promoted to
 a breakpoint sits exactly at the reach end it belongs to.
+
+Every edge length is a difference between two positions in one reach's own
+frame, so an offset frame - a MIKE river reach reporting chainages along the
+whole branch - cancels out.
 """
 
 from __future__ import annotations
@@ -40,25 +44,26 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             for bp, bp_key in zip(reach.breakpoints, bp_keys):
                 g0.add_node(bp_key, data=bp.data)
 
-            # A breakpoint sitting at distance 0 (or, on the other end, at
-            # the reach's full length) is not an intermediate point - it is
+            # A breakpoint sitting where the reach itself starts (or, on the
+            # other end, where it ends) is not an intermediate point - it is
             # geometrically the same location as start_key/end_key, one of
             # the reach's own gridpoints promoted to a breakpoint. Tag that
-            # edge and clamp it to an exact 0.0: leading_distance/diff are
-            # each derived from a different upstream source than the other
-            # endpoint's coordinate, so floating-point noise could otherwise
-            # leave a spurious tiny positive or negative edge weight where
-            # the true value is analytically zero. A breakpoint's distance
-            # can also be genuinely unknown (unrelated to whether the
-            # reach's own length is known - a NetworkReach subclass makes
-            # no promise the two are coupled), so both ends guard for None.
+            # edge and clamp it to an exact 0.0: the two coordinates in each
+            # difference are each derived from a different upstream source,
+            # so floating-point noise could otherwise leave a spurious tiny
+            # positive or negative edge weight where the true value is
+            # analytically zero. A breakpoint's distance can also be
+            # genuinely unknown (unrelated to whether the reach's own length
+            # is known - a NetworkReach subclass makes no promise the two are
+            # coupled), so both ends guard for None.
             leading_distance = reach.breakpoints[0].distance
             if leading_distance is None:
                 leading_length = None
                 leading_is_boundary = False
             else:
-                leading_is_boundary = abs(leading_distance) <= _CHAINAGE_TOLERANCE
-                leading_length = 0.0 if leading_is_boundary else leading_distance
+                leading_diff = leading_distance - reach.start_distance
+                leading_is_boundary = abs(leading_diff) <= _CHAINAGE_TOLERANCE
+                leading_length = 0.0 if leading_is_boundary else leading_diff
             g0.add_edge(
                 start_key,
                 bp_keys[0],
@@ -66,16 +71,17 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
                 boundary=leading_is_boundary,
             )
 
-            # Only the final segment needs the total length. Break point
-            # distances are known even when the total is not, so a reach
-            # without a length still gets real lengths on every edge but
-            # this one.
+            # Only the final segment needs the total length, through
+            # end_distance. Break point distances are known even when the
+            # total is not, so a reach without a length still gets real
+            # lengths on every edge but this one.
             trailing_distance = reach.breakpoints[-1].distance
-            if reach.length is None or trailing_distance is None:
+            end_distance = reach.end_distance
+            if end_distance is None or trailing_distance is None:
                 tail_length = None
                 tail_is_boundary = False
             else:
-                tail_diff = reach.length - trailing_distance
+                tail_diff = end_distance - trailing_distance
                 tail_is_boundary = abs(tail_diff) <= _CHAINAGE_TOLERANCE
                 tail_length = 0.0 if tail_is_boundary else tail_diff
             g0.add_edge(
