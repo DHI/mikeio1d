@@ -7,6 +7,7 @@ timeseries loaded.
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 import pandas as pd
@@ -151,6 +152,36 @@ def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | N
     return length if length is not None else (reach.length or None)
 
 
+def _has_real_gridpoints(reach: ResultReach) -> bool:
+    """Whether these are the reach's own gridpoints, or one synthetic stand-in.
+
+    mikeio1d invents a single gridpoint for the link-node formats that define
+    none of their own (EPANET, SWMM), so a count this low means the reach has
+    no interior of its own to report.
+    """
+    return len(reach.gridpoints) > 2
+
+
+def _reach_start_distance(reach: ResultReach) -> float:
+    """Resolve where the reach's start node sits, in the frame its breakpoints use.
+
+    A MIKE reach's breakpoints are placed at their chainage, which is a
+    coordinate along the whole river branch rather than an offset along this
+    reach: the branch's chainage origin is a survey datum, so a modelled reach
+    commonly starts thousands of metres in, and may even start below zero.
+    A link-node reach has no chainage at all - its two breakpoints are placed
+    0.0 and `length` apart by hand - so its frame starts at zero.
+    """
+    if not _has_real_gridpoints(reach):
+        return 0.0
+
+    # EPANET reports -inf rather than a chainage. Nothing places a breakpoint
+    # against it, but an origin that is not a number would poison every edge
+    # length on the reach, so fall back to the frame the breakpoints are in.
+    origin = reach.start_chainage
+    return origin if math.isfinite(origin) else 0.0
+
+
 def _build_reach_breakpoints(
     reach: ResultReach,
     *,
@@ -179,7 +210,7 @@ def _build_reach_breakpoints(
     matched to the main file's gridpoints by index - the only real case
     today is a single-gridpoint reach against a single-gridpoint companion.
     """
-    if len(reach.gridpoints) > 2:
+    if _has_real_gridpoints(reach):
         unique_gridpoints = reach.gridpoints
         distances_per_gridpoint = [[gp.chainage] for gp in unique_gridpoints]
     else:
@@ -233,6 +264,7 @@ class Res1DReach(NetworkReach):
         self._start = start_node
         self._end = end_node
         self._length = _resolve_reach_length(length, reach)
+        self._start_distance = _reach_start_distance(reach)
         self._breakpoints = breakpoints or []
 
     @property
@@ -250,6 +282,10 @@ class Res1DReach(NetworkReach):
     @property
     def length(self) -> float | None:
         return self._length
+
+    @property
+    def start_distance(self) -> float:
+        return self._start_distance
 
     @property
     def breakpoints(self) -> list[ReachBreakPoint]:
