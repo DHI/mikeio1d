@@ -8,6 +8,12 @@ a breakpoint sits exactly at the reach end it belongs to.
 Every edge length is a difference between two positions in one reach's own
 frame, so an offset frame - a MIKE river reach reporting chainages along the
 whole branch - cancels out.
+
+Two reaches between the same pair of nodes - parallel pumps, a battery of
+orifices - stay apart because each one's break points are keyed by its own id,
+so each gets its own chain of graph nodes. A reach with no break points has only
+the one start-to-end edge, which is why two of those between the same nodes are
+refused rather than collapsed into one.
 """
 
 from __future__ import annotations
@@ -27,6 +33,10 @@ _CHAINAGE_TOLERANCE = 1e-3
 
 def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
     g0 = nx.Graph()
+    # Which reach claimed each node pair with a bare start-to-end edge. Every
+    # other edge this builds has a break point key - a (reach_id, distance)
+    # tuple - at one end at least, so no two reaches can land on it.
+    lone_reach_by_pair: dict[frozenset[str], str] = {}
     for reach in reaches:
         # 1) Add start and end nodes
         for node in [reach.start, reach.end]:
@@ -38,6 +48,17 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
         start_key = reach.start.id
         end_key = reach.end.id
         if reach.n_breakpoints == 0:
+            pair = frozenset((start_key, end_key))
+            claimed_by = lone_reach_by_pair.get(pair)
+            if claimed_by is not None:
+                raise ValueError(
+                    f"Reaches {claimed_by!r} and {reach.id!r} both run between nodes "
+                    f"{start_key!r} and {end_key!r}, and neither has break points, so the "
+                    "graph cannot keep them apart. Give each of them at least one break "
+                    "point: a reach with break points gets its own chain of graph nodes, "
+                    "which is how a result file's parallel pumps and orifices stay distinct."
+                )
+            lone_reach_by_pair[pair] = reach.id
             g0.add_edge(start_key, end_key, length=reach.length, boundary=False)
         else:
             bp_keys = [bp.id for bp in reach.breakpoints]
