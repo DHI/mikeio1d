@@ -9,7 +9,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from DHI.Mike1D.ResultDataAccess import Filter
 
 
-from . import ResultSubFilter
+from .result_filter import ResultSubFilter
 
 from DHI.Mike1D.ResultDataAccess import DataItemFilterQuantity
 from DHI.Mike1D.Generic import Quantity

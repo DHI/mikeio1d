@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
-from typing import Tuple
 
 from shapely.geometry.base import BaseGeometry
 from shapely.geometry import Polygon
@@ -16,12 +14,12 @@ class CatchmentGeometry:
 
     Parameters
     ----------
-    points : List[Tuple[float, float]]
+    points : list[tuple[float, float]]
         List of points (x, y) defining the catchment boundary. The first and last points should be the same.
 
     """
 
-    points: List[Tuple[float, float]]
+    points: list[tuple[float, float]]
 
     @staticmethod
     def from_res1d_catchment(res1d_catchment) -> CatchmentGeometry:

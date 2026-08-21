@@ -105,6 +105,24 @@ Tests use fixtures from `tests/testdata/` (accessed via a generated `testdata` m
 - Ruff with numpy-style docstrings (PD, NPY, FA, D rules)
 - Formatter: `ruff format`
 
+### Imports
+
+Import order is maintained by hand — ruff's `I` (isort) rule is in `lint.ignore`,
+because the order within a group is semantic rather than alphabetical. When adding
+an import, follow the file you are editing.
+
+- One name per line is preferred, so diffs stay readable, but a short combined
+  import is fine.
+- `from __future__ import annotations` first, then a `TYPE_CHECKING` block if the
+  module needs one, then stdlib, third-party, and the package's own modules.
+- `DHI.*` and `System` come last, in a group of their own separated by a blank line.
+  They are .NET assemblies loaded through pythonnet, and keeping them apart makes a
+  module's interop surface obvious. They do not take the parenthesised form, so one
+  statement per name.
+- Within a group, put related modules together and the more central ones first.
+
+`src/mikeio1d/result_network/result_reach.py` is the worked example.
+
 ## Troubleshooting
 
 **CLR / `BadImageFormatException` when loading DLLs**

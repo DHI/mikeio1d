@@ -10,8 +10,10 @@
 
 ### Fixed
 - Reach `start_node` and `end_node` no longer fail for a `Res1D` opened with a `Path`.
+- `ResultQuantity.timeseries_id` now raises instead of silently returning `None` when the quantity is not attached to a `ResultNetwork` (#248).
 
 ### Changed
+- Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 
 ### Removed
 - `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.

@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Optional
-    from typing import List
     from .result_reader import ResultReader
     from .result_reader import ColumnMode
 
@@ -25,7 +23,7 @@ class ResultReaderQuery(ResultReader):
     """Class for reading the ResultData object TimeData into Pandas data frame using ResultDataQuery object."""
 
     def read(
-        self, timeseries_ids: List[TimeSeriesId], column_mode: Optional[ColumnMode] = None
+        self, timeseries_ids: list[TimeSeriesId], column_mode: ColumnMode | None = None
     ) -> pd.DataFrame:
         """Read the TimeData for given TimeSeriesIds into a Pandas data frame."""
         self.load_dynamic_data()
@@ -49,7 +47,7 @@ class ResultReaderQuery(ResultReader):
 
         return df
 
-    def read_all(self, column_mode: Optional[ColumnMode] = None) -> pd.DataFrame:
+    def read_all(self, column_mode: ColumnMode | None = None) -> pd.DataFrame:
         """Read all TimeData into a Pandas data frame."""
         self.load_dynamic_data()
 

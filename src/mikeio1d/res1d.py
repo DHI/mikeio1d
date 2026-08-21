@@ -5,23 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Optional
-    from typing import Type
-    from typing import Set
-
     from datetime import datetime
 
     import pandas as pd
 
     from .query import QueryData
     from .result_reader_writer.result_reader import ColumnMode
-
-    from .result_network import ResultCatchments
-    from .result_network import ResultNodes
-    from .result_network import ResultReaches
-    from .result_network import ResultStructures
-    from .result_network import ResultGlobalDatas
 
     from DHI.Mike1D.ResultDataAccess import ResultData
     from DHI.Mike1D.ResultDataAccess import ResultDataSearcher
@@ -40,6 +29,11 @@ from .result_extractor import ExtractorCreator
 from .result_extractor import ExtractorOutputFileType
 from .result_network import ResultNetwork
 from .result_network import ResultQuantity
+from .result_network import ResultCatchments
+from .result_network import ResultNodes
+from .result_network import ResultReaches
+from .result_network import ResultStructures
+from .result_network import ResultGlobalDatas
 from .result_reader_writer import ResultMerger
 from .result_reader_writer import ResultReaderCreator
 from .result_reader_writer import ResultReaderType
@@ -50,15 +44,15 @@ from .filter import NameFilter
 from .filter import StepEveryFilter
 from .filter import QuantityFilter
 
-from .query import QueryDataCatchment  # noqa: F401
-from .query import QueryDataNode  # noqa: F401
-from .query import QueryDataReach  # noqa: F401
-from .query import QueryDataStructure  # noqa: F401
-from .query import QueryDataGlobal  # noqa: F401
+from .query import QueryDataCatchment
+from .query import QueryDataNode
+from .query import QueryDataReach
+from .query import QueryDataStructure
+from .query import QueryDataGlobal
 
 from .result_query.query_data_converter import QueryDataConverter
 
-from .various import mike1d_quantities  # noqa: F401
+from .various import mike1d_quantities
 from .various import NAME_DELIMITER
 from .various import make_list_if_not_iterable
 
@@ -66,7 +60,7 @@ from .quantities import TimeSeriesId
 from .quantities import get_default_derived_quantity_classes
 from .quantities import DerivedQuantity
 
-from .pandas_extension import Mikeio1dAccessor  # noqa: F401
+from .pandas_extension import Mikeio1dAccessor
 
 from System import DateTime
 from DHI.Mike1D.Generic import Connection
@@ -204,9 +198,9 @@ class Res1D:
     def _get_info(self) -> str:
         info = []
         if self.file_path:
-            info.append(f"Start time: {str(self.start_time)}")
-            info.append(f"End time: {str(self.end_time)}")
-            info.append(f"# Timesteps: {str(self.reader.number_of_time_steps)}")
+            info.append(f"Start time: {self.start_time!s}")
+            info.append(f"End time: {self.end_time!s}")
+            info.append(f"# Timesteps: {self.reader.number_of_time_steps!s}")
             info.append(f"# Catchments: {self.result_data.Catchments.get_Count()}")
             info.append(f"# Nodes: {self.result_data.Nodes.get_Count()}")
             info.append(f"# Reaches: {self.result_data.Reaches.get_Count()}")
@@ -220,8 +214,8 @@ class Res1D:
 
     def read(
         self,
-        queries: Optional[list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData] = None,
-        column_mode: Optional[str | ColumnMode] = None,
+        queries: list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData | None = None,
+        column_mode: str | ColumnMode | None = None,
     ) -> pd.DataFrame:
         """Read result data into a pandas DataFrame.
 
@@ -261,8 +255,8 @@ class Res1D:
 
     def to_dataframe(
         self,
-        queries: Optional[list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData] = None,
-        column_mode: Optional[str | ColumnMode] = None,
+        queries: list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData | None = None,
+        column_mode: str | ColumnMode | None = None,
     ) -> pd.DataFrame:
         """Read result data into a pandas DataFrame.
 
@@ -282,8 +276,8 @@ class Res1D:
         return self.read(queries, column_mode)
 
     def _get_timeseries_ids_to_read(
-        self, queries: List[QueryData] | List[TimeSeriesId]
-    ) -> List[TimeSeriesId]:
+        self, queries: list[QueryData] | list[TimeSeriesId]
+    ) -> list[TimeSeriesId]:
         """Find out which list of TimeSeriesId objects should be used for reading."""
         queries = make_list_if_not_iterable(queries)
 
@@ -355,7 +349,7 @@ class Res1D:
     def extract(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: list[QueryData] | QueryData | list[TimeSeriesId] | TimeSeriesId | None = None,
         time_step_skipping_number=1,
         ext=None,
     ):
@@ -403,7 +397,7 @@ class Res1D:
     def to_csv(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: list[QueryData] | QueryData | list[TimeSeriesId] | TimeSeriesId | None = None,
         time_step_skipping_number=1,
     ):
         """Extract to csv file.
@@ -415,7 +409,7 @@ class Res1D:
     def to_dfs0(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: list[QueryData] | QueryData | list[TimeSeriesId] | TimeSeriesId | None = None,
         time_step_skipping_number=1,
     ):
         """Extract to dfs0 file.
@@ -427,7 +421,7 @@ class Res1D:
     def to_txt(
         self,
         file_path,
-        queries: Optional[List[QueryData] | QueryData | List[TimeSeriesId] | TimeSeriesId] = None,
+        queries: list[QueryData] | QueryData | list[TimeSeriesId] | TimeSeriesId | None = None,
         time_step_skipping_number=1,
     ):
         """Extract to txt file.
@@ -437,7 +431,7 @@ class Res1D:
         self.extract(file_path, queries, time_step_skipping_number, ExtractorOutputFileType.TXT)
 
     @staticmethod
-    def merge(file_names: List[str] | List[Res1D], merged_file_name: str):
+    def merge(file_names: list[str] | list[Res1D], merged_file_name: str):
         """Merge res1d files.
 
         It is possible to merge three kinds of result files:
@@ -466,7 +460,7 @@ class Res1D:
         result_merger.merge(merged_file_name)
 
     @staticmethod
-    def _convert_res1d_to_str_for_file_names(file_names: List[str] | List[Res1D]):
+    def _convert_res1d_to_str_for_file_names(file_names: list[str] | list[Res1D]):
         file_names_new = []
         for i in range(len(file_names)):
             entry = file_names[i]
@@ -475,7 +469,7 @@ class Res1D:
         return file_names_new
 
     @staticmethod
-    def get_supported_file_extensions() -> Set[str]:
+    def get_supported_file_extensions() -> set[str]:
         """Get supported file extensions for Res1D."""
         return {
             # MIKE 1D
@@ -496,18 +490,18 @@ class Res1D:
             ".resx",
         }
 
-    def add_derived_quantity(self, derived_quantity: str | Type[DerivedQuantity]):
+    def add_derived_quantity(self, derived_quantity: str | type[DerivedQuantity]):
         """Add a derived quantity to the Res1D object, propogating changes to the network.
 
         Parameters
         ----------
-        derived_quantity : str | Type[DerivedQuantity]
+        derived_quantity : str | type[DerivedQuantity]
             Derived quantity to be added
         """
         derived_quantity = derived_quantity(self)
         self.network.add_derived_quantity(derived_quantity)
 
-    def remove_derived_quantity(self, derived_quantity: Type[DerivedQuantity] | str):
+    def remove_derived_quantity(self, derived_quantity: type[DerivedQuantity] | str):
         """Remove a derived quantity from the Res1D object, propogating changes to the network.
 
         Parameters
@@ -565,12 +559,12 @@ class Res1D:
         return self.reader.number_of_time_steps
 
     @property
-    def quantities(self) -> List[str]:
+    def quantities(self) -> list[str]:
         """Quantities in res1d file."""
         return self.reader.quantities
 
     @property
-    def derived_quantities(self) -> List[str]:
+    def derived_quantities(self) -> list[str]:
         """Derived quantities available for res1d file."""
         dq = [
             *self.nodes.derived_quantities,
@@ -643,9 +637,9 @@ class Res1D:
 
 __all__ = [
     "Res1D",
+    "ResultCatchments",
+    "ResultGlobalDatas",
     "ResultNodes",
     "ResultReaches",
-    "ResultCatchments",
     "ResultStructures",
-    "ResultGlobalDatas",
 ]

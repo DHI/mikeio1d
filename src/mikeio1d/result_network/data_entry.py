@@ -3,7 +3,7 @@
 from DHI.Mike1D.MikeIO import DataEntry as DataEntryNet
 
 
-class DataEntry(object):
+class DataEntry:
     """Class storing a Mike1D data item and a corresponding element index.
 
     Parameters

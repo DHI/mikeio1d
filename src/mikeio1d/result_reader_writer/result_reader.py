@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Optional
     from ..res1d import Res1D
     from ..filter import ResultFilter
 
@@ -83,10 +81,10 @@ class ResultReader(ABC):
     def __init__(
         self,
         res1d,
-        file_path: str | Path = None,
+        file_path: str | Path | None = None,
         col_name_delimiter=NAME_DELIMITER,
         put_chainage_in_col_name=True,
-        filter: ResultFilter = None,
+        filter: ResultFilter | None = None,
     ):
         self.res1d: Res1D = res1d
 
@@ -164,8 +162,8 @@ class ResultReader(ABC):
     @abstractmethod
     def read(
         self,
-        timeseries_ids: List[TimeSeriesId] = None,
-        column_mode: Optional[str | ColumnMode] = None,
+        timeseries_ids: list[TimeSeriesId] | None = None,
+        column_mode: str | ColumnMode | None = None,
     ) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
@@ -185,7 +183,7 @@ class ResultReader(ABC):
         ...
 
     @abstractmethod
-    def read_all(self, column_mode: Optional[str | ColumnMode]) -> pd.DataFrame:
+    def read_all(self, column_mode: str | ColumnMode | None) -> pd.DataFrame:
         """Read all time series data into a data frame.
 
         Parameters
@@ -298,7 +296,7 @@ class ResultReader(ABC):
     def _is_lts_event_time_column(
         self,
         quantity_column: str | TimeSeriesId | tuple,
-        column_level_names: Optional[List[str]] = None,
+        column_level_names: list[str] | None = None,
     ) -> bool:
         """Determine if the quantity_column is the LTS event time column.
 

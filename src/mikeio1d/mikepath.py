@@ -4,6 +4,7 @@ import os
 import sys
 import platform
 import pythonnet
+from typing import ClassVar
 
 
 class MikePath:
@@ -41,7 +42,7 @@ class MikePath:
         else mikeio1d_bin_path
     )
 
-    library_patterns = ["DHI.*.dll"]
+    library_patterns: ClassVar[list[str]] = ["DHI.*.dll"]
 
     @staticmethod
     def setup_mike_installation(syspath):

@@ -88,12 +88,26 @@ experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 "Bug Tracker" = "https://github.com/DHI/mikeio1d/issues"
 
 [tool.ruff]
+# Pinned: ruff 0.16 grew its default rule set substantially, so an unpinned
+# upgrade silently changes what CI enforces. Bump this and the version in
+# .github/workflows/full_test.yml together.
+required-version = ">=0.16,<0.17"
 include = ["pyproject.toml", "src/mikeio1d/**/*.py"]
 line-length = 100
 lint.extend-select = ["D", "PD", "NPY", "FA"]
 lint.ignore = [
-    "E402",  # ignore for now
-    "F401",  # ignore for now
-    "PD901", # allow using 'df' for pd.DataFrame type
+    "E402",   # ignore for now
+    "F401",   # ignore for now
+    "I",      # import order is semantic, not alphabetical; see the note below
+    "TRY004", # ValueError -> TypeError on type checks would break callers
+    "BLE001", # the broad catches wrap .NET interop, where the type is unknowable
+    "S102",   # exec is how mikenet binds .NET namespaces into the module
+    "DTZ001", # MIKE result timestamps are naive by design
 ]
 lint.pydocstyle.convention = "numpy"
+
+# Imports are grouped by hand: one name per line, Python first, then the DHI and
+# System interop in a trailing group of its own. Within a group the order is
+# semantic rather than alphabetical, which isort has no sort key for -- every
+# configuration tried reorders around 500 lines. Hence the I ignore above.
+# The convention, with a worked example, is written up in CLAUDE.md.

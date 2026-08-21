@@ -12,14 +12,13 @@ class ExtractorTxt(Extractor):
 
     def export(self):
         """Export data to text file."""
-        self.f = open(self.out_file_name, "w")
-        self.set_output_format()
-        self.write_item_type()
-        self.write_quantity()
-        self.write_name()
-        self.write_chainage()
-        self.write_data_items()
-        self.f.close()
+        with open(self.out_file_name, "w") as self.f:
+            self.set_output_format()
+            self.write_item_type()
+            self.write_quantity()
+            self.write_name()
+            self.write_chainage()
+            self.write_data_items()
 
     def set_output_format(self):
         """Set output format."""

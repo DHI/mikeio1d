@@ -15,7 +15,7 @@ import pandas as pd
 from System import DateTime
 from DHI.Mike1D.ResultDataAccess import Period
 
-from . import ResultSubFilter
+from .result_filter import ResultSubFilter
 from ..dotnet import to_dotnet_datetime
 
 
@@ -67,7 +67,7 @@ class TimeFilter(ResultSubFilter):
         if isinstance(time_interval, slice):
             start = time_interval.start
             end = time_interval.stop
-        elif isinstance(time_interval, tuple) or isinstance(time_interval, list):
+        elif isinstance(time_interval, (tuple, list)):
             start, end = time_interval
         else:
             raise ValueError("time parameter must be a slice, tuple or list")

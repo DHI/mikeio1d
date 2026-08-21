@@ -6,9 +6,9 @@ This module contains the ExampleDerivedQuantity class, which is an example of ho
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
@@ -24,19 +24,19 @@ class ExampleDerivedQuantity(DerivedQuantity):
     _NAME = "WaterLevelPlusOne"
 
     # Replace with the groups that the derived quantity can be applied to
-    _GROUPS = {TimeSeriesIdGroup.NODE, TimeSeriesIdGroup.REACH}
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup]] = {TimeSeriesIdGroup.NODE, TimeSeriesIdGroup.REACH}
 
     # Replace with the source quantity that the derived quantity is derived from
     _SOURCE_QUANTITY = "WaterLevel"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]) -> pd.DataFrame:
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]) -> pd.DataFrame:
         """Transform the source quantities into the derived quantity.
 
         Parameters
         ----------
         df_source : pd.DataFrame
             A DataFrame containing all the required sournce quantities.
-        locations : List[ResultLocation]
+        locations : list[ResultLocation]
             A list of ResultLocation objects associated with each column of df_source.
 
         Returns

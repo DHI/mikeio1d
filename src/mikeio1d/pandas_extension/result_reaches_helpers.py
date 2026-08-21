@@ -24,7 +24,9 @@ def groupby_chainage(df: pd.DataFrame, **kwargs) -> TransposedGroupBy:
     return groupby
 
 
-def agg_chainage(df: pd.DataFrame, agg=["first"], gb_kwargs: dict = {}, **kwargs) -> pd.DataFrame:
+def agg_chainage(
+    df: pd.DataFrame, agg=None, gb_kwargs: dict | None = None, **kwargs
+) -> pd.DataFrame:
     """Aggregate results along the chainage axis.
 
     Parameters
@@ -40,5 +42,7 @@ def agg_chainage(df: pd.DataFrame, agg=["first"], gb_kwargs: dict = {}, **kwargs
         DataFrame with aggregated results.
 
     """
-    groupby = groupby_chainage(df, **gb_kwargs)
+    if agg is None:
+        agg = ["first"]
+    groupby = groupby_chainage(df, **(gb_kwargs if gb_kwargs is not None else {}))
     return groupby.agg(agg, **kwargs)

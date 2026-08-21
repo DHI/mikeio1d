@@ -1,11 +1,10 @@
 """ResultGlobalDatas class."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     from ..res1d import Res1D
 
     from DHI.Mike1D.ResultDataAccess import IDataItem
@@ -60,7 +59,7 @@ class ResultGlobalDatasCreator(ResultLocationsCreator):
 
     def __init__(self, result_locations: ResultGlobalDatas, res1d: Res1D):
         ResultLocationsCreator.__init__(self, result_locations, res1d)
-        self.result_global_data_list: List[ResultGlobalData] = []
+        self.result_global_data_list: list[ResultGlobalData] = []
 
     def create(self):
         """Perform ResultCatchments creation steps."""

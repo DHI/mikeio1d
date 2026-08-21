@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     import pandas as pd
 
     from mikeio1d.result_network import ResultLocation
@@ -22,10 +21,10 @@ class ReachQQManning(DerivedQuantity):
     """Derived quantity for Manning's Q in a reach."""
 
     _NAME = "ReachQQManning"
-    _GROUPS = {TimeSeriesIdGroup.REACH}
+    _GROUPS: ClassVar[set[TimeSeriesIdGroup]] = {TimeSeriesIdGroup.REACH}
     _SOURCE_QUANTITY = "Discharge"
 
-    def derive(self, df_source: pd.DataFrame, locations: List[ResultLocation]):
+    def derive(self, df_source: pd.DataFrame, locations: list[ResultLocation]):
         """Derive Manning's Q in a reach."""
         dtype = df_source.dtypes.iloc[0]
         full_flow_discharges = np.fromiter(self.get_full_flow_discharges(locations), dtype=dtype)
@@ -36,6 +35,6 @@ class ReachQQManning(DerivedQuantity):
         """Get the full flow discharge for a gridpoint."""
         return gridpoint.result_reach.full_flow_discharge
 
-    def get_full_flow_discharges(self, gridpoints: List[ResultGridPoint]):
+    def get_full_flow_discharges(self, gridpoints: list[ResultGridPoint]):
         """Get the full flow discharges for a list of gridpoints."""
         yield from (self.get_full_flow_discharge(location) for location in gridpoints)

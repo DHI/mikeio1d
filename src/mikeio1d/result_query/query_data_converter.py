@@ -5,12 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     from ..res1d import Res1D
-    from .query_data import QueryData
 
 from ..quantities import TimeSeriesId
+from .query_data import QueryData
 
 
 class QueryDataConverter:
@@ -47,7 +45,7 @@ class QueryDataConverter:
     @staticmethod
     def convert_queries_to_time_series_ids(
         res1d: Res1D, queries: list[QueryData]
-    ) -> List[TimeSeriesId]:
+    ) -> list[TimeSeriesId]:
         """Convert queries to TimeSeriesId objects.
 
         Parameters
@@ -59,7 +57,7 @@ class QueryDataConverter:
 
         Returns
         -------
-        List[TimeSeriesId]
+        list[TimeSeriesId]
             List of timeseries ids.
 
         """

@@ -44,7 +44,7 @@ if current_python_version not in SpecifierSet(requires_python):
     )
 
 if "64" not in platform.architecture()[0]:
-    raise Exception("This library has not been tested for a 32 bit system.")
+    raise RuntimeError("This library has not been tested for a 32 bit system.")
 
 MikePath.setup_mike_installation(sys.path)
 

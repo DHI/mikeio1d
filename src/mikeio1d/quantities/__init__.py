@@ -1,13 +1,13 @@
 """Package for defining quantities."""
 
-from .timeseries_id import TimeSeriesId  # noqa: F401
-from .timeseries_id import TimeSeriesIdGroup  # noqa: F401
-from .derived import DerivedQuantity  # noqa: F401
-from .derived import get_default_derived_quantity_classes  # noqa: F401
+from .timeseries_id import TimeSeriesId
+from .timeseries_id import TimeSeriesIdGroup
+from .derived import DerivedQuantity
+from .derived import get_default_derived_quantity_classes
 
 __all__ = [
+    "DerivedQuantity",
     "TimeSeriesId",
     "TimeSeriesIdGroup",
-    "DerivedQuantity",
     "get_default_derived_quantity_classes",
 ]

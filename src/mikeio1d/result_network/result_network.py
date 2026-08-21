@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Dict
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
@@ -80,11 +78,11 @@ class ResultNetwork:
     def __init__(self, res1d: Res1D):
         self.res1d = res1d
         self.data: ResultData = res1d.result_data
-        self.data_items: List[IDataItem] = res1d.result_data.DataItems
+        self.data_items: list[IDataItem] = res1d.result_data.DataItems
 
-        self.queue: List[TimeSeriesId] = []
+        self.queue: list[TimeSeriesId] = []
 
-        self.result_quantity_map: Dict[TimeSeriesId, ResultQuantity] = {}
+        self.result_quantity_map: dict[TimeSeriesId, ResultQuantity] = {}
 
         self.res1d.network = self
         self._set_result_locations()
@@ -132,7 +130,7 @@ class ResultNetwork:
 
         Parameters
         ----------
-        derived_quantity : Type[ResultQuantity]
+        derived_quantity : type[ResultQuantity]
             Derived quantity to be added to the result network.
 
         """

@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-
     from ..res1d import Res1D
     from .result_reach import ResultReach
 
@@ -182,7 +180,7 @@ class ResultGridPointCreator(ResultLocationCreator):
         result_reach: ResultReach,
         res1d: Res1D,
     ):
-        empty_data_item_list: List[IDataItem] = []
+        empty_data_item_list: list[IDataItem] = []
         ResultLocationCreator.__init__(self, result_location, empty_data_item_list, res1d)
 
         self.reach = reach

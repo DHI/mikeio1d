@@ -4,11 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from typing import Dict
-
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import List
-    from typing import Optional
     import pandas as pd
 
     from ..res1d import Res1D
@@ -37,7 +33,7 @@ from .various import make_proper_variable_name
 from .various import build_html_repr_from_sections
 
 
-class ResultLocations(ABC, Dict[str, ResultLocation]):
+class ResultLocations(ABC, dict[str, ResultLocation]):
     """A base class for a network locations (nodes, reaches) or a catchments wrapper class."""
 
     def __init__(self):
@@ -62,29 +58,29 @@ class ResultLocations(ABC, Dict[str, ResultLocation]):
         return self._group
 
     @property
-    def quantities(self) -> Dict[str, ResultQuantityCollection]:
+    def quantities(self) -> dict[str, ResultQuantityCollection]:
         """A list of available quantities."""
         result_quantity_map = self._creator.result_quantity_map
         return {k: getattr(self, make_proper_variable_name(k)) for k in result_quantity_map}
 
     @property
-    def derived_quantities(self) -> List[str]:
+    def derived_quantities(self) -> list[str]:
         """A list of available derived quantities."""
         return list(self._creator.result_quantity_derived_map.keys())
 
     @property
-    def names(self) -> List[str]:
+    def names(self) -> list[str]:
         """A list of location names (e.g. MUIDs)."""
         return list(self.keys())
 
     @property
-    def locations(self) -> List[ResultLocation]:
+    def locations(self) -> list[ResultLocation]:
         """A list of location objects (e.g. <ResultNode>)."""
         return list(self.values())
 
     def read(
         self,
-        column_mode: Optional[str | ColumnMode] = None,
+        column_mode: str | ColumnMode | None = None,
         include_derived: bool = False,
     ) -> pd.DataFrame:
         """Read the time series data for all quantities at these locations into a DataFrame.
@@ -122,7 +118,7 @@ class ResultLocations(ABC, Dict[str, ResultLocation]):
 
     def to_dataframe(
         self,
-        column_mode: Optional[str | ColumnMode] = None,
+        column_mode: str | ColumnMode | None = None,
         include_derived: bool = False,
     ) -> pd.DataFrame:
         """Read the time series data for all quantities at these locations into a DataFrame.
@@ -176,8 +172,8 @@ class ResultLocationsCreator(ABC):
         self.quantity_label = "q_"
         self.data: ResultData = res1d.result_data
         self.data_items: IDataItems = res1d.result_data.DataItems
-        self.result_quantity_map: Dict[str : List[ResultQuantity]] = {}
-        self.result_quantity_derived_map: Dict[str, List[ResultQuantityDerived]] = {}
+        self.result_quantity_map: dict[str, list[ResultQuantity]] = {}
+        self.result_quantity_derived_map: dict[str, list[ResultQuantityDerived]] = {}
 
     @abstractmethod
     def create(self):
@@ -215,11 +211,10 @@ class ResultLocationsCreator(ABC):
 
     def can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
         """Check if a derived quantity can be added to the result locations."""
-        if self.result_locations.group not in derived_quantity.groups:
-            return False
-        elif derived_quantity.source_quantity not in self.result_quantity_map:
-            return False
-        return True
+        return (
+            self.result_locations.group in derived_quantity.groups
+            and derived_quantity.source_quantity in self.result_quantity_map
+        )
 
     def add_derived_quantity(self, derived_quantity: DerivedQuantity):
         """Add a derived quantity to the result network.

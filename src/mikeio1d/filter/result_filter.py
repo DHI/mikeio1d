@@ -24,7 +24,7 @@ class ResultFilter:
 
     def use_filter(self) -> bool:
         """Whether the filter should be applied."""
-        return any([f.use_filter() for f in self.sub_filters])
+        return any(f.use_filter() for f in self.sub_filters)
 
     def apply(self, result_data: ResultData):
         """Apply filter."""
@@ -49,11 +49,11 @@ class ResultSubFilter(Protocol):
 
     def apply(self, filter: Filter, result_data: ResultData | None) -> None:
         """Apply the filter to the provided Filter object."""
-        pass
+        ...
 
     def use_filter(self) -> bool:
         """Check if the filter should be used."""
-        pass
+        ...
 
     def _box_inputs_to_str_list(self, value: str | list[str] | None) -> list[str]:
         if value is None:

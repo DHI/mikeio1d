@@ -1,16 +1,16 @@
 """ResultCatchments class."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict
-    from typing import Callable
     from geopandas import GeoDataFrame
 
     from ..res1d import Res1D
 
     from DHI.Mike1D.ResultDataAccess import Res1DCatchment
+    from collections.abc import Callable
 
 from ..dotnet import pythonnet_implementation as impl
 from ..pandas_extension import ResultFrameAggregator
@@ -46,8 +46,8 @@ class ResultCatchments(ResultLocations):
 
     def to_geopandas(
         self,
-        agg: str | Callable = None,
-        agg_kwargs: Dict[str : str | Callable] = {},
+        agg: str | Callable | None = None,
+        agg_kwargs: dict[str, str | Callable] | None = None,
     ) -> GeoDataFrame:
         """Convert catchments to a geopandas.GeoDataFrame object.
 
@@ -65,7 +65,7 @@ class ResultCatchments(ResultLocations):
             - 'max'   : maximum value of all quantities
             -  np.max : maximum value of all quantities
 
-        agg_kwargs : dict, default {}
+        agg_kwargs : dict, default None
             Aggregation function for specific column levels (e.g. {time='min', chainage='first'}).
 
         Returns
@@ -82,7 +82,7 @@ class ResultCatchments(ResultLocations):
         if agg is None:
             return gdf
 
-        rfa = ResultFrameAggregator(agg, **agg_kwargs)
+        rfa = ResultFrameAggregator(agg, **(agg_kwargs or {}))
 
         df_quantities = self.read(column_mode="compact")
         df_quantities = rfa.aggregate(df_quantities)
