@@ -31,9 +31,11 @@ class Network:
     """Network built from a set of reaches, with coordinate lookup and data access."""
 
     def __init__(self, reaches: Sequence[NetworkReach]):
-        graph = _generate_graph(reaches)
-        self._initialize_network_attributes(graph)
+        # Ids first: two reaches sharing one would interleave their break points
+        # into a single chain, and the graph error would describe the wreckage
+        # rather than the cause.
         self._reaches = self._generate_reaches_dict(reaches)
+        self._initialize_network_attributes(_generate_graph(reaches))
 
     def _initialize_network_attributes(self, graph: nx.Graph):
         self._alias_map = _generate_alias_map(graph)
@@ -249,7 +251,16 @@ class Network:
     def _generate_reaches_dict(
         reaches: Sequence[NetworkReach],
     ) -> dict[str, NetworkReach]:
-        return {r.id: r for r in reaches}
+        by_id: dict[str, NetworkReach] = {}
+        for reach in reaches:
+            if reach.id in by_id:
+                raise ValueError(
+                    f"Two reaches share the id {reach.id!r}. A reach is addressed by its "
+                    "id, and its break points are keyed by it, so keeping both would drop "
+                    "one of them and interleave their edges."
+                )
+            by_id[reach.id] = reach
+        return by_id
 
     def to_dataframe(self, sel: str | None = None) -> pd.DataFrame:
         """Dataframe using node ids as column names.
