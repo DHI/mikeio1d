@@ -156,10 +156,12 @@ def _has_real_gridpoints(reach: ResultReach) -> bool:
     """Whether these are the reach's own gridpoints, or one synthetic stand-in.
 
     mikeio1d invents a single gridpoint for the link-node formats that define
-    none of their own (EPANET, SWMM), so a count this low means the reach has
-    no interior of its own to report.
+    none of their own (EPANET, SWMM). Only the source can tell the two cases
+    apart, so ask it: the stand-in went to the reach that reported nothing.
+    Counting what came back cannot, since a reach is free to report as few
+    gridpoints as the stand-in stands for.
     """
-    return len(reach.gridpoints) > 2
+    return any(res1d_reach.GridPoints.Count > 0 for res1d_reach in reach.res1d_reaches)
 
 
 def _reach_start_distance(reach: ResultReach) -> float:
@@ -192,17 +194,17 @@ def _build_reach_breakpoints(
 ) -> list[ReachBreakPoint]:
     """Build a reach's break points from its mikeio1d gridpoints.
 
-    Reaches with more than 2 gridpoints have real, independently-measured
+    A reach with gridpoints of its own has real, independently-measured
     start/end points, so every gridpoint becomes a break point at its own
     chainage (the first/last ones end up coincident with the reach's own
     start_node/end_node - the graph builder connects them with a zero-length
     edge).
 
-    Reaches with 2 or fewer gridpoints are link-node models (e.g. EPANET),
-    whose single synthetic gridpoint belongs to neither end - it is
-    duplicated into two break points, one at each end (distance 0.0, and
-    distance `length` if known or None otherwise), so the reach's own
-    quantities (e.g. Flow) are reachable the same way MIKE's are. Decided in
+    A reach with none is a link-node model (e.g. EPANET), and the synthetic
+    gridpoint mikeio1d gave it belongs to neither end - it is duplicated into
+    two break points, one at each end (distance 0.0, and distance `length` if
+    known or None otherwise), so the reach's own quantities (e.g. Flow) are
+    reachable the same way MIKE's are. Decided in
     https://github.com/DHI/modelskill/issues/680.
 
     A companion ``.resx`` result (``extra``) contributes its own reach-level
