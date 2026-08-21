@@ -68,11 +68,14 @@ class ReachBreakPoint(ABC):
     * :attr:`data` - a time-indexed :class:`pandas.DataFrame` whose columns
       are quantity names.
 
-    The :attr:`distance` convenience property returns ``id[1]`` (the
-    along-reach distance in the units used by the parent network, or
-    ``None`` if unknown). A break point with an unknown distance cannot be
-    looked up via ``find(reach=..., distance=<number>)``, but is still
-    reachable through ``ReachObservation`` and ``recall()``.
+    The :attr:`distance` convenience property returns ``id[1]`` (the position
+    along the reach in the units used by the parent network, or ``None`` if
+    unknown). It need not be measured from the start node: a MIKE river reach
+    reports its chainage, which is a coordinate along the whole branch, so the
+    distance from the start node is ``distance - reach.start_distance``. A
+    break point with an unknown distance cannot be looked up via
+    ``find(reach=..., distance=<number>)``, but is still reachable through
+    ``ReachObservation`` and ``recall()``.
 
     Examples
     --------
@@ -106,7 +109,7 @@ class ReachBreakPoint(ABC):
 
     @property
     def distance(self) -> float | None:
-        """Along-reach distance from the start node, or None if unknown."""
+        """Position along the reach, in the reach's own frame, or None if unknown."""
         return self.id[1]
 
     @property
@@ -135,6 +138,11 @@ class NetworkReach(ABC):
     :attr:`length` is optional and defaults to ``None``. Reach length matters
     in some domains (rivers, sewer networks) and not in others (link-node water
     distribution models), so override it only where a length exists.
+
+    :attr:`start_distance` and :attr:`end_distance` say where the reach's own
+    ends sit in the frame its break points are placed in. They default to
+    ``0.0`` and the length, which is right wherever break points are measured
+    from the start node; override them where the frame is offset.
 
     The concrete helper :class:`BasicReach` is provided for the common case
     where all data is already available in memory.
@@ -193,6 +201,23 @@ class NetworkReach(ABC):
     def length(self) -> float | None:
         """Total length of this reach in network units, or ``None`` if undefined."""
         return None
+
+    @property
+    def start_distance(self) -> float:
+        """Position of the start node, in the frame :attr:`breakpoints` are placed in.
+
+        Zero for a reach whose break points are measured from its own start.
+        Override it where they are not: a MIKE river reach places them at their
+        chainage, a coordinate along the whole branch, so a reach can begin
+        thousands of metres in - or below zero.
+        """
+        return 0.0
+
+    @property
+    def end_distance(self) -> float | None:
+        """Position of the end node, or ``None`` where the length is undefined."""
+        length = self.length
+        return None if length is None else self.start_distance + length
 
     @property
     @abstractmethod
