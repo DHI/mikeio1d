@@ -11,6 +11,9 @@
 ### Fixed
 - Reach `start_node` and `end_node` no longer fail for a `Res1D` opened with a `Path`.
 - `ResultQuantity.timeseries_id` now raises instead of silently returning `None` when the quantity is not attached to a `ResultNetwork` (#248).
+- Reach geometry no longer accumulates for the lifetime of the process; the cached points and
+  distances now live on the `ReachGeometry` object and are freed with it (#248).
+- `Res1D.to_txt` and `Res1D.to_csv` no longer leave the output file open when a write fails (#248).
 
 ### Changed
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
