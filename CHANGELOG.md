@@ -5,8 +5,10 @@
 ### Added
 
 ### Fixed
+- `ResultQuantity.timeseries_id` now raises instead of silently returning `None` when the quantity is not attached to a `ResultNetwork` (#248).
 
 ### Changed
+- Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 
 ### Removed
 
