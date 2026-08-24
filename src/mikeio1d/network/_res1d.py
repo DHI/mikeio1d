@@ -159,13 +159,16 @@ def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | N
     """Resolve a reach's effective length.
 
     A length read from a companion input file wins, since mikeio1d has none
-    to offer for the formats that need one. Otherwise: mikeio1d returns 0
-    when it cannot read a reach length - link-node models such as EPANET
-    report this for every reach. Report it as undefined rather than as a
-    zero-length reach, which would make length-weighted graph algorithms
-    treat the reach as free. The two cases cannot be told apart upstream.
+    to offer for the formats that need one. Zero means undefined whichever of
+    the two said it: mikeio1d returns 0 when it cannot read a reach length -
+    link-node models such as EPANET report this for every reach - and an input
+    file is free to carry a 0 in the same spirit. Reported as undefined rather
+    than as a zero-length reach, which would make length-weighted graph
+    algorithms treat the reach as free, and would put a link-node reach's two
+    break points at the same distance, collapsing them onto one. The two cases
+    cannot be told apart upstream.
     """
-    return length if length is not None else (reach.length or None)
+    return (length if length is not None else reach.length) or None
 
 
 def _has_real_gridpoints(reach: ResultReach) -> bool:
