@@ -30,7 +30,25 @@ def _copy(tmp_path, stem, *suffixes):
 
 
 def _lengths(network):
-    return {reach_id: reach.length for reach_id, reach in network._reaches.items()}
+    """Each reach's length as the graph carries it, summed along its own chain.
+
+    A break point's alias names its reach, and every edge of a reach has one at
+    an end, so the graph alone says how long each reach came out. None where any
+    edge's length is unknown, which is how a reach without a length reads.
+    """
+    graph = network.graph
+    aliases = {node: graph.nodes[node]["alias"] for node in graph.nodes}
+
+    lengths = {}
+    for u, v, length in graph.edges(data="length"):
+        named = [alias[0] for alias in (aliases[u], aliases[v]) if isinstance(alias, tuple)]
+        if not named:
+            # A reach with no break points at all, which no result file yields -
+            # see test_network_breakpoints.py.
+            continue
+        total = lengths.get(named[0], 0.0)
+        lengths[named[0]] = None if None in (total, length) else total + length
+    return lengths
 
 
 class TestWhatOpenAccepts:
