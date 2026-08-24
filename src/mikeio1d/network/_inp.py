@@ -39,7 +39,13 @@ def read_sections(path: str | Path) -> dict[str, list[list[str]]]:
     sections: dict[str, list[list[str]]] = {}
     current: list[list[str]] | None = None
 
-    with open(path, "r", encoding="utf-8", errors="replace") as f:
+    # Read as latin-1 rather than guessed at: every byte maps to one character
+    # and back, so a name spelled in the Windows ANSI codepage - which is what
+    # EPANET writes - survives intact instead of being replaced by U+FFFD. Which
+    # encoding it really was is settled later, by reconciling the names against
+    # the result file, where a candidate can be checked rather than assumed
+    # (see _companions._rekey_by_main_file).
+    with open(path, "r", encoding="latin-1") as f:
         for line in f:
             # A comment can trail a data row, so strip it before anything else.
             line = line.split(";", 1)[0].strip()

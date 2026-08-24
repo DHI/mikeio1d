@@ -60,14 +60,16 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
 
     Parameters
     ----------
-    locations : mapping of str to location
-        The companion file's nodes or reaches.
+    locations : mapping of str to value
+        What the companion file said, keyed by its own spelling of each name:
+        the nodes or reaches of a companion result, or the reach lengths read
+        from an input file.
     known : container of str
         The main file's names for the same kind of location.
 
     Returns
     -------
-    dict of str to location
+    dict of str to value
     """
     rekeyed = {}
     for name in locations:
@@ -284,7 +286,11 @@ def _read_companions(
         elif suffix == ".inp":
             if lengths is not None:
                 raise ValueError("Two '.inp' companions were given; a network can read one.")
-            lengths = _read_companion_lengths(companion)
+            # An '.inp' is read byte-for-byte, so a non-ASCII reach id arrives
+            # spelled the way that file spells it. Reconciled against the result
+            # file, as a companion result's names already are, or the length
+            # would be filed under a name no reach answers to.
+            lengths = _rekey_by_main_file(_read_companion_lengths(companion), res.reaches)
         else:
             raise ValueError(
                 f"'{suffix}' is not a companion a network can read. Expected '.resx' for "

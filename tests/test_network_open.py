@@ -11,6 +11,8 @@ pytest.importorskip("networkx")
 from mikeio1d import Res1D
 from mikeio1d.network import Network
 from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
+from mikeio1d.network._companions import _rekey_by_main_file
+from mikeio1d.network._inp import read_pipe_lengths
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
@@ -116,6 +118,50 @@ class TestCompanionDiscovery:
         shutil.copy(_TESTDATA / "epanet.inp", tmp_path / "model.inp")
 
         assert _lengths(Network.open(res)) == _lengths(Network.open(_RES1D))
+
+
+_NON_ASCII_INP = """
+[PIPES]
+rør1 1 2 250 300 100
+"""
+"""One pipe, named outside ASCII. Fields are whitespace-delimited either way."""
+
+
+class TestAReachIdOutsideAscii:
+    """A non-ASCII reach id survives the '.inp' and still finds its reach.
+
+    EPANET writes its input file in the Windows ANSI codepage, while mikeio1d
+    hands back '.res' names decoded as UTF-8, so one model can spell one reach
+    two ways. Every fixture here is pure ASCII, where the two spellings
+    coincide, so the two halves are tested apart: the read keeps the bytes
+    whichever encoding wrote them, and reconciling against the result file
+    settles which encoding that was.
+    """
+
+    def test_the_codepage_epanet_writes_is_read_as_itself(self, tmp_path):
+        inp = tmp_path / "model.inp"
+        inp.write_bytes(_NON_ASCII_INP.encode("cp1252"))
+
+        assert read_pipe_lengths(inp) == {"rør1": 250.0}
+
+    def test_a_utf8_input_file_is_reconciled_against_the_result(self, tmp_path):
+        """Read one byte at a time, UTF-8 arrives mis-spelled - and repairable."""
+        inp = tmp_path / "model.inp"
+        inp.write_bytes(_NON_ASCII_INP.encode("utf-8"))
+
+        lengths = read_pipe_lengths(inp)
+
+        assert lengths != {"rør1": 250.0}
+        assert _rekey_by_main_file(lengths, {"rør1"}) == {"rør1": 250.0}
+
+    def test_a_name_no_reach_answers_to_keeps_its_own_spelling(self, tmp_path):
+        """So an input file from another model still reads as the mismatch it is."""
+        inp = tmp_path / "model.inp"
+        inp.write_bytes(_NON_ASCII_INP.encode("cp1252"))
+
+        lengths = read_pipe_lengths(inp)
+
+        assert _rekey_by_main_file(lengths, {"10", "9"}) == lengths
 
 
 class TestCompanionErrors:
