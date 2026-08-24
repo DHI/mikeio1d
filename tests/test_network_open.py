@@ -15,6 +15,7 @@ from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSION
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
 _EPANET_RES = str(_TESTDATA / "epanet.res")
+_EPANET_RESX = str(_TESTDATA / "epanet.resx")
 _PIPE, _PUMP = "10", "9"
 _PIPE_LENGTH = 3209.544
 
@@ -155,6 +156,29 @@ class TestExtensionPolicy:
     def test_a_format_res1d_cannot_read_is_refused(self):
         with pytest.raises(NotImplementedError, match="Unsupported file extension"):
             Network.open(str(_TESTDATA / "xsections.xns11"))
+
+
+class TestQuantityFiltering:
+    """Asking for some of a location's quantities, by their MIKE IDs."""
+
+    def _quantities(self, quantities):
+        network = Network.open(_EPANET_RES, companions=[_EPANET_RESX], quantities=quantities)
+        return sorted(network.quantities)
+
+    def test_a_node_quantity_whose_id_is_no_identifier_is_read(self):
+        """A .resx tank carries both Volume and Volume Percentage."""
+        assert self._quantities("Volume Percentage") == ["Volume Percentage"]
+
+    def test_a_reach_quantity_whose_id_is_no_identifier_is_read(self):
+        """A .resx pump carries efficiency, energy and energy costs."""
+        assert self._quantities("Pump energy") == ["Pump energy"]
+
+    def test_two_ids_sharing_a_prefix_stay_apart(self):
+        """'Pump energy' must not also claim the 'Pump energy costs' column."""
+        assert self._quantities(["Pump energy", "Pump energy costs"]) == [
+            "Pump energy",
+            "Pump energy costs",
+        ]
 
 
 def test_pumps_keep_an_unknown_length_even_with_the_inp(tmp_path):
