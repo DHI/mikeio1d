@@ -432,7 +432,9 @@ class Network:
         Returns
         -------
         int | List[int]
-            Node or breakpoint id(s) in the generic network
+            Node or breakpoint id(s) in the generic network. A list argument is
+            answered with a list, even a one-element one; a scalar argument with
+            a scalar.
 
         Raises
         ------
@@ -451,6 +453,11 @@ class Network:
 
         if not by_node and not by_breakpoint:
             raise ValueError("Must specify either 'node' or both 'reach' and 'distance' parameters")
+
+        # The answer keeps the shape of the argument it came from: a caller who
+        # passed a list gets a list back, even a one-element one, so building the
+        # selection programmatically does not change the type of the result.
+        one_answer = not isinstance(node if by_node else distance, list)
 
         ids: list[str | tuple[str, float]]
 
@@ -520,9 +527,7 @@ class Network:
             raise KeyError(
                 f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {set(self._alias_map.keys())}"
             )
-        if len(resolved) == 1:
-            return resolved[0]
-        return resolved
+        return resolved[0] if one_answer else resolved
 
     @overload
     def recall(self, id: int) -> dict[str, Any]:
@@ -543,7 +548,8 @@ class Network:
         Returns
         -------
         Dict[str, Any] | List[Dict[str, Any]]
-            Original coordinates. For single input returns dict, for multiple inputs returns list of dicts.
+            Original coordinates: a dict for a single id, a list of dicts for a
+            list of ids, even a one-element one.
             Dict contains coordinates:
             - For nodes: 'node' key with node id
             - For breakpoints: 'reach' and 'distance' keys with reach id and distance
@@ -555,7 +561,8 @@ class Network:
         ValueError
             If node id string format is invalid
         """
-        if not isinstance(id, list):
+        one_answer = not isinstance(id, list)
+        if one_answer:
             id = [id]
 
         reverse_alias_map = {v: k for k, v in self._alias_map.items()}
@@ -571,10 +578,7 @@ class Network:
             else:
                 results.append({"reach": key[0], "distance": key[1]})
 
-        if len(results) == 1:
-            return results[0]
-        else:
-            return results
+        return results[0] if one_answer else results
 
     def copy(self) -> Network:
         """Create a deep copy of the Network.
