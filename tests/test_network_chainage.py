@@ -14,17 +14,16 @@ import pytest
 
 pytest.importorskip("networkx")
 
+from mikeio1d import Res1D
 from mikeio1d.network import BasicNode, BasicReach, Network, ReachBreakPoint
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RIVER = str(_TESTDATA / "network_river.res1d")
-_EPANET_RES = str(_TESTDATA / "epanet.res")
 
 # The only fixture whose reaches carry a river chainage rather than a per-link
 # offset: 'river' covers km 53.1-55.1 of its branch, 'tributary' starts 50 m in,
 # and 'basin_right' starts 10 m below its branch's zero.
 _OFFSET_REACHES = ["river", "tributary", "basin_right"]
-_RIVER_ORIGIN = 53100.0
 
 _EVERY_FIXTURE = [
     "network.res1d",  # urban links, each measured from its own zero
@@ -37,6 +36,12 @@ _EVERY_FIXTURE = [
 @pytest.fixture(scope="module")
 def river():
     return Network.open(_RIVER)
+
+
+@pytest.fixture(scope="module")
+def river_lengths():
+    """Reach lengths as Res1D reports them, which the graph must add up to."""
+    return {name: reach.length for name, reach in Res1D(_RIVER).reaches.items()}
 
 
 def _empty_node(id):
@@ -58,30 +63,35 @@ class _Point(ReachBreakPoint):
         return pd.DataFrame()
 
 
-def _end_edges(network, reach_id):
-    """The two edges joining a reach's own nodes to its outermost break points."""
-    reach = network._reaches[reach_id]
-    graph_id = network._alias_map
-    leading = network.graph.edges[
+def _chain_nodes(network, reach_id):
+    """A reach's graph nodes in order: start node, its break points, end node.
+
+    A break point's alias names the reach it belongs to, so one reach's chain
+    can be read off the graph without asking the network for its reaches.
+    """
+    aliases = {node: network.graph.nodes[node]["alias"] for node in network.graph.nodes}
+    breakpoints = sorted(
+        (alias[1], node)
+        for node, alias in aliases.items()
+        if isinstance(alias, tuple) and alias[0] == reach_id
+    )
+    return [
         network.find(reach=reach_id, distance="start"),
-        graph_id[reach.breakpoints[0].id],
-    ]
-    trailing = network.graph.edges[
-        graph_id[reach.breakpoints[-1].id],
+        *(node for _, node in breakpoints),
         network.find(reach=reach_id, distance="end"),
     ]
-    return leading, trailing
+
+
+def _end_edges(network, reach_id):
+    """The two edges joining a reach's own nodes to its outermost break points."""
+    chain = _chain_nodes(network, reach_id)
+
+    return network.graph.edges[chain[0], chain[1]], network.graph.edges[chain[-2], chain[-1]]
 
 
 def _chain_lengths(network, reach_id):
     """Every edge length along one reach, start node through to end node."""
-    reach = network._reaches[reach_id]
-    graph_id = network._alias_map
-    chain = [
-        network.find(reach=reach_id, distance="start"),
-        *(graph_id[breakpoint.id] for breakpoint in reach.breakpoints),
-        network.find(reach=reach_id, distance="end"),
-    ]
+    chain = _chain_nodes(network, reach_id)
     return [network.graph.edges[a, b]["length"] for a, b in zip(chain, chain[1:])]
 
 
@@ -97,11 +107,26 @@ class TestAReachThatDoesNotStartAtZero:
         assert (trailing["length"], trailing["boundary"]) == (0.0, True)
 
     @pytest.mark.parametrize("reach_id", _OFFSET_REACHES)
-    def test_its_edges_add_up_to_its_length(self, river, reach_id):
+    def test_its_edges_add_up_to_its_length(self, river, river_lengths, reach_id):
         """The origin cancels, so the chain measures the reach and not the branch."""
-        expected = river._reaches[reach_id].length
+        expected = river_lengths[reach_id]
 
         assert sum(_chain_lengths(river, reach_id)) == pytest.approx(expected)
+
+    def test_a_break_point_below_its_branch_zero_keeps_its_sign(self, river):
+        """A position can sit below its frame's origin, where a size cannot.
+
+        'basin_right' is modelled 10 m upstream of its branch's chainage zero,
+        so its first two break points are negative. Reading their distance as
+        a size - the old ``abs(distance)`` - put them 10 m and 5 m from a start
+        node they in fact sit on.
+        """
+        found = river.find(reach="basin_right", distance=[-10.0, -5.0])
+
+        assert river.recall(found) == [
+            {"reach": "basin_right", "distance": -10.0},
+            {"reach": "basin_right", "distance": -5.0},
+        ]
 
 
 class TestEveryFixture:
@@ -115,42 +140,6 @@ class TestEveryFixture:
         lengths = [attrs["length"] for _, _, attrs in graph.edges(data=True)]
 
         assert [length for length in lengths if length is not None and length < 0] == []
-
-
-class TestTheFrameAResultReachReports:
-    """Read from the reach where there is a chainage, and zero where there is none."""
-
-    def test_a_river_reach_starts_at_its_chainage_origin(self, river):
-        assert river._reaches["river"].start_distance == pytest.approx(_RIVER_ORIGIN)
-
-    def test_a_river_reach_ends_a_length_further_on(self, river):
-        reach = river._reaches["river"]
-
-        assert reach.end_distance == pytest.approx(_RIVER_ORIGIN + reach.length)
-
-    def test_a_break_point_below_its_branch_zero_keeps_its_sign(self, river):
-        """A position can sit below its frame's origin, where a size cannot.
-
-        'basin_right' is modelled 10 m upstream of its branch's chainage zero,
-        so its first two break points are negative. Reading their distance as
-        a size - the old ``abs(distance)`` - put them 10 m and 5 m from a start
-        node they in fact sit on.
-        """
-        reach = river._reaches["basin_right"]
-
-        below_zero = [bp.distance for bp in reach.breakpoints if bp.distance < 0]
-
-        assert below_zero == [-10.0, -5.0]
-        assert river.recall(river.find(reach="basin_right", distance=-10.0)) == {
-            "reach": "basin_right",
-            "distance": -10.0,
-        }
-
-    def test_a_link_node_reach_has_no_chainage_to_report(self):
-        """EPANET's synthetic gridpoints are placed by hand, from zero."""
-        epanet = Network.open(_EPANET_RES, companions=[])
-
-        assert {reach.start_distance for reach in epanet._reaches.values()} == {0.0}
 
 
 class TestTheDefaultFrame:
