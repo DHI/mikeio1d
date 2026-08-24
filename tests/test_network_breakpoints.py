@@ -100,3 +100,21 @@ def test_a_two_gridpoint_reach_keeps_both():
     )
 
     assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0]
+
+
+def test_gridpoints_listed_out_of_order_come_out_ascending():
+    """A reach's segments are listed by the file, in whatever order it likes.
+
+    Break points are documented as ascending and the graph builder counts on
+    it, reading the outermost pair as the reach's ends and each consecutive
+    difference as an edge length. Taken as they come, a reach whose segments
+    were listed downstream-first would get a backwards chain and negative
+    lengths, and nothing would say so.
+    """
+    reach = _Reach("r0", [53200.0, 53100.0, 53300.0])
+
+    breakpoints = _build_reach_breakpoints(
+        reach, length=200.0, quantities=None, populate_gridpoints=False
+    )
+
+    assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0, 53300.0]

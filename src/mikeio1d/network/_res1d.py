@@ -229,7 +229,14 @@ def _build_reach_breakpoints(
     today is a single-gridpoint reach against a single-gridpoint companion.
     """
     if _has_real_gridpoints(reach):
-        unique_gridpoints = reach.gridpoints
+        # Sorted rather than taken as they come: a multi-segment reach reports
+        # its gridpoints one segment at a time, in the order the file lists the
+        # segments, which is not promised to be the order they sit in.
+        # ``NetworkReach.breakpoints`` is documented as ascending, and the graph
+        # builder relies on it - the first and last break point are the reach's
+        # outermost, and consecutive differences are edge lengths, which a
+        # backwards pair would report as negative.
+        unique_gridpoints = sorted(reach.gridpoints, key=lambda gp: gp.chainage)
         distances_per_gridpoint = [[gp.chainage] for gp in unique_gridpoints]
     else:
         unique_gridpoints = reach.gridpoints[:1]
@@ -237,7 +244,9 @@ def _build_reach_breakpoints(
 
     extra_gridpoints: list[ResultGridPoint] = []
     if extra is not None and reach.name in extra.reaches:
-        extra_gridpoints = extra.reaches[reach.name].gridpoints
+        # Sorted the same way, so pairing by index pairs the two files' points
+        # in the same order along the reach.
+        extra_gridpoints = sorted(extra.reaches[reach.name].gridpoints, key=lambda gp: gp.chainage)
 
     breakpoints: list[ReachBreakPoint] = []
     for i, (gp, distances) in enumerate(zip(unique_gridpoints, distances_per_gridpoint)):
