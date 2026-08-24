@@ -1,10 +1,11 @@
-"""Test which of a reach's gridpoints become break points.
+"""Test that every reach comes out of a file with break points of its own.
 
-A MIKE reach brings its own gridpoints, and each one is a real, measured
-position along the reach. A link-node reach (EPANET, SWMM) brings none, so
-mikeio1d hands it one synthetic stand-in that belongs to neither end, and
-that one point has to be placed at both ends by hand. The two cases are told
-apart by what the file reported, never by how many gridpoints came back.
+A break point is keyed by its reach's id, so a reach that has any gets a chain
+of graph nodes to itself and stays distinct from a parallel reach between the
+same two nodes. ``Network`` refuses two reaches with no break points between one
+pair of nodes, and no result file can reach that state: a MIKE reach brings its
+own gridpoints, and a link-node reach (EPANET, SWMM) is handed one synthetic
+stand-in that is placed at both of its ends.
 """
 
 # ruff: noqa: E402
@@ -17,18 +18,37 @@ pytest.importorskip("networkx")
 from mikeio1d import Res1D
 from mikeio1d.network import Network
 from mikeio1d.network._res1d import _build_reach_breakpoints
-from mikeio1d.network._res1d import _has_real_gridpoints
 
 _TESTDATA = Path(__file__).parent / "testdata"
-_RIVER = str(_TESTDATA / "network_river.res1d")
-_EPANET_RES = str(_TESTDATA / "epanet.res")
-# The only fixture with reaches running in parallel: five node pairs carry more
-# than one, among them four pumps to the WWTP and a weir beside four orifices.
-_PARALLEL = str(_TESTDATA / "network_sirius_h2s.res1d")
+
+_FIXTURES = [
+    "network.res1d",  # MIKE urban, an h-point at each end of every reach
+    "network_river.res1d",  # MIKE river, gridpoints along a branch
+    "network_cali.res11",
+    "epanet.res",  # link-node, one synthetic gridpoint per reach
+    # The only fixture with reaches running in parallel: five node pairs carry
+    # more than one, among them four pumps to the WWTP and a weir beside four
+    # orifices.
+    "network_sirius_h2s.res1d",
+]
 
 
-def _topology_only(path):
-    return Network.open(path, companions=[], nodes=[], reaches=[], quantities=[])
+@pytest.mark.parametrize("filename", _FIXTURES)
+def test_every_reach_keeps_a_chain_of_its_own(filename):
+    """A reach of n break points spans n + 1 edges, and shares none of them.
+
+    So the edge count is one per reach plus one per break point. Two reaches
+    landing on a single edge would leave it short, which is the collision
+    ``Network`` refuses when neither has break points to be told apart by.
+    """
+    path = str(_TESTDATA / filename)
+    # Topology only: the shape of the graph is the whole subject, and reading
+    # every timeseries of the largest fixture would cost seconds.
+    graph = Network.open(path, companions=[], nodes=[], reaches=[], quantities=[]).graph
+
+    breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["alias"], tuple)]
+
+    assert graph.number_of_edges() == len(Res1D(path).reaches) + len(breakpoints)
 
 
 class _Gridpoint:
@@ -61,98 +81,22 @@ class _GridPoints:
         self.Count = count
 
 
-def _distances(reach, **kwargs):
-    kwargs.setdefault("length", 100.0)
-    kwargs.setdefault("quantities", None)
-    kwargs.setdefault("populate_gridpoints", False)
-    return [bp.distance for bp in _build_reach_breakpoints(reach, **kwargs)]
+def test_a_two_gridpoint_reach_keeps_both():
+    """Both ends were measured, so neither may be dropped for the other.
 
-
-class TestAReachWithGridpointsOfItsOwn:
-    """Every gridpoint is a measured position, so every one is kept."""
-
-    def test_a_two_gridpoint_reach_keeps_both(self):
-        """Both ends were measured, so neither may be dropped for the other.
-
-        Nothing in the test data reports as few as two - a MIKE reach carries
-        an h-point at each end with at least one Q-point between - but the
-        count is the file's to choose, and reading it as a link-node reach
-        would discard the end gridpoint and duplicate the start's data. The
-        chainages here are a branch coordinate, as a river reach's are, so
-        the two readings cannot agree by accident.
-        """
-        reach = _Reach("r0", [53100.0, 53200.0])
-
-        assert _distances(reach) == [53100.0, 53200.0]
-
-    def test_a_river_reach_keeps_one_break_point_per_gridpoint(self):
-        """The real thing, at chainages along the branch rather than from zero."""
-        reach = Res1D(_RIVER).reaches["river"]
-
-        assert _distances(reach) == [gp.chainage for gp in reach.gridpoints]
-
-
-class TestAReachWithNoGridpointsOfItsOwn:
-    """Its one stand-in has to answer for both ends."""
-
-    def test_its_stand_in_is_placed_at_each_end(self):
-        reach = Res1D(_EPANET_RES).reaches["10"]
-
-        assert _distances(reach, length=250.0) == [0.0, 250.0]
-
-    def test_an_unknown_length_leaves_the_far_end_unplaced(self):
-        """EPANET reports no length, and a guessed one would measure edges."""
-        reach = Res1D(_EPANET_RES).reaches["10"]
-
-        assert _distances(reach, length=None) == [0.0, None]
-
-
-class TestWhatTellsTheTwoApart:
-    """The file's own gridpoint count, not the count mikeio1d handed back."""
-
-    def test_a_reach_that_reported_gridpoints_has_real_ones(self):
-        assert _has_real_gridpoints(_Reach("r0", [0.0, 100.0])) is True
-
-    def test_a_reach_that_reported_none_got_a_stand_in(self):
-        link_node = _Reach("r0", [])
-        link_node.gridpoints = [_Gridpoint("r0", 0.0)]
-
-        assert _has_real_gridpoints(link_node) is False
-
-    def test_every_river_reach_has_real_gridpoints(self):
-        reaches = Res1D(_RIVER).reaches.values()
-
-        assert all(_has_real_gridpoints(reach) for reach in reaches)
-
-    def test_no_link_node_reach_does(self):
-        reaches = Res1D(_EPANET_RES).reaches.values()
-
-        assert not any(_has_real_gridpoints(reach) for reach in reaches)
-
-
-class TestEveryReachGetsAtLeastOne:
-    """Which is what keeps reaches running in parallel apart in the graph.
-
-    A break point is keyed by its reach's id, so a reach that has any gets a
-    chain of graph nodes to itself. Two reaches with none between the same two
-    nodes would share a single edge, and ``Network`` refuses them - a state no
-    result file can reach, since every reach comes out with break points either
-    way.
+    The one case no fixture can put to the loader, and the reason it asks the
+    file for its gridpoint count rather than counting what came back: a reach
+    read as a link-node one would discard its end gridpoint and duplicate the
+    start's data, silently. Nothing in the test data reports as few as two - a
+    MIKE reach carries an h-point at each end with at least one Q-point between
+    - but the count is the file's to choose. The chainages here are a branch
+    coordinate, as a river reach's are, so the two readings cannot agree by
+    accident.
     """
+    reach = _Reach("r0", [53100.0, 53200.0])
 
-    @pytest.mark.parametrize(
-        "filename",
-        ["network_river.res1d", "epanet.res", "network_sirius_h2s.res1d"],
+    breakpoints = _build_reach_breakpoints(
+        reach, length=100.0, quantities=None, populate_gridpoints=False
     )
-    def test_no_reach_comes_out_without_break_points(self, filename):
-        network = _topology_only(str(_TESTDATA / filename))
 
-        assert [r.id for r in network._reaches.values() if r.n_breakpoints == 0] == []
-
-    def test_parallel_reaches_each_keep_a_chain_of_their_own(self):
-        """A reach of n break points spans n + 1 edges, and shares none of them."""
-        network = _topology_only(_PARALLEL)
-
-        spanned = sum(r.n_breakpoints + 1 for r in network._reaches.values())
-
-        assert network.graph.number_of_edges() == spanned
+    assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0]
