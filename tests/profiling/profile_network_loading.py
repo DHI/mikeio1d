@@ -32,6 +32,14 @@ from mikeio1d.network import Network
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
 
+def _at_least_one(value: str) -> int:
+    """An argparse type for a count that cannot be zero."""
+    count = int(value)
+    if count < 1:
+        raise argparse.ArgumentTypeError(f"expected at least 1, got {count}")
+    return count
+
+
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -59,7 +67,9 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--repeat",
-        type=int,
+        # At least one: the report is built from the loads, so none of it exists
+        # without one, and argparse says so better than a NameError does.
+        type=_at_least_one,
         default=3,
         help="How many timed loads to run. The reported figures are the "
         "minimum and median over these.",

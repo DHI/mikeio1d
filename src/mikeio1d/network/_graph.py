@@ -143,5 +143,6 @@ def _build_dataframe(g: nx.Graph) -> pd.DataFrame:
         return pd.DataFrame(index=pd.Index([], name="time"), columns=columns)
     df = pd.concat(data_in_nodes, axis=1)
     df.columns = df.columns.set_names(["node", "quantity"])
-    df.index.name = "time"
-    return df.copy()
+    # rename_axis rather than assigning index.name, which would rename the index
+    # each node's own frame holds where concat handed back a shared one.
+    return df.rename_axis(index="time")

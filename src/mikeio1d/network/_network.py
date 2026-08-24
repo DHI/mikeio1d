@@ -387,7 +387,9 @@ class Network:
         List[str]
             List of quantities
         """
-        return list(self.to_dataframe().columns.get_level_values(1).unique())
+        # Read off _df rather than to_dataframe(), whose copy would duplicate
+        # the whole dataset for the sake of its column labels.
+        return list(self._df.columns.get_level_values("quantity").unique())
 
     @overload
     def find(
