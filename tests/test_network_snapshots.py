@@ -23,7 +23,6 @@ import pytest
 pytest.importorskip("networkx")
 
 from mikeio1d.network import Network
-from mikeio1d.network._inp import read_pipe_lengths
 
 from tests.network_snapshot import describe
 
@@ -118,12 +117,11 @@ def test_loader_output_is_unchanged(case, update_snapshots):
     assert not problems, "\n".join([f"'{case}' has changed:", *problems[:40]])
 
 
-def test_the_inp_reader_ignores_line_endings(tmp_path):
-    """A companion is parsed the same whichever line ending it arrives with.
+def test_a_companion_is_read_the_same_whichever_line_endings_it_has(tmp_path):
+    """The snapshots only transfer if the ``.inp`` parser cannot tell them apart.
 
-    The snapshots came from a repository whose copy of ``epanet.inp`` has CRLF
-    endings, while this one keeps LF. They only transfer if the parser cannot
-    tell the difference.
+    They came from a repository whose copy of ``epanet.inp`` has CRLF endings,
+    while this one keeps LF.
     """
     lf_end, crlf_end = bytes([10]), bytes([13, 10])
     lf = Path(_EPANET_INP).read_bytes().replace(crlf_end, lf_end)
@@ -134,4 +132,6 @@ def test_the_inp_reader_ignores_line_endings(tmp_path):
     as_lf.write_bytes(lf)
     as_crlf.write_bytes(crlf)
 
-    assert read_pipe_lengths(as_lf) == read_pipe_lengths(as_crlf)
+    assert describe(Network.open(_EPANET_RES, companions=[as_lf])) == describe(
+        Network.open(_EPANET_RES, companions=[as_crlf])
+    )
