@@ -44,20 +44,7 @@ _UNSUPPORTED_EXTENSIONS: dict[str, str] = {
 
 
 def _validate_extension(suffix: str) -> None:
-    """Check that a network can be built from a file with this extension.
-
-    Parameters
-    ----------
-    suffix : str
-        The file extension, including its dot.
-
-    Raises
-    ------
-    NotImplementedError
-        If ``Res1D`` cannot read the extension at all, if it can read it but the
-        result holds no network to map, or if it is a format nothing has mapped
-        onto a network yet.
-    """
+    """Check that a network can be built from a file with this extension."""
     extension = suffix.lower()
 
     # Checked before the supported set below, since these all *are* readable by
