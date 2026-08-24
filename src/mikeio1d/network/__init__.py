@@ -18,6 +18,18 @@ Examples
 >>> network.to_dataframe()  # doctest: +SKIP
 """
 
+try:
+    import networkx
+    import xarray
+except ImportError as err:
+    # Checked here rather than left to the first bare import inside the module,
+    # so the message names the extra to install rather than the module that was
+    # missing.
+    raise ImportError(
+        "mikeio1d.network needs networkx and xarray, which the 'network' extra "
+        "installs: pip install mikeio1d[network]"
+    ) from err
+
 from ._network import Network
 from ._types import BasicNode, BasicReach, NetworkNode, NetworkReach, ReachBreakPoint
 
