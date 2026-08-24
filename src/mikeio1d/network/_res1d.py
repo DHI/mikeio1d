@@ -15,7 +15,7 @@ import pandas as pd
 from ..res1d import Res1D
 
 if TYPE_CHECKING:
-    from ..result_network import ResultGridPoint, ResultNode, ResultReach
+    from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
     from ._companions import _Companion
 
 from ._types import NetworkNode, NetworkReach, ReachBreakPoint
@@ -24,6 +24,21 @@ from ._types import NetworkNode, NetworkReach, ReachBreakPoint
 # allocating its own. A large network has two per reach, which profiling showed
 # to be the biggest single cost of a filtered load. Never mutate it in place.
 _EMPTY_DATA = pd.DataFrame()
+
+
+def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> ResultQuantity:
+    """Resolve a MIKE quantity ID to the ResultQuantity holding its timeseries.
+
+    Not the same as ``getattr(node, quantity_id)``. mikeio1d attaches the
+    attribute under a name it has made safe to type, replacing every character
+    that cannot appear in a Python identifier, so an ID such as
+    ``Volume Percentage`` is only reachable as ``Volume_Percentage``. The
+    location's own map is keyed by the ID as the file spells it, which is what
+    ``node.quantities`` reports and what a caller filters on.
+    """
+    # One ResultQuantity per ID on a node or a gridpoint; only a whole reach or a
+    # collection spans several.
+    return node._creator.result_quantity_map[quantity_id][0]
 
 
 def _simplify_colnames(
@@ -52,7 +67,7 @@ def _simplify_colnames(
         # Reading the whole location is one interop call rather than one per quantity.
         df = node.to_dataframe()
     else:
-        df = pd.concat([getattr(node, q).to_dataframe() for q in wanted], axis=1)
+        df = pd.concat([_quantity_at(node, q).to_dataframe() for q in wanted], axis=1)
 
     renamer_dict = {}
     for quantity in wanted:
