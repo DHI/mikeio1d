@@ -20,11 +20,27 @@ import pandas as pd
 import xarray as xr
 
 from ..res1d import Res1D
-from ._companions import _companion_paths, _read_companions
+from ._companions import _companion_paths, _read_companions, _CompanionConflict
 from ._graph import _CHAINAGE_TOLERANCE, _build_dataframe, _generate_alias_map, _generate_graph
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
 from ._types import NetworkReach
+
+
+def _blame_the_companions(res: Res1D, found: Sequence[Any], err: Exception) -> ValueError:
+    """Name the companions in an error about them, for a caller who asked for none.
+
+    A companion found beside the result file has to be named when it turns out
+    to be the problem, or the error points at files the caller did not know were
+    being read.
+    """
+    names = ", ".join(f"'{Path(str(companion)).name}'" for companion in found)
+    return ValueError(
+        f"Failed to build a network from '{Path(str(res.file_path)).name}': {err}\n"
+        f"Companion files read alongside it, because they share its folder: "
+        f"{names}. Pass companions=[] to read the result file on its own, or "
+        "name the companions you want."
+    )
 
 
 class Network:
@@ -222,8 +238,18 @@ class Network:
 
         found, discovered = _companion_paths(res, companions)
 
+        # Each failure that a companion caused is caught where it is raised, so
+        # a fault in the result file itself keeps its own message: advice to
+        # drop the companions cannot help with a topology the result file does
+        # not have.
         try:
             extra, lengths = _read_companions(res, found)
+        except ValueError as err:
+            if not discovered:
+                raise
+            raise _blame_the_companions(res, found, err) from err
+
+        try:
             list_of_reaches = _load_res1d_network(
                 res,
                 nodes_list,
@@ -232,18 +258,10 @@ class Network:
                 lengths=lengths,
                 quantities=quantities_set,
             )
-        except ValueError as err:
+        except _CompanionConflict as err:
             if not discovered:
                 raise
-            # A companion nobody asked for must be named when it fails, or the
-            # error points at files the caller did not know were being read.
-            names = ", ".join(f"'{Path(str(companion)).name}'" for companion in found)
-            raise ValueError(
-                f"Failed to build a network from '{Path(str(res.file_path)).name}': {err}\n"
-                f"Companion files read alongside it, because they share its folder: "
-                f"{names}. Pass companions=[] to read the result file on its own, or "
-                "name the companions you want."
-            ) from err
+            raise _blame_the_companions(res, found, err) from err
 
         return cls(list_of_reaches)
 

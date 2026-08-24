@@ -25,6 +25,16 @@ _COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
 _COMPANION_ENCODINGS = ("cp1252", "latin-1")
 
 
+class _CompanionConflict(ValueError):
+    """A companion file and the result file both carry the same quantity.
+
+    Raised while the network is being built rather than while the companion is
+    being read, so it is told apart from a fault in the result file itself: a
+    caller who never asked for the companion has to be told which files were
+    read alongside, and only for the failures a companion caused.
+    """
+
+
 def _repair_mis_decoded(name: str) -> list[str]:
     """Re-read a name as UTF-8, undoing a single-byte decoding of those bytes.
 

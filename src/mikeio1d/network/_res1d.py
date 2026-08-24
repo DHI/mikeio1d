@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from ..res1d import Res1D
+from ._companions import _CompanionConflict
 
 if TYPE_CHECKING:
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
@@ -103,7 +104,7 @@ def _merge_extra_quantities(
 
     Raises
     ------
-    ValueError
+    _CompanionConflict
         If a quantity appears in both frames. Concatenating would give the
         location two columns of the same name, which is the state
         ``_simplify_colnames`` already refuses.
@@ -113,7 +114,7 @@ def _merge_extra_quantities(
 
     overlapping = base.columns.intersection(extra.columns)
     if len(overlapping) > 0:
-        raise ValueError(
+        raise _CompanionConflict(
             f"Location {location_id!r} already has {sorted(overlapping)} in the "
             "main result file, so the companion file's copy cannot be merged in."
         )

@@ -9,9 +9,9 @@ import pytest
 pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
-from mikeio1d.network import Network
+from mikeio1d.network import Network, _network
 from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
-from mikeio1d.network._companions import _rekey_by_main_file
+from mikeio1d.network._companions import _CompanionConflict, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
 
 _TESTDATA = Path(__file__).parent / "testdata"
@@ -29,6 +29,15 @@ def _copy(tmp_path, stem, *suffixes):
     for suffix in suffixes:
         shutil.copy(_TESTDATA / f"{stem}{suffix}", tmp_path / f"model{suffix}")
     return tmp_path / f"model{suffixes[0]}"
+
+
+def _raise(error):
+    """A stand-in for a loader that fails, for the sake of the error path."""
+
+    def fail(*args, **kwargs):
+        raise error
+
+    return fail
 
 
 def _lengths(network):
@@ -186,6 +195,33 @@ class TestCompanionErrors:
         (tmp_path / "model.inp").write_text("[JUNCTIONS]\n", encoding="utf-8")
 
         with pytest.raises(ValueError, match="model.inp") as excinfo:
+            Network.open(res)
+
+        assert "companions=[]" in str(excinfo.value)
+
+    def test_a_fault_in_the_result_file_is_not_blamed_on_them(self, tmp_path, monkeypatch):
+        """Dropping the companions cannot fix a topology the result file lacks.
+
+        The blame is attached where a companion failure is raised, rather than
+        around the whole load, so an error from the result file itself arrives
+        with its own message and no advice that cannot help.
+        """
+        res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
+        monkeypatch.setattr(_network, "_load_res1d_network", _raise(ValueError("no start node")))
+
+        with pytest.raises(ValueError, match="no start node") as excinfo:
+            Network.open(res)
+
+        assert "companions=[]" not in str(excinfo.value)
+
+    def test_a_conflict_raised_while_loading_still_names_them(self, tmp_path, monkeypatch):
+        """A companion's quantity colliding with the main file's is their fault."""
+        res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
+        monkeypatch.setattr(
+            _network, "_load_res1d_network", _raise(_CompanionConflict("already has Volume"))
+        )
+
+        with pytest.raises(ValueError, match="model.resx") as excinfo:
             Network.open(res)
 
         assert "companions=[]" in str(excinfo.value)
