@@ -139,7 +139,8 @@ def _describe_graph(network: Any) -> dict[str, Any]:
         "edges": edges,
         "nodes": nodes,
         "alias_map": {
-            _alias_key(alias): int(node_id) for alias, node_id in network._alias_map.items()
+            _alias_key(alias): int(node_id)
+            for node_id, alias in network.graph.nodes(data="alias")
         },
     }
 
@@ -222,7 +223,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
         all, which is behaviour recorded under ``reaches`` instead.
     """
     found = {}
-    for alias in network._alias_map:
+    for _, alias in network.graph.nodes(data="alias"):
         if isinstance(alias, tuple):
             reach, distance = alias
             if distance is None:
@@ -238,7 +239,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
             endpoints[f"{reach_id}@{where}"] = int(network.find(reach=reach_id, distance=where))
 
     recalled = {}
-    for node_id in sorted(network._alias_map.values()):
+    for node_id in sorted(network.graph.nodes()):
         entry = dict(network.recall(int(node_id)))
         if "distance" in entry:
             entry["distance"] = _num(entry["distance"])

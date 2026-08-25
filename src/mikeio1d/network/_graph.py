@@ -23,12 +23,8 @@ from collections.abc import Sequence
 import networkx as nx
 import pandas as pd
 
+from ._naming import _CHAINAGE_TOLERANCE
 from ._types import NetworkReach
-
-# Tolerance for comparing along-reach chainage/distance values, in whatever
-# distance unit the network uses. Shared between find()'s breakpoint lookup
-# and _generate_graph's boundary-edge detection.
-_CHAINAGE_TOLERANCE = 1e-3
 
 
 def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
@@ -128,10 +124,6 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             )
 
     return nx.convert_node_labels_to_integers(g0, label_attribute="alias")
-
-
-def _generate_alias_map(g: nx.Graph) -> dict[str | tuple[str, float], int]:
-    return {g.nodes[id]["alias"]: id for id in g.nodes()}
 
 
 def _build_dataframe(g: nx.Graph) -> pd.DataFrame:

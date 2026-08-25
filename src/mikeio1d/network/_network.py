@@ -21,7 +21,7 @@ import xarray as xr
 
 from ..res1d import Res1D
 from ._companions import _companion_paths, _read_companions, _CompanionConflict
-from ._graph import _CHAINAGE_TOLERANCE, _build_dataframe, _generate_alias_map, _generate_graph
+from ._graph import _build_dataframe, _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
@@ -55,7 +55,6 @@ class Network:
         self._initialize_network_attributes(_generate_graph(reaches))
 
     def _initialize_network_attributes(self, graph: nx.Graph):
-        self._alias_map = _generate_alias_map(graph)
         self._df = _build_dataframe(graph)
         self._graph = graph.copy()
         self._naming = _Naming(self._graph, self._reaches)
@@ -508,7 +507,7 @@ class Network:
         missing_ids = [ids[i] for i, v in enumerate(resolved) if v is None]
         if missing_ids:
             raise KeyError(
-                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {set(self._alias_map.keys())}"
+                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {set(self._naming.aliases)}"
             )
         return resolved[0] if one_answer else resolved
 
