@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Overview – MIKE IO 1D</title>
+<title>network.network – MIKE IO 1D</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -64,14 +64,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/network.html" rel="next">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -82,8 +81,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-d5382f61a7c05c0e60b360404eaa31c2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
-<link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -111,9 +108,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -175,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Overview</h1>
+          <h1 class="quarto-secondary-nav-title"></h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -196,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link active">
+            <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">User Guide</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -205,7 +199,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
@@ -304,388 +298,514 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d" class="nav-link active" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d"><i class="fa-solid fa-circle-nodes" aria-label="circle-nodes"></i> Res1D</a></li>
-  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations"><i class="fa-solid fa-map-pin" aria-label="map-pin"></i> Locations</a></li>
-  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities"><i class="fa-solid fa-chart-line" aria-label="chart-line"></i> Quantities</a></li>
-  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11"><i class="fa-solid fa-bridge-water" aria-label="bridge-water"></i> Xns11</a></li>
-  <li><a href="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources" id="toc-b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources" class="nav-link" data-scroll-target="#b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources"><i class="fa-solid fa-book" aria-label="book"></i> Additional resources</a></li>
+  <li><a href="#mikeio1d.network.Network" id="toc-mikeio1d.network.Network" class="nav-link active" data-scroll-target="#mikeio1d.network.Network">network.Network</a>
+  <ul class="collapse">
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#mikeio1d.network.Network.copy" id="toc-mikeio1d.network.Network.copy" class="nav-link" data-scroll-target="#mikeio1d.network.Network.copy">copy</a></li>
+  <li><a href="#mikeio1d.network.Network.find" id="toc-mikeio1d.network.Network.find" class="nav-link" data-scroll-target="#mikeio1d.network.Network.find">find</a></li>
+  <li><a href="#mikeio1d.network.Network.open" id="toc-mikeio1d.network.Network.open" class="nav-link" data-scroll-target="#mikeio1d.network.Network.open">open</a></li>
+  <li><a href="#mikeio1d.network.Network.recall" id="toc-mikeio1d.network.Network.recall" class="nav-link" data-scroll-target="#mikeio1d.network.Network.recall">recall</a></li>
+  <li><a href="#mikeio1d.network.Network.to_dataframe" id="toc-mikeio1d.network.Network.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.network.Network.to_dataframe">to_dataframe</a></li>
+  <li><a href="#mikeio1d.network.Network.to_dataset" id="toc-mikeio1d.network.Network.to_dataset" class="nav-link" data-scroll-target="#mikeio1d.network.Network.to_dataset">to_dataset</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/overview.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="overview.ipynb" download="overview.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.Network.ipynb" download="network.Network.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title d-none d-lg-block">Overview</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d" class="level2">
-<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120636972636c652d6e6f646573203e7d7d-res1d"><i class="fa-solid fa-circle-nodes" aria-label="circle-nodes"></i> Res1D</h2>
-<p><a href="../user-guide/res1d.html">Res1D</a> is the main interface for accessing data on a <a href="../user-guide/network.html">Network</a>.</p>
-<div id="5ff8bafc" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mikeio1d</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">'../data/network.res1d'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>&lt;mikeio1d.Res1D&gt;</code></pre>
-</div>
-</div>
-</section>
-<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations" class="level2">
-<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206d61702d70696e203e7d7d-locations"><i class="fa-solid fa-map-pin" aria-label="map-pin"></i> Locations</h2>
-<p><a href="../user-guide/locations.html">Locations</a> are where model results exist in the network. The main location types are <a href="../api/result_network.ResultNodes.html#mikeio1d.result_network.ResultNodes">nodes</a>, <a href="../api/result_network.ResultReaches.html#mikeio1d.result_network.ResultReaches">reaches</a>, and <a href="../api/result_network.ResultCatchments.html#mikeio1d.result_network.ResultCatchments">catchments</a>. Each of these location types are accessible via a <a href="../api/Res1D.html#mikeio1d.Res1D"><code>Res1D</code></a> object.</p>
-<div id="0ba31993" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res.nodes</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-&lt;ResultNodes&gt; (119)
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
-</div>
-</div>
-<p>Specific <a href="../api/result_network.ResultLocation.html#mikeio1d.result_network.ResultLocation">locations</a> are accessible via their unique ID.</p>
-<div id="31e25576" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-&lt;Manhole: 101&gt;
-    <style>
-        ul {
-            margin: 0px;
-            padding: 0px;
-            padding-left: 2em;
-        }
-    </style>
-    <details><summary>Attributes (8)</summary><ul><li>id: 101</li><li>type: Manhole</li><li>xcoord: -687859.5004882812</li><li>ycoord: -1056308.700012207</li><li>ground_level: 196.67999267578125</li><li>bottom_level: 195.92999267578125</li><li>critical_level: inf</li><li>diameter: 1.0</li></ul></details><details><summary>Quantities (1)</summary><ul><li>Water level (m)</li></ul></details><details><summary>Derived Quantities (3)</summary><ul><li>NodeFlooding</li><li>NodeWaterDepth</li><li>NodeWaterLevelAboveCritical</li></ul></details>
-</div>
-</div>
-</section>
-<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities" class="level2">
-<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c2066612063686172742d6c696e65203e7d7d-quantities"><i class="fa-solid fa-chart-line" aria-label="chart-line"></i> Quantities</h2>
-<p><a href="../user-guide/quantities.html">Quantities</a> are the actual model results, which can be read into a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a> or plotted directly.</p>
-<div id="63009f2a" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.nodes[<span class="st">'101'</span>].WaterLevel.read()</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<section id="mikeio1d.network.Network" class="level1">
+<h1>network.Network</h1>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.Network(<span class="va">self</span>, reaches)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A network of nodes and reaches, addressable by the names it came with.</p>
+<p>A result file names a location the way the model did: a node id, or a reach and a distance along it. A graph needs one flat set of integers. A Network holds both - :attr:<code>graph</code> is the integer-labelled graph carrying the timeseries each location holds, and :meth:<code>find</code> and :meth:<code>recall</code> translate between the two namings.</p>
+<p>Build one with :meth:<code>open</code>, which reads a result file, or by handing the constructor a sequence of :class:<code>~mikeio1d.network.NetworkReach</code>.</p>
+<section id="attributes" class="level2">
+<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">WaterLevel:101</th>
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">1994-08-07 16:35:00.000</th>
-<td>195.931503</td>
+<td><a href="#mikeio1d.network.Network.graph">graph</a></td>
+<td>Graph of the network.</td>
 </tr>
 <tr class="even">
-<th data-quarto-table-cell-role="th">1994-08-07 16:36:01.870</th>
-<td>195.931595</td>
+<td><a href="#mikeio1d.network.Network.quantities">quantities</a></td>
+<td>Quantities present in data.</td>
 </tr>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">1994-08-07 16:37:07.560</th>
-<td>195.931625</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">1994-08-07 16:38:55.828</th>
-<td>195.931656</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">1994-08-07 16:39:55.828</th>
-<td>195.931656</td>
+<td><a href="#mikeio1d.network.Network.reaches">reaches</a></td>
+<td>The network’s reaches, by the id the model gave them.</td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
-<div id="eb0d22ea" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res.nodes[<span class="st">'101'</span>].WaterLevel.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="overview_files/figure-html/cell-6-output-1.png" width="607" height="416" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p><a href="../api/result_network.ResultQuantityCollection.html#mikeio1d.result_network.ResultQuantityCollection">Quantity collections</a> enable reading a specific quantity for many locations at once.</p>
-<div id="86761fa9" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> res.reaches.Discharge.read()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.describe().T.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">count</th>
-<th data-quarto-table-cell-role="th">mean</th>
-<th data-quarto-table-cell-role="th">std</th>
-<th data-quarto-table-cell-role="th">min</th>
-<th data-quarto-table-cell-role="th">25%</th>
-<th data-quarto-table-cell-role="th">50%</th>
-<th data-quarto-table-cell-role="th">75%</th>
-<th data-quarto-table-cell-role="th">max</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Discharge:100l1:23.8414</th>
-<td>110.0</td>
-<td>0.014078</td>
-<td>0.026875</td>
-<td>0.000006</td>
-<td>0.000636</td>
-<td>0.001032</td>
-<td>0.005988</td>
-<td>0.099751</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">Discharge:101l1:33.218</th>
-<td>110.0</td>
-<td>-0.000034</td>
-<td>0.005649</td>
-<td>-0.022655</td>
-<td>0.000004</td>
-<td>0.000005</td>
-<td>0.000022</td>
-<td>0.019202</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Discharge:102l1:5.46832</th>
-<td>110.0</td>
-<td>0.069058</td>
-<td>0.100331</td>
-<td>-0.011316</td>
-<td>0.003062</td>
-<td>0.017987</td>
-<td>0.096062</td>
-<td>0.326383</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">Discharge:103l1:13.0327</th>
-<td>110.0</td>
-<td>-0.000011</td>
-<td>0.001084</td>
-<td>-0.006748</td>
-<td>0.000002</td>
-<td>0.000017</td>
-<td>0.000337</td>
-<td>0.001056</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Discharge:104l1:17.2065</th>
-<td>110.0</td>
-<td>0.000005</td>
-<td>0.000002</td>
-<td>0.000003</td>
-<td>0.000005</td>
-<td>0.000005</td>
-<td>0.000005</td>
-<td>0.000025</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
 </section>
-<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11" class="level2">
-<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206661206272696467652d7761746572203e7d7d-xns11"><i class="fa-solid fa-bridge-water" aria-label="bridge-water"></i> Xns11</h2>
-<p><a href="../user-guide/xns11.html">Xns11</a> is the main interface for accessing cross section data.</p>
-<div id="21dfdfaa" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>xns <span class="op">=</span> mikeio1d.<span class="bu">open</span>(<span class="st">'../data/mikep_cs_demo.xns11'</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>xns[<span class="st">'basin_left1'</span>,<span class="st">'122.042'</span>,<span class="st">'1'</span>].plot(with_marker_labels<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="overview_files/figure-html/cell-8-output-1.png" width="602" height="451" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Access a cross section’s <a href="../api/cross_sections.CrossSection.html#mikeio1d.cross_sections.CrossSection.raw"><code>raw</code></a> info as a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a>.</p>
-<div id="1091977b" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> xns[<span class="st">'basin_left1'</span>,<span class="st">'122.042'</span>,<span class="st">'1'</span>].raw</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">markers</th>
-<th data-quarto-table-cell-role="th">marker_labels</th>
-<th data-quarto-table-cell-role="th">x</th>
-<th data-quarto-table-cell-role="th">z</th>
-<th data-quarto-table-cell-role="th">resistance</th>
+<th>Name</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">0</th>
-<td></td>
-<td></td>
-<td>0.000</td>
-<td>6059.508</td>
-<td>25.0</td>
+<td><a href="#mikeio1d.network.Network.copy">copy</a></td>
+<td>Create a deep copy of the Network.</td>
 </tr>
 <tr class="even">
-<th data-quarto-table-cell-role="th">1</th>
-<td></td>
-<td></td>
-<td>2.062</td>
-<td>6059.624</td>
-<td>25.0</td>
+<td><a href="#mikeio1d.network.Network.find">find</a></td>
+<td>Find node or breakpoint id in the Network object based on former coordinates.</td>
 </tr>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">2</th>
-<td>1</td>
-<td>Left Levee Bank (1)</td>
-<td>4.124</td>
-<td>6059.754</td>
-<td>25.0</td>
+<td><a href="#mikeio1d.network.Network.open">open</a></td>
+<td>Read a network from a result file.</td>
 </tr>
 <tr class="even">
-<th data-quarto-table-cell-role="th">3</th>
-<td></td>
-<td></td>
-<td>6.186</td>
-<td>6059.607</td>
-<td>25.0</td>
+<td><a href="#mikeio1d.network.Network.recall">recall</a></td>
+<td>Recover the original coordinates of an element given the node id(s) in the Network object.</td>
 </tr>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">4</th>
-<td></td>
-<td></td>
-<td>14.435</td>
-<td>6058.882</td>
-<td>25.0</td>
+<td><a href="#mikeio1d.network.Network.to_dataframe">to_dataframe</a></td>
+<td>Dataframe using node ids as column names.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.network.Network.to_dataset">to_dataset</a></td>
+<td>Dataset of the timeseries, with each node’s original identity alongside.</td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
-<p>Access a cross section’s <a href="../api/cross_sections.CrossSection.html#mikeio1d.cross_sections.CrossSection.processed"><code>processed</code></a> info as a <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame"><code>DataFrame</code></a>.</p>
-<div id="77e6263d" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> xns[<span class="st">'basin_left1'</span>,<span class="st">'122.042'</span>,<span class="st">'1'</span>].processed</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<section id="mikeio1d.network.Network.copy" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.copy">copy</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>network.Network.copy()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create a deep copy of the Network.</p>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">level</th>
-<th data-quarto-table-cell-role="th">flow_area</th>
-<th data-quarto-table-cell-role="th">radius</th>
-<th data-quarto-table-cell-role="th">storage_width</th>
-<th data-quarto-table-cell-role="th">additional_storage_area</th>
-<th data-quarto-table-cell-role="th">resistance</th>
-<th data-quarto-table-cell-role="th">conveyance_factor</th>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<th data-quarto-table-cell-role="th">0</th>
-<td>6052.803000</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>0.0</td>
-<td>25.0</td>
-<td>0.000000</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">1</th>
-<td>6052.944857</td>
-<td>0.160191</td>
-<td>0.075978</td>
-<td>2.743476</td>
-<td>0.0</td>
-<td>25.0</td>
-<td>0.718409</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2</th>
-<td>6053.086714</td>
-<td>0.790062</td>
-<td>0.165315</td>
-<td>6.136873</td>
-<td>0.0</td>
-<td>25.0</td>
-<td>5.949433</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">3</th>
-<td>6053.228571</td>
-<td>3.633195</td>
-<td>0.172199</td>
-<td>29.866016</td>
-<td>0.0</td>
-<td>25.0</td>
-<td>28.113531</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">4</th>
-<td>6053.370429</td>
-<td>9.264321</td>
-<td>0.251109</td>
-<td>50.128968</td>
-<td>0.0</td>
-<td>25.0</td>
-<td>92.185348</td>
+<td></td>
+<td>Network</td>
+<td>Deep copy of the Network object</td>
 </tr>
 </tbody>
 </table>
-
-</div>
-</div>
-</div>
 </section>
-<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources" class="level2">
-<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c20666120626f6f6b203e7d7d-additional-resources"><i class="fa-solid fa-book" aria-label="book"></i> Additional resources</h2>
+</section>
+<section id="mikeio1d.network.Network.find" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.find">find</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>network.Network.find(node<span class="op">=</span><span class="va">None</span>, reach<span class="op">=</span><span class="va">None</span>, distance<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Find node or breakpoint id in the Network object based on former coordinates.</p>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 23%">
+<col style="width: 63%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>node</td>
+<td>str | List[str]</td>
+<td>Node id(s) in the original network, by default None</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>reach</td>
+<td>str | List[str]</td>
+<td>Reach id(s) for breakpoint lookup or reach endpoint lookup, by default None</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>distance</td>
+<td>str | float | List[str | float]</td>
+<td>Distance(s) along reach for breakpoint lookup, or “start”/“end” for reach endpoints, by default None</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 11%">
+<col style="width: 84%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>int | List[int]</td>
+<td>Node or breakpoint id(s) in the generic network. A list argument is answered with a list, even a one-element one; a scalar argument with a scalar.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>ValueError</td>
+<td>If invalid combination of parameters is provided</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>KeyError</td>
+<td>If requested node/breakpoint is not found in the network</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.network.Network.open" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.open">open</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>network.Network.<span class="bu">open</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    res,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    companions<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    nodes<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    reaches<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    quantities<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read a network from a result file.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 1%">
+<col style="width: 5%">
+<col style="width: 91%">
+<col style="width: 1%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>res</td>
+<td>(str, Path or Res1D)</td>
+<td>Path to a <code>.res1d</code>, <code>.res11</code> or <code>.res</code> result file, or an already-opened :class:<code>~mikeio1d.Res1D</code>.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>companions</td>
+<td>sequence of str, Path or Res1D, or None</td>
+<td>Files read alongside the result and recognised by their extension: * <code>.resx</code> – extra EPANET results for the same network. Its node quantities (tank <code>Volume</code> and <code>Volume Percentage</code>) are merged onto the matching nodes, and its reach quantities (pump <code>efficiency</code>, <code>energy</code> and <code>energy costs</code>) onto the matching reach’s breakpoints. * <code>.inp</code> – the EPANET input file, read for its <code>[PIPES]</code> lengths. No result file carries a reach length, so without this one no reach has one. <code>None</code> <em>(default)</em> looks for them beside the result file, matching its folder and stem; <code>[]</code> reads none; a list reads exactly those. Only EPANET results are looked beside.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>nodes</td>
+<td>str, list of str, or None</td>
+<td>Controls which nodes have their timeseries data loaded into memory. * <code>None</code> <em>(default)</em> – data is loaded for every node. * A single node ID or a list of node IDs – only those nodes get data; others are topology-only. * <code>[]</code> (empty list) – no node data is loaded at all. The full network topology is always constructed regardless of this setting, so <code>find()</code> and <code>recall()</code> still work on all nodes.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>reaches</td>
+<td>str, list of str, or None</td>
+<td>Controls which reaches have their intermediate gridpoint data populated. * <code>None</code> <em>(default)</em> – gridpoints are populated for every reach. * A single reach name or a list of reach names – only those reaches get gridpoint data; others are topology-only. * <code>[]</code> (empty list) – no gridpoint data is loaded at all. EPANET reaches have at most one gridpoint (see Notes), but this argument still governs whether its data, and any matching <code>.resx</code> reach quantities, are populated.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>quantities</td>
+<td>str, list of str, or None</td>
+<td>Controls which quantities are read at each selected location. * <code>None</code> <em>(default)</em> – every quantity is read. * A single quantity name or a list of names – only those are read. * <code>[]</code> (empty list) – no data is read at all. A location that does not carry a requested quantity becomes topology-only rather than an error, so this composes with <code>nodes</code> and <code>reaches</code> on files where nodes and reaches hold different quantities.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>Network</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-1" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-1">Raises</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 10%">
+<col style="width: 85%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>NotImplementedError</td>
+<td>If no network can be built from the file’s extension.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>ValueError</td>
+<td>If a companion has an extension this reader does not know, if two companions of the same kind are given, or if a <code>.resx</code> does not come from the same run as the result file.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"model.res1d"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Load data only for the two nodes where observations exist, and skip all intermediate gridpoint data to keep memory usage low:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>...     <span class="st">"model.res1d"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>...     nodes<span class="op">=</span>[<span class="st">"node_a"</span>, <span class="st">"node_b"</span>],</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>...     reaches<span class="op">=</span>[],</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>... )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read a single quantity, for a calibration loop that only scores discharge:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"model.res1d"</span>, quantities<span class="op">=</span><span class="st">"Discharge"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Name the companions rather than letting them be found:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>...     <span class="st">"model.res"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>...     companions<span class="op">=</span>[<span class="st">"other.resx"</span>, <span class="st">"other.inp"</span>],</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>... )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="notes" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h4>
+<p>MIKE 11 keeps its timeseries on reach gridpoints rather than on nodes, so the nodes of a <code>.res11</code> network carry no data of their own. Pass <code>reaches</code> rather than <code>nodes</code> to control what gets loaded.</p>
+<p>An EPANET reach carries one synthetic gridpoint, which mikeio1d gives a breakpoint at each end so that the reach’s own quantities (<code>Flow</code>, <code>Velocity</code>, …) are reachable the way a MIKE reach’s end data is. As a result:</p>
 <ul>
-<li><a href="https://nbviewer.jupyter.org/github/DHI/mikeio1d/tree/main/notebooks/">Example notebooks</a></li>
-<li><a href="https://github.com/DHI/mikeio1d/tree/main/tests">Unit tests</a></li>
-<li><a href="http://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/">MIKE 1D API</a></li>
+<li>without the <code>.inp</code>, a reach’s length is unknown, so only its first breakpoint (<code>distance=0.0</code>) is real; the second is not addressable by distance at all – <code>find(reach=..., distance=...)</code> resolves it only via <code>distance="start"</code>/<code>"end"</code> (which return the node, not the breakpoint), or not at all by a number. The corresponding edges of :attr:<code>graph</code> are <code>length=None</code></li>
+<li>with the <code>.inp</code>, a pipe’s second breakpoint sits at its full length – both breakpoints are then addressable by distance, and the edge between them carries the pipe’s real length. Pumps and valves keep an unaddressable second breakpoint even so, since <code>[PIPES]</code> is the only section carrying lengths</li>
 </ul>
+<p>Node timeseries, :meth:<code>to_dataframe</code>, :meth:<code>to_dataset</code>, <code>find(node=...)</code> and :meth:<code>recall</code> are unaffected.</p>
+</section>
+</section>
+<section id="mikeio1d.network.Network.recall" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.recall">recall</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>network.Network.recall(<span class="bu">id</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Recover the original coordinates of an element given the node id(s) in the Network object.</p>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 26%">
+<col style="width: 46%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>id</td>
+<td>int | List[int]</td>
+<td>Node id(s) in the generic network</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 15%">
+<col style="width: 81%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>Dict[str, Any] | List[Dict[str, Any]]</td>
+<td>Original coordinates: a dict for a single id, a list of dicts for a list of ids, even a one-element one. Dict contains coordinates: - For nodes: ‘node’ key with node id - For breakpoints: ‘reach’ and ‘distance’ keys with reach id and distance</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-2" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-2">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>KeyError</td>
+<td>If node id is not found in the network</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.network.Network.to_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.to_dataframe">to_dataframe</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_dataframe(sel<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dataframe using node ids as column names.</p>
+<p>It will be multiindex unless ‘sel’ is passed.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 23%">
+<col style="width: 50%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sel</td>
+<td>Optional[str]</td>
+<td>Quantity to select, by default None</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-4" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Timeseries contained in graph nodes</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.network.Network.to_dataset" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.to_dataset">to_dataset</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_dataset()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dataset of the timeseries, with each node’s original identity alongside.</p>
+<section id="returns-5" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-5">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 1%">
+<col style="width: 2%">
+<col style="width: 96%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>xr.Dataset</td>
+<td>One variable per quantity over <code>(time, node)</code>. <code>node</code> is the integer index the graph uses, and the <code>name</code>, <code>reach</code> and <code>distance</code> coordinates carry the names the model gave the same locations, so a consumer never has to hold on to the network to know what a column is:: Coordinates: * time datetime64 * node int64 0 1 2 3 … name &lt;U16 ‘J1’ ‘J2’ ’’ ’’ reach &lt;U16 ’’ ’’ ‘r1’ ‘r1’ distance float64 nan nan 0.0 24.5 Empty when no location carries data.</td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -1089,15 +1209,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
   });
   </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../user-guide/network.html" class="pagination-link" aria-label="Network">
-        <span class="nav-page-text">Network</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -1106,7 +1217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>   
     <div class="nav-footer-center">
 <p>© 2024 DHI Group</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/overview.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+</div>
     <div class="nav-footer-right">
       &nbsp;
     </div>

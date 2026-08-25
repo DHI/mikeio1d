@@ -270,6 +270,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#locations" id="toc-locations" class="nav-link" data-scroll-target="#locations">Locations</a></li>
   <li><a href="#quantities" id="toc-quantities" class="nav-link" data-scroll-target="#quantities">Quantities</a></li>
   <li><a href="#cross-sections" id="toc-cross-sections" class="nav-link" data-scroll-target="#cross-sections">Cross sections</a></li>
+  <li><a href="#network" id="toc-network" class="nav-link" data-scroll-target="#network">Network</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
@@ -378,6 +379,38 @@ ul.task-list li input[type="checkbox"] {
 <tr class="even">
 <td><a href="../api/cross_sections.CrossSectionCollection.html#mikeio1d.cross_sections.CrossSectionCollection">cross_sections.CrossSectionCollection</a></td>
 <td>A collection of CrossSection objects.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="network" class="level2">
+<h2 class="anchored" data-anchor-id="network">Network</h2>
+<p>Provisional. Needs the network extra, and may still change shape.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="../api/network.Network.html#mikeio1d.network.Network">network.Network</a></td>
+<td>A network of nodes and reaches, addressable by the names it came with.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/network.NetworkNode.html#mikeio1d.network.NetworkNode">network.NetworkNode</a></td>
+<td>Abstract base class for a node in a network.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/network.NetworkReach.html#mikeio1d.network.NetworkReach">network.NetworkReach</a></td>
+<td>Abstract base class for a reach in a network.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/network.ReachBreakPoint.html#mikeio1d.network.ReachBreakPoint">network.ReachBreakPoint</a></td>
+<td>Abstract base class for an intermediate break point along a network reach.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/network.BasicNode.html#mikeio1d.network.BasicNode">network.BasicNode</a></td>
+<td>Concrete :class:<code>NetworkNode</code> for programmatic network construction.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/network.BasicReach.html#mikeio1d.network.BasicReach">network.BasicReach</a></td>
+<td>Concrete :class:<code>NetworkReach</code> for programmatic network construction.</td>
 </tr>
 </tbody>
 </table>
