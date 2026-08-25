@@ -506,9 +506,8 @@ class Network:
         resolved = [self._naming.id_of(id) for id in ids]
         missing_ids = [ids[i] for i, v in enumerate(resolved) if v is None]
         if missing_ids:
-            raise KeyError(
-                f"Node/breakpoint(s) {missing_ids} not found in the network. Available nodes are {set(self._naming.aliases)}"
-            )
+            details = "; ".join(f"{id!r} - {self._naming.describe_miss(id)}" for id in missing_ids)
+            raise KeyError(f"Not found in the network: {details}")
         return resolved[0] if one_answer else resolved
 
     @overload

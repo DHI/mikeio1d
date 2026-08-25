@@ -14,6 +14,7 @@ it for the lifetime of the network; :meth:`~mikeio1d.network.Network.find`,
 from __future__ import annotations
 
 from collections.abc import Mapping
+from difflib import get_close_matches
 
 import networkx as nx
 import numpy as np
@@ -152,3 +153,31 @@ class _Naming:
             "reach": ("node", np.array(reaches, dtype=str)),
             "distance": ("node", np.array(distances, dtype=float)),
         }
+
+    def describe_miss(self, alias: Alias, limit: int = 5) -> str:
+        """Say what the network holds nearest to an alias it does not.
+
+        An error that lists every name in the network is unreadable on a real
+        model - the ``network.res1d`` fixture has some fifteen thousand - so the
+        few candidates a caller plausibly meant are named instead.
+        """
+        if _is_break_point(alias):
+            reach_id, distance = alias
+            known = [
+                key[1]
+                for key in self._by_alias
+                if _is_break_point(key) and key[0] == reach_id and key[1] is not None
+            ]
+            if not known:
+                if reach_id not in self._reaches:
+                    return f"the network has no reach {reach_id!r}"
+                return f"no break point of reach {reach_id!r} sits at a known distance"
+            nearest = sorted(sorted(known, key=lambda d: abs(d - distance))[:limit])
+            listed = ", ".join(format(d, "g") for d in nearest)
+            return f"nearest distances on reach {reach_id!r}: {listed}"
+
+        names = [key for key in self._by_alias if not _is_break_point(key)]
+        close = get_close_matches(alias, names, n=limit)
+        if close:
+            return "did you mean " + ", ".join(repr(name) for name in close) + "?"
+        return f"the network has {len(names)} nodes, none named {alias!r}"
