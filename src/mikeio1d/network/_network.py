@@ -539,8 +539,6 @@ class Network:
         ------
         KeyError
             If node id is not found in the network
-        ValueError
-            If node id string format is invalid
         """
         one_answer = not isinstance(id, list)
         if one_answer:

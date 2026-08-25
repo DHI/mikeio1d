@@ -74,8 +74,8 @@ class ReachBreakPoint(ABC):
     reports its chainage, which is a coordinate along the whole branch, so the
     distance from the start node is ``distance - reach.start_distance``. A
     break point with an unknown distance cannot be looked up via
-    ``find(reach=..., distance=<number>)``, but is still reachable through
-    ``ReachObservation`` and ``recall()``.
+    ``find(reach=..., distance=<number>)``, but still has a graph node of its
+    own, so it carries data and ``recall()`` names it.
 
     Examples
     --------
@@ -223,6 +223,11 @@ class NetworkReach(ABC):
     @abstractmethod
     def breakpoints(self) -> list[ReachBreakPoint]:
         """Ordered list of intermediate :class:`ReachBreakPoint` objects (may be empty).
+
+        Ordered means ascending by distance from the start node, and
+        :class:`Network` relies on it: the first and last are the reach's
+        outermost, and consecutive differences are edge lengths, which a
+        backwards pair would report as negative.
 
         A break point is keyed by its reach's id, so a reach that has any gets
         its own chain of graph nodes and stays distinct from a parallel reach
