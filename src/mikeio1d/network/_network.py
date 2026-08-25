@@ -24,6 +24,7 @@ import xarray as xr
 from ..res1d import Res1D
 from ._companions import _companion_paths, _read_companions, _CompanionConflict
 from ._graph import _CHAINAGE_TOLERANCE, _build_dataframe, _generate_alias_map, _generate_graph
+from ._naming import _Naming
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
 from ._types import NetworkReach
@@ -59,6 +60,7 @@ class Network:
         self._alias_map = _generate_alias_map(graph)
         self._df = _build_dataframe(graph)
         self._graph = graph.copy()
+        self._naming = _Naming(self._graph, self._reaches)
 
     def __repr__(self) -> str:
         time = self._df.index
@@ -532,14 +534,7 @@ class Network:
             ids = []
             for reach_i, distance_i in zip(reach, distance):
                 if distance_i in ["start", "end"]:
-                    if reach_i not in self._reaches:
-                        raise KeyError(f"Reach '{reach_i}' not found in the network.")
-
-                    network_reach = self._reaches[reach_i]
-                    if distance_i == "start":
-                        ids.append(network_reach.start.id)
-                    else:
-                        ids.append(network_reach.end.id)
+                    ids.append(self._naming.endpoint(reach_i, distance_i))
                 else:
                     if not isinstance(distance_i, (int, float)):
                         raise ValueError(
@@ -548,22 +543,7 @@ class Network:
                         )
                     ids.append((reach_i, distance_i))
 
-        def _resolve_id(id):
-            if id in self._alias_map:
-                return self._alias_map[id]
-            if isinstance(id, tuple):
-                reach_id, distance = id
-                for key, val in self._alias_map.items():
-                    if (
-                        isinstance(key, tuple)
-                        and key[0] == reach_id
-                        and key[1] is not None
-                        and abs(key[1] - distance) <= _CHAINAGE_TOLERANCE
-                    ):
-                        return val
-            return None
-
-        resolved = [_resolve_id(id) for id in ids]
+        resolved = [self._naming.id_of(id) for id in ids]
         missing_ids = [ids[i] for i, v in enumerate(resolved) if v is None]
         if missing_ids:
             raise KeyError(
