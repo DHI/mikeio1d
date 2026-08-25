@@ -158,8 +158,8 @@ class _Naming:
         """Say what the network holds nearest to an alias it does not.
 
         An error that lists every name in the network is unreadable on a real
-        model - the ``network.res1d`` fixture has some fifteen thousand - so the
-        few candidates a caller plausibly meant are named instead.
+        model - several thousand of them even in this repository's fixtures - so
+        the few candidates a caller plausibly meant are named instead.
         """
         if _is_break_point(alias):
             reach_id, distance = alias
