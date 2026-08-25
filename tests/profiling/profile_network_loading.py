@@ -136,7 +136,7 @@ def main() -> None:
             elapsed,
             elapsed_cpu,
             network.graph.number_of_nodes(),
-            len(network._reaches),
+            len(network.reaches),
             sorted(network.quantities),
         )
         # Freed before returning so every load starts from a comparable heap

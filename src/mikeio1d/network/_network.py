@@ -8,9 +8,11 @@ translate between them.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, overload
 
 import networkx as nx
@@ -377,6 +379,26 @@ class Network:
     def graph(self) -> nx.Graph:
         """Graph of the network."""
         return self._graph
+
+    @property
+    def reaches(self) -> Mapping[str, NetworkReach]:
+        """The network's reaches, by the id the model gave them.
+
+        Read-only. A reach answers for its own length, endpoints and break
+        points, which is how a caller asks about a location without holding the
+        result file open.
+
+        Returns
+        -------
+        Mapping[str, NetworkReach]
+            Reach id to reach.
+
+        Examples
+        --------
+        >>> network.reaches["10"].length  # doctest: +SKIP
+        304.8
+        """
+        return MappingProxyType(self._reaches)
 
     @property
     def quantities(self) -> list[str]:

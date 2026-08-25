@@ -158,7 +158,7 @@ def _describe_reaches(network: Any) -> dict[str, Any]:
         One entry per reach id.
     """
     described = {}
-    for reach_id, reach in network._reaches.items():
+    for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
             "start": str(reach.start.id),
             "end": str(reach.end.id),
@@ -233,7 +233,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
         found[_alias_key(alias)] = int(answer)
 
     endpoints = {}
-    for reach_id in network._reaches:
+    for reach_id in network.reaches:
         for where in ("start", "end"):
             endpoints[f"{reach_id}@{where}"] = int(network.find(reach=reach_id, distance=where))
 
@@ -267,7 +267,7 @@ def describe(network: Any) -> dict[str, Any]:
     """
     return {
         "counts": {
-            "reaches": len(network._reaches),
+            "reaches": len(network.reaches),
             "graph_nodes": int(network.graph.number_of_nodes()),
             "graph_edges": int(network.graph.number_of_edges()),
         },
