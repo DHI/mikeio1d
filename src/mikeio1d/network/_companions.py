@@ -16,7 +16,14 @@ from ..res1d import Res1D
 from ._inp import read_pipe_lengths
 
 _COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
-"""Result extensions whose companions can be found by folder and stem."""
+"""Result extensions whose companions can be found by folder and stem.
+
+Only EPANET's ``.res``, because no other product this reader knows writes
+companions worth looking for. A MIKE result sitting beside an unrelated ``.inp``
+is the case this keeps out: found companions are read without the caller asking,
+so the search has to be narrow enough that finding one is good evidence it
+belongs.
+"""
 
 # The encodings a companion file's text is worth re-reading as. mikeio1d hands
 # back '.res' names decoded as UTF-8 but '.resx' names decoded with the Windows

@@ -45,7 +45,17 @@ def _blame_the_companions(res: Res1D, found: Sequence[Any], err: Exception) -> V
 
 
 class Network:
-    """Network built from a set of reaches, with coordinate lookup and data access."""
+    """A network of nodes and reaches, addressable by the names it came with.
+
+    A result file names a location the way the model did: a node id, or a reach
+    and a distance along it. A graph needs one flat set of integers. A Network
+    holds both - :attr:`graph` is the integer-labelled graph carrying the
+    timeseries each location holds, and :meth:`find` and :meth:`recall`
+    translate between the two namings.
+
+    Build one with :meth:`open`, which reads a result file, or by handing the
+    constructor a sequence of :class:`~mikeio1d.network.NetworkReach`.
+    """
 
     def __init__(self, reaches: Sequence[NetworkReach]):
         # Ids first: two reaches sharing one would interleave their break points
@@ -102,8 +112,7 @@ class Network:
 
             ``None`` *(default)* looks for them beside the result file, matching
             its folder and stem; ``[]`` reads none; a list reads exactly those.
-            Only EPANET results are looked for, since no other product writes
-            companions this reader knows.
+            Only EPANET results are looked beside.
         nodes : str, list of str, or None, optional
             Controls which nodes have their timeseries data loaded into memory.
 
@@ -183,12 +192,10 @@ class Network:
         so the nodes of a ``.res11`` network carry no data of their own. Pass
         ``reaches`` rather than ``nodes`` to control what gets loaded.
 
-        EPANET is a link-node model, and mikeio1d reports a single synthetic
-        gridpoint for each reach, not tied to either end. That gridpoint is
-        duplicated into two breakpoints, one at each end of the reach, so its
-        own quantities (``Flow``, ``Velocity``, ...) are reachable through
-        :meth:`find` and :meth:`recall` the same way a MIKE reach's end data
-        already is. As a result:
+        An EPANET reach carries one synthetic gridpoint, which mikeio1d gives a
+        breakpoint at each end so that the reach's own quantities (``Flow``,
+        ``Velocity``, ...) are reachable the way a MIKE reach's end data is. As
+        a result:
 
         * without the ``.inp``, a reach's length is unknown, so only its first
           breakpoint (``distance=0.0``) is real; the second is not addressable

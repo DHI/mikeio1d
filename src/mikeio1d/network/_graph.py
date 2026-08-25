@@ -12,8 +12,10 @@ whole branch - cancels out.
 Two reaches between the same pair of nodes - parallel pumps, a battery of
 orifices - stay apart because each one's break points are keyed by its own id,
 so each gets its own chain of graph nodes. A reach with no break points has only
-the one start-to-end edge, which is why two of those between the same nodes are
-refused rather than collapsed into one.
+the one start-to-end edge, which is why :func:`_generate_graph` refuses two of
+those between the same nodes rather than collapsing them into one. That refusal
+is the promise :attr:`~mikeio1d.network.NetworkReach.breakpoints` makes to a
+reader supplying its own reaches.
 """
 
 from __future__ import annotations

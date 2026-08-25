@@ -3,6 +3,12 @@
 The reading itself belongs to ``Res1D``; this module only presents what it read
 as nodes, reaches and breakpoints, and decides which locations get their
 timeseries loaded.
+
+Where a product keeps its timeseries differs, and that is what most of the
+adapting is. MIKE 11 holds them on reach gridpoints rather than on nodes, so the
+nodes of a ``.res11`` network carry no data of their own. EPANET is a link-node
+model and holds them on a single synthetic gridpoint per reach, tied to neither
+end - see :func:`_build_reach_breakpoints` for what becomes of it.
 """
 
 from __future__ import annotations
