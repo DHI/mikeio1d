@@ -16,6 +16,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 import networkx as nx
+import numpy as np
+import numpy.typing as npt
 
 from ._types import NetworkReach
 
@@ -53,6 +55,12 @@ class _Naming:
     def __init__(self, graph: nx.Graph, reaches: Mapping[str, NetworkReach]):
         self._by_alias: dict[Alias, int] = {
             graph.nodes[node_id]["alias"]: node_id for node_id in graph.nodes()
+        }
+        # Both directions are kept, rather than one inverted on demand: recall()
+        # and to_dataset() each want the reverse of the whole map, and building
+        # it per call made every lookup cost a pass over the network.
+        self._by_id: dict[int, Alias] = {
+            node_id: alias for alias, node_id in self._by_alias.items()
         }
         self._reaches = reaches
 
@@ -97,3 +105,50 @@ class _Naming:
             raise KeyError(f"Reach '{reach_id}' not found in the network.")
         reach = self._reaches[reach_id]
         return reach.start.id if which == "start" else reach.end.id
+
+    def alias_of(self, node_id: int) -> Alias:
+        """Give the name a graph integer's location had before it became one.
+
+        Raises
+        ------
+        KeyError
+            If the network has no node by that integer.
+        """
+        if node_id not in self._by_id:
+            raise KeyError(f"Node ID {node_id} not found in the network.")
+        return self._by_id[node_id]
+
+    def identity_coords(self, nodes: npt.ArrayLike) -> dict[str, tuple[str, np.ndarray]]:
+        """Describe each node by the name it had before it became an integer.
+
+        Parameters
+        ----------
+        nodes : array-like of int
+            The integer ids to describe, in the order they appear.
+
+        Returns
+        -------
+        dict
+            ``name``, ``reach`` and ``distance`` arrays along the ``node``
+            dimension. A node fills in ``name`` and leaves the other two empty; a
+            breakpoint fills in ``reach`` and ``distance`` and leaves ``name``
+            empty. Nothing carries both, so the empty half says which it is.
+        """
+        names, reaches, distances = [], [], []
+        for node in np.asarray(nodes):
+            alias = self._by_id[int(node)]
+            if _is_break_point(alias):
+                reach, distance = alias
+                names.append("")
+                reaches.append(reach)
+                distances.append(np.nan if distance is None else distance)
+            else:
+                names.append(alias)
+                reaches.append("")
+                distances.append(np.nan)
+
+        return {
+            "name": ("node", np.array(names, dtype=str)),
+            "reach": ("node", np.array(reaches, dtype=str)),
+            "distance": ("node", np.array(distances, dtype=float)),
+        }

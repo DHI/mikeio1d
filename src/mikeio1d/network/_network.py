@@ -16,15 +16,13 @@ from types import MappingProxyType
 from typing import Any, overload
 
 import networkx as nx
-import numpy as np
-import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 
 from ..res1d import Res1D
 from ._companions import _companion_paths, _read_companions, _CompanionConflict
 from ._graph import _CHAINAGE_TOLERANCE, _build_dataframe, _generate_alias_map, _generate_graph
-from ._naming import _Naming
+from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
 from ._types import NetworkReach
@@ -306,43 +304,6 @@ class Network:
             df.attrs["quantity"] = sel
             return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
 
-    def _identity_coords(self, nodes: npt.ArrayLike) -> dict[str, tuple[str, np.ndarray]]:
-        """Describe each node by the name it had before it became an integer.
-
-        Parameters
-        ----------
-        nodes : array-like of int
-            The integer ids to describe, in the order they appear.
-
-        Returns
-        -------
-        dict
-            ``name``, ``reach`` and ``distance`` arrays along the ``node``
-            dimension. A node fills in ``name`` and leaves the other two empty; a
-            breakpoint fills in ``reach`` and ``distance`` and leaves ``name``
-            empty. Nothing carries both, so the empty half says which it is.
-        """
-        aliases = {node_id: alias for alias, node_id in self._alias_map.items()}
-
-        names, reaches, distances = [], [], []
-        for node in np.asarray(nodes):
-            alias = aliases[int(node)]
-            if isinstance(alias, tuple):
-                reach, distance = alias
-                names.append("")
-                reaches.append(reach)
-                distances.append(np.nan if distance is None else distance)
-            else:
-                names.append(alias)
-                reaches.append("")
-                distances.append(np.nan)
-
-        return {
-            "name": ("node", np.array(names, dtype=str)),
-            "reach": ("node", np.array(reaches, dtype=str)),
-            "distance": ("node", np.array(distances, dtype=float)),
-        }
-
     def to_dataset(self) -> xr.Dataset:
         """Dataset of the timeseries, with each node's original identity alongside.
 
@@ -375,7 +336,7 @@ class Network:
                 for q in quantities
             }
         )
-        return ds.assign_coords(self._identity_coords(ds.node.values))
+        return ds.assign_coords(self._naming.identity_coords(ds.node.values))
 
     @property
     def graph(self) -> nx.Graph:
@@ -587,18 +548,13 @@ class Network:
         if one_answer:
             id = [id]
 
-        reverse_alias_map = {v: k for k, v in self._alias_map.items()}
-
         results: list[dict[str, Any]] = []
         for node_id in id:
-            if node_id not in reverse_alias_map:
-                raise KeyError(f"Node ID {node_id} not found in the network.")
-
-            key = reverse_alias_map[node_id]
-            if isinstance(key, str):
-                results.append({"node": key})
+            alias = self._naming.alias_of(node_id)
+            if _is_break_point(alias):
+                results.append({"reach": alias[0], "distance": alias[1]})
             else:
-                results.append({"reach": key[0], "distance": key[1]})
+                results.append({"node": alias})
 
         return results[0] if one_answer else results
 
