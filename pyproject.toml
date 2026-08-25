@@ -46,6 +46,9 @@ dependencies = [
     'mikecore; platform_system=="Linux"',
 ]
 
+[project.optional-dependencies]
+network = ["xarray", "networkx"]
+
 [dependency-groups]
 test = [
     "pytest",
@@ -77,7 +80,9 @@ notebooks = [
     "folium",
     "mapclassify",
 ]
-docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1"]
+# xarray and networkx mirror the network extra: quartodoc documents
+# mikeio1d.network, which imports both at module level.
+docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1", "xarray", "networkx"]
 experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
 
 [project.urls]

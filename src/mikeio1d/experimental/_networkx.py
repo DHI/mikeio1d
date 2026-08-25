@@ -15,6 +15,10 @@ def to_networkx(
 
     Nodes become nodes, reaches become edges. Gridpoints ignored.
 
+    See ``mikeio1d.network.Network.open``, whose ``graph`` keeps the gridpoints,
+    the reach lengths and the timeseries. The two builders should become one,
+    once it is settled whether a network graph is directed (issue #214).
+
     Parameters
     ----------
     res : Res1D
