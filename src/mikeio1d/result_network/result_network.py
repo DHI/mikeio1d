@@ -47,7 +47,7 @@ class ResultNetwork:
     queue: list
         A list of TimeSeriesId objects to be used when calling res1D.read().
     nodes : ResultNodes object
-        Is is a wrapper class object for all ResultData nodes.
+        It is a wrapper class object for all ResultData nodes.
     reaches : ResultReaches object
         Is a wrapper class object for all ResultData reaches.
     catchments : ResultCatchments object
