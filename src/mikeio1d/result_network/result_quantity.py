@@ -102,7 +102,7 @@ class ResultQuantity:
 
     @property
     def name(self) -> str:
-        """Name of the quantity id assosciated with collection."""
+        """Name of the quantity id associated with collection."""
         return self._name
 
     def add(self):
