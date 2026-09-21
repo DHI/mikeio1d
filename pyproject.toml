@@ -47,6 +47,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# The single place xarray and networkx are declared. The docs and experimental
+# groups need them too and are synced with '--extra network' rather than
+# repeating the pair.
 network = ["xarray", "networkx"]
 
 [dependency-groups]
@@ -80,10 +83,8 @@ notebooks = [
     "folium",
     "mapclassify",
 ]
-# xarray and networkx mirror the network extra: quartodoc documents
-# mikeio1d.network, which imports both at module level.
-docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1", "xarray", "networkx"]
-experimental = ["xarray", "networkx", "typing-extensions>=4.10"]
+docs = ["quarto-cli", "quartodoc==0.9.1", "griffe==1.5.1"]
+experimental = ["typing-extensions>=4.10"]
 
 [project.urls]
 "Homepage" = "https://github.com/DHI/mikeio1d"

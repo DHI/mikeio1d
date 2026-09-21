@@ -19,6 +19,8 @@
 
 ### Changed
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
+- The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
+  both are synced with `--extra network`, which is now the only place the pair is declared.
 
 ### Removed
 - `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.
