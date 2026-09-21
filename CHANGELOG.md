@@ -3,11 +3,10 @@
 ## [Unreleased]
 
 ### Added
-- `mikeio1d.network` (provisional): build a graph-shaped `Network` from a result file, with
+- `mikeio1d.network`: build a graph-shaped `Network` from a result file, with
   `Network.open`, `Network.reaches`, `find`/`recall` between original and graph names,
   `to_dataframe`/`to_dataset`, and the EPANET `.resx`/`.inp` companions. Needs the new
-  `network` extra (`pip install mikeio1d[network]`). The shape of what it returns may still
-  change.
+  `network` extra (`pip install mikeio1d[network]`).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 

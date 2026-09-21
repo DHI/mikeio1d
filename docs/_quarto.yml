@@ -126,7 +126,7 @@ quartodoc:
     - cross_sections.CrossSection
     - cross_sections.CrossSectionCollection
   - title: Network
-    desc: 'Provisional. Needs the network extra, and may still change shape.'
+    desc: 'Needs the network extra.'
     contents:
     - network.Network
     - network.NetworkNode

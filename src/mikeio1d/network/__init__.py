@@ -5,8 +5,8 @@ them: a node id, or a reach and a distance along it. This module turns that into
 a :class:`Network` - a networkx graph whose nodes are flat integers, carrying the
 timeseries each location holds - and translates between the two namings.
 
-The module is provisional. It needs ``networkx`` and ``xarray``, which the
-``network`` extra installs::
+The module needs ``networkx`` and ``xarray``, which the ``network`` extra
+installs::
 
     pip install mikeio1d[network]
 
