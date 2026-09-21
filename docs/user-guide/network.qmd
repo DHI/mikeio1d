@@ -38,7 +38,7 @@ The `mikeio1d.network` module reads a result file into a graph of these elements
 `length=0.0` is a valid weight, so a length-weighted `networkx` call treats a boundary edge as a free hop rather than refusing it — unlike an edge whose length is unknown, which carries `None`. Filter on `boundary` where the distance should count only real reach segments.
 :::
 
-The module is provisional and needs the `network` extra:
+The module needs the `network` extra:
 
 ```bash
 pip install mikeio1d[network]
