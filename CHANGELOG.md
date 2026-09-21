@@ -8,6 +8,8 @@
   `to_dataframe`/`to_dataset`, and the EPANET `.resx`/`.inp` companions. Needs the new
   `network` extra (`pip install mikeio1d[network]`). The shape of what it returns may still
   change.
+- Network user guide section covering how a result file becomes a graph, with a diagram of the
+  mapping and a note on why a zero-length boundary edge is free to cross.
 
 ### Fixed
 - Reach `start_node` and `end_node` no longer fail for a `Res1D` opened with a `Path`.
