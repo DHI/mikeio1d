@@ -72,11 +72,23 @@
     ]
   },
   {
+    "objectID": "user-guide/network.html#reading-a-network-as-a-graph",
+    "href": "user-guide/network.html#reading-a-network-as-a-graph",
+    "title": "Network",
+    "section": "Reading a network as a graph",
+    "text": "Reading a network as a graph\nThe mikeio1d.network module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and find() and recall() translate between those names and the integers the graph uses.\n\n\n\nA reach’s own first and last grid point sit exactly where the reach’s nodes do, so each is joined to its node by an edge of length 0.0 flagged boundary. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.\n\n\n\n\n\n\n\n\nNoteA boundary edge is free to cross\n\n\n\nlength=0.0 is a valid weight, so a length-weighted networkx call treats a boundary edge as a free hop rather than refusing it — unlike an edge whose length is unknown, which carries None. Filter on boundary where the distance should count only real reach segments.\n\n\nThe module is provisional and needs the network extra:\npip install mikeio1d[network]",
+    "crumbs": [
+      "Home",
+      "User Guide",
+      "Network"
+    ]
+  },
+  {
     "objectID": "user-guide/network.html#additional-resources",
     "href": "user-guide/network.html#additional-resources",
     "title": "Network",
     "section": "Additional resources",
-    "text": "Additional resources\n\nMIKE 1D API",
+    "text": "Additional resources\n\nMIKE 1D API\nNetwork API reference\nNetwork notebook",
     "crumbs": [
       "Home",
       "User Guide",

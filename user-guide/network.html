@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -270,6 +305,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#grid-points" id="toc-grid-points" class="nav-link" data-scroll-target="#grid-points">Grid Points</a></li>
   <li><a href="#nodes" id="toc-nodes" class="nav-link" data-scroll-target="#nodes">Nodes</a></li>
   <li><a href="#catchments" id="toc-catchments" class="nav-link" data-scroll-target="#catchments">Catchments</a></li>
+  <li><a href="#reading-a-network-as-a-graph" id="toc-reading-a-network-as-a-graph" class="nav-link" data-scroll-target="#reading-a-network-as-a-graph">Reading a network as a graph</a></li>
   <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional resources</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/network.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.ipynb" download="network.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
@@ -332,10 +368,37 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="catchments">Catchments</h2>
 <p>Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.</p>
 </section>
+<section id="reading-a-network-as-a-graph" class="level2">
+<h2 class="anchored" data-anchor-id="reading-a-network-as-a-graph">Reading a network as a graph</h2>
+<p>The <code>mikeio1d.network</code> module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and <code>find()</code> and <code>recall()</code> translate between those names and the integers the graph uses.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../images/docs/res1d_network_mapping.svg" class="img-fluid figure-img"></p>
+<figcaption>A reach’s own first and last grid point sit exactly where the reach’s nodes do, so each is joined to its node by an edge of length <code>0.0</code> flagged <code>boundary</code>. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A boundary edge is free to cross
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>length=0.0</code> is a valid weight, so a length-weighted <code>networkx</code> call treats a boundary edge as a free hop rather than refusing it — unlike an edge whose length is unknown, which carries <code>None</code>. Filter on <code>boundary</code> where the distance should count only real reach segments.</p>
+</div>
+</div>
+<p>The module is provisional and needs the <code>network</code> extra:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install mikeio1d<span class="pp">[</span><span class="ss">network</span><span class="pp">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 <section id="additional-resources" class="level2">
 <h2 class="anchored" data-anchor-id="additional-resources">Additional resources</h2>
 <ul>
 <li><a href="https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/">MIKE 1D API</a></li>
+<li><a href="../api/index.html"><code>Network</code> API reference</a></li>
+<li><a href="https://nbviewer.jupyter.org/github/DHI/mikeio1d/blob/main/notebooks/network.ipynb">Network notebook</a></li>
 </ul>
 
 
