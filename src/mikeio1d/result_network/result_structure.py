@@ -90,7 +90,7 @@ class ResultStructure(ResultLocation):
         """Get IRes1DDataSet object associated with ResultStructure.
 
         This is the reach IRes1DDataSet object because ResultStructure objects do not
-        have a corresonding IRes1DDataSet object.
+        have a corresponding IRes1DDataSet object.
 
         Parameters
         ----------
@@ -123,15 +123,15 @@ class ResultStructure(ResultLocation):
 
 
 class ResultStructureCreator(ResultLocationCreator):
-    """Helper class for creating ResultGridPoint.
+    """Helper class for creating ResultStructure.
 
     Parameters
     ----------
-    result_location : ResultGridPoint
-        Instance of ResultGridPoint, which the ResultGridPointCreator deals with.
+    result_location : ResultStructure
+        Instance of ResultStructure, which the ResultStructureCreator deals with.
     reach: IRes1DReach
         MIKE 1D IRes1DReach object.
-    gridpoint IRes1DGridPoint
+    gridpoint : IRes1DGridPoint
         MIKE 1D IRes1DGridPoint object.
     data_items : list of IDataItem objects
         A list of IDataItem objects (vector data object) the
@@ -144,7 +144,7 @@ class ResultStructureCreator(ResultLocationCreator):
     Attributes
     ----------
     structure_data_items : list of IDataItem object.
-        List of IDataItem objects belonging to a structures
+        List of IDataItem objects belonging to structures
         defined on the current grid point.
 
     """
@@ -164,7 +164,7 @@ class ResultStructureCreator(ResultLocationCreator):
         self.data_items_dict: dict[str, IDataItem] = {}
 
     def create(self):
-        """Perform ResultGridPoint creation steps."""
+        """Perform ResultStructure creation steps."""
         for data_item in self.data_items_intial:
             self.add_res1d_structure_data_item(data_item)
 

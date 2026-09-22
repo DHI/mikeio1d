@@ -27,7 +27,7 @@ class ResultGridPoint(ResultLocation):
     ----------
     reach: IRes1DReach
         MIKE 1D IRes1DReach object.
-    gridpoint IRes1DGridPoint
+    gridpoint : IRes1DGridPoint
         MIKE 1D IRes1DGridPoint object.
     data_items : list of IDataItem objects
         A list of IDataItem objects (vector data object) the
@@ -153,7 +153,7 @@ class ResultGridPointCreator(ResultLocationCreator):
         Instance of ResultGridPoint, which the ResultGridPointCreator deals with.
     reach: IRes1DReach
         MIKE 1D IRes1DReach object.
-    gridpoint IRes1DGridPoint
+    gridpoint : IRes1DGridPoint
         MIKE 1D IRes1DGridPoint object.
     data_items : list of IDataItem objects
         A list of IDataItem objects (vector data object) the
@@ -166,7 +166,7 @@ class ResultGridPointCreator(ResultLocationCreator):
     Attributes
     ----------
     structure_data_items : list of IDataItem object.
-        List of IDataItem objects belonging to a structures
+        List of IDataItem objects belonging to structures
         defined on the current grid point.
 
     """
