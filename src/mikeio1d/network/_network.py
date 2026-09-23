@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterable
     from datetime import datetime
 
     from ._naming import Address
@@ -489,6 +490,57 @@ class Network:
         # Read off _df rather than to_dataframe(), whose copy would duplicate
         # the whole dataset for the sake of its column labels.
         return list(self._df.columns.get_level_values("quantity").unique())
+
+    def locations(self, *, reach: str | None = None, quantity: str | None = None) -> list[Address]:
+        """List the locations this network can be read at.
+
+        Parameters
+        ----------
+        reach : str, optional
+            Only the break points along this reach, in the order they sit. The
+            reach's own end nodes are not among them - they are nodes, and a
+            node is named by its own ID. ``None`` *(default)* lists everything.
+        quantity : str, optional
+            Only locations carrying this quantity. ``None`` *(default)* does not
+            filter.
+
+        Returns
+        -------
+        list[str | tuple[str, float]]
+            Addresses, each of which :meth:`resolve` answers for. A break point
+            whose distance is unknown is left out: nothing can name it.
+
+        Raises
+        ------
+        ValueError
+            If the network was not opened from a result file, or if
+            :meth:`release` has been called on it.
+
+        Examples
+        --------
+        Every break point of a reach that carries discharge, which is the batch
+        a reach observation has to be scored against:
+
+        >>> network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
+        [('100l1', 23.8413574216414)]
+        """
+        source = self._require_source("locations()")
+        if reach is None:
+            aliases: Iterable[Alias] = self._naming.aliases
+        elif reach in self._reaches:
+            aliases = [point.id for point in self._reaches[reach].breakpoints]
+        else:
+            raise KeyError(f"locations() found {self._naming.describe_miss((reach, 0.0))}")
+
+        found: list[Address] = []
+        for alias in aliases:
+            if _is_break_point(alias) and alias[1] is None:
+                continue
+            carried = source.quantities_at(alias)
+            if carried is None or (quantity is not None and quantity not in carried):
+                continue
+            found.append(alias)
+        return found
 
     def resolve(self, address: Address, *, tol: float | None = None) -> dict[str, Any] | None:
         """Say whether a location is in this network, and what it carries.
