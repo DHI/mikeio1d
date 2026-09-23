@@ -107,7 +107,11 @@ class _Source:
         gridpoint, so asking for both is one read, not two.
         """
         if not series:
-            return pd.DataFrame(index=self._res.time_index)
+            # Nothing asked for, nothing opened. The file's own time index would
+            # be the tidier index to carry here, but reading it loads the whole
+            # of the file's dynamic data, which is the one thing asking for
+            # nothing should not do.
+            return pd.DataFrame(index=pd.DatetimeIndex([], name="time"))
 
         # Grouped by file, and within a file de-duplicated, so what crosses the
         # interop boundary is each distinct series exactly once.

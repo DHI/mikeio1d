@@ -491,6 +491,117 @@ class Network:
         # the whole dataset for the sake of its column labels.
         return list(self._df.columns.get_level_values("quantity").unique())
 
+    def _blame_unreadable(self, items: Sequence[tuple[Address, str]], source: _Source) -> KeyError:
+        """Say which of the requested items cannot be read, and why each cannot.
+
+        Every one of them, in a single error: a caller reading fifty locations
+        wants one round trip, not fifty. Kept to one line, since a KeyError
+        renders its message through repr and would show the newlines raw.
+        """
+        faults = []
+        for address, quantity in items:
+            node_id = self._naming.id_of(address)
+            if node_id is None:
+                faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
+                continue
+            carried = source.quantities_at(self._naming.alias_of(node_id)) or []
+            if quantity in carried:
+                continue
+            if carried:
+                faults.append(f"{address!r} carries {sorted(carried)}, not {quantity!r}")
+            else:
+                faults.append(
+                    f"{address!r} carries no quantities of its own, so {quantity!r} cannot be "
+                    "read there - MIKE 11 keeps its timeseries on reach gridpoints rather than "
+                    "on nodes, so use locations(reach=...) to find them"
+                )
+        shown = "; ".join(faults[:10])
+        if len(faults) > 10:
+            shown += f"; ... and {len(faults) - 10} more"
+        return KeyError(
+            f"read() cannot read {len(faults)} of the {len(items)} items asked for: {shown}. "
+            "resolve() says what one location carries, and locations(quantity=...) says where "
+            "a quantity is, both without reading anything."
+        )
+
+    def read(
+        self,
+        items: Sequence[tuple[Address, str]],
+        *,
+        start: str | datetime | None = None,
+        end: str | datetime | None = None,
+    ) -> pd.DataFrame:
+        """Read the series named by ``(address, quantity)`` pairs.
+
+        The only member here that touches timeseries data. Everything asked for
+        crosses to the result file in one batched call per file it lives in, so
+        a reach's whole set of break points is one read rather than one each.
+
+        Parameters
+        ----------
+        items : sequence of (address, quantity)
+            What to read. An address is a node ID, or a reach ID and a distance
+            along it, as :meth:`locations` gives and :meth:`resolve` confirms.
+            An empty sequence reads nothing at all, and returns an empty frame
+            rather than the whole file.
+        start, end : str or datetime, optional
+            Trim the returned frame to this window. This selects on the result
+            that came back; it does not read less. MIKE 1D loads a file's whole
+            dynamic data on the first read of anything in it.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time-indexed, one column per element of ``items``, in that order and
+            keeping duplicates. The columns are the items themselves, so
+            ``df[items[i]]`` selects the series asked for.
+
+        Raises
+        ------
+        KeyError
+            If any item names a location the network does not have, or a
+            quantity that location does not carry. Every failing item is named.
+        ValueError
+            If the network was not opened from a result file, or if
+            :meth:`release` has been called on it.
+
+        Notes
+        -----
+        An EPANET reach's two break points are one gridpoint seen twice, so
+        asking for both gives two identical columns from a single read.
+
+        Examples
+        --------
+        >>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
+
+        A reach observation, whose break points have to agree before one of them
+        can stand for the reach:
+
+        >>> points = network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
+        >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
+        """
+        source = self._require_source("read()")
+        # An empty request never reaches the file. Res1D.read([]) means "read
+        # everything", which is the opposite of what asking for nothing wants.
+        series = []
+        for address, quantity in items:
+            node_id = self._naming.id_of(address)
+            found = (
+                None
+                if node_id is None
+                else source.series_at(self._naming.alias_of(node_id), quantity)
+            )
+            if found is None:
+                raise self._blame_unreadable(items, source)
+            series.append(found)
+
+        df = source.read(series)
+        # A flat index, so a column label is the whole (address, quantity) pair
+        # the caller handed in - an address is itself a tuple, and a MultiIndex
+        # would read the two apart.
+        df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
+        return df if start is None and end is None else df.loc[start:end]
+
     def locations(self, *, reach: str | None = None, quantity: str | None = None) -> list[Address]:
         """List the locations this network can be read at.
 
