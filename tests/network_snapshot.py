@@ -272,7 +272,7 @@ def describe(network: Any) -> dict[str, Any]:
             "graph_nodes": int(network.graph.number_of_nodes()),
             "graph_edges": int(network.graph.number_of_edges()),
         },
-        "quantities": sorted(str(q) for q in network.quantities),
+        "quantities": sorted(str(q) for q in network.loaded_quantities),
         "graph": _describe_graph(network),
         "reaches": _describe_reaches(network),
         "dataframe": _describe_dataframe(network),

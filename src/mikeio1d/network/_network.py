@@ -76,7 +76,7 @@ class Network:
             "<Network>",
             f"Reaches: {len(self._reaches)}",
             f"Nodes: {self._graph.number_of_nodes()}",
-            f"Quantities: {self.quantities}",
+            f"Quantities: {self.loaded_quantities}",
             f"Time: {time_window}",
         ]
         return "\n".join(out)
@@ -370,13 +370,15 @@ class Network:
         return MappingProxyType(self._reaches)
 
     @property
-    def quantities(self) -> list[str]:
-        """Quantities present in data.
+    def loaded_quantities(self) -> list[str]:
+        """Quantities this network holds data for.
+
+        What the filters of :meth:`open` let through.
 
         Returns
         -------
-        List[str]
-            List of quantities
+        list[str]
+            List of quantities.
         """
         # Read off _df rather than to_dataframe(), whose copy would duplicate
         # the whole dataset for the sake of its column labels.

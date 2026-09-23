@@ -93,7 +93,7 @@ class TestCompanionDiscovery:
         network = Network.open(res)
 
         assert _lengths(network)[_PIPE] == pytest.approx(_PIPE_LENGTH)
-        assert "Volume" in network.quantities
+        assert "Volume" in network.loaded_quantities
 
     def test_an_empty_list_refuses_them(self, tmp_path):
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
@@ -101,7 +101,7 @@ class TestCompanionDiscovery:
         network = Network.open(res, companions=[])
 
         assert _lengths(network)[_PIPE] is None
-        assert "Volume" not in network.quantities
+        assert "Volume" not in network.loaded_quantities
 
     def test_a_named_companion_need_not_be_a_sibling(self, tmp_path):
         res = _copy(tmp_path, "epanet", ".res")
@@ -117,7 +117,7 @@ class TestCompanionDiscovery:
 
         network = Network.open(res, companions=[Res1D(str(tmp_path / "model.resx"))])
 
-        assert "Volume" in network.quantities
+        assert "Volume" in network.loaded_quantities
 
     def test_a_mike_result_ignores_an_inp_beside_it(self, tmp_path):
         """Only EPANET writes companions this reader knows.
@@ -298,7 +298,7 @@ class TestQuantityFiltering:
 
     def _quantities(self, quantities):
         network = Network.open(_EPANET_RES, companions=[_EPANET_RESX], quantities=quantities)
-        return sorted(network.quantities)
+        return sorted(network.loaded_quantities)
 
     def test_a_node_quantity_whose_id_is_no_identifier_is_read(self):
         """A .resx tank carries both Volume and Volume Percentage."""
