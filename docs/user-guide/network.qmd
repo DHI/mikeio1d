@@ -45,7 +45,6 @@ pip install mikeio1d[network]
 ```
 
 ## Reading only what you need
-A network is not a rectangle. Nodes carry water level, interior grid points carry discharge, and MIKE 11 carries nothing on nodes at all, so a dense `location × quantity` table of a result file is around half padding. Where only a few locations matter — a handful of sensors to compare a model against — open the topology on its own and read the series afterwards.
 
 Pass `nodes=[]` and `reaches=[]` for the whole topology and none of the data:
 
