@@ -20,10 +20,12 @@ import pandas as pd
 
 from ..res1d import Res1D
 from ._companions import _CompanionConflict
+from ._source import _Series
 
 if TYPE_CHECKING:
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
     from ._companions import _Companion
+    from ._naming import Alias
 
 from ._types import NetworkNode, NetworkReach, ReachBreakPoint
 
@@ -209,6 +211,20 @@ def _reach_start_distance(reach: ResultReach) -> float:
     return origin if math.isfinite(origin) else 0.0
 
 
+def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
+    """Map every quantity a location carries to the series holding it.
+
+    Reading the map costs nothing - a location knows what it carries from the
+    file header alone - which is what lets a network answer where a quantity
+    lives without loading any of it.
+    """
+    series = {}
+    for quantity_id in location.quantities:
+        quantity = _quantity_at(location, quantity_id)
+        series[quantity_id] = _Series(quantity.res1d, quantity.timeseries_id)
+    return series
+
+
 def _build_reach_breakpoints(
     reach: ResultReach,
     *,
@@ -216,6 +232,7 @@ def _build_reach_breakpoints(
     quantities: set[str] | None,
     populate_gridpoints: bool,
     extra: _Companion | None = None,
+    series: dict[Alias, dict[str, _Series]] | None = None,
 ) -> list[ReachBreakPoint]:
     """Build a reach's break points from its mikeio1d gridpoints.
 
@@ -236,6 +253,14 @@ def _build_reach_breakpoints(
     quantities (e.g. pump energy) the same way it already does for nodes,
     matched to the main file's gridpoints by index - the only real case
     today is a single-gridpoint reach against a single-gridpoint companion.
+
+    ``series``, when given, is filled with the series reachable at each break
+    point. It is collected here because this is the only place that knows which
+    gridpoint a break point was made from: an EPANET reach's two break points
+    are one gridpoint seen twice, and their distances come from a companion
+    ``.inp``, so neither correspondence can be recovered afterwards. Unlike
+    ``data``, it ignores ``quantities`` and ``populate_gridpoints`` - what a
+    location *can* offer does not depend on what this load chose to read.
     """
     if _has_real_gridpoints(reach):
         # Sorted rather than taken as they come: a multi-segment reach reports
@@ -266,6 +291,16 @@ def _build_reach_breakpoints(
                 _simplify_colnames(extra_gridpoints[i], quantities),
                 location_id=reach.name,
             )
+        if series is not None:
+            carried = _series_at(gp)
+            if i < len(extra_gridpoints):
+                carried.update(_series_at(extra_gridpoints[i]))
+            # Under every distance this gridpoint was stretched over, so both of
+            # an EPANET reach's break points name the one series it really has.
+            # A distance of None is not an address - nothing can ask for it.
+            for distance in distances:
+                if distance is not None:
+                    series[(gp.reach_name, distance)] = carried
         breakpoints.extend(GridPoint(gp.reach_name, d, data) for d in distances)
     return breakpoints
 
@@ -336,6 +371,7 @@ def _load_res1d_network(
     extra: _Companion | None = None,
     lengths: dict[str, float] | None = None,
     quantities: set[str] | None = None,
+    series: dict[Alias, dict[str, _Series]] | None = None,
 ) -> list[Res1DReach]:
     nodes_set = set(nodes)
     reaches_set = set(reaches)
@@ -351,6 +387,13 @@ def _load_res1d_network(
 
     def _init_node(reach: ResultReach, is_end: bool) -> Res1DNode:
         id = reach.end_node if is_end else reach.start_node
+        # Recorded for every node the graph will hold, whatever the filters let
+        # through, so a caller can still read a node this load skipped.
+        if series is not None and id not in series:
+            carried = _series_at(res.nodes[id])
+            if extra is not None and id in extra.nodes:
+                carried.update(_series_at(extra.nodes[id]))
+            series[id] = carried
         if id in nodes_set:
             if id not in node_data:
                 df = _simplify_colnames(res.nodes[id], quantities)
@@ -375,6 +418,7 @@ def _load_res1d_network(
             quantities=quantities,
             populate_gridpoints=reach.name in reaches_set,
             extra=extra,
+            series=series,
         )
         return Res1DReach(
             reach,

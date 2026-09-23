@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from datetime import datetime
 
+    from ._naming import Alias
+
 from collections.abc import Mapping
 from collections.abc import Sequence
 from copy import deepcopy
@@ -31,6 +33,7 @@ from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
 from ._source import _Source
+from ._source import _Series
 from ._types import NetworkReach
 
 
@@ -266,6 +269,11 @@ class Network:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
+        # Filled by the load, which is the only place that knows which gridpoint
+        # each break point was made from. Never narrowed by the filters above:
+        # what a location offers is a fact about the file, not about this load.
+        items: dict[Alias, dict[str, _Series]] = {}
+
         try:
             list_of_reaches = _load_res1d_network(
                 res,
@@ -274,13 +282,14 @@ class Network:
                 extra=extra,
                 lengths=lengths,
                 quantities=quantities_set,
+                series=items,
             )
         except _CompanionConflict as err:
             if not discovered:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
-        source = _Source(res, {}, companion=None if extra is None else extra.res)
+        source = _Source(res, items, companion=None if extra is None else extra.res)
         return cls(list_of_reaches, source=source)
 
     @staticmethod
