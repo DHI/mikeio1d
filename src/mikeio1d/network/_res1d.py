@@ -21,6 +21,7 @@ import pandas as pd
 from ..res1d import Res1D
 from ._companions import _CompanionConflict
 from ._source import _Series
+from ._source import _Source
 
 if TYPE_CHECKING:
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
@@ -231,8 +232,8 @@ def _build_reach_breakpoints(
     length: float | None,
     quantities: set[str] | None,
     populate_gridpoints: bool,
+    series: dict[Alias, dict[str, _Series]],
     extra: _Companion | None = None,
-    series: dict[Alias, dict[str, _Series]] | None = None,
 ) -> list[ReachBreakPoint]:
     """Build a reach's break points from its mikeio1d gridpoints.
 
@@ -254,9 +255,9 @@ def _build_reach_breakpoints(
     matched to the main file's gridpoints by index - the only real case
     today is a single-gridpoint reach against a single-gridpoint companion.
 
-    ``series``, when given, is filled with the series reachable at each break
-    point. It is collected here because this is the only place that knows which
-    gridpoint a break point was made from: an EPANET reach's two break points
+    ``series`` is filled with the series reachable at each break point. It is
+    collected here because this is the only place that knows which gridpoint a
+    break point was made from: an EPANET reach's two break points
     are one gridpoint seen twice, and their distances come from a companion
     ``.inp``, so neither correspondence can be recovered afterwards. Unlike
     ``data``, it ignores ``quantities`` and ``populate_gridpoints`` - what a
@@ -291,16 +292,15 @@ def _build_reach_breakpoints(
                 _simplify_colnames(extra_gridpoints[i], quantities),
                 location_id=reach.name,
             )
-        if series is not None:
-            carried = _series_at(gp)
-            if i < len(extra_gridpoints):
-                carried.update(_series_at(extra_gridpoints[i]))
-            # Under every distance this gridpoint was stretched over, so both of
-            # an EPANET reach's break points name the one series it really has.
-            # A distance of None is not an address - nothing can ask for it.
-            for distance in distances:
-                if distance is not None:
-                    series[(gp.reach_name, distance)] = carried
+        carried = _series_at(gp)
+        if i < len(extra_gridpoints):
+            carried.update(_series_at(extra_gridpoints[i]))
+        # Under every distance this gridpoint was stretched over, so both of
+        # an EPANET reach's break points name the one series it really has.
+        # A distance of None is not an address - nothing can ask for it.
+        for distance in distances:
+            if distance is not None:
+                series[(gp.reach_name, distance)] = carried
         breakpoints.extend(GridPoint(gp.reach_name, d, data) for d in distances)
     return breakpoints
 
@@ -371,11 +371,23 @@ def _load_res1d_network(
     extra: _Companion | None = None,
     lengths: dict[str, float] | None = None,
     quantities: set[str] | None = None,
-    series: dict[Alias, dict[str, _Series]] | None = None,
-) -> list[Res1DReach]:
+) -> tuple[list[Res1DReach], _Source]:
+    """Read a result file as reaches, and as the source they can be re-read through.
+
+    Both come out of the one walk over ``res.reaches``, and neither can be had
+    from the other afterwards: the reaches are what the filters let through,
+    while the source records what every location could offer. Returned together
+    so that the map, whose keys are gridpoint-to-break-point correspondences
+    only this walk knows, is never assembled by a caller.
+    """
     nodes_set = set(nodes)
     reaches_set = set(reaches)
     lengths = lengths or {}
+
+    # Filled as the reaches are built, since that is the only place that knows
+    # which gridpoint a break point was made from. Never narrowed by the filters
+    # above: what a location offers is a fact about the file, not about this load.
+    series: dict[Alias, dict[str, _Series]] = {}
 
     # In order to work with bigger files, we might want to select a subset of nodes and avoid
     # potential memory issues. For this reason, we create this intermediate step that populates
@@ -389,7 +401,7 @@ def _load_res1d_network(
         id = reach.end_node if is_end else reach.start_node
         # Recorded for every node the graph will hold, whatever the filters let
         # through, so a caller can still read a node this load skipped.
-        if series is not None and id not in series:
+        if id not in series:
             carried = _series_at(res.nodes[id])
             if extra is not None and id in extra.nodes:
                 carried.update(_series_at(extra.nodes[id]))
@@ -417,8 +429,8 @@ def _load_res1d_network(
             length=_resolve_reach_length(reach_length, reach),
             quantities=quantities,
             populate_gridpoints=reach.name in reaches_set,
-            extra=extra,
             series=series,
+            extra=extra,
         )
         return Res1DReach(
             reach,
@@ -428,4 +440,5 @@ def _load_res1d_network(
             breakpoints=breakpoints,
         )
 
-    return [_build_reach(reach) for reach in res.reaches.values()]
+    built = [_build_reach(reach) for reach in res.reaches.values()]
+    return built, _Source(res, series, companion=None if extra is None else extra.res)
