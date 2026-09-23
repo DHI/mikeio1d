@@ -33,6 +33,10 @@
 
 ### Removed
 - `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.
+- `network.BasicNode`, `network.BasicReach`, and building a `Network` from a sequence of reaches.
+  A `Network` is now built with `Network.open`, which is how anything ever used it. The abstract
+  element classes stay in place, no longer exported, so a source over reaches already in memory
+  can be added when something needs one (#257).
 
 ## [1.3.1] - 2026-07-15
 
