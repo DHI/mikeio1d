@@ -44,6 +44,49 @@ The module needs the `network` extra:
 pip install mikeio1d[network]
 ```
 
+## Reading only what you need
+A network is not a rectangle. Nodes carry water level, interior grid points carry discharge, and MIKE 11 carries nothing on nodes at all, so a dense `location × quantity` table of a result file is around half padding. Where only a few locations matter — a handful of sensors to compare a model against — open the topology on its own and read the series afterwards.
+
+Pass `nodes=[]` and `reaches=[]` for the whole topology and none of the data:
+
+```python
+from mikeio1d.network import Network
+
+network = Network.open("model.res1d", nodes=[], reaches=[])
+```
+
+The network then answers from the file header and its own break points, without reading any timeseries:
+
+```python
+network.period()                                   # (start, end)
+network.quantities                                 # {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
+network.resolve("manhole_12")                      # {'address': ..., 'quantities': [...]}
+network.locations(reach="100l1", quantity="Discharge")
+```
+
+`resolve()` returns `None` for a location the network does not have, rather than raising as `find()` does, so a caller can ask before committing to a read. Give it a `tol` to snap a measured chainage onto the model's:
+
+```python
+network.resolve(("100l1", 23.8), tol=0.1)
+# {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge']}
+```
+
+`read()` is the only one of these that touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and everything asked for crosses to the result file in one batched call:
+
+```python
+points = network.locations(reach="100l1", quantity="Discharge")
+network.read([(point, "Discharge") for point in points])
+```
+
+A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`.
+
+::: {.callout-note}
+## The file stays open
+A network holds its result file for its own lifetime so these can answer. Call `release()` to let go of it once the data is out; `to_dataframe()` and `to_dataset()` keep working afterwards, and the five members above stop.
+
+MIKE 1D loads a file's whole dynamic data on the first read of anything in it, so what reading late saves is the work of building frames for locations you never asked about, not the file read itself.
+:::
+
 ## Additional resources
 - [MIKE 1D API](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)
 - [`Network` API reference](../api/index.qmd)
