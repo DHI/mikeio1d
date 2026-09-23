@@ -25,6 +25,7 @@ from ._graph import _build_dataframe, _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
+from ._source import _Source
 from ._types import NetworkReach
 
 
@@ -57,12 +58,15 @@ class Network:
     constructor a sequence of :class:`~mikeio1d.network.NetworkReach`.
     """
 
-    def __init__(self, reaches: Sequence[NetworkReach]):
+    def __init__(self, reaches: Sequence[NetworkReach], *, source: _Source | None = None):
         # Ids first: two reaches sharing one would interleave their break points
         # into a single chain, and the graph error would describe the wreckage
         # rather than the cause.
         self._reaches = self._generate_reaches_dict(reaches)
         self._initialize_network_attributes(_generate_graph(reaches))
+        # None for a network built straight from reaches: there is no file
+        # behind it, so the members that read one say so rather than guess.
+        self._source = source
 
     def _initialize_network_attributes(self, graph: nx.Graph):
         self._df = _build_dataframe(graph)
@@ -271,7 +275,8 @@ class Network:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
-        return cls(list_of_reaches)
+        source = _Source(res, {}, companion=None if extra is None else extra.res)
+        return cls(list_of_reaches, source=source)
 
     @staticmethod
     def _generate_reaches_dict(
@@ -566,9 +571,47 @@ class Network:
     def copy(self) -> Network:
         """Create a deep copy of the Network.
 
+        The graph, the reaches and the timeseries are copied. The result file
+        the network was opened from is shared rather than copied, so both
+        networks read through one open file - see :meth:`release`.
+
         Returns
         -------
         Network
             Deep copy of the Network object
         """
         return deepcopy(self)
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> Network:
+        """Copy everything but the result file, which is shared.
+
+        A ``Res1D`` cannot be deep-copied at all - it holds .NET objects, and
+        the attempt raises ``TypeError: cannot pickle 'Filter' object``. Sharing
+        it is also the behaviour worth having: a copy is made to alter the graph
+        or the frames, never to open the file a second time.
+        """
+        clone = self.__class__.__new__(self.__class__)
+        memo[id(self)] = clone
+        for key, value in self.__dict__.items():
+            setattr(clone, key, value if key == "_source" else deepcopy(value, memo))
+        return clone
+
+    def release(self) -> None:
+        """Let go of the result file the network was opened from.
+
+        A network keeps that file open for its own lifetime, so that
+        :meth:`period`, :meth:`resolve`, :meth:`locations` and :meth:`read` can
+        answer after the open. Releasing it frees what the file holds, at the
+        cost of those five members: they then behave as they do on a network
+        built straight from reaches, and raise.
+
+        The data already read is untouched - :meth:`to_dataframe` and
+        :meth:`to_dataset` keep working. Calling this twice is harmless.
+
+        Examples
+        --------
+        >>> network = Network.open("model.res1d")  # doctest: +SKIP
+        >>> ds = network.to_dataset()  # doctest: +SKIP
+        >>> network.release()  # doctest: +SKIP
+        """
+        self._source = None

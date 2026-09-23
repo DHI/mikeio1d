@@ -108,6 +108,10 @@ class _Companion:
     """
 
     def __init__(self, res: Res1D, extra: Res1D) -> None:
+        # Kept so a series read after the open can go back to the file it came
+        # from: a companion's quantities live in its own Res1D, not the main
+        # file's, so they cannot be read through the main one.
+        self.res = extra
         self.nodes = _rekey_by_main_file(extra.nodes, res.nodes)
         self.reaches = _rekey_by_main_file(extra.reaches, res.reaches)
 
