@@ -8,6 +8,11 @@ translate between them.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from datetime import datetime
+
 from collections.abc import Mapping
 from collections.abc import Sequence
 from copy import deepcopy
@@ -373,6 +378,47 @@ class Network:
         304.8
         """
         return MappingProxyType(self._reaches)
+
+    def _require_source(self, what: str) -> _Source:
+        """Give the result file behind this network, or explain why there is none.
+
+        Two ways to end up here: a network built straight from reaches never had
+        a file, and a released one has let go of it. They want different advice,
+        so they are told apart.
+        """
+        if self._source is None:
+            raise ValueError(
+                f"{what} needs the result file this network was opened from, and this "
+                "network has none. Either it was built from NetworkReach objects rather "
+                "than by Network.open(), in which case its data is already in memory - "
+                "use to_dataframe() or to_dataset() - or release() has been called on "
+                "it, in which case open the file again."
+            )
+        return self._source
+
+    def period(self) -> tuple[datetime, datetime]:
+        """First and last timestep of the result file.
+
+        Read from the file header, so this costs nothing even on a network
+        opened with no timeseries at all.
+
+        Returns
+        -------
+        tuple[datetime, datetime]
+            Start and end of the result file's time axis.
+
+        Raises
+        ------
+        ValueError
+            If the network was not opened from a result file, or if
+            :meth:`release` has been called on it.
+
+        Examples
+        --------
+        >>> network.period()  # doctest: +SKIP
+        (datetime.datetime(1994, 8, 7, 16, 35), datetime.datetime(1994, 8, 7, 18, 35))
+        """
+        return self._require_source("period()").period
 
     @property
     def loaded_quantities(self) -> list[str]:
