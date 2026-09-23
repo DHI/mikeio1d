@@ -1,9 +1,9 @@
-"""Abstract network elements, and the simplest concrete pair.
+"""The network elements a source hands over.
 
-A reader supplies nodes, reaches and breakpoints; :class:`~mikeio1d.network.Network`
+A source supplies nodes, reaches and breakpoints; :class:`~mikeio1d.network.Network`
 takes them and knows nothing about the file they came from. The abstract classes
-here are that contract, and :class:`BasicNode`/:class:`BasicReach` are enough to
-build a network by hand or in a test.
+here are that contract - what ``_Source.build()`` returns, and all a network ever
+sees of where its topology came from.
 """
 
 from __future__ import annotations
@@ -26,12 +26,8 @@ class NetworkNode(ABC):
     * :attr:`data` - a time-indexed :class:`pandas.DataFrame` whose columns
       are quantity names.
 
-    The concrete helper :class:`BasicNode` is provided for the common case
-    where the data is already available as a DataFrame.
-
     See Also
     --------
-    BasicNode : Ready-to-use concrete implementation.
     NetworkReach : Connects two NetworkNode instances.
     Network : Container that assembles nodes and reaches into a graph.
     """
@@ -126,8 +122,8 @@ class NetworkReach(ABC):
     a list of :class:`ReachBreakPoint` objects for intermediate chainage
     locations.
 
-    Subclass this to integrate your own network topology.  Four properties
-    must be implemented:
+    A source's ``build()`` returns these.  Four properties must be
+    implemented:
 
     * :attr:`id` - a unique string identifier for the reach.
     * :attr:`start` - the upstream/start :class:`NetworkNode`.
@@ -143,9 +139,6 @@ class NetworkReach(ABC):
     ends sit in the frame its break points are placed in. They default to
     ``0.0`` and the length, which is right wherever break points are measured
     from the start node; override them where the frame is offset.
-
-    The concrete helper :class:`BasicReach` is provided for the common case
-    where all data is already available in memory.
 
     Examples
     --------
@@ -176,7 +169,6 @@ class NetworkReach(ABC):
 
     See Also
     --------
-    BasicReach : Ready-to-use concrete implementation.
     NetworkNode : Represents the start/end of this reach.
     ReachBreakPoint : Intermediate data points along this reach.
     Network : Assembles a list of NetworkReach objects into a graph.
@@ -240,101 +232,3 @@ class NetworkReach(ABC):
     def n_breakpoints(self) -> int:
         """Number of break points in the reach."""
         return len(self.breakpoints)
-
-
-class BasicNode(NetworkNode):
-    """Concrete :class:`NetworkNode` for programmatic network construction.
-
-    Parameters
-    ----------
-    id : str
-        Unique node identifier.
-    data : pd.DataFrame
-        Time-indexed DataFrame with one column per quantity.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> time = pd.date_range("2020", periods=3, freq="h")
-    >>> node = BasicNode("junction_1", pd.DataFrame({"WaterLevel": [1.0, 1.1, 1.2]}, index=time))
-    """
-
-    def __init__(
-        self,
-        id: str,
-        data: pd.DataFrame,
-    ) -> None:
-        self._id = id
-        self._data = data
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
-
-
-class BasicReach(NetworkReach):
-    """Concrete :class:`NetworkReach` for programmatic network construction.
-
-    Parameters
-    ----------
-    id : str
-        Unique reach identifier.
-    start : NetworkNode
-        Start node.
-    end : NetworkNode
-        End node.
-    length : float, optional
-        Reach length, by default None (undefined).
-    breakpoints : list[ReachBreakPoint], optional
-        Intermediate break points, by default empty.
-
-    Examples
-    --------
-    >>> reach = BasicReach("reach_1", node_a, node_b, length=250.0)
-
-    Where the domain has no reach length, leave it out:
-
-    >>> reach = BasicReach("pipe_1", node_a, node_b)
-
-    Two of these between the same two nodes - twin pipes, parallel pumps - need
-    a break point each, or the graph cannot tell them apart. See
-    :attr:`NetworkReach.breakpoints`.
-    """
-
-    def __init__(
-        self,
-        id: str,
-        start: NetworkNode,
-        end: NetworkNode,
-        length: float | None = None,
-        breakpoints: list[ReachBreakPoint] | None = None,
-    ) -> None:
-        self._id = id
-        self._start = start
-        self._end = end
-        self._length = length
-        self._breakpoints: list[ReachBreakPoint] = breakpoints or []
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def start(self) -> NetworkNode:
-        return self._start
-
-    @property
-    def end(self) -> NetworkNode:
-        return self._end
-
-    @property
-    def length(self) -> float | None:
-        return self._length
-
-    @property
-    def breakpoints(self) -> list[ReachBreakPoint]:
-        return self._breakpoints
