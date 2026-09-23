@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from datetime import datetime
 
+    from ._naming import Address
     from ._naming import Alias
 
 from collections.abc import Mapping
@@ -430,10 +431,55 @@ class Network:
         return self._require_source("period()").period
 
     @property
+    def quantities(self) -> Mapping[str, str | None]:
+        """Quantities readable somewhere in this network, by their units.
+
+        The union over every location the network has, so everything named here
+        can be read at some address - see :meth:`locations`. A result file's
+        header may declare more than this: a MIKE river result carries structure
+        and sensor quantities that sit on neither a node nor a gridpoint, and
+        nothing in a network can address them.
+
+        Read-only, and free: a location knows what it carries without any of it
+        being loaded. Narrower than the header, wider than
+        :attr:`loaded_quantities`, which is only what this load kept.
+
+        Returns
+        -------
+        Mapping[str, str | None]
+            Quantity ID to unit abbreviation. The unit is ``None`` where the
+            file gave none.
+
+        Raises
+        ------
+        ValueError
+            If the network was not opened from a result file, or if
+            :meth:`release` has been called on it.
+
+        Examples
+        --------
+        >>> network.quantities  # doctest: +SKIP
+        {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
+        """
+        source = self._require_source("quantities")
+        units = source.units
+        readable = {
+            quantity
+            for alias in self._naming.aliases
+            for quantity in (source.quantities_at(alias) or ())
+        }
+        # Ordered by the file's own header, so two networks over one file list
+        # their shared quantities alike whatever their topology.
+        ordered = [q for q in units if q in readable]
+        ordered += sorted(readable.difference(units))
+        return MappingProxyType({q: units.get(q) for q in ordered})
+
+    @property
     def loaded_quantities(self) -> list[str]:
         """Quantities this network holds data for.
 
-        What the filters of :meth:`open` let through.
+        What the filters of :meth:`open` let through, which is narrower than
+        :attr:`quantities` wherever a location was left topology-only.
 
         Returns
         -------
@@ -443,6 +489,60 @@ class Network:
         # Read off _df rather than to_dataframe(), whose copy would duplicate
         # the whole dataset for the sake of its column labels.
         return list(self._df.columns.get_level_values("quantity").unique())
+
+    def resolve(self, address: Address, *, tol: float | None = None) -> dict[str, Any] | None:
+        """Say whether a location is in this network, and what it carries.
+
+        The soft form of :meth:`find`: an address that is not here is answered
+        with ``None`` rather than an exception, which is what makes it usable
+        for deciding whether to read at all.
+
+        Parameters
+        ----------
+        address : str or tuple[str, float]
+            A node ID, or a reach ID and a distance along it. ``"start"`` and
+            ``"end"`` are not addresses - they name the node at a reach's end,
+            which :meth:`find` reaches, and :meth:`recall` then names.
+        tol : float, optional
+            How far a distance may be from a break point's own and still mean
+            it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
+            snap a measured chainage onto the model's; the nearest break point
+            inside the window wins. Ignored for a node ID.
+
+        Returns
+        -------
+        dict or None
+            ``None`` if there is no such location. Otherwise ``address``, the
+            network's own spelling of it, and ``quantities``, the quantity IDs
+            readable there. An empty list is an answer: every node of a MIKE 11
+            result carries nothing, since that format keeps its timeseries on
+            reach gridpoints.
+
+        Raises
+        ------
+        ValueError
+            If ``tol`` is negative or not finite, or if the network was not
+            opened from a result file.
+
+        Examples
+        --------
+        >>> network.resolve("101")  # doctest: +SKIP
+        {'address': '101', 'quantities': ['WaterLevel']}
+
+        >>> network.resolve(("100l1", 23.8), tol=0.1)  # doctest: +SKIP
+        {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge']}
+
+        >>> network.resolve("no_such_node") is None  # doctest: +SKIP
+        True
+        """
+        source = self._require_source("resolve()")
+        node_id = self._naming.id_of(address, tol=tol)
+        if node_id is None:
+            return None
+        # Back through the naming rather than echoing the argument, so the
+        # address that comes out is the one the rest of the surface takes.
+        alias = self._naming.alias_of(node_id)
+        return {"address": alias, "quantities": source.quantities_at(alias) or []}
 
     @overload
     def find(

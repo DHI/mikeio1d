@@ -13,6 +13,8 @@ it for the lifetime of the network; :meth:`~mikeio1d.network.Network.find`,
 
 from __future__ import annotations
 
+import math
+
 from collections.abc import Mapping
 from difflib import get_close_matches
 
@@ -34,6 +36,14 @@ Alias = str | tuple[str, float | None]
 A plain ``str`` is a node id. A ``(reach_id, distance)`` tuple is a break point,
 whose ``distance`` is ``None`` where its position along the reach is genuinely
 unknown. Nothing is both, so the shape says which it is.
+"""
+
+Address = str | tuple[str, float]
+"""A location a caller can name.
+
+The addressable part of :data:`Alias`. A break point whose distance is unknown -
+an EPANET reach read without its ``.inp`` - has an alias and a graph node, but
+nothing can ask for it by name.
 """
 
 
@@ -73,25 +83,36 @@ class _Naming:
         """Every alias in the network, mapped to its graph integer."""
         return self._by_alias
 
-    def id_of(self, alias: Alias) -> int | None:
+    def id_of(self, alias: Alias, *, tol: float | None = None) -> int | None:
         """Give the graph integer for an alias, or None if there is no such place.
 
         An exact hit answers immediately. Failing that, a break point is matched
-        on distance within :data:`_CHAINAGE_TOLERANCE`, so a caller need not
-        reproduce a stored float exactly.
+        on distance within ``tol``, defaulting to :data:`_CHAINAGE_TOLERANCE`, so
+        a caller need not reproduce a stored float exactly.
+
+        The nearest break point inside the window wins. At the default tolerance
+        that is the only one there, but a caller widening the window is snapping
+        a measured distance onto the model's, and means the closest.
         """
         if alias in self._by_alias:
             return self._by_alias[alias]
+        if tol is None:
+            tol = _CHAINAGE_TOLERANCE
+        elif not math.isfinite(tol) or tol < 0:
+            raise ValueError(
+                f"A distance tolerance must be a finite, non-negative number, got {tol!r}."
+            )
         if _is_break_point(alias):
             reach_id, distance = alias
+            nearest: int | None = None
+            nearest_gap = math.inf
             for key, node_id in self._by_alias.items():
-                if (
-                    _is_break_point(key)
-                    and key[0] == reach_id
-                    and key[1] is not None
-                    and abs(key[1] - distance) <= _CHAINAGE_TOLERANCE
-                ):
-                    return node_id
+                if not (_is_break_point(key) and key[0] == reach_id and key[1] is not None):
+                    continue
+                gap = abs(key[1] - distance)
+                if gap <= tol and gap < nearest_gap:
+                    nearest, nearest_gap = node_id, gap
+            return nearest
         return None
 
     def endpoint(self, reach_id: str, which: str) -> str:

@@ -30,10 +30,12 @@ except ImportError as err:
         "installs: pip install mikeio1d[network]"
     ) from err
 
+from ._naming import Address
 from ._network import Network
 from ._types import BasicNode, BasicReach, NetworkNode, NetworkReach, ReachBreakPoint
 
 __all__ = [
+    "Address",
     "BasicNode",
     "BasicReach",
     "Network",
