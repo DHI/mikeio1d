@@ -10,7 +10,7 @@ import pytest
 pytest.importorskip("networkx")
 pytest.importorskip("xarray")
 
-from mikeio1d.network import BasicNode, BasicReach, Network
+from mikeio1d.network import Network
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _EPANET_RES = str(_TESTDATA / "epanet.res")
@@ -71,31 +71,13 @@ class TestIdentityCoordinates:
         assert ds["Flow"].attrs["long_name"] == "Flow"
 
 
-class TestWithoutAResultFile:
-    """A network can be built by hand, and its dataset needs no MIKE file."""
+class TestANetworkHoldingNoData:
+    """A topology-only open has the whole graph and nothing to put in it."""
 
-    def test_a_hand_built_network_produces_the_same_coordinates(self):
-        time = pd.date_range("2024-01-01", periods=3, freq="h")
-        nodes = [
-            BasicNode(name, pd.DataFrame({"WaterLevel": [1.0, 2.0, 3.0]}, index=time))
-            for name in ("A", "B", "C")
-        ]
-        reaches = [
-            BasicReach("r0", nodes[0], nodes[1], length=100.0),
-            BasicReach("r1", nodes[1], nodes[2], length=50.0),
-        ]
+    def test_it_gives_an_empty_dataset(self):
+        network = Network.open(_EPANET_RES, companions=[], nodes=[], reaches=[])
 
-        ds = Network(reaches).to_dataset()
+        ds = network.to_dataset()
 
-        assert sorted(str(name) for name in ds.name.values) == ["A", "B", "C"]
-        assert set(str(reach) for reach in ds.reach.values) == {""}
-        assert np.isnan(ds.distance.values).all()
-        assert ds["WaterLevel"].sizes == {"time": 3, "node": 3}
-
-    def test_a_network_holding_no_data_gives_an_empty_dataset(self):
-        empty = pd.DataFrame()
-        nodes = [BasicNode("A", empty), BasicNode("B", empty)]
-
-        ds = Network([BasicReach("r0", nodes[0], nodes[1], length=1.0)]).to_dataset()
-
+        assert network.graph.number_of_nodes() > 0
         assert len(ds.data_vars) == 0

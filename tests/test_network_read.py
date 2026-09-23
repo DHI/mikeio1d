@@ -17,7 +17,7 @@ pytest.importorskip("networkx")
 pytest.importorskip("xarray")
 
 from mikeio1d import Res1D
-from mikeio1d.network import BasicNode, BasicReach, Network
+from mikeio1d.network import Network
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
@@ -48,10 +48,11 @@ def river():
     return Network.open(_RIVER, nodes=[], reaches=[])
 
 
-def _hand_built():
-    """A network made from objects, with no result file behind it."""
-    empty = pd.DataFrame()
-    return Network([BasicReach("r", BasicNode("a", empty), BasicNode("b", empty), 1.0, [])])
+def _released():
+    """A network that has let go of the result file it was opened from."""
+    network = Network.open(_RES1D, nodes=[], reaches=[])
+    network.release()
+    return network
 
 
 class TestTheOpenReadsNothing:
@@ -85,9 +86,9 @@ class TestThePeriod:
 
         assert network.period() == (res.start_time, res.end_time)
 
-    def test_a_network_with_no_file_says_so(self):
+    def test_a_released_network_says_so(self):
         with pytest.raises(ValueError, match="needs the result file"):
-            _hand_built().period()
+            _released().period()
 
 
 class TestWhatQuantitiesMeans:
@@ -178,9 +179,9 @@ class TestResolvingAnAddress:
         assert epanet.resolve("10")["address"] == "10"
         assert epanet.resolve(("10", 0.0))["address"] == ("10", 0.0)
 
-    def test_a_network_with_no_file_says_so(self):
+    def test_a_released_network_says_so(self):
         with pytest.raises(ValueError, match="needs the result file"):
-            _hand_built().resolve("a")
+            _released().resolve("101")
 
 
 class TestListingLocations:
@@ -219,9 +220,9 @@ class TestListingLocations:
         with pytest.raises(KeyError, match="no reach"):
             network.locations(reach="no_such_reach")
 
-    def test_a_network_with_no_file_says_so(self):
+    def test_a_released_network_says_so(self):
         with pytest.raises(ValueError, match="needs the result file"):
-            _hand_built().locations()
+            _released().locations()
 
 
 class TestReadingSeries:
@@ -306,9 +307,9 @@ class TestReadingSeries:
 
         assert "cannot read 2 of the 2" in str(failure.value)
 
-    def test_a_network_with_no_file_says_so(self):
+    def test_a_released_network_says_so(self):
         with pytest.raises(ValueError, match="needs the result file"):
-            _hand_built().read([("a", "WaterLevel")])
+            _released().read([("101", "WaterLevel")])
 
 
 class TestHoldingTheResultFile:

@@ -14,17 +14,22 @@ end - see :func:`_build_reach_breakpoints` for what becomes of it.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from ..res1d import Res1D
 from ._companions import _CompanionConflict
-from ._source import _Series
 from ._source import _Source
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from collections.abc import Sequence
+    from datetime import datetime
+
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
+    from ..quantities import TimeSeriesId
     from ._companions import _Companion
     from ._naming import Alias
 
@@ -34,6 +39,22 @@ from ._types import NetworkNode, NetworkReach, ReachBreakPoint
 # allocating its own. A large network has two per reach, which profiling showed
 # to be the biggest single cost of a filtered load. Never mutate it in place.
 _EMPTY_DATA = pd.DataFrame()
+
+
+@dataclass(frozen=True)
+class _Series:
+    """One timeseries, and the file it has to be read from.
+
+    Addressed by :class:`~mikeio1d.quantities.TimeSeriesId` rather than by the
+    ``ResultQuantity`` it came from. Loading a companion's dynamic data replaces
+    the whole ``ResultNetwork`` it hangs off (see ``ResultReader._load_file``),
+    so any quantity object captured before that point is a stale handle onto a
+    discarded object graph. A ``TimeSeriesId`` is inert, and every read looks it
+    up afresh.
+    """
+
+    res: Res1D
+    tsid: TimeSeriesId
 
 
 def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> ResultQuantity:
@@ -371,14 +392,14 @@ def _load_res1d_network(
     extra: _Companion | None = None,
     lengths: dict[str, float] | None = None,
     quantities: set[str] | None = None,
-) -> tuple[list[Res1DReach], _Source]:
-    """Read a result file as reaches, and as the source they can be re-read through.
+) -> tuple[list[Res1DReach], dict[Alias, dict[str, _Series]]]:
+    """Read a result file as reaches, and as the map of where each series sits.
 
     Both come out of the one walk over ``res.reaches``, and neither can be had
     from the other afterwards: the reaches are what the filters let through,
-    while the source records what every location could offer. Returned together
-    so that the map, whose keys are gridpoint-to-break-point correspondences
-    only this walk knows, is never assembled by a caller.
+    while the map records what every location could offer. Returned together so
+    that the map, whose keys are gridpoint-to-break-point correspondences only
+    this walk knows, is never assembled by a caller.
     """
     nodes_set = set(nodes)
     reaches_set = set(reaches)
@@ -441,4 +462,128 @@ def _load_res1d_network(
         )
 
     built = [_build_reach(reach) for reach in res.reaches.values()]
-    return built, _Source(res, series, companion=None if extra is None else extra.res)
+    return built, series
+
+
+class _Res1DSource(_Source):
+    """A :class:`~mikeio1d.network._source._Source` backed by a result file.
+
+    Holds everything the load needs, so that :meth:`build` can produce the
+    topology rather than be handed it: the main file, the filters deciding which
+    locations get their timeseries, and the companions - a ``.resx`` read
+    alongside, and the ``[PIPES]`` lengths from an ``.inp``, which no result file
+    carries.
+
+    Parameters
+    ----------
+    res : Res1D
+        The main result file.
+    nodes, reaches : list of str
+        Which locations get their timeseries loaded. See
+        :meth:`~mikeio1d.network.Network.open`.
+    extra : _Companion or None, optional
+        The ``.resx`` read alongside, if there was one. Its quantities become
+        readable like any other, and its header is needed for their units.
+    lengths : dict of str to float, optional
+        Reach lengths from a companion ``.inp``.
+    quantities : set of str or None, optional
+        Which quantities are read at each selected location.
+    """
+
+    def __init__(
+        self,
+        res: Res1D,
+        nodes: list[str],
+        reaches: list[str],
+        *,
+        extra: _Companion | None = None,
+        lengths: dict[str, float] | None = None,
+        quantities: set[str] | None = None,
+    ) -> None:
+        self._res = res
+        self._nodes = nodes
+        self._reaches = reaches
+        self._extra = extra
+        self._lengths = lengths
+        self._quantities = quantities
+        # Filled by build(), which is the only place that knows which gridpoint
+        # each break point was made from.
+        self._items: dict[Alias, dict[str, _Series]] = {}
+
+    def build(self) -> list[Res1DReach]:
+        """Read the file as reaches, recording where every series sits.
+
+        The reaches are returned and not kept: a network deep-copies them and
+        shares its source, so holding them here would leave a copy's two views
+        of its reaches pointing at different objects.
+        """
+        built, self._items = _load_res1d_network(
+            self._res,
+            self._nodes,
+            self._reaches,
+            extra=self._extra,
+            lengths=self._lengths,
+            quantities=self._quantities,
+        )
+        return built
+
+    @property
+    def period(self) -> tuple[datetime, datetime]:
+        """First and last timestep of the main result file."""
+        return self._res.start_time, self._res.end_time
+
+    @property
+    def units(self) -> Mapping[str, str]:
+        """Unit abbreviation per quantity ID, over the main file and companion.
+
+        The main file wins where both spell the same quantity, since it is the
+        one the network was opened from.
+        """
+        units: dict[str, str] = {}
+        for res in (None if self._extra is None else self._extra.res, self._res):
+            if res is None:
+                continue
+            for quantity in res.result_data.Quantities:
+                units[str(quantity.Id)] = str(quantity.EumQuantity.UnitAbbreviation)
+        return units
+
+    def quantities_at(self, alias: Alias) -> list[str] | None:
+        """Quantity IDs readable at one location, or None if it has no series."""
+        carried = self._items.get(alias)
+        return None if carried is None else list(carried)
+
+    def read(self, items: Sequence[tuple[Alias, str]]) -> pd.DataFrame:
+        """Read the given pairs, one batched call per file they live in.
+
+        Each distinct series is read once however often it was asked for - an
+        EPANET reach's two break points name the same gridpoint, so asking for
+        both is one read, not two.
+        """
+        if not items:
+            # Nothing asked for, nothing opened. The file's own time index would
+            # be the tidier index to carry here, but reading it loads the whole
+            # of the file's dynamic data, which is the one thing asking for
+            # nothing should not do.
+            return pd.DataFrame(index=pd.DatetimeIndex([], name="time"))
+
+        series = [self._items[alias][quantity] for alias, quantity in items]
+
+        # Grouped by file, and within a file de-duplicated, so what crosses the
+        # interop boundary is each distinct series exactly once.
+        by_file: dict[int, tuple[Res1D, list[TimeSeriesId]]] = {}
+        for item in series:
+            _, tsids = by_file.setdefault(id(item.res), (item.res, []))
+            if item.tsid not in tsids:
+                tsids.append(item.tsid)
+
+        columns: dict[tuple[int, TimeSeriesId], pd.Series] = {}
+        for res, tsids in by_file.values():
+            frame = res.read(tsids, column_mode="timeseries")
+            for tsid, (_, column) in zip(tsids, frame.items()):
+                columns[(id(res), tsid)] = column
+
+        return pd.concat(
+            [columns[(id(item.res), item.tsid)] for item in series],
+            axis=1,
+            keys=range(len(series)),
+        )

@@ -34,7 +34,7 @@ from ._companions import _companion_paths, _read_companions, _CompanionConflict
 from ._graph import _build_dataframe, _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
-from ._res1d import _load_res1d_network
+from ._res1d import _Res1DSource
 from ._types import NetworkReach
 
 
@@ -63,19 +63,17 @@ class Network:
     timeseries each location holds, and :meth:`find` and :meth:`recall`
     translate between the two namings.
 
-    Build one with :meth:`open`, which reads a result file, or by handing the
-    constructor a sequence of :class:`~mikeio1d.network.NetworkReach`.
+    Build one with :meth:`open`, which reads a result file.
     """
 
-    def __init__(self, reaches: Sequence[NetworkReach], *, source: _Source | None = None):
+    def __init__(self, source: _Source):
+        self._source = source
+        reaches = source.build()
         # Ids first: two reaches sharing one would interleave their break points
         # into a single chain, and the graph error would describe the wreckage
         # rather than the cause.
         self._reaches = self._generate_reaches_dict(reaches)
         self._initialize_network_attributes(_generate_graph(reaches))
-        # None for a network built straight from reaches: there is no file
-        # behind it, so the members that read one say so rather than guess.
-        self._source = source
 
     def _initialize_network_attributes(self, graph: nx.Graph):
         self._df = _build_dataframe(graph)
@@ -270,21 +268,21 @@ class Network:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
+        source = _Res1DSource(
+            res,
+            nodes_list,
+            reaches_list,
+            extra=extra,
+            lengths=lengths,
+            quantities=quantities_set,
+        )
+
         try:
-            list_of_reaches, source = _load_res1d_network(
-                res,
-                nodes_list,
-                reaches_list,
-                extra=extra,
-                lengths=lengths,
-                quantities=quantities_set,
-            )
+            return cls(source)
         except _CompanionConflict as err:
             if not discovered:
                 raise
             raise _blame_the_companions(res, found, err) from err
-
-        return cls(list_of_reaches, source=source)
 
     @staticmethod
     def _generate_reaches_dict(
@@ -383,19 +381,17 @@ class Network:
         return MappingProxyType(self._reaches)
 
     def _require_source(self, what: str) -> _Source:
-        """Give the result file behind this network, or explain why there is none.
+        """Give the source behind this network, or explain why there is none.
 
-        Two ways to end up here: a network built straight from reaches never had
-        a file, and a released one has let go of it. They want different advice,
-        so they are told apart.
+        One way to end up here: :meth:`release` has been called. A network is
+        constructed from a source, so it cannot have gone without one.
         """
         if self._source is None:
             raise ValueError(
-                f"{what} needs the result file this network was opened from, and this "
-                "network has none. Either it was built from NetworkReach objects rather "
-                "than by Network.open(), in which case its data is already in memory - "
-                "use to_dataframe() or to_dataset() - or release() has been called on "
-                "it, in which case open the file again."
+                f"{what} needs the result file this network was opened from, and "
+                "release() has let go of it. The data already read is still here - "
+                "use to_dataframe() or to_dataset() - and opening the file again "
+                "restores the rest."
             )
         return self._source
 
@@ -413,8 +409,7 @@ class Network:
         Raises
         ------
         ValueError
-            If the network was not opened from a result file, or if
-            :meth:`release` has been called on it.
+            If :meth:`release` has been called on this network.
 
         Examples
         --------
@@ -446,8 +441,7 @@ class Network:
         Raises
         ------
         ValueError
-            If the network was not opened from a result file, or if
-            :meth:`release` has been called on it.
+            If :meth:`release` has been called on this network.
 
         Examples
         --------
@@ -554,8 +548,7 @@ class Network:
             If any item names a location the network does not have, or a
             quantity that location does not carry. Every failing item is named.
         ValueError
-            If the network was not opened from a result file, or if
-            :meth:`release` has been called on it.
+            If :meth:`release` has been called on this network.
 
         Notes
         -----
@@ -573,21 +566,19 @@ class Network:
         >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
         """
         source = self._require_source("read()")
-        # An empty request never reaches the file. Res1D.read([]) means "read
-        # everything", which is the opposite of what asking for nothing wants.
-        series = []
+        # Resolved to the source's own spelling before anything is read, so a bad
+        # item is named rather than read around, and so the source is handed only
+        # pairs it has already confirmed.
+        resolved: list[tuple[Alias, str]] = []
         for address, quantity in items:
             node_id = self._naming.id_of(address)
-            found = (
-                None
-                if node_id is None
-                else source.series_at(self._naming.alias_of(node_id), quantity)
-            )
-            if found is None:
+            alias = None if node_id is None else self._naming.alias_of(node_id)
+            carried = None if alias is None else source.quantities_at(alias)
+            if carried is None or quantity not in carried:
                 raise self._blame_unreadable(items, source)
-            series.append(found)
+            resolved.append((alias, quantity))
 
-        df = source.read(series)
+        df = source.read(resolved)
         # A flat index, so a column label is the whole (address, quantity) pair
         # the caller handed in - an address is itself a tuple, and a MultiIndex
         # would read the two apart.
@@ -616,8 +607,7 @@ class Network:
         Raises
         ------
         ValueError
-            If the network was not opened from a result file, or if
-            :meth:`release` has been called on it.
+            If :meth:`release` has been called on this network.
 
         Examples
         --------
@@ -676,8 +666,8 @@ class Network:
         Raises
         ------
         ValueError
-            If ``tol`` is negative or not finite, or if the network was not
-            opened from a result file.
+            If ``tol`` is negative or not finite, or if :meth:`release` has
+            been called on this network.
 
         Examples
         --------
@@ -912,8 +902,7 @@ class Network:
         A network keeps that file open for its own lifetime, so that
         :meth:`period`, :meth:`resolve`, :meth:`locations` and :meth:`read` can
         answer after the open. Releasing it frees what the file holds, at the
-        cost of those five members: they then behave as they do on a network
-        built straight from reaches, and raise.
+        cost of those five members: they raise from then on.
 
         The data already read is untouched - :meth:`to_dataframe` and
         :meth:`to_dataset` keep working. Calling this twice is harmless.

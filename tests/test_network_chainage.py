@@ -15,7 +15,9 @@ import pytest
 pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
-from mikeio1d.network import BasicNode, BasicReach, Network, ReachBreakPoint
+from mikeio1d.network import Network
+from mikeio1d.network._source import _Source
+from mikeio1d.network._types import NetworkNode, NetworkReach, ReachBreakPoint
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RIVER = str(_TESTDATA / "network_river.res1d")
@@ -44,8 +46,80 @@ def river_lengths():
     return {name: reach.length for name, reach in Res1D(_RIVER).reaches.items()}
 
 
-def _empty_node(id):
-    return BasicNode(id, pd.DataFrame())
+class _Node(NetworkNode):
+    """A node carrying nothing."""
+
+    def __init__(self, id):
+        self._id = id
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def data(self):
+        return pd.DataFrame()
+
+
+class _Reach(NetworkReach):
+    """A reach with whatever length and break points a test needs."""
+
+    def __init__(self, id, start, end, length=None, breakpoints=None):
+        self._id = id
+        self._start = start
+        self._end = end
+        self._length = length
+        self._breakpoints = breakpoints or []
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def start(self):
+        return self._start
+
+    @property
+    def end(self):
+        return self._end
+
+    @property
+    def length(self):
+        return self._length
+
+    @property
+    def breakpoints(self):
+        return self._breakpoints
+
+
+class _HandBuilt(_Source):
+    """A source over reaches already in memory.
+
+    A Network is built from a source, so a test wanting a shape no result file
+    produces - twin reaches between one pair of nodes, a reach with no length -
+    supplies it this way. Only build() is ever reached; the members that answer
+    about timeseries belong to a file-backed source.
+    """
+
+    def __init__(self, reaches):
+        self._reaches = reaches
+
+    def build(self):
+        return self._reaches
+
+    @property
+    def period(self):
+        raise NotImplementedError
+
+    @property
+    def units(self):
+        return {}
+
+    def quantities_at(self, alias):
+        return None
+
+    def read(self, items):
+        raise NotImplementedError
 
 
 class _Point(ReachBreakPoint):
@@ -146,30 +220,30 @@ class TestTheDefaultFrame:
     """A reach measured from its own start needs to say nothing at all."""
 
     def test_it_starts_at_zero(self):
-        reach = BasicReach("r0", _empty_node("A"), _empty_node("B"), length=100.0)
+        reach = _Reach("r0", _Node("A"), _Node("B"), length=100.0)
 
         assert reach.start_distance == 0.0
 
     def test_it_ends_at_its_length(self):
-        reach = BasicReach("r0", _empty_node("A"), _empty_node("B"), length=100.0)
+        reach = _Reach("r0", _Node("A"), _Node("B"), length=100.0)
 
         assert reach.end_distance == 100.0
 
     def test_it_has_no_end_without_a_length(self):
-        reach = BasicReach("r0", _empty_node("A"), _empty_node("B"))
+        reach = _Reach("r0", _Node("A"), _Node("B"))
 
         assert reach.end_distance is None
 
     def test_an_interior_break_point_keeps_a_real_edge_to_each_end(self):
         """Only a break point on a reach's end is a boundary; these are not."""
-        reach = BasicReach(
+        reach = _Reach(
             "r0",
-            _empty_node("A"),
-            _empty_node("B"),
+            _Node("A"),
+            _Node("B"),
             length=100.0,
             breakpoints=[_Point("r0", 25.0), _Point("r0", 75.0)],
         )
-        network = Network([reach])
+        network = Network(_HandBuilt([reach]))
 
         leading, trailing = _end_edges(network, "r0")
 
@@ -181,42 +255,42 @@ class TestTwoReachesTheGraphCannotTellApart:
     """A break point is what keeps two reaches between the same nodes distinct."""
 
     def test_neither_having_one_is_refused(self):
-        a, b = _empty_node("A"), _empty_node("B")
+        a, b = _Node("A"), _Node("B")
         reaches = [
-            BasicReach("r0", a, b, length=100.0),
-            BasicReach("r1", a, b, length=250.0),
+            _Reach("r0", a, b, length=100.0),
+            _Reach("r1", a, b, length=250.0),
         ]
 
         with pytest.raises(ValueError, match="'r0' and 'r1'"):
-            Network(reaches)
+            Network(_HandBuilt(reaches))
 
     def test_the_pair_is_the_same_read_backwards(self):
         """The graph is undirected, so running the other way does not help."""
-        a, b = _empty_node("A"), _empty_node("B")
+        a, b = _Node("A"), _Node("B")
         reaches = [
-            BasicReach("r0", a, b, length=100.0),
-            BasicReach("r1", b, a, length=250.0),
+            _Reach("r0", a, b, length=100.0),
+            _Reach("r1", b, a, length=250.0),
         ]
 
         with pytest.raises(ValueError, match="'r0' and 'r1'"):
-            Network(reaches)
+            Network(_HandBuilt(reaches))
 
     def test_a_break_point_each_keeps_them_apart(self):
-        a, b = _empty_node("A"), _empty_node("B")
+        a, b = _Node("A"), _Node("B")
         reaches = [
-            BasicReach("r0", a, b, length=100.0, breakpoints=[_Point("r0", 50.0)]),
-            BasicReach("r1", a, b, length=250.0, breakpoints=[_Point("r1", 125.0)]),
+            _Reach("r0", a, b, length=100.0, breakpoints=[_Point("r0", 50.0)]),
+            _Reach("r1", a, b, length=250.0, breakpoints=[_Point("r1", 125.0)]),
         ]
 
-        assert Network(reaches).graph.number_of_edges() == 4
+        assert Network(_HandBuilt(reaches)).graph.number_of_edges() == 4
 
     def test_sharing_an_id_is_refused(self):
         """Their break points would interleave into one chain, losing a reach."""
-        a, b = _empty_node("A"), _empty_node("B")
+        a, b = _Node("A"), _Node("B")
         reaches = [
-            BasicReach("r0", a, b, length=100.0, breakpoints=[_Point("r0", 50.0)]),
-            BasicReach("r0", a, b, length=250.0, breakpoints=[_Point("r0", 50.0)]),
+            _Reach("r0", a, b, length=100.0, breakpoints=[_Point("r0", 50.0)]),
+            _Reach("r0", a, b, length=250.0, breakpoints=[_Point("r0", 50.0)]),
         ]
 
         with pytest.raises(ValueError, match="share the id 'r0'"):
-            Network(reaches)
+            Network(_HandBuilt(reaches))

@@ -34,7 +34,7 @@ def _copy(tmp_path, stem, *suffixes):
 
 
 def _raise(error):
-    """A stand-in for a loader that fails, for the sake of the error path."""
+    """A stand-in for a load that fails, for the sake of the error path."""
 
     def fail(*args, **kwargs):
         raise error
@@ -209,7 +209,7 @@ class TestCompanionErrors:
         with its own message and no advice that cannot help.
         """
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
-        monkeypatch.setattr(_network, "_load_res1d_network", _raise(ValueError("no start node")))
+        monkeypatch.setattr(_network._Res1DSource, "build", _raise(ValueError("no start node")))
 
         with pytest.raises(ValueError, match="no start node") as excinfo:
             Network.open(res)
@@ -220,7 +220,7 @@ class TestCompanionErrors:
         """A companion's quantity colliding with the main file's is their fault."""
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
         monkeypatch.setattr(
-            _network, "_load_res1d_network", _raise(_CompanionConflict("already has Volume"))
+            _network._Res1DSource, "build", _raise(_CompanionConflict("already has Volume"))
         )
 
         with pytest.raises(ValueError, match="model.resx") as excinfo:
