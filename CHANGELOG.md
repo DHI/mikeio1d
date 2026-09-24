@@ -9,10 +9,9 @@
   `network` extra (`pip install mikeio1d[network]`).
 - `Network.period`, `Network.quantities`, `Network.resolve`, `Network.locations` and
   `Network.read`, for asking a result file what it holds and reading only the series a
-  caller turns out to need. Open with `nodes=[], reaches=[]` for the whole topology and no
-  timeseries, then read by the names the model used - a node ID, or a reach and a distance
-  along it. A network keeps its result file open to answer, and `Network.release` lets go
-  of it (#250).
+  caller turns out to need, by the names the model used - a node ID, or a reach and a
+  distance along it. A network keeps its result file open to answer, and `Network.release`
+  lets go of it (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 
@@ -24,9 +23,15 @@
 - `Res1D.to_txt` and `Res1D.to_csv` no longer leave the output file open when a write fails (#248).
 
 ### Changed
+- `Network.open` reads the header and the topology and no timeseries. `to_dataframe` and
+  `to_dataset` read every location when they are called, and stop after `release`. The
+  `nodes`, `reaches` and `quantities` options are gone: read the locations you need with
+  `Network.read` instead (#250).
 - `Network.quantities` now names what can be read somewhere in the network, mapped to its
-  unit, rather than what a given load happened to keep. What it used to mean is
-  `Network.loaded_quantities`. Membership and `sorted()` read the same either way (#250).
+  unit. Membership and `sorted()` read as before; indexing does not (#250).
+- A `.resx` carrying a quantity its `.res` already has at the same location is refused
+  however the network is read. It used to be refused only where a frame was built, and
+  otherwise read silently from the `.resx` (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.

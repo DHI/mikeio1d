@@ -46,15 +46,15 @@ pip install mikeio1d[network]
 
 ## Reading only what you need
 
-Pass `nodes=[]` and `reaches=[]` for the whole topology and none of the data:
+`Network.open` reads the header and the topology, and no timeseries:
 
 ```python
 from mikeio1d.network import Network
 
-network = Network.open("model.res1d", nodes=[], reaches=[])
+network = Network.open("model.res1d")
 ```
 
-The network then answers from the file header and its own break points, without reading any timeseries:
+The network then answers from the file header and its own break points, still without reading any:
 
 ```python
 network.period()                                   # (start, end)
@@ -70,7 +70,7 @@ network.resolve(("100l1", 23.8), tol=0.1)
 # {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge']}
 ```
 
-`read()` is the only one of these that touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and everything asked for crosses to the result file in one batched call:
+`read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and everything asked for crosses to the result file in one batched call:
 
 ```python
 points = network.locations(reach="100l1", quantity="Discharge")
@@ -79,9 +79,11 @@ network.read([(point, "Discharge") for point in points])
 
 A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`.
 
+`to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network.
+
 ::: {.callout-note}
 ## The file stays open
-A network holds its result file for its own lifetime so these can answer. Call `release()` to let go of it once the data is out; `to_dataframe()` and `to_dataset()` keep working afterwards, and the five members above stop.
+A network holds its result file for its own lifetime, since every series is read from it on request. Call `release()` to let go of it once the data is out. The topology stays - `graph`, `reaches`, `find()` and `recall()` - while everything above, `to_dataframe()` and `to_dataset()` stop.
 
 MIKE 1D loads a file's whole dynamic data on the first read of anything in it, so what reading late saves is the work of building frames for locations you never asked about, not the file read itself.
 :::
