@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from pathlib import Path
 
     from ..res1d import Res1D
-    from ._res1d import _Results
+    from ._results import _Results
     from ._types import NetworkReach
 
 from ._companions import _companion_paths

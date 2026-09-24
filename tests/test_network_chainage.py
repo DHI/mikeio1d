@@ -15,7 +15,7 @@ pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
 from mikeio1d.network import Network
-from mikeio1d.network._res1d import _Results
+from mikeio1d.network._results import _Results
 from mikeio1d.network._types import NetworkReach, ReachBreakPoint
 
 _TESTDATA = Path(__file__).parent / "testdata"
@@ -56,7 +56,7 @@ def _hand_built(reaches):
     For a shape no result file produces - twin reaches between one pair of
     nodes, a reach with no length. Only the topology is ever asked about.
     """
-    return Network(reaches, _Results(series={}, units={}, period=(None, None)))
+    return Network(reaches, _Results.empty())
 
 
 def _chain_nodes(network, reach_id):

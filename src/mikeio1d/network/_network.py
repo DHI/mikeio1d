@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
     from ._naming import Address
     from ._naming import Alias
-    from ._res1d import _Results
+    from ._results import _Results
 
 from collections.abc import Mapping
 from collections.abc import Sequence
@@ -44,7 +44,8 @@ class Network:
     as the ``alias`` attribute, and :meth:`resolve` gives the integer for a name.
 
     Build one with :meth:`open`, which reads a result file's topology. The
-    timeseries stay in the file until :meth:`read` asks for them.
+    timeseries stay in the file until :meth:`read` asks for them. The
+    constructor is internal: it takes what a loader produces, not a file.
     """
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
