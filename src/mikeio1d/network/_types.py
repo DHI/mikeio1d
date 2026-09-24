@@ -8,6 +8,11 @@ that is the loader's series map to answer.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from ._naming import Address
+
 from dataclasses import dataclass
 
 
@@ -97,3 +102,26 @@ class NetworkReach:
     def n_breakpoints(self) -> int:
         """Number of break points in the reach."""
         return len(self.breakpoints)
+
+
+@dataclass(frozen=True)
+class Location:
+    """A location a network has, as :meth:`Network.resolve` answers for it.
+
+    Attributes
+    ----------
+    address : str or tuple[str, float]
+        The network's own spelling of the location, which the rest of the
+        network takes. A distance is the one the file stores, not the one asked
+        for.
+    quantities : tuple of str
+        The quantity IDs readable there. Empty is an answer: the location is
+        in the network but carries nothing of its own.
+    node : int
+        The integer :attr:`Network.graph` and :meth:`Network.to_dataset` label
+        the location with. ``graph.nodes[node]["alias"]`` is the address.
+    """
+
+    address: Address
+    quantities: tuple[str, ...]
+    node: int

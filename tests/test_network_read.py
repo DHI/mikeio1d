@@ -112,7 +112,7 @@ class TestWhatQuantitiesMeans:
         somewhere = {
             quantity
             for address in river.locations()
-            for quantity in river.resolve(address)["quantities"]
+            for quantity in river.resolve(address).quantities
         }
 
         assert set(river.quantities) == somewhere
@@ -128,16 +128,16 @@ class TestResolvingAnAddress:
     def test_a_node_gives_back_its_own_name(self, network):
         resolved = network.resolve("101")
 
-        assert (resolved["address"], resolved["quantities"]) == ("101", ["WaterLevel"])
+        assert (resolved.address, resolved.quantities) == ("101", ("WaterLevel",))
 
     def test_the_node_is_the_graph_integer_labelled_with_the_address(self, network):
         resolved = network.resolve(("100l1", 23.8), tol=0.1)
 
-        assert network.graph.nodes[resolved["node"]]["alias"] == resolved["address"]
+        assert network.graph.nodes[resolved.node]["alias"] == resolved.address
 
     def test_the_node_selects_the_location_in_the_dataset(self, network):
         """The integer is what to_dataset() is indexed by, and names the same place."""
-        node = network.resolve("101")["node"]
+        node = network.resolve("101").node
 
         column = network.to_dataset()["WaterLevel"].sel(node=node)
 
@@ -146,7 +146,7 @@ class TestResolvingAnAddress:
     def test_a_break_point_snaps_to_the_distance_the_file_stores(self, network):
         resolved = network.resolve(("100l1", 23.8), tol=0.1)
 
-        assert resolved["address"] == _Q_POINT
+        assert resolved.address == _Q_POINT
 
     def test_a_distance_outside_the_tolerance_is_not_here(self, network):
         assert network.resolve(("100l1", 23.8)) is None
@@ -159,7 +159,7 @@ class TestResolvingAnAddress:
         """A caller widening the window is snapping a measurement, not sweeping."""
         resolved = network.resolve(("100l1", 20.0), tol=30.0)
 
-        assert resolved["address"] == _Q_POINT
+        assert resolved.address == _Q_POINT
 
     @pytest.mark.parametrize("tol", [-1.0, float("nan"), float("inf")])
     def test_a_tolerance_that_is_not_a_distance_is_refused(self, network, tol):
@@ -177,12 +177,12 @@ class TestResolvingAnAddress:
 
         resolved = res11.resolve(node)
 
-        assert (resolved["address"], resolved["quantities"]) == (node, [])
+        assert (resolved.address, resolved.quantities) == (node, ())
 
     def test_a_node_and_a_reach_sharing_a_name_stay_apart(self, epanet):
         """EPANET names a junction 10 and a pipe 10. The shape says which."""
-        assert epanet.resolve("10")["address"] == "10"
-        assert epanet.resolve(("10", 0.0))["address"] == ("10", 0.0)
+        assert epanet.resolve("10").address == "10"
+        assert epanet.resolve(("10", 0.0)).address == ("10", 0.0)
 
 
 class TestListingLocations:
@@ -227,7 +227,7 @@ class TestReadingSeries:
 
     def test_a_series_matches_what_the_whole_frame_gives(self, network):
         """Reading one item gives what reading every item gives for it."""
-        expected = network.to_dataframe()[(network.resolve("101")["node"], "WaterLevel")]
+        expected = network.to_dataframe()[(network.resolve("101").node, "WaterLevel")]
 
         read = network.read([("101", "WaterLevel")])
 

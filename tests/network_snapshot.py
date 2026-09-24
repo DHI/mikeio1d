@@ -241,12 +241,12 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     for _, alias in network.graph.nodes(data="alias"):
         if isinstance(alias, tuple) and alias[1] is None:
             continue
-        found[_alias_key(alias)] = int(network.resolve(alias)["node"])
+        found[_alias_key(alias)] = int(network.resolve(alias).node)
 
     endpoints = {}
     for reach_id, reach in network.reaches.items():
         for where, node in (("start", reach.start), ("end", reach.end)):
-            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node.id)["node"])
+            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node.id).node)
 
     recalled = {}
     for node_id, alias in sorted(network.graph.nodes(data="alias")):

@@ -33,6 +33,7 @@ from ._graph import _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
+from ._types import Location
 from ._types import NetworkReach
 
 
@@ -521,7 +522,7 @@ class Network:
             found.append(alias)
         return found
 
-    def resolve(self, address: Address, *, tol: float | None = None) -> dict[str, Any] | None:
+    def resolve(self, address: Address, *, tol: float | None = None) -> Location | None:
         """Say whether a location is in this network, what it carries, and where.
 
         The one lookup by name. An address that is not here is answered with
@@ -542,17 +543,10 @@ class Network:
 
         Returns
         -------
-        dict or None
-            ``None`` if there is no such location. Otherwise:
-
-            * ``address`` -- the network's own spelling of it, which the rest of
-              the surface takes
-            * ``quantities`` -- the quantity IDs readable there. An empty list
-              is an answer: every node of a MIKE 11 result carries nothing,
-              since that format keeps its timeseries on reach gridpoints
-            * ``node`` -- the integer :attr:`graph` and :meth:`to_dataset` label
-              the location with. Going back, ``graph.nodes[node]["alias"]`` is
-              the address
+        Location or None
+            ``None`` if there is no such location. Otherwise its address as the
+            network spells it, the quantities readable there, and its graph
+            integer.
 
         Raises
         ------
@@ -562,22 +556,21 @@ class Network:
         Examples
         --------
         >>> network.resolve("101")  # doctest: +SKIP
-        {'address': '101', 'quantities': ['WaterLevel'], 'node': 5}
+        Location(address='101', quantities=('WaterLevel',), node=5)
 
         >>> network.resolve(("100l1", 23.8), tol=0.1)  # doctest: +SKIP
-        {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge'], 'node': 3}
+        Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
 
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        results = self._results
         # The network's own spelling rather than the argument echoed, so the
         # address that comes out is the one the rest of the surface takes.
         alias = self._naming.canonical(address, tol=tol)
         if alias is None:
             return None
-        return {
-            "address": alias,
-            "quantities": results.quantities_at(alias) or [],
-            "node": self._naming.aliases[alias],
-        }
+        return Location(
+            address=alias,
+            quantities=tuple(self._results.quantities_at(alias) or ()),
+            node=self._naming.aliases[alias],
+        )

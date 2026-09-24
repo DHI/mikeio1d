@@ -32,8 +32,10 @@ except ImportError as err:
 
 from ._naming import Address
 from ._network import Network
+from ._types import Location
 
 __all__ = [
     "Address",
+    "Location",
     "Network",
 ]

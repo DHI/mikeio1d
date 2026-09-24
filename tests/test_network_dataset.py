@@ -32,7 +32,7 @@ class TestIdentityCoordinates:
     """Every column says which location it came from, without the network."""
 
     def test_a_node_carries_its_name(self, epanet):
-        node_id = epanet.resolve("10")["node"]
+        node_id = epanet.resolve("10").node
 
         name, reach, distance = _by_int(epanet.to_dataset(), node_id)
 
@@ -41,7 +41,7 @@ class TestIdentityCoordinates:
         assert np.isnan(distance)
 
     def test_a_breakpoint_carries_its_reach_and_distance(self, epanet):
-        node_id = epanet.resolve(("10", 0.0))["node"]
+        node_id = epanet.resolve(("10", 0.0)).node
 
         name, reach, distance = _by_int(epanet.to_dataset(), node_id)
 

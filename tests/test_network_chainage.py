@@ -119,7 +119,7 @@ class TestAReachThatDoesNotStartAtZero:
         a size - the old ``abs(distance)`` - put them 10 m and 5 m from a start
         node they in fact sit on.
         """
-        found = [river.resolve(("basin_right", d))["address"] for d in (-10.0, -5.0)]
+        found = [river.resolve(("basin_right", d)).address for d in (-10.0, -5.0)]
 
         assert found == [("basin_right", -10.0), ("basin_right", -5.0)]
 
