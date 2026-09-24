@@ -152,40 +152,29 @@ class Network:
             by_id[reach.id] = reach
         return by_id
 
-    def to_dataframe(self, sel: str | None = None) -> pd.DataFrame:
+    def to_dataframe(self) -> pd.DataFrame:
         """Read every series in the network, labelled the way :meth:`read` labels them.
 
-        Each call reads the result file again; to read only some locations, use
-        :meth:`read`.
+        Each call reads the result file again. To read only some locations, or
+        one quantity, use :meth:`read`, which :meth:`locations` feeds::
 
-        Parameters
-        ----------
-        sel : str, optional
-            Only this quantity. ``None`` *(default)* reads every quantity.
+            network.read([(a, "Discharge") for a in network.locations(quantity="Discharge")])
 
         Returns
         -------
         pd.DataFrame
             Time-indexed. Columns are ``(address, quantity)`` pairs, as
-            :meth:`read` gives them, or just the addresses when ``sel`` is
-            given. A break point whose distance is unknown is labelled
-            ``(reach_id, None)``: no address names it, but it carries a series
-            all the same.
+            :meth:`read` gives them. A break point whose distance is unknown is
+            labelled ``(reach_id, None)``: no address names it, but it carries a
+            series all the same.
         """
         items = [
             (alias, quantity)
             for alias in self._naming.aliases
             for quantity in self._results.quantities_at(alias)
-            if sel is None or quantity == sel
         ]
         df = self._results.read(items).rename_axis(index="time")
-        if sel is None:
-            df.columns = pd.Index(items, tupleize_cols=False, name="item")
-        else:
-            df.columns = pd.Index(
-                [alias for alias, _ in items], tupleize_cols=False, name="address"
-            )
-            df.attrs["quantity"] = sel
+        df.columns = pd.Index(items, tupleize_cols=False, name="item")
         return df
 
     def to_dataset(self) -> xr.Dataset:
@@ -309,9 +298,7 @@ class Network:
         results = self._results
         units = results.units
         readable = {
-            quantity
-            for alias in self._naming.aliases
-            for quantity in results.quantities_at(alias)
+            quantity for alias in self._naming.aliases for quantity in results.quantities_at(alias)
         }
         # Ordered by the file's own header, so two networks over one file list
         # their shared quantities alike whatever their topology.

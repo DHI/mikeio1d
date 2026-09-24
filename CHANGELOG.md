@@ -35,8 +35,9 @@
   and its graph integer `node` - or `None`. It is the one lookup by name;
   `graph.nodes[node]["alias"]` goes back (#250).
 - `Network.period` is a property, like `Network.quantities` (#250).
-- `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does.
-  `to_dataset` keeps its integer `node` dimension (#250).
+- `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
+  and its `sel` option is gone: read one quantity with `Network.read` and
+  `Network.locations(quantity=...)`. `to_dataset` keeps its integer `node` dimension (#250).
 - `Network.graph` is read-only; `network.graph.copy()` gives one to edit. `Network.copy` and
   `Network.release` are gone (#250).
 - A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location`,
