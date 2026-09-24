@@ -4,7 +4,6 @@
 import shutil
 from pathlib import Path
 
-import pandas as pd
 import pytest
 
 pytest.importorskip("networkx")
@@ -14,7 +13,6 @@ from mikeio1d.network import Network, _network
 from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
 from mikeio1d.network._companions import _CompanionConflict, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
-from mikeio1d.network._res1d import _merge_extra_quantities
 from mikeio1d.network._res1d import _merge_extra_series
 from mikeio1d.network._res1d import _Series
 
@@ -241,44 +239,15 @@ class TestCompanionErrors:
 
 
 class TestWhatACompanionCollisionSays:
-    """The message the merge itself writes, rather than the blame wrapped around it.
+    """The refusal the merge writes, where a network records what each location carries.
 
     No committed pair of fixtures can collide: ``epanet.res`` holds Flow,
     Pressure and the rest, ``epanet.resx`` holds Volume and the pump
     quantities, and the two sets are disjoint. Nor can a collision be staged -
     the reader picks its parser from the file's extension but then rejects
     content that does not match it, so a ``.res`` copied under a ``.resx`` name
-    fails to load long before anything is merged. The merge is a plain frame
+    fails to load long before anything is merged. The merge is a plain dict
     operation, so it is called directly.
-    """
-
-    @pytest.fixture
-    def frames(self):
-        """A location's own frame, and a companion's carrying one of the same quantities."""
-        index = pd.date_range("2022-10-13", periods=2, freq="h")
-        base = pd.DataFrame({"Flow": [1.0, 2.0], "Volume": [3.0, 4.0]}, index=index)
-        extra = pd.DataFrame({"Volume": [5.0, 6.0]}, index=index)
-        return base, extra
-
-    def test_it_names_the_location(self, frames):
-        base, extra = frames
-
-        with pytest.raises(_CompanionConflict, match="'9'"):
-            _merge_extra_quantities(base, extra, location_id="9")
-
-    def test_it_reports_the_quantity_that_is_in_both(self, frames):
-        base, extra = frames
-
-        with pytest.raises(_CompanionConflict, match=r"\['Volume'\]"):
-            _merge_extra_quantities(base, extra, location_id="9")
-
-
-class TestWhatACompanionCollisionSaysBeforeAnythingIsRead:
-    """The same refusal, made where a network records what each location carries.
-
-    A network opened with no timeseries never merges a frame, so this is the only
-    place a collision can be caught for it. Staged directly for the reason
-    :class:`TestWhatACompanionCollisionSays` gives.
     """
 
     @pytest.fixture

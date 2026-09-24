@@ -9,7 +9,6 @@ length has to come out the same either way.
 # ruff: noqa: E402
 from pathlib import Path
 
-import pandas as pd
 import pytest
 
 pytest.importorskip("networkx")
@@ -55,10 +54,6 @@ class _Node(NetworkNode):
     @property
     def id(self):
         return self._id
-
-    @property
-    def data(self):
-        return pd.DataFrame()
 
 
 class _Reach(NetworkReach):
@@ -131,10 +126,6 @@ class _Point(ReachBreakPoint):
     @property
     def id(self):
         return self._id
-
-    @property
-    def data(self):
-        return pd.DataFrame()
 
 
 def _chain_nodes(network, reach_id):

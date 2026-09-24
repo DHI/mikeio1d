@@ -1,4 +1,4 @@
-"""Build the graph a network is made of, and read it back.
+"""Build the graph a network is made of.
 
 One reach becomes a chain of edges: start node, its breakpoints in order, end
 node. An edge carries the distance between its ends where that is known, and a
@@ -23,7 +23,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import networkx as nx
-import pandas as pd
 
 from ._naming import _CHAINAGE_TOLERANCE
 from ._types import NetworkReach
@@ -40,7 +39,7 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
         for node in [reach.start, reach.end]:
             node_key = node.id
             if node_key not in g0.nodes:
-                g0.add_node(node_key, data=node.data)
+                g0.add_node(node_key)
 
         # 2) Add edges connecting start/end nodes to their adjacent breakpoints
         start_key = reach.start.id
@@ -60,8 +59,7 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             g0.add_edge(start_key, end_key, length=reach.length, boundary=False)
         else:
             bp_keys = [bp.id for bp in reach.breakpoints]
-            for bp, bp_key in zip(reach.breakpoints, bp_keys):
-                g0.add_node(bp_key, data=bp.data)
+            g0.add_nodes_from(bp_keys)
 
             # A breakpoint sitting where the reach itself starts (or, on the
             # other end, where it ends) is not an intermediate point - it is
@@ -126,17 +124,3 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             )
 
     return nx.convert_node_labels_to_integers(g0, label_attribute="alias")
-
-
-def _build_dataframe(g: nx.Graph) -> pd.DataFrame:
-    data_in_nodes = {
-        k: v["data"] for k, v in g.nodes.items() if v["data"] is not None and not v["data"].empty
-    }
-    if len(data_in_nodes) == 0:
-        columns = pd.MultiIndex.from_arrays([[], []], names=["node", "quantity"])
-        return pd.DataFrame(index=pd.Index([], name="time"), columns=columns)
-    df = pd.concat(data_in_nodes, axis=1)
-    df.columns = df.columns.set_names(["node", "quantity"])
-    # rename_axis rather than assigning index.name, which would rename the index
-    # each node's own frame holds where concat handed back a shared one.
-    return df.rename_axis(index="time")

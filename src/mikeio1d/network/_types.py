@@ -10,21 +10,17 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-import pandas as pd
-
 
 class NetworkNode(ABC):
     """Abstract base class for a node in a network.
 
     A node represents a discrete location in the network (e.g. a junction
-    or reservoir) that carries time-series data for one or more physical
-    quantities.
+    or reservoir). What it carries is the source's to answer, not the node's -
+    see ``_Source.quantities_at``.
 
-    Two properties must be implemented:
+    One property must be implemented:
 
     * :attr:`id` - a unique string identifier for the node.
-    * :attr:`data` - a time-indexed :class:`pandas.DataFrame` whose columns
-      are quantity names.
 
     See Also
     --------
@@ -37,32 +33,20 @@ class NetworkNode(ABC):
     def id(self) -> str:
         """Unique string identifier for this node."""
 
-    @property
-    @abstractmethod
-    def data(self) -> pd.DataFrame:
-        """Time-indexed DataFrame with one column per quantity."""
-
-    @property
-    def quantities(self) -> list[str]:
-        """List of quantity names available at this node."""
-        return list(self.data.columns)
-
 
 class ReachBreakPoint(ABC):
     """Abstract base class for an intermediate break point along a network reach.
 
     Break points represent locations between the start and end nodes of a
-    reach (e.g. cross-section chainage points along a river reach) that carry
-    their own time-series data.
+    reach (e.g. cross-section chainage points along a river reach). As for a
+    node, what one carries is the source's to answer.
 
-    Two properties must be implemented:
+    One property must be implemented:
 
     * :attr:`id` - a ``(reach_id, distance)`` tuple that uniquely locates the
       break point within the network. ``distance`` may be ``None`` when the
       break point's position along the reach is genuinely unknown (e.g. a
       link-node reach with no known length).
-    * :attr:`data` - a time-indexed :class:`pandas.DataFrame` whose columns
-      are quantity names.
 
     The :attr:`distance` convenience property returns ``id[1]`` (the position
     along the reach in the units used by the parent network, or ``None`` if
@@ -71,20 +55,17 @@ class ReachBreakPoint(ABC):
     distance from the start node is ``distance - reach.start_distance``. A
     break point with an unknown distance cannot be looked up via
     ``find(reach=..., distance=<number>)``, but still has a graph node of its
-    own, so it carries data and ``recall()`` names it.
+    own, so ``to_dataframe()`` reads it and ``recall()`` names it.
 
     Examples
     --------
     Minimal subclass:
 
     >>> class MyBreakPoint(ReachBreakPoint):
-    ...     def __init__(self, reach_id, chainage, df):
+    ...     def __init__(self, reach_id, chainage):
     ...         self._id = (reach_id, chainage)
-    ...         self._data = df
     ...     @property
     ...     def id(self): return self._id
-    ...     @property
-    ...     def data(self): return self._data
 
     See Also
     --------
@@ -99,19 +80,9 @@ class ReachBreakPoint(ABC):
         """``(reach_id, distance)`` tuple uniquely identifying this break point."""
 
     @property
-    @abstractmethod
-    def data(self) -> pd.DataFrame:
-        """Time-indexed DataFrame with one column per quantity."""
-
-    @property
     def distance(self) -> float | None:
         """Position along the reach, in the reach's own frame, or None if unknown."""
         return self.id[1]
-
-    @property
-    def quantities(self) -> list[str]:
-        """List of quantity names available at this break point."""
-        return list(self.data.columns)
 
 
 class NetworkReach(ABC):
@@ -170,7 +141,7 @@ class NetworkReach(ABC):
     See Also
     --------
     NetworkNode : Represents the start/end of this reach.
-    ReachBreakPoint : Intermediate data points along this reach.
+    ReachBreakPoint : Intermediate locations along this reach.
     Network : Assembles a list of NetworkReach objects into a graph.
     """
 

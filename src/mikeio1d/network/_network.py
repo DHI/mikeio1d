@@ -811,7 +811,7 @@ class Network:
     def copy(self) -> Network:
         """Create a deep copy of the Network.
 
-        The graph, the reaches and the timeseries are copied. The result file
+        The graph and the reaches are copied. The result file
         the network was opened from is shared rather than copied, so both
         networks read through one open file - see :meth:`release`.
 
@@ -827,8 +827,8 @@ class Network:
 
         A ``Res1D`` cannot be deep-copied at all - it holds .NET objects, and
         the attempt raises ``TypeError: cannot pickle 'Filter' object``. Sharing
-        it is also the behaviour worth having: a copy is made to alter the graph
-        or the frames, never to open the file a second time.
+        it is also the behaviour worth having: a copy is made to alter the graph,
+        never to open the file a second time.
         """
         clone = self.__class__.__new__(self.__class__)
         memo[id(self)] = clone

@@ -1,8 +1,8 @@
 """Adapt a :class:`~mikeio1d.Res1D` result file to the network element classes.
 
-The reading itself belongs to ``Res1D``; this module only presents what it read
-as nodes, reaches and breakpoints, and decides which locations get their
-timeseries loaded.
+The reading itself belongs to ``Res1D``; this module only presents its topology
+as nodes, reaches and breakpoints, and records where each location's timeseries
+sit so they can be read when asked for.
 
 Where a product keeps its timeseries differs, and that is what most of the
 adapting is. MIKE 11 holds them on reach gridpoints rather than on nodes, so the
@@ -36,11 +36,6 @@ if TYPE_CHECKING:
 
 from ._types import NetworkNode, NetworkReach, ReachBreakPoint
 
-# Topology-only nodes and gridpoints all share this frame instead of each
-# allocating its own. A large network has two per reach, which profiling showed
-# to be the biggest single cost of a filtered load. Never mutate it in place.
-_EMPTY_DATA = pd.DataFrame()
-
 
 @dataclass(frozen=True)
 class _Series:
@@ -71,86 +66,6 @@ def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> Result
     # One ResultQuantity per ID on a node or a gridpoint; only a whole reach or a
     # collection spans several.
     return node._creator.result_quantity_map[quantity_id][0]
-
-
-def _simplify_colnames(
-    node: ResultNode | ResultGridPoint, quantities: set[str] | None = None
-) -> pd.DataFrame:
-    # We remove suffixes and indexes so the columns contain only the quantity names
-
-    # Some formats keep no timeseries at all on some locations - MIKE 11, for instance,
-    # stores everything on reach gridpoints, leaving the nodes empty. Asking mikeio1d
-    # for a dataframe there raises, so return an empty one instead.
-    if not node.quantities:
-        return pd.DataFrame()
-
-    # The columns in a Res1D dataframe follow the convention "Quantity:Location:Sublocation"
-    # where Location refers to the node id or the reach id followed by the chainage.
-    RES1D_NAME_SEP = ":"
-
-    available = list(node.quantities)
-    wanted = available if quantities is None else [q for q in available if q in quantities]
-
-    if not wanted:
-        # A location need not carry every requested quantity; it stays topology-only.
-        return _EMPTY_DATA
-
-    if len(wanted) == len(available):
-        # Reading the whole location is one interop call rather than one per quantity.
-        df = node.to_dataframe()
-    else:
-        df = pd.concat([_quantity_at(node, q).to_dataframe() for q in wanted], axis=1)
-
-    renamer_dict = {}
-    for quantity in wanted:
-        column_pairs = [
-            (col, quantity) for col in df.columns if quantity in col.split(RES1D_NAME_SEP)
-        ]
-        if len(column_pairs) != 1:
-            raise ValueError(
-                f"There must be exactly one column per quantity, found {column_pairs}."
-            )
-        old_name, new_name = column_pairs[0]
-        renamer_dict[old_name] = new_name
-    return df.rename(columns=renamer_dict).copy()
-
-
-def _merge_extra_quantities(
-    base: pd.DataFrame, extra: pd.DataFrame, *, location_id: str
-) -> pd.DataFrame:
-    """Append a companion file's quantities to a node's or reach's frame.
-
-    Parameters
-    ----------
-    base : pd.DataFrame
-        The node's or reach's frame from the main result file.
-    extra : pd.DataFrame
-        The same location's frame from the companion file, sharing its time index.
-    location_id : str
-        Node or reach ID, used in error messages.
-
-    Returns
-    -------
-    pd.DataFrame
-
-    Raises
-    ------
-    _CompanionConflict
-        If a quantity appears in both frames. Concatenating would give the
-        location two columns of the same name, which is the state
-        ``_simplify_colnames`` already refuses.
-    """
-    if extra.empty:
-        return base
-
-    overlapping = base.columns.intersection(extra.columns)
-    if len(overlapping) > 0:
-        raise _CompanionConflict(
-            f"Location {location_id!r} already has {sorted(overlapping)} in the "
-            "main result file, so the companion file's copy cannot be merged in."
-        )
-
-    return pd.concat([base, extra], axis=1)
 
 
 def _merge_extra_series(
@@ -187,36 +102,21 @@ def _merge_extra_series(
 
 
 class Res1DNode(NetworkNode):
-    def __init__(
-        self,
-        id: str,
-        *,
-        data: pd.DataFrame | None = None,
-    ):
+    def __init__(self, id: str):
         self._id = id
-        self._data = _EMPTY_DATA if data is None else data
 
     @property
     def id(self) -> str:
         return self._id
 
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
-
 
 class GridPoint(ReachBreakPoint):
-    def __init__(self, reach_id: str, chainage: float | None, data: pd.DataFrame | None = None):
+    def __init__(self, reach_id: str, chainage: float | None):
         self._id = (reach_id, chainage)
-        self._data = _EMPTY_DATA if data is None else data
 
     @property
     def id(self) -> tuple[str, float | None]:
         return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
 
 
 def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | None:

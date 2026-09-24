@@ -2,8 +2,9 @@
 
 A result file describes a network as locations with the names the model gave
 them: a node id, or a reach and a distance along it. This module turns that into
-a :class:`Network` - a networkx graph whose nodes are flat integers, carrying the
-timeseries each location holds - and translates between the two namings.
+a :class:`Network` - a networkx graph whose nodes are flat integers, reading the
+timeseries each location holds when they are asked for - and translates between
+the two namings.
 
 The module needs ``networkx`` and ``xarray``, which the ``network`` extra
 installs::
