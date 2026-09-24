@@ -99,8 +99,18 @@ class _Results:
                 tsids.append(item.tsid)
 
         columns: dict[tuple[int, TimeSeriesId], pd.Series] = {}
+        index = None
         for res, tsids in by_file.values():
             frame = res.read(tsids, column_mode="timeseries")
+            # Concatenating would align two different axes on their timestamps
+            # and fill the gaps with NaN, rather than say the files disagree.
+            if index is not None and not frame.index.equals(index):
+                raise ValueError(
+                    f"'{res.file_path}' does not share a time axis with the result "
+                    f"file it was read alongside: {len(frame.index)} steps against "
+                    f"{len(index)}, so the two are not from the same run."
+                )
+            index = frame.index
             for tsid, (_, column) in zip(tsids, frame.items()):
                 columns[(id(res), tsid)] = column
 

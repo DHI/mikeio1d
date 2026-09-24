@@ -150,13 +150,16 @@ def _open_companion_result(
     extra = _as_res1d(resx)
 
     # Merging two different runs would line up silently and produce a network
-    # that is wrong in a way no later error would reveal.
-    if not res.time_index.equals(extra.time_index):
+    # that is wrong in a way no later error would reveal. Only the period is
+    # compared here: the full time axis is not in a '.resx' header, and reading
+    # it would load both files' dynamic data. _Results.read checks the axes
+    # once a read brings the two together.
+    if (res.start_time, res.end_time) != (extra.start_time, extra.end_time):
         raise ValueError(
-            "The '.resx' companion does not share a time axis with the "
+            "The '.resx' companion does not cover the same period as the "
             "'.res' file, so the two are not from the same run. Got "
-            f"{len(extra.time_index)} steps ending {extra.end_time} against "
-            f"{len(res.time_index)} ending {res.end_time}."
+            f"{extra.start_time} - {extra.end_time} against "
+            f"{res.start_time} - {res.end_time}."
         )
 
     # Each of the companion's names, under its spelling in the main file.

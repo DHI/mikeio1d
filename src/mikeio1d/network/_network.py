@@ -377,6 +377,9 @@ class Network:
         KeyError
             If any item names a location the network does not have, or a
             quantity that location does not carry. Every failing item is named.
+        ValueError
+            If the items span the result file and its ``.resx`` companion, and
+            the two turn out to have different time axes.
 
         Examples
         --------

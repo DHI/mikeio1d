@@ -62,6 +62,15 @@ class TestTheOpenReadsNothing:
 
         assert res.reader._loaded is False
 
+    def test_opening_with_a_companion_result_leaves_both_files_unread(self):
+        res = Res1D(_EPANET_RES)
+        resx = Res1D(str(_TESTDATA / "epanet.resx"))
+
+        Network.open(res, companions=[resx])
+
+        assert res.reader._loaded is False
+        assert resx.reader._loaded is False
+
     def test_reading_one_series_is_what_loads_the_file(self):
         res = Res1D(_RES1D)
         network = Network.open(res)
