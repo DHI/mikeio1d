@@ -11,6 +11,7 @@ it for the lifetime of the network.
 
 from __future__ import annotations
 
+import bisect
 import math
 
 from collections.abc import Mapping
@@ -71,10 +72,15 @@ class _Naming:
         self._by_id: dict[int, Alias] = {
             node_id: alias for alias, node_id in self._by_alias.items()
         }
+        # The known break point distances of each reach, ascending, so a
+        # tolerant lookup searches one reach rather than the whole network.
+        self._distances: dict[str, list[float]] = {}
+        for alias in self._by_alias:
+            if _is_break_point(alias) and alias[1] is not None:
+                self._distances.setdefault(alias[0], []).append(alias[1])
+        for known in self._distances.values():
+            known.sort()
         self._reaches = reaches
-
-    def __contains__(self, alias: Alias) -> bool:
-        return alias in self._by_alias
 
     @property
     def aliases(self) -> Mapping[Alias, int]:
@@ -100,18 +106,17 @@ class _Naming:
             raise ValueError(
                 f"A distance tolerance must be a finite, non-negative number, got {tol!r}."
             )
-        if _is_break_point(address):
-            reach_id, distance = address
-            nearest: Alias | None = None
-            nearest_gap = math.inf
-            for key in self._by_alias:
-                if not (_is_break_point(key) and key[0] == reach_id and key[1] is not None):
-                    continue
-                gap = abs(key[1] - distance)
-                if gap <= tol and gap < nearest_gap:
-                    nearest, nearest_gap = key, gap
-            return nearest
-        return None
+        if not _is_break_point(address) or address[1] is None:
+            return None
+        reach_id, distance = address
+        known = self._distances.get(reach_id, [])
+        # Only the two distances either side of the one asked for can be nearest;
+        # of two equally near, the lower wins.
+        i = bisect.bisect_left(known, distance)
+        nearest = min(known[max(i - 1, 0) : i + 1], key=lambda d: abs(d - distance), default=None)
+        if nearest is None or abs(nearest - distance) > tol:
+            return None
+        return (reach_id, nearest)
 
     def identity_coords(self, nodes: npt.ArrayLike) -> dict[str, tuple[str, np.ndarray]]:
         """Describe each node by the name it had before it became an integer.
@@ -157,11 +162,7 @@ class _Naming:
         """
         if _is_break_point(alias):
             reach_id, distance = alias
-            known = [
-                key[1]
-                for key in self._by_alias
-                if _is_break_point(key) and key[0] == reach_id and key[1] is not None
-            ]
+            known = self._distances.get(reach_id, [])
             if not known:
                 if reach_id not in self._reaches:
                     return f"the network has no reach {reach_id!r}"
