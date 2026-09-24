@@ -3,6 +3,7 @@
 # ruff: noqa: E402
 import shutil
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,10 +12,9 @@ pytest.importorskip("networkx")
 from mikeio1d import Res1D
 from mikeio1d.network import Network, _network
 from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
-from mikeio1d.network._companions import _CompanionConflict, _rekey_by_main_file
+from mikeio1d.network import _companions
+from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
-from mikeio1d.network._res1d import _merge_extra_series
-from mikeio1d.network._res1d import _Series
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
@@ -216,11 +216,11 @@ class TestCompanionErrors:
 
         assert "companions=[]" not in str(excinfo.value)
 
-    def test_a_conflict_raised_while_loading_still_names_them(self, tmp_path, monkeypatch):
+    def test_a_clash_with_the_result_file_still_names_them(self, tmp_path, monkeypatch):
         """A companion's quantity colliding with the main file's is their fault."""
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
         monkeypatch.setattr(
-            _network._Res1DSource, "build", _raise(_CompanionConflict("already has Volume"))
+            _companions, "_refuse_clashes", _raise(ValueError("already has ['Volume']"))
         )
 
         with pytest.raises(ValueError, match="model.resx") as excinfo:
@@ -238,40 +238,57 @@ class TestCompanionErrors:
             Network.open(res, companions=[bad])
 
 
+def _location(*quantities, chainage=0.0):
+    """A node or gridpoint as a header describes it: what it carries, and where."""
+    return SimpleNamespace(quantities=list(quantities), chainage=chainage)
+
+
+def _files(nodes=None, reaches=None):
+    """A result file, or a companion, reduced to the locations a clash is looked for in."""
+    reaches = {rid: SimpleNamespace(gridpoints=gps) for rid, gps in (reaches or {}).items()}
+    return SimpleNamespace(nodes=nodes or {}, reaches=reaches)
+
+
 class TestWhatACompanionCollisionSays:
-    """The refusal the merge writes, where a network records what each location carries.
+    """The refusal written when a companion carries what the result file already does.
 
     No committed pair of fixtures can collide: ``epanet.res`` holds Flow,
     Pressure and the rest, ``epanet.resx`` holds Volume and the pump
     quantities, and the two sets are disjoint. Nor can a collision be staged -
     the reader picks its parser from the file's extension but then rejects
     content that does not match it, so a ``.res`` copied under a ``.resx`` name
-    fails to load long before anything is merged. The merge is a plain dict
-    operation, so it is called directly.
+    fails to load long before anything is compared. The check reads nothing but
+    what each location says it carries, so it is handed exactly that.
     """
 
-    @pytest.fixture
-    def carried(self):
-        """A location's own series, and a companion's naming one of the same quantities."""
-        base = {"Flow": _Series(res=None, tsid="flow"), "Volume": _Series(res=None, tsid="v")}
-        extra = {"Volume": _Series(res=None, tsid="resx volume")}
-        return base, extra
+    def test_it_names_the_node_and_the_quantity(self):
+        res = _files(nodes={"9": _location("Flow", "Volume")})
+        companion = _files(nodes={"9": _location("Volume")})
 
-    def test_it_names_the_location_and_the_quantity(self, carried):
-        base, extra = carried
+        with pytest.raises(ValueError, match=r"'9'.*\['Volume'\]"):
+            _refuse_clashes(res, companion)
 
-        with pytest.raises(_CompanionConflict, match=r"'9'.*\['Volume'\]"):
-            _merge_extra_series(base, extra, location_id="9")
+    def test_it_names_the_reach_whose_gridpoint_clashes(self):
+        res = _files(reaches={"9": [_location("Flow", "Energy")]})
+        companion = _files(reaches={"9": [_location("Energy")]})
 
-    def test_disjoint_quantities_are_merged(self, carried):
-        base, _ = carried
-        extra = {"Pump energy": _Series(res=None, tsid="energy")}
+        with pytest.raises(ValueError, match=r"'9'.*\['Energy'\]"):
+            _refuse_clashes(res, companion)
 
-        assert list(_merge_extra_series(base, extra, location_id="9")) == [
-            "Flow",
-            "Volume",
-            "Pump energy",
-        ]
+    def test_gridpoints_are_paired_along_the_reach(self):
+        """Listed out of order, the two files still pair their points by chainage."""
+        res = _files(reaches={"r": [_location("Q", chainage=10.0), _location("H", chainage=0.0)]})
+        companion = _files(
+            reaches={"r": [_location("H2", chainage=10.0), _location("Q", chainage=0.0)]}
+        )
+
+        _refuse_clashes(res, companion)
+
+    def test_disjoint_quantities_pass(self):
+        res = _files(nodes={"9": _location("Flow")}, reaches={"9": [_location("Flow")]})
+        companion = _files(nodes={"9": _location("Volume")}, reaches={"9": [_location("Energy")]})
+
+        _refuse_clashes(res, companion)
 
 
 class TestExtensionPolicy:

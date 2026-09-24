@@ -30,7 +30,7 @@ import pandas as pd
 import xarray as xr
 
 from ..res1d import Res1D
-from ._companions import _companion_paths, _read_companions, _CompanionConflict
+from ._companions import _companion_paths, _read_companions
 from ._graph import _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
@@ -192,10 +192,10 @@ class Network:
 
         found, discovered = _companion_paths(res, companions)
 
-        # Each failure that a companion caused is caught where it is raised, so
-        # a fault in the result file itself keeps its own message: advice to
-        # drop the companions cannot help with a topology the result file does
-        # not have.
+        # Every failure a companion can cause is raised while reading it, so a
+        # fault in the result file itself keeps its own message: advice to drop
+        # the companions cannot help with a topology the result file does not
+        # have.
         try:
             extra, lengths = _read_companions(res, found)
         except ValueError as err:
@@ -203,14 +203,7 @@ class Network:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
-        source = _Res1DSource(res, extra=extra, lengths=lengths)
-
-        try:
-            return cls(source)
-        except _CompanionConflict as err:
-            if not discovered:
-                raise
-            raise _blame_the_companions(res, found, err) from err
+        return cls(_Res1DSource(res, extra=extra, lengths=lengths))
 
     @staticmethod
     def _generate_reaches_dict(

@@ -40,16 +40,6 @@ belongs.
 _COMPANION_ENCODINGS = ("cp1252", "latin-1")
 
 
-class _CompanionConflict(ValueError):
-    """A companion file and the result file both carry the same quantity.
-
-    Raised while the network is being built rather than while the companion is
-    being read, so it is told apart from a fault in the result file itself: a
-    caller who never asked for the companion has to be told which files were
-    read alongside, and only for the failures a companion caused.
-    """
-
-
 def _repair_mis_decoded(name: str) -> list[str]:
     """Re-read a name as UTF-8, undoing a single-byte decoding of those bytes.
 
@@ -168,8 +158,9 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
     Raises
     ------
     ValueError
-        If the extension is not ``.resx``, or if the file does not come from
-        the same run as ``res``.
+        If the extension is not ``.resx``, if the file does not come from the
+        same run as ``res``, or if the two carry the same quantity at one
+        location.
     """
     if isinstance(resx, (str, Path)):
         path = Path(resx)
@@ -217,7 +208,41 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
             "the same model."
         )
 
+    _refuse_clashes(res, companion)
     return companion
+
+
+def _refuse_clashes(res: Res1D, companion: _Companion) -> None:
+    """Refuse a companion carrying a quantity the result file has at the same place.
+
+    Letting one replace the other would read whichever file happened to be
+    merged last, with nothing to say so. Checked from the headers alone, before
+    anything is built, so the failure is raised where every other fault in a
+    companion is.
+
+    A reach's gridpoints are paired the way the loader pairs them: both sorted
+    by chainage, then by position. A link-node reach has a single synthetic
+    gridpoint in each file, so the pairing is that one against that one.
+
+    Raises
+    ------
+    ValueError
+        Naming the first location where the two overlap, and what they share.
+    """
+    pairs = [(node_id, res.nodes[node_id], node) for node_id, node in companion.nodes.items()]
+    for reach_id, reach in companion.reaches.items():
+        by_chainage = [
+            sorted(r.gridpoints, key=lambda gp: gp.chainage) for r in (res.reaches[reach_id], reach)
+        ]
+        pairs += [(reach_id, own, other) for own, other in zip(*by_chainage)]
+
+    for location_id, own, other in pairs:
+        overlapping = set(own.quantities) & set(other.quantities)
+        if overlapping:
+            raise ValueError(
+                f"Location {location_id!r} already has {sorted(overlapping)} in the "
+                "main result file, so the companion file's copy cannot be merged in."
+            )
 
 
 def _find_epanet_companions(res: Path) -> tuple[Path | None, Path | None]:

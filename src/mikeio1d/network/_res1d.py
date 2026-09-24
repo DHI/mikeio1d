@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from ..res1d import Res1D
-from ._companions import _CompanionConflict
 from ._companions import _units_of
 from ._source import _Source
 
@@ -66,39 +65,6 @@ def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> Result
     # One ResultQuantity per ID on a node or a gridpoint; only a whole reach or a
     # collection spans several.
     return node._creator.result_quantity_map[quantity_id][0]
-
-
-def _merge_extra_series(
-    base: dict[str, _Series], extra: dict[str, _Series], *, location_id: str
-) -> dict[str, _Series]:
-    """Add a companion file's series to what a node or break point carries.
-
-    Parameters
-    ----------
-    base : dict of str to _Series
-        The location's series in the main result file, by quantity ID.
-    extra : dict of str to _Series
-        The same location's series in the companion file.
-    location_id : str
-        Node or reach ID, used in error messages.
-
-    Returns
-    -------
-    dict of str to _Series
-
-    Raises
-    ------
-    _CompanionConflict
-        If a quantity appears in both. Letting one replace the other would read
-        whichever file happened to be merged last, with nothing to say so.
-    """
-    overlapping = base.keys() & extra.keys()
-    if overlapping:
-        raise _CompanionConflict(
-            f"Location {location_id!r} already has {sorted(overlapping)} in the "
-            "main result file, so the companion file's copy cannot be merged in."
-        )
-    return {**base, **extra}
 
 
 class Res1DNode(NetworkNode):
@@ -238,9 +204,9 @@ def _build_reach_breakpoints(
     for i, (gp, distances) in enumerate(zip(unique_gridpoints, distances_per_gridpoint)):
         carried = _series_at(gp)
         if i < len(extra_gridpoints):
-            carried = _merge_extra_series(
-                carried, _series_at(extra_gridpoints[i]), location_id=reach.name
-            )
+            # Disjoint from the main file's: a clash was refused when the
+            # companion was opened.
+            carried = {**carried, **_series_at(extra_gridpoints[i])}
         # Under every distance this gridpoint was stretched over, so both of
         # an EPANET reach's break points name the one series it really has.
         # Including a distance of None: nothing can ask for that break point by
@@ -334,7 +300,7 @@ def _load_res1d_network(
         if id not in series:
             carried = _series_at(res.nodes[id])
             if extra is not None and id in extra.nodes:
-                carried = _merge_extra_series(carried, _series_at(extra.nodes[id]), location_id=id)
+                carried = {**carried, **_series_at(extra.nodes[id])}
             series[id] = carried
         return Res1DNode(id)
 
