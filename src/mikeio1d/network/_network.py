@@ -474,8 +474,8 @@ class Network:
         ----------
         address : str or tuple[str, float]
             A node ID, or a reach ID and a distance along it. A reach's own end
-            nodes are named by their IDs, which ``reaches[reach_id].start.id``
-            and ``.end.id`` give.
+            nodes are named by their IDs, which ``reaches[reach_id].start``
+            and ``.end`` give.
         tol : float, optional
             How far a distance may be from a break point's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to

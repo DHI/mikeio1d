@@ -17,19 +17,6 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class NetworkNode:
-    """A node in a network, such as a junction or a reservoir.
-
-    Attributes
-    ----------
-    id : str
-        The id the model gave the node, unique within the network.
-    """
-
-    id: str
-
-
-@dataclass(frozen=True)
 class ReachBreakPoint:
     """A location along a reach, between its two end nodes.
 
@@ -63,8 +50,8 @@ class NetworkReach:
     ----------
     id : str
         The id the model gave the reach, unique within the network.
-    start, end : NetworkNode
-        The start (upstream) and end (downstream) nodes.
+    start, end : str
+        The ids of the start (upstream) and end (downstream) nodes.
     length : float or None
         Total length in network units, or ``None`` where it is undefined. Reach
         length matters in some domains (rivers, sewer networks) and not in
@@ -87,8 +74,8 @@ class NetworkReach:
     """
 
     id: str
-    start: NetworkNode
-    end: NetworkNode
+    start: str
+    end: str
     length: float | None = None
     start_distance: float = 0.0
     breakpoints: tuple[ReachBreakPoint, ...] = ()

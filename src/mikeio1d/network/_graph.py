@@ -34,14 +34,13 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
     lone_reach_by_pair: dict[frozenset[str], str] = {}
     for reach in reaches:
         # 1) Add start and end nodes
-        for node in [reach.start, reach.end]:
-            node_key = node.id
+        for node_key in (reach.start, reach.end):
             if node_key not in g0.nodes:
                 g0.add_node(node_key)
 
         # 2) Add edges connecting start/end nodes to their adjacent breakpoints
-        start_key = reach.start.id
-        end_key = reach.end.id
+        start_key = reach.start
+        end_key = reach.end
         if reach.n_breakpoints == 0:
             pair = frozenset((start_key, end_key))
             claimed_by = lone_reach_by_pair.get(pair)

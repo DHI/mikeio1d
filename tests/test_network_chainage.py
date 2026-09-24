@@ -16,7 +16,7 @@ pytest.importorskip("networkx")
 from mikeio1d import Res1D
 from mikeio1d.network import Network
 from mikeio1d.network._res1d import _Results
-from mikeio1d.network._types import NetworkNode, NetworkReach, ReachBreakPoint
+from mikeio1d.network._types import NetworkReach, ReachBreakPoint
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RIVER = str(_TESTDATA / "network_river.res1d")
@@ -74,9 +74,9 @@ def _chain_nodes(network, reach_id):
     by_alias = {alias: node for node, alias in aliases.items()}
     reach = network.reaches[reach_id]
     return [
-        by_alias[reach.start.id],
+        by_alias[reach.start],
         *(node for _, node in breakpoints),
-        by_alias[reach.end.id],
+        by_alias[reach.end],
     ]
 
 
@@ -141,17 +141,17 @@ class TestTheDefaultFrame:
     """A reach measured from its own start needs to say nothing at all."""
 
     def test_it_starts_at_zero(self):
-        reach = _reach("r0", NetworkNode("A"), NetworkNode("B"), length=100.0)
+        reach = _reach("r0", "A", "B", length=100.0)
 
         assert reach.start_distance == 0.0
 
     def test_it_ends_at_its_length(self):
-        reach = _reach("r0", NetworkNode("A"), NetworkNode("B"), length=100.0)
+        reach = _reach("r0", "A", "B", length=100.0)
 
         assert reach.end_distance == 100.0
 
     def test_it_has_no_end_without_a_length(self):
-        reach = _reach("r0", NetworkNode("A"), NetworkNode("B"))
+        reach = _reach("r0", "A", "B")
 
         assert reach.end_distance is None
 
@@ -159,8 +159,8 @@ class TestTheDefaultFrame:
         """Only a break point on a reach's end is a boundary; these are not."""
         reach = _reach(
             "r0",
-            NetworkNode("A"),
-            NetworkNode("B"),
+            "A",
+            "B",
             length=100.0,
             breakpoints=[ReachBreakPoint("r0", 25.0), ReachBreakPoint("r0", 75.0)],
         )
@@ -176,7 +176,7 @@ class TestTwoReachesTheGraphCannotTellApart:
     """A break point is what keeps two reaches between the same nodes distinct."""
 
     def test_neither_having_one_is_refused(self):
-        a, b = NetworkNode("A"), NetworkNode("B")
+        a, b = "A", "B"
         reaches = [
             _reach("r0", a, b, length=100.0),
             _reach("r1", a, b, length=250.0),
@@ -187,7 +187,7 @@ class TestTwoReachesTheGraphCannotTellApart:
 
     def test_the_pair_is_the_same_read_backwards(self):
         """The graph is undirected, so running the other way does not help."""
-        a, b = NetworkNode("A"), NetworkNode("B")
+        a, b = "A", "B"
         reaches = [
             _reach("r0", a, b, length=100.0),
             _reach("r1", b, a, length=250.0),
@@ -197,7 +197,7 @@ class TestTwoReachesTheGraphCannotTellApart:
             _hand_built(reaches)
 
     def test_a_break_point_each_keeps_them_apart(self):
-        a, b = NetworkNode("A"), NetworkNode("B")
+        a, b = "A", "B"
         reaches = [
             _reach("r0", a, b, length=100.0, breakpoints=[ReachBreakPoint("r0", 50.0)]),
             _reach("r1", a, b, length=250.0, breakpoints=[ReachBreakPoint("r1", 125.0)]),
@@ -207,7 +207,7 @@ class TestTwoReachesTheGraphCannotTellApart:
 
     def test_sharing_an_id_is_refused(self):
         """Their break points would interleave into one chain, losing a reach."""
-        a, b = NetworkNode("A"), NetworkNode("B")
+        a, b = "A", "B"
         reaches = [
             _reach("r0", a, b, length=100.0, breakpoints=[ReachBreakPoint("r0", 50.0)]),
             _reach("r0", a, b, length=250.0, breakpoints=[ReachBreakPoint("r0", 50.0)]),

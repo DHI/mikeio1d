@@ -175,8 +175,8 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
     described = {}
     for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
-            "start": str(reach.start.id),
-            "end": str(reach.end.id),
+            "start": str(reach.start),
+            "end": str(reach.end),
             "length": _num(reach.length),
             "n_breakpoints": int(reach.n_breakpoints),
             "breakpoints": [
@@ -245,7 +245,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     endpoints = {}
     for reach_id, reach in network.reaches.items():
         for where, node in (("start", reach.start), ("end", reach.end)):
-            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node.id).node)
+            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).node)
 
     recalled = {}
     for node_id, alias in sorted(network.graph.nodes(data="alias")):

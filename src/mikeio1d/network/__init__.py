@@ -33,7 +33,6 @@ except ImportError as err:
 from ._naming import Address
 from ._network import Network
 from ._types import Location
-from ._types import NetworkNode
 from ._types import NetworkReach
 from ._types import ReachBreakPoint
 
@@ -41,7 +40,6 @@ __all__ = [
     "Address",
     "Location",
     "Network",
-    "NetworkNode",
     "NetworkReach",
     "ReachBreakPoint",
 ]

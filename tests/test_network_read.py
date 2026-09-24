@@ -173,7 +173,7 @@ class TestResolvingAnAddress:
         makes the difference matter.
         """
         res11 = Network.open(_RES11)
-        node = next(iter(res11.reaches.values())).start.id
+        node = next(iter(res11.reaches.values())).start
 
         resolved = res11.resolve(node)
 
@@ -291,7 +291,7 @@ class TestReadingSeries:
 
     def test_a_location_carrying_nothing_points_at_the_gridpoints(self):
         res11 = Network.open(_RES11)
-        node = next(iter(res11.reaches.values())).start.id
+        node = next(iter(res11.reaches.values())).start
 
         with pytest.raises(KeyError, match="carries no quantities of its own"):
             res11.read([(node, "Discharge")])

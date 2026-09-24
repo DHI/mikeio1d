@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from ._companions import _Companion
     from ._naming import Alias
 
-from ._types import NetworkNode, NetworkReach, ReachBreakPoint
+from ._types import NetworkReach, ReachBreakPoint
 
 
 def _units_of(res: Res1D) -> dict[str, str]:
@@ -235,14 +235,14 @@ def _load_res1d_network(
     # which gridpoint a break point was made from.
     series: dict[Alias, dict[str, _Series]] = {}
 
-    def _init_node(id: str) -> NetworkNode:
+    def _init_node(id: str) -> str:
         # A node shared by several reaches is visited once per reach endpoint.
         if id not in series:
             carried = _series_at(res.nodes[id])
             if extra is not None and id in extra.nodes:
                 carried = {**carried, **_series_at(extra.nodes[id])}
             series[id] = carried
-        return NetworkNode(id)
+        return id
 
     def _build_reach(reach: ResultReach) -> NetworkReach:
         # Some formats (.resx) report no end nodes at all, and a reach without
