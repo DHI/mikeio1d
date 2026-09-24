@@ -88,6 +88,17 @@ A network holds its result file for its own lifetime, since every series is read
 MIKE 1D loads a file's whole dynamic data on the first read of anything in it, so what reading late saves is the work of building frames for locations you never asked about, not the file read itself.
 :::
 
+## Where each format keeps its timeseries
+
+Which locations carry data depends on the product that wrote the file.
+
+* **MIKE 1D (`.res1d`)**: nodes and reach grid points both carry timeseries. Each grid point becomes a break point at its own chainage.
+* **MIKE 11 (`.res11`)**: timeseries sit on reach grid points, not on nodes, so every node carries nothing of its own. `resolve()` answers for a node with an empty `quantities`, and `locations(reach=...)` lists the grid points to read instead.
+* **EPANET (`.res`)**: a link-node model with one synthetic grid point per reach. mikeio1d places a break point at each end of the reach from it, so a reach's own quantities (`Flow`, `Velocity`, ...) can be read the way a MIKE reach's end data can. Both break points are one grid point seen twice, so reading both gives two identical columns from a single read.
+    * Without the `.inp`, no reach has a length, so only the first break point (`distance=0.0`) has an address. The second has a graph node but no name, and the edges around it carry `length=None`.
+    * With the `.inp`, a pipe's second break point sits at the pipe's full length, and both are addressable. Pumps and valves keep an unaddressable second break point even so, since `[PIPES]` is the only section that carries lengths.
+    * A `.resx` beside the `.res` adds tank `Volume` and `Volume Percentage` to its nodes and pump energy quantities to its reaches.
+
 ## Additional resources
 - [MIKE 1D API](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)
 - [`Network` API reference](../api/index.qmd)

@@ -131,27 +131,8 @@ class Network:
 
         Notes
         -----
-        MIKE 11 keeps its timeseries on reach gridpoints rather than on nodes,
-        so the nodes of a ``.res11`` network carry no data of their own. Use
-        ``locations(reach=...)`` to find the gridpoints to read.
-
-        An EPANET reach carries one synthetic gridpoint, which mikeio1d gives a
-        breakpoint at each end so that the reach's own quantities (``Flow``,
-        ``Velocity``, ...) are reachable the way a MIKE reach's end data is. As
-        a result:
-
-        * without the ``.inp``, a reach's length is unknown, so only its first
-          breakpoint (``distance=0.0``) is real; the second has a graph node
-          but no address, so :meth:`resolve` and :meth:`read` cannot name it.
-          The corresponding edges of :attr:`graph` are ``length=None``
-        * with the ``.inp``, a pipe's second breakpoint sits at its full length
-          -- both breakpoints are then addressable by distance, and the edge
-          between them carries the pipe's real length. Pumps and valves keep an
-          unaddressable second breakpoint even so, since ``[PIPES]`` is the only
-          section carrying lengths
-
-        Node timeseries, :meth:`to_dataframe` and :meth:`to_dataset` are
-        unaffected.
+        Where a format keeps its timeseries, and so which locations carry
+        them, is described per format in the user guide's network page.
         """
         return cls(*_load_network(res, companions))
 
@@ -359,8 +340,7 @@ class Network:
             else:
                 faults.append(
                     f"{address!r} carries no quantities of its own, so {quantity!r} cannot be "
-                    "read there - MIKE 11 keeps its timeseries on reach gridpoints rather than "
-                    "on nodes, so use locations(reach=...) to find them"
+                    "read there; locations(reach=...) lists the break points that can be"
                 )
         shown = "; ".join(faults[:10])
         if len(faults) > 10:
@@ -408,11 +388,6 @@ class Network:
         KeyError
             If any item names a location the network does not have, or a
             quantity that location does not carry. Every failing item is named.
-
-        Notes
-        -----
-        An EPANET reach's two break points are one gridpoint seen twice, so
-        asking for both gives two identical columns from a single read.
 
         Examples
         --------
