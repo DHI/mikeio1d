@@ -55,7 +55,7 @@ class TestTheOpenReadsNothing:
         res = Res1D(_RES1D)
         network = Network.open(res)
 
-        network.period()
+        _ = network.period
         dict(network.quantities)
         network.resolve("101")
         network.locations(quantity="Discharge")
@@ -77,7 +77,7 @@ class TestThePeriod:
     def test_it_agrees_with_the_result_file(self, network):
         res = Res1D(_RES1D)
 
-        assert network.period() == (res.start_time, res.end_time)
+        assert network.period == (res.start_time, res.end_time)
 
 
 class TestWhatQuantitiesMeans:

@@ -79,7 +79,7 @@ class Network:
             f"Reaches: {len(self._reaches)}",
             f"Nodes: {self._graph.number_of_nodes()}",
         ]
-        start, end = self.period()
+        start, end = self.period
         out += [f"Quantities: {list(self.quantities)}", f"Time: {start} - {end}"]
         return "\n".join(out)
 
@@ -313,6 +313,7 @@ class Network:
         """
         return MappingProxyType(self._reaches)
 
+    @property
     def period(self) -> tuple[datetime, datetime]:
         """First and last timestep of the result file.
 
@@ -326,7 +327,7 @@ class Network:
 
         Examples
         --------
-        >>> network.period()  # doctest: +SKIP
+        >>> network.period  # doctest: +SKIP
         (datetime.datetime(1994, 8, 7, 16, 35), datetime.datetime(1994, 8, 7, 18, 35))
         """
         return self._results.period
