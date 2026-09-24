@@ -21,7 +21,6 @@ import pandas as pd
 
 from ..res1d import Res1D
 from ._companions import _units_of
-from ._source import _Source
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -204,13 +203,24 @@ def _load_res1d_network(
     *,
     extra: _Companion | None = None,
     lengths: dict[str, float] | None = None,
-) -> tuple[list[NetworkReach], dict[Alias, dict[str, _Series]]]:
-    """Read a result file as reaches, and as the map of where each series sits.
+) -> tuple[list[NetworkReach], _Results]:
+    """Read a result file as reaches, and as the results a network reads through.
 
     Both come out of the one walk over ``res.reaches``, and neither touches a
     timeseries: a location knows what it carries from the file header alone.
-    Returned together so that the map, whose keys are gridpoint-to-break-point
-    correspondences only this walk knows, is never assembled by a caller.
+    Returned together so that the series map, whose keys are
+    gridpoint-to-break-point correspondences only this walk knows, is never
+    assembled by a caller.
+
+    Parameters
+    ----------
+    res : Res1D
+        The main result file.
+    extra : _Companion or None, optional
+        The ``.resx`` read alongside, if there was one. Its quantities become
+        readable like any other, and its header is needed for their units.
+    lengths : dict of str to float, optional
+        Reach lengths from a companion ``.inp``, which no result file carries.
     """
     lengths = lengths or {}
 
@@ -247,83 +257,51 @@ def _load_res1d_network(
         )
 
     built = [_build_reach(reach) for reach in res.reaches.values()]
-    return built, series
+
+    # The main file wins where both spell the same quantity, since it is the one
+    # the network was opened from.
+    units = {**(extra.units if extra is not None else {}), **_units_of(res)}
+    return built, _Results(series=series, units=units, period=(res.start_time, res.end_time))
 
 
-class _Res1DSource(_Source):
-    """A :class:`~mikeio1d.network._source._Source` backed by a result file.
+@dataclass(frozen=True)
+class _Results:
+    """What a network reads through: where each series sits, and the file header.
 
-    Holds everything the load needs, so that :meth:`build` can produce the
-    topology rather than be handed it: the main file and the companions - a
-    ``.resx`` read alongside, and the ``[PIPES]`` lengths from an ``.inp``, which
-    no result file carries.
+    Everything here comes from the headers, so holding it costs nothing, and a
+    network keeps one for as long as it can read. It is shared rather than
+    copied when the network is, since the ``Res1D`` its series point into holds
+    .NET objects that cannot be deep-copied.
 
-    Parameters
+    Attributes
     ----------
-    res : Res1D
-        The main result file.
-    extra : _Companion or None, optional
-        The ``.resx`` read alongside, if there was one. Its quantities become
-        readable like any other, and its header is needed for their units.
-    lengths : dict of str to float, optional
-        Reach lengths from a companion ``.inp``.
+    series : mapping of alias to (mapping of str to _Series)
+        Every location's series, by quantity ID. A location absent from it has
+        none; one mapped to an empty dict carries nothing, which is every node
+        of a MIKE 11 result.
+    units : mapping of str to str
+        Unit abbreviation per quantity ID, over the main file and companion.
+    period : tuple of datetime
+        First and last timestep of the main result file.
     """
 
-    def __init__(
-        self,
-        res: Res1D,
-        *,
-        extra: _Companion | None = None,
-        lengths: dict[str, float] | None = None,
-    ) -> None:
-        self._res = res
-        self._extra = extra
-        self._lengths = lengths
-        # Filled by build(), which is the only place that knows which gridpoint
-        # each break point was made from.
-        self._items: dict[Alias, dict[str, _Series]] = {}
-
-    def build(self) -> list[NetworkReach]:
-        """Read the file as reaches, recording where every series sits.
-
-        The reaches are returned and not kept: a network deep-copies them and
-        shares its source, so holding them here would leave a copy's two views
-        of its reaches pointing at different objects.
-        """
-        built, self._items = _load_res1d_network(
-            self._res, extra=self._extra, lengths=self._lengths
-        )
-        return built
-
-    @property
-    def period(self) -> tuple[datetime, datetime]:
-        """First and last timestep of the main result file."""
-        return self._res.start_time, self._res.end_time
-
-    @property
-    def units(self) -> Mapping[str, str]:
-        """Unit abbreviation per quantity ID, over the main file and companion.
-
-        The main file wins where both spell the same quantity, since it is the
-        one the network was opened from.
-        """
-        units: dict[str, str] = {}
-        if self._extra is not None:
-            units.update(self._extra.units)
-        units.update(_units_of(self._res))
-        return units
+    series: Mapping[Alias, Mapping[str, _Series]]
+    units: Mapping[str, str]
+    period: tuple[datetime, datetime]
 
     def quantities_at(self, alias: Alias) -> list[str] | None:
         """Quantity IDs readable at one location, or None if it has no series."""
-        carried = self._items.get(alias)
+        carried = self.series.get(alias)
         return None if carried is None else list(carried)
 
     def read(self, items: Sequence[tuple[Alias, str]]) -> pd.DataFrame:
         """Read the given pairs, one batched call per file they live in.
 
-        Each distinct series is read once however often it was asked for - an
-        EPANET reach's two break points name the same gridpoint, so asking for
-        both is one read, not two.
+        Each pair is one :meth:`quantities_at` has confirmed, under the network's
+        own spelling of the location. The frame has one column per pair, in
+        order and keeping duplicates, and each distinct series is read once
+        however often it was asked for - an EPANET reach's two break points name
+        the same gridpoint, so asking for both is one read, not two.
         """
         if not items:
             # Nothing asked for, nothing opened. The file's own time index would
@@ -332,7 +310,7 @@ class _Res1DSource(_Source):
             # nothing should not do.
             return pd.DataFrame(index=pd.DatetimeIndex([], name="time"))
 
-        series = [self._items[alias][quantity] for alias, quantity in items]
+        series = [self.series[alias][quantity] for alias, quantity in items]
 
         # Grouped by file, and within a file de-duplicated, so what crosses the
         # interop boundary is each distinct series exactly once.

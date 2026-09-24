@@ -16,7 +16,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from ._naming import Address
     from ._naming import Alias
-    from ._source import _Source
+    from ._res1d import _Results
 
 from collections.abc import Mapping
 from collections.abc import Sequence
@@ -34,7 +34,7 @@ from ._companions import _companion_paths, _read_companions
 from ._graph import _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
-from ._res1d import _Res1DSource
+from ._res1d import _load_res1d_network
 from ._types import NetworkReach
 
 
@@ -66,9 +66,8 @@ class Network:
     timeseries stay in the file until :meth:`read` asks for them.
     """
 
-    def __init__(self, source: _Source):
-        self._source = source
-        reaches = source.build()
+    def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
+        self._results: _Results | None = results
         # Ids first: two reaches sharing one would interleave their break points
         # into a single chain, and the graph error would describe the wreckage
         # rather than the cause.
@@ -85,7 +84,7 @@ class Network:
             f"Reaches: {len(self._reaches)}",
             f"Nodes: {self._graph.number_of_nodes()}",
         ]
-        if self._source is None:
+        if self._results is None:
             out.append("Result file: released")
         else:
             start, end = self.period()
@@ -203,7 +202,7 @@ class Network:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
-        return cls(_Res1DSource(res, extra=extra, lengths=lengths))
+        return cls(*_load_res1d_network(res, extra=extra, lengths=lengths))
 
     @staticmethod
     def _generate_reaches_dict(
@@ -241,19 +240,19 @@ class Network:
         ValueError
             If :meth:`release` has been called on this network.
         """
-        source = self._require_source("to_dataframe()")
+        results = self._require_results("to_dataframe()")
         # Every graph node, including a break point no address can name: it
         # carries a series all the same, and the graph has a node for it.
         columns = [
             (node_id, alias, quantity)
             for alias, node_id in self._naming.aliases.items()
-            for quantity in (source.quantities_at(alias) or ())
+            for quantity in (results.quantities_at(alias) or ())
         ]
         if not columns:
             index = pd.MultiIndex.from_arrays([[], []], names=["node", "quantity"])
             return pd.DataFrame(index=pd.Index([], name="time"), columns=index)
 
-        df = source.read([(alias, quantity) for _, alias, quantity in columns])
+        df = results.read([(alias, quantity) for _, alias, quantity in columns])
         df.columns = pd.MultiIndex.from_tuples(
             [(node_id, quantity) for node_id, _, quantity in columns], names=["node", "quantity"]
         )
@@ -330,20 +329,20 @@ class Network:
         """
         return MappingProxyType(self._reaches)
 
-    def _require_source(self, what: str) -> _Source:
-        """Give the source behind this network, or explain why there is none.
+    def _require_results(self, what: str) -> _Results:
+        """Give the results this network reads through, or explain why there are none.
 
         One way to end up here: :meth:`release` has been called. A network is
-        constructed from a source, so it cannot have gone without one.
+        constructed with its results, so it cannot have gone without them.
         """
-        if self._source is None:
+        if self._results is None:
             raise ValueError(
                 f"{what} needs the result file this network was opened from, and "
                 "release() has let go of it. The topology is still here - graph, "
                 "reaches, find() and recall() - and opening the file again "
                 "restores the rest."
             )
-        return self._source
+        return self._results
 
     def period(self) -> tuple[datetime, datetime]:
         """First and last timestep of the result file.
@@ -366,7 +365,7 @@ class Network:
         >>> network.period()  # doctest: +SKIP
         (datetime.datetime(1994, 8, 7, 16, 35), datetime.datetime(1994, 8, 7, 18, 35))
         """
-        return self._require_source("period()").period
+        return self._require_results("period()").period
 
     @property
     def quantities(self) -> Mapping[str, str | None]:
@@ -397,12 +396,12 @@ class Network:
         >>> network.quantities  # doctest: +SKIP
         {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
         """
-        source = self._require_source("quantities")
-        units = source.units
+        results = self._require_results("quantities")
+        units = results.units
         readable = {
             quantity
             for alias in self._naming.aliases
-            for quantity in (source.quantities_at(alias) or ())
+            for quantity in (results.quantities_at(alias) or ())
         }
         # Ordered by the file's own header, so two networks over one file list
         # their shared quantities alike whatever their topology.
@@ -410,7 +409,9 @@ class Network:
         ordered += sorted(readable.difference(units))
         return MappingProxyType({q: units.get(q) for q in ordered})
 
-    def _blame_unreadable(self, items: Sequence[tuple[Address, str]], source: _Source) -> KeyError:
+    def _blame_unreadable(
+        self, items: Sequence[tuple[Address, str]], results: _Results
+    ) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
 
         Every one of them, in a single error: a caller reading fifty locations
@@ -423,7 +424,7 @@ class Network:
             if alias is None:
                 faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
                 continue
-            carried = source.quantities_at(alias) or []
+            carried = results.quantities_at(alias) or []
             if quantity in carried:
                 continue
             if carried:
@@ -498,19 +499,19 @@ class Network:
         >>> points = network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
         """
-        source = self._require_source("read()")
-        # Resolved to the source's own spelling before anything is read, so a bad
-        # item is named rather than read around, and so the source is handed only
+        results = self._require_results("read()")
+        # Resolved to the network's own spelling before anything is read, so a bad
+        # item is named rather than read around, and so the results are handed only
         # pairs it has already confirmed.
         resolved: list[tuple[Alias, str]] = []
         for address, quantity in items:
             alias = self._naming.canonical(address)
-            carried = None if alias is None else source.quantities_at(alias)
+            carried = None if alias is None else results.quantities_at(alias)
             if carried is None or quantity not in carried:
-                raise self._blame_unreadable(items, source)
+                raise self._blame_unreadable(items, results)
             resolved.append((alias, quantity))
 
-        df = source.read(resolved)
+        df = results.read(resolved)
         # A flat index, so a column label is the whole (address, quantity) pair
         # the caller handed in - an address is itself a tuple, and a MultiIndex
         # would read the two apart.
@@ -549,7 +550,7 @@ class Network:
         >>> network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         [('100l1', 23.8413574216414)]
         """
-        source = self._require_source("locations()")
+        results = self._require_results("locations()")
         if reach is None:
             aliases: Iterable[Alias] = self._naming.aliases
         elif reach in self._reaches:
@@ -561,7 +562,7 @@ class Network:
         for alias in aliases:
             if _is_break_point(alias) and alias[1] is None:
                 continue
-            carried = source.quantities_at(alias)
+            carried = results.quantities_at(alias)
             if carried is None or (quantity is not None and quantity not in carried):
                 continue
             found.append(alias)
@@ -612,13 +613,13 @@ class Network:
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        source = self._require_source("resolve()")
+        results = self._require_results("resolve()")
         # The network's own spelling rather than the argument echoed, so the
         # address that comes out is the one the rest of the surface takes.
         alias = self._naming.canonical(address, tol=tol)
         if alias is None:
             return None
-        return {"address": alias, "quantities": source.quantities_at(alias) or []}
+        return {"address": alias, "quantities": results.quantities_at(alias) or []}
 
     @overload
     def find(
@@ -824,7 +825,7 @@ class Network:
         clone = self.__class__.__new__(self.__class__)
         memo[id(self)] = clone
         for key, value in self.__dict__.items():
-            setattr(clone, key, value if key == "_source" else deepcopy(value, memo))
+            setattr(clone, key, value if key == "_results" else deepcopy(value, memo))
         return clone
 
     def release(self) -> None:
@@ -846,4 +847,4 @@ class Network:
         >>> df = network.read([("101", "WaterLevel")])  # doctest: +SKIP
         >>> network.release()  # doctest: +SKIP
         """
-        self._source = None
+        self._results = None

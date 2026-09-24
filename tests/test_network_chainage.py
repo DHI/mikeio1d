@@ -15,7 +15,7 @@ pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
 from mikeio1d.network import Network
-from mikeio1d.network._source import _Source
+from mikeio1d.network._res1d import _Results
 from mikeio1d.network._types import NetworkNode, NetworkReach, ReachBreakPoint
 
 _TESTDATA = Path(__file__).parent / "testdata"
@@ -50,34 +50,13 @@ def _reach(id, start, end, length=None, breakpoints=()):
     return NetworkReach(id, start, end, length=length, breakpoints=tuple(breakpoints))
 
 
-class _HandBuilt(_Source):
-    """A source over reaches already in memory.
+def _hand_built(reaches):
+    """A network over reaches already in memory, carrying no series at all.
 
-    A Network is built from a source, so a test wanting a shape no result file
-    produces - twin reaches between one pair of nodes, a reach with no length -
-    supplies it this way. Only build() is ever reached; the members that answer
-    about timeseries belong to a file-backed source.
+    For a shape no result file produces - twin reaches between one pair of
+    nodes, a reach with no length. Only the topology is ever asked about.
     """
-
-    def __init__(self, reaches):
-        self._reaches = reaches
-
-    def build(self):
-        return self._reaches
-
-    @property
-    def period(self):
-        raise NotImplementedError
-
-    @property
-    def units(self):
-        return {}
-
-    def quantities_at(self, alias):
-        return None
-
-    def read(self, items):
-        raise NotImplementedError
+    return Network(reaches, _Results(series={}, units={}, period=(None, None)))
 
 
 def _chain_nodes(network, reach_id):
@@ -186,7 +165,7 @@ class TestTheDefaultFrame:
             length=100.0,
             breakpoints=[ReachBreakPoint("r0", 25.0), ReachBreakPoint("r0", 75.0)],
         )
-        network = Network(_HandBuilt([reach]))
+        network = _hand_built([reach])
 
         leading, trailing = _end_edges(network, "r0")
 
@@ -205,7 +184,7 @@ class TestTwoReachesTheGraphCannotTellApart:
         ]
 
         with pytest.raises(ValueError, match="'r0' and 'r1'"):
-            Network(_HandBuilt(reaches))
+            _hand_built(reaches)
 
     def test_the_pair_is_the_same_read_backwards(self):
         """The graph is undirected, so running the other way does not help."""
@@ -216,7 +195,7 @@ class TestTwoReachesTheGraphCannotTellApart:
         ]
 
         with pytest.raises(ValueError, match="'r0' and 'r1'"):
-            Network(_HandBuilt(reaches))
+            _hand_built(reaches)
 
     def test_a_break_point_each_keeps_them_apart(self):
         a, b = NetworkNode("A"), NetworkNode("B")
@@ -225,7 +204,7 @@ class TestTwoReachesTheGraphCannotTellApart:
             _reach("r1", a, b, length=250.0, breakpoints=[ReachBreakPoint("r1", 125.0)]),
         ]
 
-        assert Network(_HandBuilt(reaches)).graph.number_of_edges() == 4
+        assert _hand_built(reaches).graph.number_of_edges() == 4
 
     def test_sharing_an_id_is_refused(self):
         """Their break points would interleave into one chain, losing a reach."""
@@ -236,4 +215,4 @@ class TestTwoReachesTheGraphCannotTellApart:
         ]
 
         with pytest.raises(ValueError, match="share the id 'r0'"):
-            Network(_HandBuilt(reaches))
+            _hand_built(reaches)

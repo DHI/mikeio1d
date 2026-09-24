@@ -209,7 +209,7 @@ class TestCompanionErrors:
         with its own message and no advice that cannot help.
         """
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
-        monkeypatch.setattr(_network._Res1DSource, "build", _raise(ValueError("no start node")))
+        monkeypatch.setattr(_network, "_load_res1d_network", _raise(ValueError("no start node")))
 
         with pytest.raises(ValueError, match="no start node") as excinfo:
             Network.open(res)
