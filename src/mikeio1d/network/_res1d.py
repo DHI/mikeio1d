@@ -67,24 +67,6 @@ def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> Result
     return node._creator.result_quantity_map[quantity_id][0]
 
 
-class Res1DNode(NetworkNode):
-    def __init__(self, id: str):
-        self._id = id
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-
-class GridPoint(ReachBreakPoint):
-    def __init__(self, reach_id: str, chainage: float | None):
-        self._id = (reach_id, chainage)
-
-    @property
-    def id(self) -> tuple[str, float | None]:
-        return self._id
-
-
 def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | None:
     """Resolve a reach's effective length.
 
@@ -213,66 +195,8 @@ def _build_reach_breakpoints(
         # name, but it is a graph node, and to_dataframe() reads every one.
         for distance in distances:
             series[(gp.reach_name, distance)] = carried
-        breakpoints.extend(GridPoint(gp.reach_name, d) for d in distances)
+        breakpoints.extend(ReachBreakPoint(gp.reach_name, d) for d in distances)
     return breakpoints
-
-
-class Res1DReach(NetworkReach):
-    """NetworkReach adapter for a mikeio1d ResultReach."""
-
-    def __init__(
-        self,
-        reach: ResultReach,
-        start_node: Res1DNode,
-        end_node: Res1DNode,
-        *,
-        length: float | None = None,
-        breakpoints: list[ReachBreakPoint] | None = None,
-    ):
-        self._id = reach.name
-
-        # Must be checked separately: some formats (.resx) report None for both the
-        # reach and the node, which the identity checks below would let through.
-        if reach.start_node is None or reach.end_node is None:
-            raise ValueError(
-                f"mikeio1d reported no start/end node for reach {reach.name!r}; "
-                "this result format's topology cannot be represented as a Network."
-            )
-
-        if start_node.id != reach.start_node:
-            raise ValueError("Incorrect starting node.")
-        if end_node.id != reach.end_node:
-            raise ValueError("Incorrect ending node.")
-
-        self._start = start_node
-        self._end = end_node
-        self._length = _resolve_reach_length(length, reach)
-        self._start_distance = _reach_start_distance(reach)
-        self._breakpoints = breakpoints or []
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def start(self) -> Res1DNode:
-        return self._start
-
-    @property
-    def end(self) -> Res1DNode:
-        return self._end
-
-    @property
-    def length(self) -> float | None:
-        return self._length
-
-    @property
-    def start_distance(self) -> float:
-        return self._start_distance
-
-    @property
-    def breakpoints(self) -> list[ReachBreakPoint]:
-        return self._breakpoints
 
 
 def _load_res1d_network(
@@ -280,7 +204,7 @@ def _load_res1d_network(
     *,
     extra: _Companion | None = None,
     lengths: dict[str, float] | None = None,
-) -> tuple[list[Res1DReach], dict[Alias, dict[str, _Series]]]:
+) -> tuple[list[NetworkReach], dict[Alias, dict[str, _Series]]]:
     """Read a result file as reaches, and as the map of where each series sits.
 
     Both come out of the one walk over ``res.reaches``, and neither touches a
@@ -294,30 +218,32 @@ def _load_res1d_network(
     # which gridpoint a break point was made from.
     series: dict[Alias, dict[str, _Series]] = {}
 
-    def _init_node(reach: ResultReach, is_end: bool) -> Res1DNode:
-        id = reach.end_node if is_end else reach.start_node
+    def _init_node(id: str) -> NetworkNode:
         # A node shared by several reaches is visited once per reach endpoint.
         if id not in series:
             carried = _series_at(res.nodes[id])
             if extra is not None and id in extra.nodes:
                 carried = {**carried, **_series_at(extra.nodes[id])}
             series[id] = carried
-        return Res1DNode(id)
+        return NetworkNode(id)
 
-    def _build_reach(reach: ResultReach) -> Res1DReach:
-        reach_length = lengths.get(reach.name)
-        breakpoints = _build_reach_breakpoints(
-            reach,
-            length=_resolve_reach_length(reach_length, reach),
-            series=series,
-            extra=extra,
-        )
-        return Res1DReach(
-            reach,
-            _init_node(reach, False),
-            _init_node(reach, True),
-            length=reach_length,
-            breakpoints=breakpoints,
+    def _build_reach(reach: ResultReach) -> NetworkReach:
+        # Some formats (.resx) report no end nodes at all, and a reach without
+        # them cannot be placed in a graph.
+        if reach.start_node is None or reach.end_node is None:
+            raise ValueError(
+                f"mikeio1d reported no start/end node for reach {reach.name!r}; "
+                "this result format's topology cannot be represented as a Network."
+            )
+        length = _resolve_reach_length(lengths.get(reach.name), reach)
+        breakpoints = _build_reach_breakpoints(reach, length=length, series=series, extra=extra)
+        return NetworkReach(
+            id=reach.name,
+            start=_init_node(reach.start_node),
+            end=_init_node(reach.end_node),
+            length=length,
+            start_distance=_reach_start_distance(reach),
+            breakpoints=tuple(breakpoints),
         )
 
     built = [_build_reach(reach) for reach in res.reaches.values()]
@@ -357,7 +283,7 @@ class _Res1DSource(_Source):
         # each break point was made from.
         self._items: dict[Alias, dict[str, _Series]] = {}
 
-    def build(self) -> list[Res1DReach]:
+    def build(self) -> list[NetworkReach]:
         """Read the file as reaches, recording where every series sits.
 
         The reaches are returned and not kept: a network deep-copies them and

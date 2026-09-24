@@ -13,9 +13,7 @@ Two reaches between the same pair of nodes - parallel pumps, a battery of
 orifices - stay apart because each one's break points are keyed by its own id,
 so each gets its own chain of graph nodes. A reach with no break points has only
 the one start-to-end edge, which is why :func:`_generate_graph` refuses two of
-those between the same nodes rather than collapsing them into one. That refusal
-is the promise :attr:`~mikeio1d.network.NetworkReach.breakpoints` makes to a
-reader supplying its own reaches.
+those between the same nodes rather than collapsing them into one.
 """
 
 from __future__ import annotations
@@ -71,7 +69,7 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             # positive or negative edge weight where the true value is
             # analytically zero. A breakpoint's distance can also be
             # genuinely unknown (unrelated to whether the reach's own length
-            # is known - a NetworkReach subclass makes no promise the two are
+            # is known - a NetworkReach makes no promise the two are
             # coupled), so both ends guard for None.
             leading_distance = reach.breakpoints[0].distance
             if leading_distance is None:
