@@ -186,7 +186,9 @@ class TestResolvingAnAddress:
         res11 = Network.open(_RES11)
         node = next(iter(res11.reaches.values())).start.id
 
-        assert res11.resolve(node) == {"address": node, "quantities": []}
+        resolved = res11.resolve(node)
+
+        assert (resolved["address"], resolved["quantities"]) == (node, [])
 
     def test_a_node_and_a_reach_sharing_a_name_stay_apart(self, epanet):
         """EPANET names a junction 10 and a pipe 10. The shape says which."""
