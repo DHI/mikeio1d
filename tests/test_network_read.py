@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-pytest.importorskip("networkx")
+nx = pytest.importorskip("networkx")
 pytest.importorskip("xarray")
 
 from mikeio1d import Res1D
@@ -48,13 +48,6 @@ def river():
     return Network.open(_RIVER)
 
 
-def _released():
-    """A network that has let go of the result file it was opened from."""
-    network = Network.open(_RES1D)
-    network.release()
-    return network
-
-
 class TestTheOpenReadsNothing:
     """The claim the whole surface rests on: metadata costs no timeseries."""
 
@@ -85,10 +78,6 @@ class TestThePeriod:
         res = Res1D(_RES1D)
 
         assert network.period() == (res.start_time, res.end_time)
-
-    def test_a_released_network_says_so(self):
-        with pytest.raises(ValueError, match="needs the result file"):
-            _released().period()
 
 
 class TestWhatQuantitiesMeans:
@@ -195,10 +184,6 @@ class TestResolvingAnAddress:
         assert epanet.resolve("10")["address"] == "10"
         assert epanet.resolve(("10", 0.0))["address"] == ("10", 0.0)
 
-    def test_a_released_network_says_so(self):
-        with pytest.raises(ValueError, match="needs the result file"):
-            _released().resolve("101")
-
 
 class TestListingLocations:
     """Where a quantity is, from topology alone."""
@@ -235,10 +220,6 @@ class TestListingLocations:
     def test_a_reach_that_is_not_here_is_named(self, network):
         with pytest.raises(KeyError, match="no reach"):
             network.locations(reach="no_such_reach")
-
-    def test_a_released_network_says_so(self):
-        with pytest.raises(ValueError, match="needs the result file"):
-            _released().locations()
 
 
 class TestReadingSeries:
@@ -322,38 +303,17 @@ class TestReadingSeries:
 
         assert "cannot read 2 of the 2" in str(failure.value)
 
-    def test_a_released_network_says_so(self):
-        with pytest.raises(ValueError, match="needs the result file"):
-            _released().read([("101", "WaterLevel")])
 
+class TestTheGraph:
+    """What the graph lets a caller do to it."""
 
-class TestHoldingTheResultFile:
-    """What keeping the file open costs, and how to stop paying it."""
+    def test_it_cannot_be_edited_under_the_lookups(self, network):
+        with pytest.raises(nx.NetworkXError, match="Frozen"):
+            network.graph.add_node(-1)
 
-    def test_a_copy_shares_the_file_and_still_reads(self, network):
-        """deepcopy cannot clone a Res1D at all, so the copy shares it."""
-        clone = network.copy()
+    def test_a_copy_of_it_can(self, network):
+        graph = network.graph.copy()
 
-        assert clone.graph is not network.graph
-        assert clone.read([("101", "WaterLevel")]).shape == (110, 1)
+        graph.add_node(-1)
 
-    def test_releasing_keeps_the_topology(self):
-        released = _released()
-
-        aliases = {alias for _, alias in released.graph.nodes(data="alias")}
-
-        assert "101" in aliases
-        assert released.reaches["100l1"].breakpoints
-        assert "Result file: released" in repr(released)
-
-    @pytest.mark.parametrize("member", ["to_dataframe", "to_dataset"])
-    def test_releasing_stops_the_whole_frame_too(self, member):
-        with pytest.raises(ValueError, match="needs the result file"):
-            getattr(_released(), member)()
-
-    def test_releasing_twice_is_harmless(self):
-        network = Network.open(_RES1D)
-
-        network.release()
-        network.release()
-
+        assert -1 not in network.graph

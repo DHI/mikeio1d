@@ -19,7 +19,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from collections.abc import Mapping
 from collections.abc import Sequence
-from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
@@ -66,7 +65,7 @@ class Network:
     """
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
-        self._results: _Results | None = results
+        self._results = results
         # Ids first: two reaches sharing one would interleave their break points
         # into a single chain, and the graph error would describe the wreckage
         # rather than the cause.
@@ -80,11 +79,8 @@ class Network:
             f"Reaches: {len(self._reaches)}",
             f"Nodes: {self._graph.number_of_nodes()}",
         ]
-        if self._results is None:
-            out.append("Result file: released")
-        else:
-            start, end = self.period()
-            out += [f"Quantities: {list(self.quantities)}", f"Time: {start} - {end}"]
+        start, end = self.period()
+        out += [f"Quantities: {list(self.quantities)}", f"Time: {start} - {end}"]
         return "\n".join(out)
 
     @classmethod
@@ -228,13 +224,8 @@ class Network:
         -------
         pd.DataFrame
             Timeseries at every graph node, columns ``(node, quantity)``.
-
-        Raises
-        ------
-        ValueError
-            If :meth:`release` has been called on this network.
         """
-        results = self._require_results("to_dataframe()")
+        results = self._results
         # Every graph node, including a break point no address can name: it
         # carries a series all the same, and the graph has a node for it.
         columns = [
@@ -279,11 +270,6 @@ class Network:
                     distance  float64   nan nan 0.0 24.5
 
             Empty when no location carries data.
-
-        Raises
-        ------
-        ValueError
-            If :meth:`release` has been called on this network.
         """
         df_raw = self.to_dataframe()
         if len(df_raw.columns) == 0:
@@ -300,8 +286,12 @@ class Network:
 
     @property
     def graph(self) -> nx.Graph:
-        """Graph of the network."""
-        return self._graph
+        """Graph of the network, read-only.
+
+        Its lookups are built from it once, so it cannot change under them.
+        ``network.graph.copy()`` gives a graph to edit.
+        """
+        return nx.freeze(self._graph)
 
     @property
     def reaches(self) -> Mapping[str, NetworkReach]:
@@ -323,20 +313,6 @@ class Network:
         """
         return MappingProxyType(self._reaches)
 
-    def _require_results(self, what: str) -> _Results:
-        """Give the results this network reads through, or explain why there are none.
-
-        One way to end up here: :meth:`release` has been called. A network is
-        constructed with its results, so it cannot have gone without them.
-        """
-        if self._results is None:
-            raise ValueError(
-                f"{what} needs the result file this network was opened from, and "
-                "release() has let go of it. The topology is still here - graph "
-                "and reaches - and opening the file again restores the rest."
-            )
-        return self._results
-
     def period(self) -> tuple[datetime, datetime]:
         """First and last timestep of the result file.
 
@@ -348,17 +324,12 @@ class Network:
         tuple[datetime, datetime]
             Start and end of the result file's time axis.
 
-        Raises
-        ------
-        ValueError
-            If :meth:`release` has been called on this network.
-
         Examples
         --------
         >>> network.period()  # doctest: +SKIP
         (datetime.datetime(1994, 8, 7, 16, 35), datetime.datetime(1994, 8, 7, 18, 35))
         """
-        return self._require_results("period()").period
+        return self._results.period
 
     @property
     def quantities(self) -> Mapping[str, str | None]:
@@ -379,17 +350,12 @@ class Network:
             Quantity ID to unit abbreviation. The unit is ``None`` where the
             file gave none.
 
-        Raises
-        ------
-        ValueError
-            If :meth:`release` has been called on this network.
-
         Examples
         --------
         >>> network.quantities  # doctest: +SKIP
         {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
         """
-        results = self._require_results("quantities")
+        results = self._results
         units = results.units
         readable = {
             quantity
@@ -474,8 +440,6 @@ class Network:
         KeyError
             If any item names a location the network does not have, or a
             quantity that location does not carry. Every failing item is named.
-        ValueError
-            If :meth:`release` has been called on this network.
 
         Notes
         -----
@@ -492,7 +456,7 @@ class Network:
         >>> points = network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
         """
-        results = self._require_results("read()")
+        results = self._results
         # Resolved to the network's own spelling before anything is read, so a bad
         # item is named rather than read around, and so the results are handed only
         # pairs it has already confirmed.
@@ -530,11 +494,6 @@ class Network:
             Addresses, each of which :meth:`resolve` answers for. A break point
             whose distance is unknown is left out: nothing can name it.
 
-        Raises
-        ------
-        ValueError
-            If :meth:`release` has been called on this network.
-
         Examples
         --------
         Every break point of a reach that carries discharge, which is the batch
@@ -543,7 +502,7 @@ class Network:
         >>> network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         [('100l1', 23.8413574216414)]
         """
-        results = self._require_results("locations()")
+        results = self._results
         if reach is None:
             aliases: Iterable[Alias] = self._naming.aliases
         elif reach in self._reaches:
@@ -597,8 +556,7 @@ class Network:
         Raises
         ------
         ValueError
-            If ``tol`` is negative or not finite, or if :meth:`release` has
-            been called on this network.
+            If ``tol`` is negative or not finite.
 
         Examples
         --------
@@ -611,7 +569,7 @@ class Network:
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        results = self._require_results("resolve()")
+        results = self._results
         # The network's own spelling rather than the argument echoed, so the
         # address that comes out is the one the rest of the surface takes.
         alias = self._naming.canonical(address, tol=tol)
@@ -622,52 +580,3 @@ class Network:
             "quantities": results.quantities_at(alias) or [],
             "node": self._naming.aliases[alias],
         }
-
-    def copy(self) -> Network:
-        """Create a deep copy of the Network.
-
-        The graph and the reaches are copied. The result file
-        the network was opened from is shared rather than copied, so both
-        networks read through one open file - see :meth:`release`.
-
-        Returns
-        -------
-        Network
-            Deep copy of the Network object
-        """
-        return deepcopy(self)
-
-    def __deepcopy__(self, memo: dict[int, Any]) -> Network:
-        """Copy everything but the result file, which is shared.
-
-        A ``Res1D`` cannot be deep-copied at all - it holds .NET objects, and
-        the attempt raises ``TypeError: cannot pickle 'Filter' object``. Sharing
-        it is also the behaviour worth having: a copy is made to alter the graph,
-        never to open the file a second time.
-        """
-        clone = self.__class__.__new__(self.__class__)
-        memo[id(self)] = clone
-        for key, value in self.__dict__.items():
-            setattr(clone, key, value if key == "_results" else deepcopy(value, memo))
-        return clone
-
-    def release(self) -> None:
-        """Let go of the result file the network was opened from.
-
-        A network keeps that file open for its own lifetime, since every series
-        is read from it on request. Releasing it frees what the file holds, at
-        the cost of everything that reads or asks about series: :meth:`period`,
-        :attr:`quantities`, :meth:`resolve`, :meth:`locations`, :meth:`read`,
-        :meth:`to_dataframe` and :meth:`to_dataset` raise from then on.
-
-        The topology is untouched - :attr:`graph`, with each node's ``alias``,
-        and :attr:`reaches` keep working. Frames already read are the caller's
-        own. Calling this twice is harmless.
-
-        Examples
-        --------
-        >>> network = Network.open("model.res1d")  # doctest: +SKIP
-        >>> df = network.read([("101", "WaterLevel")])  # doctest: +SKIP
-        >>> network.release()  # doctest: +SKIP
-        """
-        self._results = None
