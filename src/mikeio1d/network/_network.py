@@ -175,7 +175,7 @@ class Network:
         items = [
             (alias, quantity)
             for alias in self._naming.aliases
-            for quantity in (self._results.quantities_at(alias) or ())
+            for quantity in self._results.quantities_at(alias)
             if sel is None or quantity == sel
         ]
         df = self._results.read(items).rename_axis(index="time")
@@ -310,7 +310,7 @@ class Network:
         readable = {
             quantity
             for alias in self._naming.aliases
-            for quantity in (results.quantities_at(alias) or ())
+            for quantity in results.quantities_at(alias)
         }
         # Ordered by the file's own header, so two networks over one file list
         # their shared quantities alike whatever their topology.
@@ -333,7 +333,7 @@ class Network:
             if alias is None:
                 faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
                 continue
-            carried = results.quantities_at(alias) or []
+            carried = results.quantities_at(alias)
             if quantity in carried:
                 continue
             if carried:
@@ -407,8 +407,7 @@ class Network:
         resolved: list[tuple[Alias, str]] = []
         for address, quantity in items:
             alias = self._naming.canonical(address)
-            carried = None if alias is None else results.quantities_at(alias)
-            if carried is None or quantity not in carried:
+            if alias is None or quantity not in results.quantities_at(alias):
                 raise self._blame_unreadable(items, results)
             resolved.append((alias, quantity))
 
@@ -458,8 +457,7 @@ class Network:
         for alias in aliases:
             if _is_break_point(alias) and alias[1] is None:
                 continue
-            carried = results.quantities_at(alias)
-            if carried is None or (quantity is not None and quantity not in carried):
+            if quantity is not None and quantity not in results.quantities_at(alias):
                 continue
             found.append(alias)
         return found
@@ -513,6 +511,6 @@ class Network:
             return None
         return Location(
             address=alias,
-            quantities=tuple(self._results.quantities_at(alias) or ()),
+            quantities=self._results.quantities_at(alias),
             node=self._naming.aliases[alias],
         )

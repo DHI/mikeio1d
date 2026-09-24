@@ -68,10 +68,9 @@ class _Results:
         """Results with no series at all, for a network that holds topology only."""
         return cls(series={}, units={}, period=(None, None))
 
-    def quantities_at(self, alias: Alias) -> list[str] | None:
-        """Quantity IDs readable at one location, or None if it has no series."""
-        carried = self.series.get(alias)
-        return None if carried is None else list(carried)
+    def quantities_at(self, alias: Alias) -> tuple[str, ...]:
+        """Quantity IDs readable at one location; empty where it carries none."""
+        return tuple(self.series.get(alias, ()))
 
     def read(self, items: Sequence[tuple[Alias, str]]) -> pd.DataFrame:
         """Read the given pairs, one batched call per file they live in.
