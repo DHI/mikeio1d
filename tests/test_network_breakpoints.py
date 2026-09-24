@@ -81,6 +81,11 @@ class _GridPoints:
         self.Count = count
 
 
+def _carrying_nothing(reach):
+    """The series of every gridpoint on a reach, which is none at each."""
+    return {(reach.name, i): {} for i in range(len(reach.gridpoints))}
+
+
 def test_a_two_gridpoint_reach_keeps_both():
     """Both ends were measured, so neither may be dropped for the other.
 
@@ -96,7 +101,7 @@ def test_a_two_gridpoint_reach_keeps_both():
     reach = _Reach("r0", [53100.0, 53200.0])
 
     breakpoints = _build_reach_breakpoints(
-        reach, length=100.0, series={}
+        reach, length=100.0, series_by_key=_carrying_nothing(reach), series={}
     )
 
     assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0]
@@ -114,7 +119,7 @@ def test_gridpoints_listed_out_of_order_come_out_ascending():
     reach = _Reach("r0", [53200.0, 53100.0, 53300.0])
 
     breakpoints = _build_reach_breakpoints(
-        reach, length=200.0, series={}
+        reach, length=200.0, series_by_key=_carrying_nothing(reach), series={}
     )
 
     assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0, 53300.0]

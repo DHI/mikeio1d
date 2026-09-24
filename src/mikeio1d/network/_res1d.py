@@ -19,8 +19,9 @@ from typing import TYPE_CHECKING
 from ..res1d import Res1D
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
-    from ._companions import _Companion
     from ._naming import Alias
 
 from ._results import _Results
@@ -113,12 +114,45 @@ def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
     return series
 
 
+_SeriesKey = str | tuple[str, int]
+"""Where a series sits in a result file, before any break point is placed.
+
+A ``str`` is a node id. A ``(reach_id, i)`` tuple is the ``i``-th of the reach's
+:func:`_ordered_gridpoints`. A companion result is keyed the same way, which is
+how its series land on the main file's locations.
+"""
+
+
+def _ordered_gridpoints(reach: ResultReach) -> list[ResultGridPoint]:
+    """Give the gridpoints a reach's break points are made from, in order along it.
+
+    Sorted rather than taken as they come: a multi-segment reach reports its
+    gridpoints one segment at a time, in the order the file lists the segments,
+    which is not promised to be the order they sit in. A link-node reach has
+    only the one synthetic stand-in mikeio1d gave it.
+    """
+    if _has_real_gridpoints(reach):
+        return sorted(reach.gridpoints, key=lambda gp: gp.chainage)
+    return reach.gridpoints[:1]
+
+
+def _series_by_key(res: Res1D) -> dict[_SeriesKey, dict[str, _Series]]:
+    """Map every node and gridpoint of a result file to the series it carries."""
+    found: dict[_SeriesKey, dict[str, _Series]] = {
+        node_id: _series_at(node) for node_id, node in res.nodes.items()
+    }
+    for reach_id, reach in res.reaches.items():
+        for i, gridpoint in enumerate(_ordered_gridpoints(reach)):
+            found[(reach_id, i)] = _series_at(gridpoint)
+    return found
+
+
 def _build_reach_breakpoints(
     reach: ResultReach,
     *,
     length: float | None,
+    series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
     series: dict[Alias, dict[str, _Series]],
-    extra: _Companion | None = None,
 ) -> list[ReachBreakPoint]:
     """Build a reach's break points from its mikeio1d gridpoints.
 
@@ -135,44 +169,21 @@ def _build_reach_breakpoints(
     reachable the same way MIKE's are. Decided in
     https://github.com/DHI/modelskill/issues/680.
 
-    A companion ``.resx`` result (``extra``) contributes its own reach-level
-    quantities (e.g. pump energy) the same way it already does for nodes,
-    matched to the main file's gridpoints by index - the only real case
-    today is a single-gridpoint reach against a single-gridpoint companion.
-
-    ``series`` is filled with the series reachable at each break point. It is
-    collected here because this is the only place that knows which gridpoint a
-    break point was made from: an EPANET reach's two break points
-    are one gridpoint seen twice, and their distances come from a companion
-    ``.inp``, so neither correspondence can be recovered afterwards.
+    ``series`` is filled with the series reachable at each break point, taken
+    from ``series_by_key``. It is collected here because this is the only place
+    that knows which gridpoint a break point was made from: an EPANET reach's
+    two break points are one gridpoint seen twice, and their distances come from
+    a companion ``.inp``, so neither correspondence can be recovered afterwards.
     """
+    gridpoints = _ordered_gridpoints(reach)
     if _has_real_gridpoints(reach):
-        # Sorted rather than taken as they come: a multi-segment reach reports
-        # its gridpoints one segment at a time, in the order the file lists the
-        # segments, which is not promised to be the order they sit in.
-        # ``NetworkReach.breakpoints`` is documented as ascending, and the graph
-        # builder relies on it - the first and last break point are the reach's
-        # outermost, and consecutive differences are edge lengths, which a
-        # backwards pair would report as negative.
-        unique_gridpoints = sorted(reach.gridpoints, key=lambda gp: gp.chainage)
-        distances_per_gridpoint = [[gp.chainage] for gp in unique_gridpoints]
+        distances_per_gridpoint = [[gp.chainage] for gp in gridpoints]
     else:
-        unique_gridpoints = reach.gridpoints[:1]
-        distances_per_gridpoint = [[0.0, length] for _ in unique_gridpoints]
-
-    extra_gridpoints: list[ResultGridPoint] = []
-    if extra is not None and reach.name in extra.reaches:
-        # Sorted the same way, so pairing by index pairs the two files' points
-        # in the same order along the reach.
-        extra_gridpoints = sorted(extra.reaches[reach.name].gridpoints, key=lambda gp: gp.chainage)
+        distances_per_gridpoint = [[0.0, length] for _ in gridpoints]
 
     breakpoints: list[ReachBreakPoint] = []
-    for i, (gp, distances) in enumerate(zip(unique_gridpoints, distances_per_gridpoint)):
-        carried = _series_at(gp)
-        if i < len(extra_gridpoints):
-            # Disjoint from the main file's: a clash was refused when the
-            # companion was opened.
-            carried = {**carried, **_series_at(extra_gridpoints[i])}
+    for i, (gp, distances) in enumerate(zip(gridpoints, distances_per_gridpoint)):
+        carried = series_by_key[(reach.name, i)]
         # Under every distance this gridpoint was stretched over, so both of
         # an EPANET reach's break points name the one series it really has.
         # Including a distance of None: nothing can ask for that break point by
@@ -186,7 +197,8 @@ def _build_reach_breakpoints(
 def _load_res1d_network(
     res: Res1D,
     *,
-    extra: _Companion | None = None,
+    series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
+    units: Mapping[str, str],
     lengths: dict[str, float] | None = None,
 ) -> tuple[list[NetworkReach], _Results]:
     """Read a result file as reaches, and as the results a network reads through.
@@ -201,9 +213,10 @@ def _load_res1d_network(
     ----------
     res : Res1D
         The main result file.
-    extra : _Companion or None, optional
-        The ``.resx`` read alongside, if there was one. Its quantities become
-        readable like any other, and its header is needed for their units.
+    series_by_key : mapping of _SeriesKey to (dict of str to _Series)
+        What each node and gridpoint carries, a companion's series included.
+    units : mapping of str to str
+        Unit abbreviation per quantity ID, a companion's included.
     lengths : dict of str to float, optional
         Reach lengths from a companion ``.inp``, which no result file carries.
     """
@@ -214,12 +227,7 @@ def _load_res1d_network(
     series: dict[Alias, dict[str, _Series]] = {}
 
     def _init_node(id: str) -> str:
-        # A node shared by several reaches is visited once per reach endpoint.
-        if id not in series:
-            carried = _series_at(res.nodes[id])
-            if extra is not None and id in extra.nodes:
-                carried = {**carried, **_series_at(extra.nodes[id])}
-            series[id] = carried
+        series[id] = series_by_key[id]
         return id
 
     def _build_reach(reach: ResultReach) -> NetworkReach:
@@ -231,7 +239,9 @@ def _load_res1d_network(
                 "this result format's topology cannot be represented as a Network."
             )
         length = _resolve_reach_length(lengths.get(reach.name), reach)
-        breakpoints = _build_reach_breakpoints(reach, length=length, series=series, extra=extra)
+        breakpoints = _build_reach_breakpoints(
+            reach, length=length, series_by_key=series_by_key, series=series
+        )
         return NetworkReach(
             id=reach.name,
             start=_init_node(reach.start_node),
@@ -242,8 +252,4 @@ def _load_res1d_network(
         )
 
     built = [_build_reach(reach) for reach in res.reaches.values()]
-
-    # The main file wins where both spell the same quantity, since it is the one
-    # the network was opened from.
-    units = {**(extra.units if extra is not None else {}), **_units_of(res)}
     return built, _Results(series=series, units=units, period=(res.start_time, res.end_time))

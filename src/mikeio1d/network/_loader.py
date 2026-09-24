@@ -24,6 +24,8 @@ from ._policy import _as_res1d
 from ._policy import _path_of
 from ._policy import _validate_extension
 from ._res1d import _load_res1d_network
+from ._res1d import _series_by_key
+from ._res1d import _units_of
 
 
 def _blame_the_companions(
@@ -66,14 +68,29 @@ def _load_network(
     _validate_extension(_path_of(res).suffix)
     res = _as_res1d(res)
 
+    series_by_key = _series_by_key(res)
+    units = _units_of(res)
+
     found, discovered = _companion_paths(res, companions)
     # Every failure a companion can cause is raised while reading it, so a
     # fault in the result file itself keeps its own message.
     try:
-        extra, lengths = _read_companions(res, found)
+        extra, lengths = _read_companions(res, found, series_by_key)
     except ValueError as err:
         if not discovered:
             raise
         raise _blame_the_companions(res, found, err) from err
 
-    return _load_res1d_network(res, extra=extra, lengths=lengths)
+    if extra is not None:
+        # Onto the main file's locations only: a companion gridpoint the main
+        # reach has no counterpart for has nowhere to be read from. Disjoint
+        # quantities, since a clash was refused when the companion was opened.
+        series_by_key = {
+            key: {**carried, **extra.series_by_key.get(key, {})}
+            for key, carried in series_by_key.items()
+        }
+        # The main file wins where both spell the same quantity, since it is
+        # the one the network was opened from.
+        units = {**extra.units, **units}
+
+    return _load_res1d_network(res, series_by_key=series_by_key, units=units, lengths=lengths)

@@ -13,8 +13,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from ..result_network import ResultNode
-    from ..result_network import ResultReach
+    from ._res1d import _SeriesKey
+    from ._results import _Series
 
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -24,6 +24,7 @@ from typing import Any
 from ..res1d import Res1D
 from ._inp import read_pipe_lengths
 from ._policy import _as_res1d, _suffix_of
+from ._res1d import _series_by_key
 from ._res1d import _units_of
 
 _COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
@@ -80,8 +81,8 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
     ----------
     locations : mapping of str to value
         What the companion file said, keyed by its own spelling of each name:
-        the nodes or reaches of a companion result, or the reach lengths read
-        from an input file.
+        the node or reach names of a companion result, or the reach lengths
+        read from an input file.
     known : container of str
         The main file's names for the same kind of location.
 
@@ -103,17 +104,16 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
 
 @dataclass(frozen=True)
 class _Companion:
-    """A companion result file, keyed by the main file's location names.
+    """A companion result file's series, keyed by the main file's location names.
 
-    Holds what the loader reaches into a companion for, so a node or reach is
-    found under one spelling of its name. Deliberately not the ``Res1D`` these
-    came from: a series carries the file it has to be read from (see
-    ``_res1d._Series``), so nothing downstream has to go back to the companion
+    Keyed the way the main file's own series are (see ``_res1d._SeriesKey``), so
+    merging the two is a matter of matching keys. Deliberately not the ``Res1D``
+    these came from: a series carries the file it has to be read from (see
+    ``_results._Series``), so nothing downstream has to go back to the companion
     itself.
     """
 
-    nodes: dict[str, ResultNode]
-    reaches: dict[str, ResultReach]
+    series_by_key: dict[_SeriesKey, dict[str, _Series]]
     units: Mapping[str, str]
 
 
@@ -129,8 +129,12 @@ def _read_companion_lengths(inp: str | Path) -> dict[str, float]:
     return read_pipe_lengths(path)
 
 
-def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
+def _open_companion_result(
+    res: Res1D, resx: str | Path | Res1D, own: Mapping[_SeriesKey, dict[str, _Series]]
+) -> _Companion:
     """Open and validate a companion ``.resx`` result file.
+
+    ``own`` is the main file's series, which the companion's must not overlap.
 
     Returns
     -------
@@ -155,13 +159,11 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
             f"{len(res.time_index)} ending {res.end_time}."
         )
 
-    companion = _Companion(
-        nodes=_rekey_by_main_file(extra.nodes, res.nodes),
-        reaches=_rekey_by_main_file(extra.reaches, res.reaches),
-        units=_units_of(extra),
-    )
+    # Each of the companion's names, under its spelling in the main file.
+    nodes = _rekey_by_main_file({name: name for name in extra.nodes}, res.nodes)
+    reaches = _rekey_by_main_file({name: name for name in extra.reaches}, res.reaches)
 
-    unknown_nodes = set(companion.nodes) - set(res.nodes)
+    unknown_nodes = set(nodes) - set(res.nodes)
     if unknown_nodes:
         raise ValueError(
             f"The '.resx' companion holds nodes {sorted(unknown_nodes)} that are "
@@ -169,7 +171,7 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
             "the same model."
         )
 
-    unknown_reaches = set(companion.reaches) - set(res.reaches)
+    unknown_reaches = set(reaches) - set(res.reaches)
     if unknown_reaches:
         raise ValueError(
             f"The '.resx' companion holds reaches {sorted(unknown_reaches)} that are "
@@ -177,11 +179,24 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
             "the same model."
         )
 
-    _refuse_clashes(res, companion)
-    return companion
+    main_node = {own_name: main for main, own_name in nodes.items()}
+    main_reach = {own_name: main for main, own_name in reaches.items()}
+    series_by_key: dict[_SeriesKey, dict[str, _Series]] = {}
+    for key, carried in _series_by_key(extra).items():
+        if isinstance(key, tuple):
+            key = (main_reach[key[0]], key[1])
+        else:
+            key = main_node[key]
+        series_by_key[key] = carried
+
+    _refuse_clashes(own, series_by_key)
+    return _Companion(series_by_key=series_by_key, units=_units_of(extra))
 
 
-def _refuse_clashes(res: Res1D, companion: _Companion) -> None:
+def _refuse_clashes(
+    own: Mapping[_SeriesKey, Mapping[str, object]],
+    other: Mapping[_SeriesKey, Mapping[str, object]],
+) -> None:
     """Refuse a companion carrying a quantity the result file has at the same place.
 
     Letting one replace the other would read whichever file happened to be
@@ -189,28 +204,23 @@ def _refuse_clashes(res: Res1D, companion: _Companion) -> None:
     anything is built, so the failure is raised where every other fault in a
     companion is.
 
-    A reach's gridpoints are paired the way the loader pairs them: both sorted
-    by chainage, then by position. A link-node reach has a single synthetic
-    gridpoint in each file, so the pairing is that one against that one.
+    Parameters
+    ----------
+    own, other : mapping of _SeriesKey to (mapping of quantity ID to anything)
+        What each location carries, in the main file and in the companion.
 
     Raises
     ------
     ValueError
         Naming the first location where the two overlap, and what they share.
     """
-    pairs = [(node_id, res.nodes[node_id], node) for node_id, node in companion.nodes.items()]
-    for reach_id, reach in companion.reaches.items():
-        by_chainage = [
-            sorted(r.gridpoints, key=lambda gp: gp.chainage) for r in (res.reaches[reach_id], reach)
-        ]
-        pairs += [(reach_id, own, other) for own, other in zip(*by_chainage)]
-
-    for location_id, own, other in pairs:
-        overlapping = set(own.quantities) & set(other.quantities)
+    for key, carried in other.items():
+        overlapping = set(own.get(key, ())) & set(carried)
         if overlapping:
+            where = f"Reach {key[0]!r}" if isinstance(key, tuple) else f"Node {key!r}"
             raise ValueError(
-                f"Location {location_id!r} already has {sorted(overlapping)} in the "
-                "main result file, so the companion file's copy cannot be merged in."
+                f"{where} already has {sorted(overlapping)} in the main result file, "
+                "so the companion file's copy cannot be merged in."
             )
 
 
@@ -282,7 +292,9 @@ def _companion_paths(
 
 
 def _read_companions(
-    res: Res1D, companions: Sequence[str | Path | Res1D]
+    res: Res1D,
+    companions: Sequence[str | Path | Res1D],
+    own: Mapping[_SeriesKey, dict[str, _Series]],
 ) -> tuple[_Companion | None, dict[str, float] | None]:
     """Read the companions, sorting them by what each contributes.
 
@@ -292,6 +304,8 @@ def _read_companions(
         The result file the companions belong to.
     companions : sequence of str, Path or Res1D
         The companions to read.
+    own : mapping of _SeriesKey to (dict of str to _Series)
+        The result file's own series, which a companion's must not overlap.
 
     Returns
     -------
@@ -312,7 +326,7 @@ def _read_companions(
         if suffix == ".resx":
             if extra is not None:
                 raise ValueError("Two '.resx' companions were given; a network can read one.")
-            extra = _open_companion_result(res, companion)
+            extra = _open_companion_result(res, companion, own)
         elif suffix == ".inp":
             if lengths is not None:
                 raise ValueError("Two '.inp' companions were given; a network can read one.")

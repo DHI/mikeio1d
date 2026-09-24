@@ -3,7 +3,6 @@
 # ruff: noqa: E402
 import shutil
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 
@@ -238,15 +237,9 @@ class TestCompanionErrors:
             Network.open(res, companions=[bad])
 
 
-def _location(*quantities, chainage=0.0):
-    """A node or gridpoint as a header describes it: what it carries, and where."""
-    return SimpleNamespace(quantities=list(quantities), chainage=chainage)
-
-
-def _files(nodes=None, reaches=None):
-    """A result file, or a companion, reduced to the locations a clash is looked for in."""
-    reaches = {rid: SimpleNamespace(gridpoints=gps) for rid, gps in (reaches or {}).items()}
-    return SimpleNamespace(nodes=nodes or {}, reaches=reaches)
+def _carrying(*quantities):
+    """What a node or gridpoint carries, as a header describes it."""
+    return dict.fromkeys(quantities)
 
 
 class TestWhatACompanionCollisionSays:
@@ -258,35 +251,34 @@ class TestWhatACompanionCollisionSays:
     the reader picks its parser from the file's extension but then rejects
     content that does not match it, so a ``.res`` copied under a ``.resx`` name
     fails to load long before anything is compared. The check reads nothing but
-    what each location says it carries, so it is handed exactly that.
+    what each location says it carries, so it is handed exactly that: a node by
+    its id, a gridpoint by its reach and its position along it.
     """
 
     def test_it_names_the_node_and_the_quantity(self):
-        res = _files(nodes={"9": _location("Flow", "Volume")})
-        companion = _files(nodes={"9": _location("Volume")})
+        res = {"9": _carrying("Flow", "Volume")}
+        companion = {"9": _carrying("Volume")}
 
         with pytest.raises(ValueError, match=r"'9'.*\['Volume'\]"):
             _refuse_clashes(res, companion)
 
     def test_it_names_the_reach_whose_gridpoint_clashes(self):
-        res = _files(reaches={"9": [_location("Flow", "Energy")]})
-        companion = _files(reaches={"9": [_location("Energy")]})
+        res = {("9", 0): _carrying("Flow", "Energy")}
+        companion = {("9", 0): _carrying("Energy")}
 
         with pytest.raises(ValueError, match=r"'9'.*\['Energy'\]"):
             _refuse_clashes(res, companion)
 
-    def test_gridpoints_are_paired_along_the_reach(self):
-        """Listed out of order, the two files still pair their points by chainage."""
-        res = _files(reaches={"r": [_location("Q", chainage=10.0), _location("H", chainage=0.0)]})
-        companion = _files(
-            reaches={"r": [_location("H2", chainage=10.0), _location("Q", chainage=0.0)]}
-        )
+    def test_gridpoints_are_compared_one_against_its_counterpart(self):
+        """One gridpoint's quantity does not clash with another's on the same reach."""
+        res = {("r", 0): _carrying("H"), ("r", 1): _carrying("Q")}
+        companion = {("r", 0): _carrying("Q"), ("r", 1): _carrying("H2")}
 
         _refuse_clashes(res, companion)
 
     def test_disjoint_quantities_pass(self):
-        res = _files(nodes={"9": _location("Flow")}, reaches={"9": [_location("Flow")]})
-        companion = _files(nodes={"9": _location("Volume")}, reaches={"9": [_location("Energy")]})
+        res = {"9": _carrying("Flow"), ("9", 0): _carrying("Flow")}
+        companion = {"9": _carrying("Volume"), ("9", 0): _carrying("Energy")}
 
         _refuse_clashes(res, companion)
 
