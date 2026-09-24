@@ -10,8 +10,7 @@
 - `Network.period`, `Network.quantities`, `Network.resolve`, `Network.locations` and
   `Network.read`, for asking a result file what it holds and reading only the series a
   caller turns out to need, by the names the model used - a node ID, or a reach and a
-  distance along it. A network keeps its result file open to answer, and `Network.release`
-  lets go of it (#250).
+  distance along it. A network keeps its result file open for its lifetime to answer (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 
@@ -24,7 +23,7 @@
 
 ### Changed
 - `Network.open` reads the header and the topology and no timeseries. `to_dataframe` and
-  `to_dataset` read every location when they are called, and stop after `release`. The
+  `to_dataset` read every location when they are called. The
   `nodes`, `reaches` and `quantities` options are gone: read the locations you need with
   `Network.read` instead (#250).
 - `Network.quantities` now names what can be read somewhere in the network, mapped to its
@@ -32,8 +31,19 @@
 - A `.resx` carrying a quantity its `.res` already has at the same location is refused
   however the network is read. It used to be refused only where a frame was built, and
   otherwise read silently from the `.resx` (#250).
-- `Network.resolve` also gives the graph integer of the location it finds, under `node`. It is the
-  one lookup by name; `graph.nodes[node]["alias"]` goes back (#250).
+- `Network.resolve` answers with a `Location` - its `address`, the `quantities` readable there
+  and its graph integer `node` - or `None`. It is the one lookup by name;
+  `graph.nodes[node]["alias"]` goes back (#250).
+- `Network.period` is a property, like `Network.quantities` (#250).
+- `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does.
+  `to_dataset` keeps its integer `node` dimension (#250).
+- `Network.graph` is read-only; `network.graph.copy()` gives one to edit. `Network.copy` and
+  `Network.release` are gone (#250).
+- A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location`,
+  `NetworkReach` and `ReachBreakPoint` are exported from `mikeio1d.network` (#250).
+- modelskill's `NetworkModelResult` needs matching changes: `network.period()` becomes
+  `network.period`, and `resolve()`'s `["address"]`, `["quantities"]` and `["node"]` become
+  attributes (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.

@@ -29,7 +29,7 @@ Nodes are connected together by reaches. Nodes can represent different entities:
 Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.
 
 ## Reading a network as a graph
-The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and the network is addressed by those names throughout. The graph itself is labelled with integers, each node carrying its name as the `alias` attribute; `resolve()` gives the integer for a name.
+The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and the network is addressed by those names throughout. The graph itself is labelled with integers, each node carrying its name as the `alias` attribute; `resolve()` gives the integer for a name. The graph is read-only, since the network's lookups are built from it: `network.graph.copy()` gives one to edit.
 
 ![A reach's own first and last grid point sit exactly where the reach's nodes do, so each is joined to its node by an edge of length `0.0` flagged `boundary`. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.](../images/docs/res1d_network_mapping.svg)
 
@@ -57,9 +57,9 @@ network = Network.open("model.res1d")
 The network then answers from the file header and its own break points, still without reading any:
 
 ```python
-network.period()                                   # (start, end)
+network.period                                     # (start, end)
 network.quantities                                 # {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
-network.resolve("manhole_12")                      # {'address': ..., 'quantities': [...], 'node': ...}
+network.resolve("manhole_12")                      # Location(address=..., quantities=(...), node=...)
 network.locations(reach="100l1", quantity="Discharge")
 ```
 
@@ -67,7 +67,7 @@ network.locations(reach="100l1", quantity="Discharge")
 
 ```python
 network.resolve(("100l1", 23.8), tol=0.1)
-# {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge'], 'node': 3}
+# Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
 ```
 
 `read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and everything asked for crosses to the result file in one batched call:
@@ -79,11 +79,11 @@ network.read([(point, "Discharge") for point in points])
 
 A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`.
 
-`to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network.
+`to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network. `to_dataframe()` labels its columns `(address, quantity)`, as `read()` does; `to_dataset()` indexes locations by their graph integer and carries each one's name alongside.
 
 ::: {.callout-note}
 ## The file stays open
-A network holds its result file for its own lifetime, since every series is read from it on request. Call `release()` to let go of it once the data is out. The topology stays - `graph`, with each node's `alias`, and `reaches` - while everything above, `to_dataframe()` and `to_dataset()` stop.
+A network holds its result file for its own lifetime, since every series is read from it on request. Drop the network to let go of it; frames already read are your own.
 
 MIKE 1D loads a file's whole dynamic data on the first read of anything in it, so what reading late saves is the work of building frames for locations you never asked about, not the file read itself.
 :::

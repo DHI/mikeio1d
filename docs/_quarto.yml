@@ -130,6 +130,9 @@ quartodoc:
     contents:
     - network.Network
     - network.Address
+    - network.Location
+    - network.NetworkReach
+    - network.ReachBreakPoint
     
 format:
   html:
