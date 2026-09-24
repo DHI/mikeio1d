@@ -31,7 +31,7 @@ import xarray as xr
 
 from ..res1d import Res1D
 from ._companions import _companion_paths, _read_companions, _CompanionConflict
-from ._graph import _build_dataframe, _generate_graph
+from ._graph import _generate_graph
 from ._naming import _Naming, _is_break_point
 from ._policy import _validate_extension
 from ._res1d import _Res1DSource
@@ -59,11 +59,11 @@ class Network:
 
     A result file names a location the way the model did: a node id, or a reach
     and a distance along it. A graph needs one flat set of integers. A Network
-    holds both - :attr:`graph` is the integer-labelled graph carrying the
-    timeseries each location holds, and :meth:`find` and :meth:`recall`
-    translate between the two namings.
+    holds both - :attr:`graph` is the integer-labelled graph of the locations,
+    and :meth:`find` and :meth:`recall` translate between the two namings.
 
-    Build one with :meth:`open`, which reads a result file.
+    Build one with :meth:`open`, which reads a result file's topology. The
+    timeseries stay in the file until :meth:`read` asks for them.
     """
 
     def __init__(self, source: _Source):
@@ -76,20 +76,20 @@ class Network:
         self._initialize_network_attributes(_generate_graph(reaches))
 
     def _initialize_network_attributes(self, graph: nx.Graph):
-        self._df = _build_dataframe(graph)
         self._graph = graph.copy()
         self._naming = _Naming(self._graph, self._reaches)
 
     def __repr__(self) -> str:
-        time = self._df.index
-        time_window = "N/A - N/A" if len(time) == 0 else f"{time[0]} - {time[-1]}"
         out = [
             "<Network>",
             f"Reaches: {len(self._reaches)}",
             f"Nodes: {self._graph.number_of_nodes()}",
-            f"Quantities: {self.loaded_quantities}",
-            f"Time: {time_window}",
         ]
+        if self._source is None:
+            out.append("Result file: released")
+        else:
+            start, end = self.period()
+            out += [f"Quantities: {list(self.quantities)}", f"Time: {start} - {end}"]
         return "\n".join(out)
 
     @classmethod
@@ -98,11 +98,11 @@ class Network:
         res: str | Path | Res1D,
         *,
         companions: Sequence[str | Path | Res1D] | None = None,
-        nodes: str | list[str] | None = None,
-        reaches: str | list[str] | None = None,
-        quantities: str | list[str] | None = None,
     ) -> Network:
         """Read a network from a result file.
+
+        Only the header and the topology are read. No timeseries is, until
+        :meth:`read`, :meth:`to_dataframe` or :meth:`to_dataset` asks for one.
 
         Parameters
         ----------
@@ -124,39 +124,6 @@ class Network:
             ``None`` *(default)* looks for them beside the result file, matching
             its folder and stem; ``[]`` reads none; a list reads exactly those.
             Only EPANET results are looked beside.
-        nodes : str, list of str, or None, optional
-            Controls which nodes have their timeseries data loaded into memory.
-
-            * ``None`` *(default)* -- data is loaded for every node.
-            * A single node ID or a list of node IDs -- only those nodes get
-              data; others are topology-only.
-            * ``[]`` (empty list) -- no node data is loaded at all.
-
-            The full network topology is always constructed regardless of this
-            setting, so ``find()`` and ``recall()`` still work on all nodes.
-        reaches : str, list of str, or None, optional
-            Controls which reaches have their intermediate gridpoint data
-            populated.
-
-            * ``None`` *(default)* -- gridpoints are populated for every reach.
-            * A single reach name or a list of reach names -- only those reaches
-              get gridpoint data; others are topology-only.
-            * ``[]`` (empty list) -- no gridpoint data is loaded at all.
-
-            EPANET reaches have at most one gridpoint (see Notes), but this
-            argument still governs whether its data, and any matching ``.resx``
-            reach quantities, are populated.
-        quantities : str, list of str, or None, optional
-            Controls which quantities are read at each selected location.
-
-            * ``None`` *(default)* -- every quantity is read.
-            * A single quantity name or a list of names -- only those are read.
-            * ``[]`` (empty list) -- no data is read at all.
-
-            A location that does not carry a requested quantity becomes
-            topology-only rather than an error, so this composes with ``nodes``
-            and ``reaches`` on files where nodes and reaches hold different
-            quantities.
 
         Returns
         -------
@@ -169,26 +136,17 @@ class Network:
         ValueError
             If a companion has an extension this reader does not know, if two
             companions of the same kind are given, or if a ``.resx`` does not
-            come from the same run as the result file.
+            come from the same run as the result file, or if the two carry the
+            same quantity at one location.
 
         Examples
         --------
         >>> from mikeio1d.network import Network
         >>> network = Network.open("model.res1d")  # doctest: +SKIP
 
-        Load data only for the two nodes where observations exist, and skip all
-        intermediate gridpoint data to keep memory usage low:
+        Read only the two nodes where observations exist:
 
-        >>> network = Network.open(  # doctest: +SKIP
-        ...     "model.res1d",
-        ...     nodes=["node_a", "node_b"],
-        ...     reaches=[],
-        ... )
-
-        Read a single quantity, for a calibration loop that only scores
-        discharge:
-
-        >>> network = Network.open("model.res1d", quantities="Discharge")  # doctest: +SKIP
+        >>> network.read([("node_a", "WaterLevel"), ("node_b", "WaterLevel")])  # doctest: +SKIP
 
         Name the companions rather than letting them be found:
 
@@ -200,8 +158,8 @@ class Network:
         Notes
         -----
         MIKE 11 keeps its timeseries on reach gridpoints rather than on nodes,
-        so the nodes of a ``.res11`` network carry no data of their own. Pass
-        ``reaches`` rather than ``nodes`` to control what gets loaded.
+        so the nodes of a ``.res11`` network carry no data of their own. Use
+        ``locations(reach=...)`` to find the gridpoints to read.
 
         An EPANET reach carries one synthetic gridpoint, which mikeio1d gives a
         breakpoint at each end so that the reach's own quantities (``Flow``,
@@ -232,29 +190,6 @@ class Network:
         else:
             raise TypeError(f"Expected a str, Path or Res1D object, got {type(res).__name__!r}")
 
-        if nodes is None:
-            nodes_list: list[str] = list(res.nodes.keys())
-        elif isinstance(nodes, str):
-            nodes_list = [nodes]
-        else:
-            nodes_list = list(nodes)
-
-        if reaches is None:
-            reaches_list: list[str] = list(res.reaches.keys())
-        elif isinstance(reaches, str):
-            reaches_list = [reaches]
-        else:
-            reaches_list = list(reaches)
-
-        # None is threaded through as "read everything" rather than expanded to
-        # res.quantities, which would only cost a lookup for the same result.
-        if quantities is None:
-            quantities_set: set[str] | None = None
-        elif isinstance(quantities, str):
-            quantities_set = {quantities}
-        else:
-            quantities_set = set(quantities)
-
         found, discovered = _companion_paths(res, companions)
 
         # Each failure that a companion caused is caught where it is raised, so
@@ -268,14 +203,7 @@ class Network:
                 raise
             raise _blame_the_companions(res, found, err) from err
 
-        source = _Res1DSource(
-            res,
-            nodes_list,
-            reaches_list,
-            extra=extra,
-            lengths=lengths,
-            quantities=quantities_set,
-        )
+        source = _Res1DSource(res, extra=extra, lengths=lengths)
 
         try:
             return cls(source)
@@ -300,9 +228,10 @@ class Network:
         return by_id
 
     def to_dataframe(self, sel: str | None = None) -> pd.DataFrame:
-        """Dataframe using node ids as column names.
+        """Read every series in the network, with graph node ids as column names.
 
-        It will be multiindex unless 'sel' is passed.
+        It will be multiindex unless 'sel' is passed. Each call reads the result
+        file again; to read only some locations, use :meth:`read`.
 
         Parameters
         ----------
@@ -312,9 +241,30 @@ class Network:
         Returns
         -------
         pd.DataFrame
-            Timeseries contained in graph nodes
+            Timeseries at every graph node, columns ``(node, quantity)``.
+
+        Raises
+        ------
+        ValueError
+            If :meth:`release` has been called on this network.
         """
-        df = self._df.copy()
+        source = self._require_source("to_dataframe()")
+        # Every graph node, including a break point no address can name: it
+        # carries a series all the same, and the graph has a node for it.
+        columns = [
+            (node_id, alias, quantity)
+            for alias, node_id in self._naming.aliases.items()
+            for quantity in (source.quantities_at(alias) or ())
+        ]
+        if not columns:
+            index = pd.MultiIndex.from_arrays([[], []], names=["node", "quantity"])
+            return pd.DataFrame(index=pd.Index([], name="time"), columns=index)
+
+        df = source.read([(alias, quantity) for _, alias, quantity in columns])
+        df.columns = pd.MultiIndex.from_tuples(
+            [(node_id, quantity) for node_id, _, quantity in columns], names=["node", "quantity"]
+        )
+        df = df.rename_axis(index="time")
         if sel is None:
             return df
         else:
@@ -323,6 +273,8 @@ class Network:
 
     def to_dataset(self) -> xr.Dataset:
         """Dataset of the timeseries, with each node's original identity alongside.
+
+        Reads every series, as :meth:`to_dataframe` does.
 
         Returns
         -------
@@ -341,6 +293,11 @@ class Network:
                     distance  float64   nan nan 0.0 24.5
 
             Empty when no location carries data.
+
+        Raises
+        ------
+        ValueError
+            If :meth:`release` has been called on this network.
         """
         df_raw = self.to_dataframe()
         if len(df_raw.columns) == 0:
@@ -389,8 +346,8 @@ class Network:
         if self._source is None:
             raise ValueError(
                 f"{what} needs the result file this network was opened from, and "
-                "release() has let go of it. The data already read is still here - "
-                "use to_dataframe() or to_dataset() - and opening the file again "
+                "release() has let go of it. The topology is still here - graph, "
+                "reaches, find() and recall() - and opening the file again "
                 "restores the rest."
             )
         return self._source
@@ -429,8 +386,7 @@ class Network:
         nothing in a network can address them.
 
         Read-only, and free: a location knows what it carries without any of it
-        being loaded. Narrower than the header, wider than
-        :attr:`loaded_quantities`, which is only what this load kept.
+        being loaded.
 
         Returns
         -------
@@ -460,22 +416,6 @@ class Network:
         ordered = [q for q in units if q in readable]
         ordered += sorted(readable.difference(units))
         return MappingProxyType({q: units.get(q) for q in ordered})
-
-    @property
-    def loaded_quantities(self) -> list[str]:
-        """Quantities this network holds data for.
-
-        What the filters of :meth:`open` let through, which is narrower than
-        :attr:`quantities` wherever a location was left topology-only.
-
-        Returns
-        -------
-        list[str]
-            List of quantities.
-        """
-        # Read off _df rather than to_dataframe(), whose copy would duplicate
-        # the whole dataset for the sake of its column labels.
-        return list(self._df.columns.get_level_values("quantity").unique())
 
     def _blame_unreadable(self, items: Sequence[tuple[Address, str]], source: _Source) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
@@ -899,18 +839,20 @@ class Network:
     def release(self) -> None:
         """Let go of the result file the network was opened from.
 
-        A network keeps that file open for its own lifetime, so that
-        :meth:`period`, :meth:`resolve`, :meth:`locations` and :meth:`read` can
-        answer after the open. Releasing it frees what the file holds, at the
-        cost of those five members: they raise from then on.
+        A network keeps that file open for its own lifetime, since every series
+        is read from it on request. Releasing it frees what the file holds, at
+        the cost of everything that reads or asks about series: :meth:`period`,
+        :attr:`quantities`, :meth:`resolve`, :meth:`locations`, :meth:`read`,
+        :meth:`to_dataframe` and :meth:`to_dataset` raise from then on.
 
-        The data already read is untouched - :meth:`to_dataframe` and
-        :meth:`to_dataset` keep working. Calling this twice is harmless.
+        The topology is untouched - :attr:`graph`, :attr:`reaches`, :meth:`find`
+        and :meth:`recall` keep working. Frames already read are the caller's
+        own. Calling this twice is harmless.
 
         Examples
         --------
         >>> network = Network.open("model.res1d")  # doctest: +SKIP
-        >>> ds = network.to_dataset()  # doctest: +SKIP
+        >>> df = network.read([("101", "WaterLevel")])  # doctest: +SKIP
         >>> network.release()  # doctest: +SKIP
         """
         self._source = None

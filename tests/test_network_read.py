@@ -32,25 +32,25 @@ _PIPE_LENGTH = 3209.544
 
 @pytest.fixture(scope="module")
 def network():
-    """A network with its topology and none of its data."""
-    return Network.open(_RES1D, nodes=[], reaches=[])
+    """A network as opened: its topology, and none of its series read."""
+    return Network.open(_RES1D)
 
 
 @pytest.fixture(scope="module")
 def epanet():
     """EPANET, whose companions bring both extra quantities and reach lengths."""
-    return Network.open(_EPANET_RES, nodes=[], reaches=[])
+    return Network.open(_EPANET_RES)
 
 
 @pytest.fixture(scope="module")
 def river():
     """A MIKE river result, whose header declares more than its network holds."""
-    return Network.open(_RIVER, nodes=[], reaches=[])
+    return Network.open(_RIVER)
 
 
 def _released():
     """A network that has let go of the result file it was opened from."""
-    network = Network.open(_RES1D, nodes=[], reaches=[])
+    network = Network.open(_RES1D)
     network.release()
     return network
 
@@ -60,7 +60,7 @@ class TestTheOpenReadsNothing:
 
     def test_the_whole_metadata_surface_leaves_the_file_unread(self):
         res = Res1D(_RES1D)
-        network = Network.open(res, nodes=[], reaches=[])
+        network = Network.open(res)
 
         network.period()
         dict(network.quantities)
@@ -71,7 +71,7 @@ class TestTheOpenReadsNothing:
 
     def test_reading_one_series_is_what_loads_the_file(self):
         res = Res1D(_RES1D)
-        network = Network.open(res, nodes=[], reaches=[])
+        network = Network.open(res)
 
         network.read([("101", "WaterLevel")])
 
@@ -105,9 +105,8 @@ class TestWhatQuantitiesMeans:
         """
         assert epanet.quantities["Volume"] == "m^3"
 
-    def test_a_topology_only_open_offers_everything_and_holds_nothing(self, network):
+    def test_it_names_what_the_network_carries(self, network):
         assert set(network.quantities) == {"WaterLevel", "Discharge"}
-        assert network.loaded_quantities == []
 
     def test_a_header_quantity_no_location_carries_is_left_out(self, river):
         """A river result keeps sensor and structure quantities off the network.
@@ -132,12 +131,6 @@ class TestWhatQuantitiesMeans:
     def test_a_companion_contributes_its_own_quantities(self, epanet):
         """Volume is in the .resx, not in the .res the network was opened from."""
         assert "Volume" in epanet.quantities
-
-    def test_a_filtered_load_narrows_only_what_is_held(self):
-        filtered = Network.open(_RES1D, quantities="Discharge")
-
-        assert filtered.loaded_quantities == ["Discharge"]
-        assert set(filtered.quantities) == {"WaterLevel", "Discharge"}
 
 
 class TestResolvingAnAddress:
@@ -177,7 +170,7 @@ class TestResolvingAnAddress:
         An empty list and None are different answers, and this is the case that
         makes the difference matter.
         """
-        res11 = Network.open(_RES11, nodes=[], reaches=[])
+        res11 = Network.open(_RES11)
         node = next(iter(res11.reaches.values())).start.id
 
         assert res11.resolve(node) == {"address": node, "quantities": []}
@@ -216,7 +209,7 @@ class TestListingLocations:
 
     def test_an_unaddressable_break_point_is_left_out(self):
         """Without the .inp a pipe has no length, so its far end has no distance."""
-        alone = Network.open(_EPANET_RES, companions=[], nodes=[], reaches=[])
+        alone = Network.open(_EPANET_RES, companions=[])
 
         assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0), ("10", None)]
         assert alone.locations(reach="10") == [("10", 0.0)]
@@ -236,10 +229,9 @@ class TestListingLocations:
 class TestReadingSeries:
     """The one member that touches data."""
 
-    def test_a_series_matches_what_an_eager_load_would_have_given(self, network):
-        """The acceptance test: reading late gives what reading early gave."""
-        eager = Network.open(_RES1D)
-        expected = eager.to_dataframe()[(eager.find(node="101"), "WaterLevel")]
+    def test_a_series_matches_what_the_whole_frame_gives(self, network):
+        """Reading one item gives what reading every item gives for it."""
+        expected = network.to_dataframe()[(network.find(node="101"), "WaterLevel")]
 
         read = network.read([("101", "WaterLevel")])
 
@@ -264,7 +256,7 @@ class TestReadingSeries:
     def test_asking_for_nothing_reads_nothing(self):
         """Res1D.read([]) means read everything, which is the opposite of this."""
         res = Res1D(_RES1D)
-        network = Network.open(res, nodes=[], reaches=[])
+        network = Network.open(res)
 
         read = network.read([])
 
@@ -302,7 +294,7 @@ class TestReadingSeries:
             network.read([("101", "Discharge")])
 
     def test_a_location_carrying_nothing_points_at_the_gridpoints(self):
-        res11 = Network.open(_RES11, nodes=[], reaches=[])
+        res11 = Network.open(_RES11)
         node = next(iter(res11.reaches.values())).start.id
 
         with pytest.raises(KeyError, match="carries no quantities of its own"):
@@ -330,30 +322,20 @@ class TestHoldingTheResultFile:
         assert clone.graph is not network.graph
         assert clone.read([("101", "WaterLevel")]).shape == (110, 1)
 
-    def test_releasing_keeps_the_data_already_read(self):
-        eager = Network.open(_RES1D)
-        before = eager.to_dataframe().shape
+    def test_releasing_keeps_the_topology(self):
+        released = _released()
 
-        eager.release()
+        assert released.recall(released.find(node="101")) == {"node": "101"}
+        assert "Result file: released" in repr(released)
 
-        assert eager.to_dataframe().shape == before
+    @pytest.mark.parametrize("member", ["to_dataframe", "to_dataset"])
+    def test_releasing_stops_the_whole_frame_too(self, member):
         with pytest.raises(ValueError, match="needs the result file"):
-            eager.read([("101", "WaterLevel")])
+            getattr(_released(), member)()
 
     def test_releasing_twice_is_harmless(self):
-        eager = Network.open(_RES1D, nodes=[], reaches=[])
+        network = Network.open(_RES1D)
 
-        eager.release()
-        eager.release()
+        network.release()
+        network.release()
 
-
-class TestTopologyIsAlwaysWhole:
-    """The guarantee the whole lazy surface depends on."""
-
-    def test_a_filtered_load_has_the_same_graph_as_an_unfiltered_one(self):
-        full = Network.open(_RES1D)
-        filtered = Network.open(_RES1D, nodes=[], reaches=[], quantities=[])
-
-        assert filtered.graph.number_of_nodes() == full.graph.number_of_nodes()
-        assert filtered.graph.number_of_edges() == full.graph.number_of_edges()
-        assert set(filtered.reaches) == set(full.reaches)

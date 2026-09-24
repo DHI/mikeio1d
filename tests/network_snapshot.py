@@ -100,13 +100,34 @@ def _digest(series: Any) -> dict[str, Any]:
     }
 
 
-def _describe_graph(network: Any) -> dict[str, Any]:
+def _carried(df: Any) -> dict[int, list[str]]:
+    """Group a network's dataframe columns by the graph node they belong to.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        What ``to_dataframe()`` returned, with ``(node, quantity)`` columns.
+
+    Returns
+    -------
+    dict of int to list of str
+        Sorted quantity names per graph node. A node carrying nothing is absent.
+    """
+    carried: dict[int, list[str]] = {}
+    for node, quantity in df.columns:
+        carried.setdefault(int(node), []).append(str(quantity))
+    return {node: sorted(quantities) for node, quantities in carried.items()}
+
+
+def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, Any]:
     """Describe the graph: its edges, and what each node carries.
 
     Parameters
     ----------
     network : Network
         The network to describe.
+    carried : dict of int to list of str
+        What each graph node carries, from :func:`_carried`.
 
     Returns
     -------
@@ -124,16 +145,7 @@ def _describe_graph(network: Any) -> dict[str, Any]:
         edges.append([*ends, _num(attrs.get("length")), bool(attrs.get("boundary"))])
     edges.sort(key=lambda edge: (edge[0], edge[1], str(edge[2])))
 
-    nodes = {}
-    for node in graph.nodes:
-        data = graph.nodes[node]["data"]
-        if data is None:
-            carries: Any = "absent"
-        elif data.empty:
-            carries = "empty"
-        else:
-            carries = sorted(str(column) for column in data.columns)
-        nodes[_alias_key(aliases[node])] = carries
+    nodes = {_alias_key(aliases[node]): carried.get(int(node), "empty") for node in graph.nodes}
 
     return {
         "edges": edges,
@@ -145,19 +157,22 @@ def _describe_graph(network: Any) -> dict[str, Any]:
     }
 
 
-def _describe_reaches(network: Any) -> dict[str, Any]:
+def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, Any]:
     """Describe every reach: its ends, its length and its breakpoints.
 
     Parameters
     ----------
     network : Network
         The network to describe.
+    carried : dict of int to list of str
+        What each graph node carries, from :func:`_carried`.
 
     Returns
     -------
     dict
         One entry per reach id.
     """
+    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="alias")}
     described = {}
     for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
@@ -169,7 +184,7 @@ def _describe_reaches(network: Any) -> dict[str, Any]:
                 {
                     "id": _alias_key(breakpoint.id),
                     "distance": _num(breakpoint.distance),
-                    "quantities": sorted(str(q) for q in breakpoint.quantities),
+                    "quantities": carried.get(by_alias[breakpoint.id], []),
                 }
                 for breakpoint in reach.breakpoints
             ],
@@ -177,13 +192,13 @@ def _describe_reaches(network: Any) -> dict[str, Any]:
     return described
 
 
-def _describe_dataframe(network: Any) -> dict[str, Any]:
+def _describe_dataframe(df: Any) -> dict[str, Any]:
     """Describe the assembled dataframe, values included as digests.
 
     Parameters
     ----------
-    network : Network
-        The network to describe.
+    df : pandas.DataFrame
+        What ``to_dataframe()`` returned.
 
     Returns
     -------
@@ -191,7 +206,6 @@ def _describe_dataframe(network: Any) -> dict[str, Any]:
         Shape, time span and a digest per ``(node, quantity)`` column. This is
         the numeric truth the move must not disturb.
     """
-    df = network.to_dataframe()
     index = df.index
     return {
         "shape": list(df.shape),
@@ -266,15 +280,17 @@ def describe(network: Any) -> dict[str, Any]:
     ``to_dataset()`` is deliberately absent. Its coordinates are due to change,
     while the values underneath it are pinned by the dataframe digests.
     """
+    df = network.to_dataframe()
+    carried = _carried(df)
     return {
         "counts": {
             "reaches": len(network.reaches),
             "graph_nodes": int(network.graph.number_of_nodes()),
             "graph_edges": int(network.graph.number_of_edges()),
         },
-        "quantities": sorted(str(q) for q in network.loaded_quantities),
-        "graph": _describe_graph(network),
-        "reaches": _describe_reaches(network),
-        "dataframe": _describe_dataframe(network),
+        "quantities": sorted(str(q) for q in network.quantities),
+        "graph": _describe_graph(network, carried),
+        "reaches": _describe_reaches(network, carried),
+        "dataframe": _describe_dataframe(df),
         "lookups": _describe_lookups(network),
     }

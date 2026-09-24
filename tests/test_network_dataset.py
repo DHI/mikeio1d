@@ -70,14 +70,3 @@ class TestIdentityCoordinates:
 
         assert ds["Flow"].attrs["long_name"] == "Flow"
 
-
-class TestANetworkHoldingNoData:
-    """A topology-only open has the whole graph and nothing to put in it."""
-
-    def test_it_gives_an_empty_dataset(self):
-        network = Network.open(_EPANET_RES, companions=[], nodes=[], reaches=[])
-
-        ds = network.to_dataset()
-
-        assert network.graph.number_of_nodes() > 0
-        assert len(ds.data_vars) == 0

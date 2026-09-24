@@ -44,7 +44,7 @@ def test_every_reach_keeps_a_chain_of_its_own(filename):
     path = str(_TESTDATA / filename)
     # Topology only: the shape of the graph is the whole subject, and reading
     # every timeseries of the largest fixture would cost seconds.
-    graph = Network.open(path, companions=[], nodes=[], reaches=[], quantities=[]).graph
+    graph = Network.open(path, companions=[]).graph
 
     breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["alias"], tuple)]
 
@@ -96,7 +96,7 @@ def test_a_two_gridpoint_reach_keeps_both():
     reach = _Reach("r0", [53100.0, 53200.0])
 
     breakpoints = _build_reach_breakpoints(
-        reach, length=100.0, quantities=None, populate_gridpoints=False, series={}
+        reach, length=100.0, series={}
     )
 
     assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0]
@@ -114,7 +114,7 @@ def test_gridpoints_listed_out_of_order_come_out_ascending():
     reach = _Reach("r0", [53200.0, 53100.0, 53300.0])
 
     breakpoints = _build_reach_breakpoints(
-        reach, length=200.0, quantities=None, populate_gridpoints=False, series={}
+        reach, length=200.0, series={}
     )
 
     assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0, 53300.0]
