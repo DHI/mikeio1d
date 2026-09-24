@@ -221,7 +221,7 @@ def _describe_dataframe(df: Any) -> dict[str, Any]:
 
 
 def _describe_lookups(network: Any) -> dict[str, Any]:
-    """Record the answers ``find`` and ``recall`` give, for every location.
+    """Record how every location's name and graph integer correspond.
 
     Parameters
     ----------
@@ -231,32 +231,29 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     Returns
     -------
     dict
-        ``find`` keyed by the alias it was asked for, the reach endpoint lookups,
-        and ``recall`` keyed by the integer. A breakpoint whose distance is
-        unknown is absent from ``find``: it cannot be looked up by distance at
-        all, which is behaviour recorded under ``reaches`` instead.
+        ``find``: the integer ``resolve`` gives each address. ``endpoints``: the
+        integer of each reach's start and end node. ``recall``: the name the
+        graph labels each integer with. A breakpoint whose distance is unknown
+        is absent from ``find``: no address names it, which is behaviour
+        recorded under ``reaches`` instead.
     """
     found = {}
     for _, alias in network.graph.nodes(data="alias"):
-        if isinstance(alias, tuple):
-            reach, distance = alias
-            if distance is None:
-                continue
-            answer = network.find(reach=reach, distance=distance)
-        else:
-            answer = network.find(node=alias)
-        found[_alias_key(alias)] = int(answer)
+        if isinstance(alias, tuple) and alias[1] is None:
+            continue
+        found[_alias_key(alias)] = int(network.resolve(alias)["node"])
 
     endpoints = {}
-    for reach_id in network.reaches:
-        for where in ("start", "end"):
-            endpoints[f"{reach_id}@{where}"] = int(network.find(reach=reach_id, distance=where))
+    for reach_id, reach in network.reaches.items():
+        for where, node in (("start", reach.start), ("end", reach.end)):
+            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node.id)["node"])
 
     recalled = {}
-    for node_id in sorted(network.graph.nodes()):
-        entry = dict(network.recall(int(node_id)))
-        if "distance" in entry:
-            entry["distance"] = _num(entry["distance"])
+    for node_id, alias in sorted(network.graph.nodes(data="alias")):
+        if isinstance(alias, tuple):
+            entry = {"reach": alias[0], "distance": _num(alias[1])}
+        else:
+            entry = {"node": alias}
         recalled[str(node_id)] = entry
 
     return {"find": found, "endpoints": endpoints, "recall": recalled}

@@ -32,7 +32,7 @@ class TestIdentityCoordinates:
     """Every column says which location it came from, without the network."""
 
     def test_a_node_carries_its_name(self, epanet):
-        node_id = epanet.find(node="10")
+        node_id = epanet.resolve("10")["node"]
 
         name, reach, distance = _by_int(epanet.to_dataset(), node_id)
 
@@ -41,7 +41,7 @@ class TestIdentityCoordinates:
         assert np.isnan(distance)
 
     def test_a_breakpoint_carries_its_reach_and_distance(self, epanet):
-        node_id = epanet.find(reach="10", distance=0.0)
+        node_id = epanet.resolve(("10", 0.0))["node"]
 
         name, reach, distance = _by_int(epanet.to_dataset(), node_id)
 
@@ -49,20 +49,20 @@ class TestIdentityCoordinates:
         assert reach == "10"
         assert distance == pytest.approx(0.0)
 
-    def test_the_coordinates_agree_with_recall(self, epanet):
-        """recall is the same answer, so the two must never drift apart."""
+    def test_the_coordinates_agree_with_the_graph(self, epanet):
+        """The graph's alias is the same answer, so the two must never drift apart."""
         ds = epanet.to_dataset()
 
         for node_id in ds.node.values:
             name, reach, distance = _by_int(ds, node_id)
-            recalled = epanet.recall(int(node_id))
+            alias = epanet.graph.nodes[int(node_id)]["alias"]
 
-            if "node" in recalled:
-                assert (name, reach) == (recalled["node"], "")
+            if isinstance(alias, str):
+                assert (name, reach) == (alias, "")
                 assert np.isnan(distance)
             else:
-                assert (name, reach) == ("", recalled["reach"])
-                expected = recalled["distance"]
+                assert (name, reach) == ("", alias[0])
+                expected = alias[1]
                 assert np.isnan(distance) if expected is None else distance == expected
 
     def test_a_quantity_keeps_its_long_name(self, epanet):

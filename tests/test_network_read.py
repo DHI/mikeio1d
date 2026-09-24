@@ -134,10 +134,25 @@ class TestWhatQuantitiesMeans:
 
 
 class TestResolvingAnAddress:
-    """find() without the exception, plus what the location carries."""
+    """The one lookup by name: whether a location is here, what it carries, and where."""
 
     def test_a_node_gives_back_its_own_name(self, network):
-        assert network.resolve("101") == {"address": "101", "quantities": ["WaterLevel"]}
+        resolved = network.resolve("101")
+
+        assert (resolved["address"], resolved["quantities"]) == ("101", ["WaterLevel"])
+
+    def test_the_node_is_the_graph_integer_labelled_with_the_address(self, network):
+        resolved = network.resolve(("100l1", 23.8), tol=0.1)
+
+        assert network.graph.nodes[resolved["node"]]["alias"] == resolved["address"]
+
+    def test_the_node_selects_the_location_in_the_dataset(self, network):
+        """The integer is what to_dataset() is indexed by, and names the same place."""
+        node = network.resolve("101")["node"]
+
+        column = network.to_dataset()["WaterLevel"].sel(node=node)
+
+        assert str(column["name"].item()) == "101"
 
     def test_a_break_point_snaps_to_the_distance_the_file_stores(self, network):
         resolved = network.resolve(("100l1", 23.8), tol=0.1)
@@ -148,10 +163,8 @@ class TestResolvingAnAddress:
         assert network.resolve(("100l1", 23.8)) is None
 
     def test_an_unknown_name_is_answered_rather_than_raised(self, network):
-        """The difference from find(), and the reason resolve() exists."""
+        """What makes resolve() usable for deciding whether to read at all."""
         assert network.resolve("no_such_node") is None
-        with pytest.raises(KeyError):
-            network.find(node="no_such_node")
 
     def test_the_nearest_break_point_in_a_wide_window_wins(self, network):
         """A caller widening the window is snapping a measurement, not sweeping."""
@@ -231,7 +244,7 @@ class TestReadingSeries:
 
     def test_a_series_matches_what_the_whole_frame_gives(self, network):
         """Reading one item gives what reading every item gives for it."""
-        expected = network.to_dataframe()[(network.find(node="101"), "WaterLevel")]
+        expected = network.to_dataframe()[(network.resolve("101")["node"], "WaterLevel")]
 
         read = network.read([("101", "WaterLevel")])
 
@@ -325,7 +338,10 @@ class TestHoldingTheResultFile:
     def test_releasing_keeps_the_topology(self):
         released = _released()
 
-        assert released.recall(released.find(node="101")) == {"node": "101"}
+        aliases = {alias for _, alias in released.graph.nodes(data="alias")}
+
+        assert "101" in aliases
+        assert released.reaches["100l1"].breakpoints
         assert "Result file: released" in repr(released)
 
     @pytest.mark.parametrize("member", ["to_dataframe", "to_dataset"])

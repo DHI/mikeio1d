@@ -29,7 +29,7 @@ Nodes are connected together by reaches. Nodes can represent different entities:
 Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.
 
 ## Reading a network as a graph
-The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and `find()` and `recall()` translate between those names and the integers the graph uses.
+The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and the network is addressed by those names throughout. The graph itself is labelled with integers, each node carrying its name as the `alias` attribute; `resolve()` gives the integer for a name.
 
 ![A reach's own first and last grid point sit exactly where the reach's nodes do, so each is joined to its node by an edge of length `0.0` flagged `boundary`. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.](../images/docs/res1d_network_mapping.svg)
 
@@ -59,15 +59,15 @@ The network then answers from the file header and its own break points, still wi
 ```python
 network.period()                                   # (start, end)
 network.quantities                                 # {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
-network.resolve("manhole_12")                      # {'address': ..., 'quantities': [...]}
+network.resolve("manhole_12")                      # {'address': ..., 'quantities': [...], 'node': ...}
 network.locations(reach="100l1", quantity="Discharge")
 ```
 
-`resolve()` returns `None` for a location the network does not have, rather than raising as `find()` does, so a caller can ask before committing to a read. Give it a `tol` to snap a measured chainage onto the model's:
+`resolve()` returns `None` for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a `tol` to snap a measured chainage onto the model's:
 
 ```python
 network.resolve(("100l1", 23.8), tol=0.1)
-# {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge']}
+# {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge'], 'node': 3}
 ```
 
 `read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and everything asked for crosses to the result file in one batched call:
@@ -83,7 +83,7 @@ A location that does not carry the quantity asked for is a `KeyError` naming wha
 
 ::: {.callout-note}
 ## The file stays open
-A network holds its result file for its own lifetime, since every series is read from it on request. Call `release()` to let go of it once the data is out. The topology stays - `graph`, `reaches`, `find()` and `recall()` - while everything above, `to_dataframe()` and `to_dataset()` stop.
+A network holds its result file for its own lifetime, since every series is read from it on request. Call `release()` to let go of it once the data is out. The topology stays - `graph`, with each node's `alias`, and `reaches` - while everything above, `to_dataframe()` and `to_dataset()` stop.
 
 MIKE 1D loads a file's whole dynamic data on the first read of anything in it, so what reading late saves is the work of building frames for locations you never asked about, not the file read itself.
 :::

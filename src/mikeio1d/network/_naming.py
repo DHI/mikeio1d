@@ -1,14 +1,12 @@
-"""Translate between the names a model gave a location and the graph's integers.
+"""Match the names a model gave its locations, and label the graph's integers with them.
 
 A result file names a location the way the model did: a node id, or a reach and
-a distance along it. A graph needs one flat set of integers. This module holds
-both directions of that translation, the rule for when two distances mean the
-same place, and the reach lookup that resolves a reach's own ends.
+a distance along it. This module holds the rule for when two distances mean the
+same place, the integer each name has in the graph, and the hints an error gives
+for a name the network does not have.
 
 :class:`~mikeio1d.network.Network` builds one of these from its graph and keeps
-it for the lifetime of the network; :meth:`~mikeio1d.network.Network.find`,
-:meth:`~mikeio1d.network.Network.recall` and
-:meth:`~mikeio1d.network.Network.to_dataset` are all delegations to it.
+it for the lifetime of the network.
 """
 
 from __future__ import annotations
@@ -53,23 +51,23 @@ def _is_break_point(alias: Alias) -> bool:
 
 
 class _Naming:
-    """Both directions of the translation, built once from a graph.
+    """The names in a network, and their graph integers, built once from a graph.
 
     Parameters
     ----------
     graph : nx.Graph
         The integer-labelled graph, each node carrying its ``alias``.
     reaches : Mapping[str, NetworkReach]
-        The network's reaches, by id, for resolving a reach's own ends.
+        The network's reaches, by id, for telling a missing reach from a
+        missing distance on one.
     """
 
     def __init__(self, graph: nx.Graph, reaches: Mapping[str, NetworkReach]):
         self._by_alias: dict[Alias, int] = {
             graph.nodes[node_id]["alias"]: node_id for node_id in graph.nodes()
         }
-        # Both directions are kept, rather than one inverted on demand: recall()
-        # and to_dataset() each want the reverse of the whole map, and building
-        # it per call made every lookup cost a pass over the network.
+        # Kept as well as the forward map, rather than inverted on demand:
+        # to_dataset() wants the reverse of the whole map on every call.
         self._by_id: dict[int, Alias] = {
             node_id: alias for alias, node_id in self._by_alias.items()
         }
@@ -114,36 +112,6 @@ class _Naming:
                     nearest, nearest_gap = key, gap
             return nearest
         return None
-
-    def id_of(self, alias: Alias, *, tol: float | None = None) -> int | None:
-        """Give the graph integer for an alias, or None if there is no such place."""
-        found = self.canonical(alias, tol=tol)
-        return None if found is None else self._by_alias[found]
-
-    def endpoint(self, reach_id: str, which: str) -> str:
-        """Resolve one end of a reach, named 'start' or 'end', to its node id.
-
-        Raises
-        ------
-        KeyError
-            If the network has no reach by that id.
-        """
-        if reach_id not in self._reaches:
-            raise KeyError(f"Reach '{reach_id}' not found in the network.")
-        reach = self._reaches[reach_id]
-        return reach.start.id if which == "start" else reach.end.id
-
-    def alias_of(self, node_id: int) -> Alias:
-        """Give the name a graph integer's location had before it became one.
-
-        Raises
-        ------
-        KeyError
-            If the network has no node by that integer.
-        """
-        if node_id not in self._by_id:
-            raise KeyError(f"Node ID {node_id} not found in the network.")
-        return self._by_id[node_id]
 
     def identity_coords(self, nodes: npt.ArrayLike) -> dict[str, tuple[str, np.ndarray]]:
         """Describe each node by the name it had before it became an integer.

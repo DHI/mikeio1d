@@ -1,9 +1,8 @@
 """A network of nodes and reaches, addressable by the names it came with.
 
 Reading a result file gives locations named the way the model named them: a node
-id, or a reach and a distance along it. A graph needs one flat set of integers.
-:class:`Network` holds both, and :meth:`Network.find` and :meth:`Network.recall`
-translate between them.
+id, or a reach and a distance along it. :class:`Network` is addressed by those
+names throughout; the integers its graph is labelled with stay the graph's own.
 """
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, overload
+from typing import Any
 
 import networkx as nx
 import pandas as pd
@@ -58,9 +57,9 @@ class Network:
     """A network of nodes and reaches, addressable by the names it came with.
 
     A result file names a location the way the model did: a node id, or a reach
-    and a distance along it. A graph needs one flat set of integers. A Network
-    holds both - :attr:`graph` is the integer-labelled graph of the locations,
-    and :meth:`find` and :meth:`recall` translate between the two namings.
+    and a distance along it, and every member here takes and gives those names.
+    :attr:`graph` is labelled with integers instead, each node carrying its name
+    as the ``alias`` attribute, and :meth:`resolve` gives the integer for a name.
 
     Build one with :meth:`open`, which reads a result file's topology. The
     timeseries stay in the file until :meth:`read` asks for them.
@@ -163,19 +162,17 @@ class Network:
         a result:
 
         * without the ``.inp``, a reach's length is unknown, so only its first
-          breakpoint (``distance=0.0``) is real; the second is not addressable
-          by distance at all -- ``find(reach=..., distance=...)`` resolves it
-          only via ``distance="start"``/``"end"`` (which return the node, not
-          the breakpoint), or not at all by a number. The corresponding edges of
-          :attr:`graph` are ``length=None``
+          breakpoint (``distance=0.0``) is real; the second has a graph node
+          but no address, so :meth:`resolve` and :meth:`read` cannot name it.
+          The corresponding edges of :attr:`graph` are ``length=None``
         * with the ``.inp``, a pipe's second breakpoint sits at its full length
           -- both breakpoints are then addressable by distance, and the edge
           between them carries the pipe's real length. Pumps and valves keep an
           unaddressable second breakpoint even so, since ``[PIPES]`` is the only
           section carrying lengths
 
-        Node timeseries, :meth:`to_dataframe`, :meth:`to_dataset`,
-        ``find(node=...)`` and :meth:`recall` are unaffected.
+        Node timeseries, :meth:`to_dataframe` and :meth:`to_dataset` are
+        unaffected.
         """
         if isinstance(res, (str, Path)):
             path = Path(res)
@@ -335,9 +332,8 @@ class Network:
         if self._results is None:
             raise ValueError(
                 f"{what} needs the result file this network was opened from, and "
-                "release() has let go of it. The topology is still here - graph, "
-                "reaches, find() and recall() - and opening the file again "
-                "restores the rest."
+                "release() has let go of it. The topology is still here - graph "
+                "and reaches - and opening the file again restores the rest."
             )
         return self._results
 
@@ -566,18 +562,18 @@ class Network:
         return found
 
     def resolve(self, address: Address, *, tol: float | None = None) -> dict[str, Any] | None:
-        """Say whether a location is in this network, and what it carries.
+        """Say whether a location is in this network, what it carries, and where.
 
-        The soft form of :meth:`find`: an address that is not here is answered
-        with ``None`` rather than an exception, which is what makes it usable
-        for deciding whether to read at all.
+        The one lookup by name. An address that is not here is answered with
+        ``None`` rather than an exception, which is what makes it usable for
+        deciding whether to read at all.
 
         Parameters
         ----------
         address : str or tuple[str, float]
-            A node ID, or a reach ID and a distance along it. ``"start"`` and
-            ``"end"`` are not addresses - they name the node at a reach's end,
-            which :meth:`find` reaches, and :meth:`recall` then names.
+            A node ID, or a reach ID and a distance along it. A reach's own end
+            nodes are named by their IDs, which ``reaches[reach_id].start.id``
+            and ``.end.id`` give.
         tol : float, optional
             How far a distance may be from a break point's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
@@ -587,11 +583,16 @@ class Network:
         Returns
         -------
         dict or None
-            ``None`` if there is no such location. Otherwise ``address``, the
-            network's own spelling of it, and ``quantities``, the quantity IDs
-            readable there. An empty list is an answer: every node of a MIKE 11
-            result carries nothing, since that format keeps its timeseries on
-            reach gridpoints.
+            ``None`` if there is no such location. Otherwise:
+
+            * ``address`` -- the network's own spelling of it, which the rest of
+              the surface takes
+            * ``quantities`` -- the quantity IDs readable there. An empty list
+              is an answer: every node of a MIKE 11 result carries nothing,
+              since that format keeps its timeseries on reach gridpoints
+            * ``node`` -- the integer :attr:`graph` and :meth:`to_dataset` label
+              the location with. Going back, ``graph.nodes[node]["alias"]`` is
+              the address
 
         Raises
         ------
@@ -602,10 +603,10 @@ class Network:
         Examples
         --------
         >>> network.resolve("101")  # doctest: +SKIP
-        {'address': '101', 'quantities': ['WaterLevel']}
+        {'address': '101', 'quantities': ['WaterLevel'], 'node': 5}
 
         >>> network.resolve(("100l1", 23.8), tol=0.1)  # doctest: +SKIP
-        {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge']}
+        {'address': ('100l1', 23.8413574216414), 'quantities': ['Discharge'], 'node': 3}
 
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
@@ -616,186 +617,11 @@ class Network:
         alias = self._naming.canonical(address, tol=tol)
         if alias is None:
             return None
-        return {"address": alias, "quantities": results.quantities_at(alias) or []}
-
-    @overload
-    def find(
-        self,
-        *,
-        node: str,
-        reach: None = None,
-        distance: None = None,
-    ) -> int:
-        pass
-
-    @overload
-    def find(
-        self,
-        *,
-        node: list[str],
-        reach: None = None,
-        distance: None = None,
-    ) -> list[int]:
-        pass
-
-    @overload
-    def find(
-        self,
-        *,
-        node: None = None,
-        reach: str | list[str],
-        distance: str | float,
-    ) -> int:
-        pass
-
-    @overload
-    def find(
-        self,
-        *,
-        node: None = None,
-        reach: str | list[str],
-        distance: list[str | float],
-    ) -> list[int]:
-        pass
-
-    def find(
-        self,
-        node: str | list[str] | None = None,
-        reach: str | list[str] | None = None,
-        distance: str | float | list[str | float] | None = None,
-    ) -> int | list[int]:
-        """Find node or breakpoint id in the Network object based on former coordinates.
-
-        Parameters
-        ----------
-        node : str | List[str], optional
-            Node id(s) in the original network, by default None
-        reach : str | List[str], optional
-            Reach id(s) for breakpoint lookup or reach endpoint lookup, by default None
-        distance : str | float | List[str | float], optional
-            Distance(s) along reach for breakpoint lookup, or "start"/"end"
-            for reach endpoints, by default None
-
-        Returns
-        -------
-        int | List[int]
-            Node or breakpoint id(s) in the generic network. A list argument is
-            answered with a list, even a one-element one; a scalar argument with
-            a scalar.
-
-        Raises
-        ------
-        ValueError
-            If invalid combination of parameters is provided
-        KeyError
-            If requested node/breakpoint is not found in the network
-        """
-        by_node = node is not None
-        by_breakpoint = reach is not None or distance is not None
-
-        if by_node and by_breakpoint:
-            raise ValueError(
-                "Cannot specify both 'node' and 'reach'/'distance' parameters simultaneously"
-            )
-
-        if not by_node and not by_breakpoint:
-            raise ValueError("Must specify either 'node' or both 'reach' and 'distance' parameters")
-
-        # The answer keeps the shape of the argument it came from: a caller who
-        # passed a list gets a list back, even a one-element one, so building the
-        # selection programmatically does not change the type of the result.
-        one_answer = not isinstance(node if by_node else distance, list)
-
-        ids: list[str | tuple[str, float]]
-
-        if by_node:
-            assert node is not None
-            if not isinstance(node, list):
-                node = [node]
-            ids = list(node)
-
-        else:
-            if reach is None or distance is None:
-                raise ValueError(
-                    "Both 'reach' and 'distance' parameters are required for breakpoint/endpoint lookup"
-                )
-
-            if not isinstance(reach, list):
-                reach = [reach]
-
-            if not isinstance(distance, list):
-                distance = [distance]
-
-            if len(reach) == 1:
-                reach = reach * len(distance)
-
-            if len(reach) != len(distance):
-                raise ValueError(
-                    "Incompatible lengths of 'reach' and 'distance' arguments. One 'reach' admits multiple distances, otherwise they must be the same length."
-                )
-
-            ids = []
-            for reach_i, distance_i in zip(reach, distance):
-                if distance_i in ["start", "end"]:
-                    ids.append(self._naming.endpoint(reach_i, distance_i))
-                else:
-                    if not isinstance(distance_i, (int, float)):
-                        raise ValueError(
-                            "Invalid 'distance' value for breakpoint lookup: "
-                            f"{distance_i!r}. Expected a numeric value or 'start'/'end'."
-                        )
-                    ids.append((reach_i, distance_i))
-
-        resolved = [self._naming.id_of(id) for id in ids]
-        missing_ids = [ids[i] for i, v in enumerate(resolved) if v is None]
-        if missing_ids:
-            details = "; ".join(f"{id!r} - {self._naming.describe_miss(id)}" for id in missing_ids)
-            raise KeyError(f"Not found in the network: {details}")
-        return resolved[0] if one_answer else resolved
-
-    @overload
-    def recall(self, id: int) -> dict[str, Any]:
-        pass
-
-    @overload
-    def recall(self, id: list[int]) -> list[dict[str, Any]]:
-        pass
-
-    def recall(self, id: int | list[int]) -> dict[str, Any] | list[dict[str, Any]]:
-        """Recover the original coordinates of an element given the node id(s) in the Network object.
-
-        Parameters
-        ----------
-        id : int | List[int]
-            Node id(s) in the generic network
-
-        Returns
-        -------
-        Dict[str, Any] | List[Dict[str, Any]]
-            Original coordinates: a dict for a single id, a list of dicts for a
-            list of ids, even a one-element one.
-            Dict contains coordinates:
-            - For nodes: 'node' key with node id
-            - For breakpoints: 'reach' and 'distance' keys with reach id and distance
-
-        Raises
-        ------
-        KeyError
-            If node id is not found in the network
-        """
-        one_answer = not isinstance(id, list)
-        if one_answer:
-            id = [id]
-
-        results: list[dict[str, Any]] = []
-        for node_id in id:
-            alias = self._naming.alias_of(node_id)
-            if _is_break_point(alias):
-                results.append({"reach": alias[0], "distance": alias[1]})
-            else:
-                results.append({"node": alias})
-
-        return results[0] if one_answer else results
+        return {
+            "address": alias,
+            "quantities": results.quantities_at(alias) or [],
+            "node": self._naming.aliases[alias],
+        }
 
     def copy(self) -> Network:
         """Create a deep copy of the Network.
@@ -834,8 +660,8 @@ class Network:
         :attr:`quantities`, :meth:`resolve`, :meth:`locations`, :meth:`read`,
         :meth:`to_dataframe` and :meth:`to_dataset` raise from then on.
 
-        The topology is untouched - :attr:`graph`, :attr:`reaches`, :meth:`find`
-        and :meth:`recall` keep working. Frames already read are the caller's
+        The topology is untouched - :attr:`graph`, with each node's ``alias``,
+        and :attr:`reaches` keep working. Frames already read are the caller's
         own. Calling this twice is harmless.
 
         Examples

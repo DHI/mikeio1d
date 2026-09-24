@@ -4,9 +4,9 @@
 
 ### Added
 - `mikeio1d.network`: build a graph-shaped `Network` from a result file, with
-  `Network.open`, `Network.reaches`, `find`/`recall` between original and graph names,
-  `to_dataframe`/`to_dataset`, and the EPANET `.resx`/`.inp` companions. Needs the new
-  `network` extra (`pip install mikeio1d[network]`).
+  `Network.open`, `Network.reaches`, `Network.graph`, `to_dataframe`/`to_dataset`, and the
+  EPANET `.resx`/`.inp` companions. Needs the new `network` extra
+  (`pip install mikeio1d[network]`).
 - `Network.period`, `Network.quantities`, `Network.resolve`, `Network.locations` and
   `Network.read`, for asking a result file what it holds and reading only the series a
   caller turns out to need, by the names the model used - a node ID, or a reach and a
@@ -32,6 +32,8 @@
 - A `.resx` carrying a quantity its `.res` already has at the same location is refused
   however the network is read. It used to be refused only where a frame was built, and
   otherwise read silently from the `.resx` (#250).
+- `Network.resolve` also gives the graph integer of the location it finds, under `node`. It is the
+  one lookup by name; `graph.nodes[node]["alias"]` goes back (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
@@ -42,6 +44,9 @@
   A `Network` is now built with `Network.open`, which is how anything ever used it. The
   abstract element classes are gone too: `Network.reaches` holds plain frozen records with the
   same attributes (#257).
+- `Network.find` and `Network.recall`. Every member takes the model's names, `resolve` gives the
+  graph integer for one, and each graph node's `alias` attribute names it. A reach's end nodes
+  are `reaches[reach_id].start.id` and `.end.id`, rather than `distance="start"`/`"end"` (#250).
 
 ## [1.3.1] - 2026-07-15
 

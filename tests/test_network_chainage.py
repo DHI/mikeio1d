@@ -71,10 +71,12 @@ def _chain_nodes(network, reach_id):
         for node, alias in aliases.items()
         if isinstance(alias, tuple) and alias[0] == reach_id
     )
+    by_alias = {alias: node for node, alias in aliases.items()}
+    reach = network.reaches[reach_id]
     return [
-        network.find(reach=reach_id, distance="start"),
+        by_alias[reach.start.id],
         *(node for _, node in breakpoints),
-        network.find(reach=reach_id, distance="end"),
+        by_alias[reach.end.id],
     ]
 
 
@@ -117,12 +119,9 @@ class TestAReachThatDoesNotStartAtZero:
         a size - the old ``abs(distance)`` - put them 10 m and 5 m from a start
         node they in fact sit on.
         """
-        found = river.find(reach="basin_right", distance=[-10.0, -5.0])
+        found = [river.resolve(("basin_right", d))["address"] for d in (-10.0, -5.0)]
 
-        assert river.recall(found) == [
-            {"reach": "basin_right", "distance": -10.0},
-            {"reach": "basin_right", "distance": -5.0},
-        ]
+        assert found == [("basin_right", -10.0), ("basin_right", -5.0)]
 
 
 class TestEveryFixture:

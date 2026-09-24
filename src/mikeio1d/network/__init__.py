@@ -2,9 +2,8 @@
 
 A result file describes a network as locations with the names the model gave
 them: a node id, or a reach and a distance along it. This module turns that into
-a :class:`Network` - a networkx graph whose nodes are flat integers, reading the
-timeseries each location holds when they are asked for - and translates between
-the two namings.
+a :class:`Network`: a networkx graph of those locations, addressed by the same
+names, that reads the timeseries each location holds only when asked for them.
 
 The module needs ``networkx`` and ``xarray``, which the ``network`` extra
 installs::
@@ -15,8 +14,8 @@ Examples
 --------
 >>> from mikeio1d.network import Network
 >>> network = Network.open("tests/testdata/network.res1d")  # doctest: +SKIP
->>> node = network.find(node="101")  # doctest: +SKIP
->>> network.to_dataframe()  # doctest: +SKIP
+>>> network.resolve("101")  # doctest: +SKIP
+>>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
 """
 
 try:
