@@ -50,9 +50,7 @@ class Network:
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
         self._results = results
-        # Ids first: two reaches sharing one would interleave their break points
-        # into a single chain, and the graph error would describe the wreckage
-        # rather than the cause.
+        # Before the graph, whose error for a duplicate id would not name it.
         self._reaches = self._generate_reaches_dict(reaches)
         self._graph = _generate_graph(reaches)
         self._naming = _Naming(self._graph, self._reaches)
@@ -236,9 +234,7 @@ class Network:
     def reaches(self) -> Mapping[str, NetworkReach]:
         """The network's reaches, by the id the model gave them.
 
-        Read-only. A reach answers for its own length, endpoints and break
-        points, which is how a caller asks about a location without holding the
-        result file open.
+        Read-only.
 
         Returns
         -------
@@ -256,8 +252,7 @@ class Network:
     def period(self) -> tuple[datetime, datetime]:
         """First and last timestep of the result file.
 
-        Read from the file header, so this costs nothing even on a network
-        opened with no timeseries at all.
+        Read from the file header, so no timeseries is loaded.
 
         Returns
         -------
@@ -281,8 +276,7 @@ class Network:
         and sensor quantities that sit on neither a node nor a gridpoint, and
         nothing in a network can address them.
 
-        Read-only, and free: a location knows what it carries without any of it
-        being loaded.
+        Read-only, and read from the file header.
 
         Returns
         -------
@@ -300,8 +294,7 @@ class Network:
         readable = {
             quantity for alias in self._naming.aliases for quantity in results.quantities_at(alias)
         }
-        # Ordered by the file's own header, so two networks over one file list
-        # their shared quantities alike whatever their topology.
+        # In the header's order, so the listing does not depend on the topology.
         ordered = [q for q in units if q in readable]
         ordered += sorted(readable.difference(units))
         return MappingProxyType({q: units.get(q) for q in ordered})
@@ -311,9 +304,8 @@ class Network:
     ) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
 
-        Every one of them, in a single error: a caller reading fifty locations
-        wants one round trip, not fifty. Kept to one line, since a KeyError
-        renders its message through repr and would show the newlines raw.
+        All of them in one error. Kept to one line, since a KeyError renders its
+        message through repr and would show newlines raw.
         """
         faults = []
         for address, quantity in items:
@@ -349,9 +341,7 @@ class Network:
     ) -> pd.DataFrame:
         """Read the series named by ``(address, quantity)`` pairs.
 
-        The only member here that touches timeseries data. Everything asked for
-        crosses to the result file in one batched call per file it lives in, so
-        a reach's whole set of break points is one read rather than one each.
+        Everything asked for is read in one batched call per file it lives in.
 
         Parameters
         ----------
@@ -392,9 +382,7 @@ class Network:
         >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
         """
         results = self._results
-        # Resolved to the network's own spelling before anything is read, so a bad
-        # item is named rather than read around, and so the results are handed only
-        # pairs it has already confirmed.
+        # Every item is checked before anything is read.
         resolved: list[tuple[Alias, str]] = []
         for address, quantity in items:
             alias = self._naming.canonical(address)
@@ -403,9 +391,8 @@ class Network:
             resolved.append((alias, quantity))
 
         df = results.read(resolved)
-        # A flat index, so a column label is the whole (address, quantity) pair
-        # the caller handed in - an address is itself a tuple, and a MultiIndex
-        # would read the two apart.
+        # A flat index: an address can itself be a tuple, which a MultiIndex
+        # would split.
         df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
         return df if start is None and end is None else df.loc[start:end]
 
@@ -456,9 +443,7 @@ class Network:
     def resolve(self, address: Address, *, tol: float | None = None) -> Location | None:
         """Say whether a location is in this network, what it carries, and where.
 
-        The one lookup by name. An address that is not here is answered with
-        ``None`` rather than an exception, which is what makes it usable for
-        deciding whether to read at all.
+        An address that is not here gives ``None`` rather than an exception.
 
         Parameters
         ----------
@@ -495,8 +480,6 @@ class Network:
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        # The network's own spelling rather than the argument echoed, so the
-        # address that comes out is the one the rest of the surface takes.
         alias = self._naming.canonical(address, tol=tol)
         if alias is None:
             return None
