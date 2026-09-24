@@ -72,10 +72,7 @@ class Network:
         # into a single chain, and the graph error would describe the wreckage
         # rather than the cause.
         self._reaches = self._generate_reaches_dict(reaches)
-        self._initialize_network_attributes(_generate_graph(reaches))
-
-    def _initialize_network_attributes(self, graph: nx.Graph):
-        self._graph = graph.copy()
+        self._graph = _generate_graph(reaches)
         self._naming = _Naming(self._graph, self._reaches)
 
     def __repr__(self) -> str:
