@@ -21,6 +21,7 @@ import pandas as pd
 
 from ..res1d import Res1D
 from ._companions import _CompanionConflict
+from ._companions import _units_of
 from ._source import _Source
 
 if TYPE_CHECKING:
@@ -540,11 +541,9 @@ class _Res1DSource(_Source):
         one the network was opened from.
         """
         units: dict[str, str] = {}
-        for res in (None if self._extra is None else self._extra.res, self._res):
-            if res is None:
-                continue
-            for quantity in res.result_data.Quantities:
-                units[str(quantity.Id)] = str(quantity.EumQuantity.UnitAbbreviation)
+        if self._extra is not None:
+            units.update(self._extra.units)
+        units.update(_units_of(self._res))
         return units
 
     def quantities_at(self, alias: Alias) -> list[str] | None:

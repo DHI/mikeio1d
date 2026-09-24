@@ -8,9 +8,17 @@ lengths. A companion is found by sharing the result file's folder and stem.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from ..result_network import ResultNode
+    from ..result_network import ResultReach
+
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from ..res1d import Res1D
 from ._inp import read_pipe_lengths
@@ -100,20 +108,41 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
     return rekeyed
 
 
+def _units_of(res: Res1D) -> dict[str, str]:
+    """Read the unit abbreviation of every quantity a file declares.
+
+    Taken from the header alone, so asking costs nothing beyond the open.
+
+    Returns
+    -------
+    dict of str to str
+        Unit abbreviation per quantity ID.
+    """
+    return {
+        str(quantity.Id): str(quantity.EumQuantity.UnitAbbreviation)
+        for quantity in res.result_data.Quantities
+    }
+
+
 class _Companion:
     """A companion result file, keyed by the main file's location names.
 
-    Stands in for the ``Res1D`` it wraps everywhere the loader reaches into a
-    companion, so a node or reach is found under one spelling of its name.
+    Holds what the loader reaches into a companion for, so a node or reach is
+    found under one spelling of its name. Deliberately not the ``Res1D`` these
+    came from: a series carries the file it has to be read from (see
+    ``_res1d._Series``), so nothing downstream has to go back to the companion
+    itself.
     """
 
-    def __init__(self, res: Res1D, extra: Res1D) -> None:
-        # Kept so a series read after the open can go back to the file it came
-        # from: a companion's quantities live in its own Res1D, not the main
-        # file's, so they cannot be read through the main one.
-        self.res = extra
-        self.nodes = _rekey_by_main_file(extra.nodes, res.nodes)
-        self.reaches = _rekey_by_main_file(extra.reaches, res.reaches)
+    def __init__(
+        self,
+        nodes: dict[str, ResultNode],
+        reaches: dict[str, ResultReach],
+        units: Mapping[str, str],
+    ) -> None:
+        self.nodes = nodes
+        self.reaches = reaches
+        self.units = units
 
 
 def _read_companion_lengths(inp: str | Path) -> dict[str, float]:
@@ -166,7 +195,11 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
             f"{len(res.time_index)} ending {res.end_time}."
         )
 
-    companion = _Companion(res, extra)
+    companion = _Companion(
+        nodes=_rekey_by_main_file(extra.nodes, res.nodes),
+        reaches=_rekey_by_main_file(extra.reaches, res.reaches),
+        units=_units_of(extra),
+    )
 
     unknown_nodes = set(companion.nodes) - set(res.nodes)
     if unknown_nodes:
