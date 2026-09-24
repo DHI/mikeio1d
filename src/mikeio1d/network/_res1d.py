@@ -55,15 +55,10 @@ def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> Result
 def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | None:
     """Resolve a reach's effective length.
 
-    A length read from a companion input file wins, since mikeio1d has none
-    to offer for the formats that need one. Zero means undefined whichever of
-    the two said it: mikeio1d returns 0 when it cannot read a reach length -
-    link-node models such as EPANET report this for every reach - and an input
-    file is free to carry a 0 in the same spirit. Reported as undefined rather
-    than as a zero-length reach, which would make length-weighted graph
-    algorithms treat the reach as free, and would put a link-node reach's two
-    break points at the same distance, collapsing them onto one. The two cases
-    cannot be told apart upstream.
+    A length read from a companion input file wins. Zero means undefined from
+    either source: mikeio1d returns 0 when it cannot read a length, as for every
+    EPANET reach. A zero-length reach would look free to length-weighted graph
+    algorithms, and would put a link-node reach's two break points on one spot.
     """
     return (length if length is not None else reach.length) or None
 
@@ -72,10 +67,8 @@ def _has_real_gridpoints(reach: ResultReach) -> bool:
     """Whether these are the reach's own gridpoints, or one synthetic stand-in.
 
     mikeio1d invents a single gridpoint for the link-node formats that define
-    none of their own (EPANET, SWMM). Only the source can tell the two cases
-    apart, so ask it: the stand-in went to the reach that reported nothing.
-    Counting what came back cannot, since a reach is free to report as few
-    gridpoints as the stand-in stands for.
+    none of their own (EPANET, SWMM). Counting gridpoints cannot tell the two
+    apart, so this asks the underlying reaches whether they reported any.
     """
     return any(res1d_reach.GridPoints.Count > 0 for res1d_reach in reach.res1d_reaches)
 
@@ -83,19 +76,14 @@ def _has_real_gridpoints(reach: ResultReach) -> bool:
 def _reach_start_distance(reach: ResultReach) -> float:
     """Resolve where the reach's start node sits, in the frame its breakpoints use.
 
-    A MIKE reach's breakpoints are placed at their chainage, which is a
-    coordinate along the whole river branch rather than an offset along this
-    reach: the branch's chainage origin is a survey datum, so a modelled reach
-    commonly starts thousands of metres in, and may even start below zero.
-    A link-node reach has no chainage at all - its two breakpoints are placed
-    0.0 and `length` apart by hand - so its frame starts at zero.
+    A MIKE reach's breakpoints sit at their chainage along the whole branch, so
+    the reach can start thousands of metres in, or below zero. A link-node reach
+    has no chainage, and its frame starts at zero.
     """
     if not _has_real_gridpoints(reach):
         return 0.0
 
-    # EPANET reports -inf rather than a chainage. Nothing places a breakpoint
-    # against it, but an origin that is not a number would poison every edge
-    # length on the reach, so fall back to the frame the breakpoints are in.
+    # EPANET reports -inf rather than a chainage.
     origin = reach.start_chainage
     return origin if math.isfinite(origin) else 0.0
 
@@ -103,9 +91,7 @@ def _reach_start_distance(reach: ResultReach) -> float:
 def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
     """Map every quantity a location carries to the series holding it.
 
-    Reading the map costs nothing - a location knows what it carries from the
-    file header alone - which is what lets a network answer where a quantity
-    lives without loading any of it.
+    Read from the file header; no timeseries is loaded.
     """
     series = {}
     for quantity_id in location.quantities:
@@ -126,10 +112,9 @@ how its series land on the main file's locations.
 def _ordered_gridpoints(reach: ResultReach) -> list[ResultGridPoint]:
     """Give the gridpoints a reach's break points are made from, in order along it.
 
-    Sorted rather than taken as they come: a multi-segment reach reports its
-    gridpoints one segment at a time, in the order the file lists the segments,
-    which is not promised to be the order they sit in. A link-node reach has
-    only the one synthetic stand-in mikeio1d gave it.
+    Sorted by chainage, since a multi-segment reach lists its gridpoints segment
+    by segment in no promised order. A link-node reach has only the one
+    synthetic stand-in mikeio1d gave it.
     """
     if _has_real_gridpoints(reach):
         return sorted(reach.gridpoints, key=lambda gp: gp.chainage)
@@ -156,24 +141,16 @@ def _build_reach_breakpoints(
 ) -> list[ReachBreakPoint]:
     """Build a reach's break points from its mikeio1d gridpoints.
 
-    A reach with gridpoints of its own has real, independently-measured
-    start/end points, so every gridpoint becomes a break point at its own
-    chainage (the first/last ones end up coincident with the reach's own
-    start_node/end_node - the graph builder connects them with a zero-length
-    edge).
+    A reach with gridpoints of its own gets one break point per gridpoint, at
+    its chainage.
 
-    A reach with none is a link-node model (e.g. EPANET), and the synthetic
-    gridpoint mikeio1d gave it belongs to neither end - it is duplicated into
-    two break points, one at each end (distance 0.0, and distance `length` if
-    known or None otherwise), so the reach's own quantities (e.g. Flow) are
-    reachable the same way MIKE's are. Decided in
+    A link-node reach (e.g. EPANET) has one synthetic gridpoint that belongs to
+    neither end. It becomes two break points, at 0.0 and at ``length`` (or
+    ``None`` when the length is unknown), both carrying its series. See
     https://github.com/DHI/modelskill/issues/680.
 
-    ``series`` is filled with the series reachable at each break point, taken
-    from ``series_by_key``. It is collected here because this is the only place
-    that knows which gridpoint a break point was made from: an EPANET reach's
-    two break points are one gridpoint seen twice, and their distances come from
-    a companion ``.inp``, so neither correspondence can be recovered afterwards.
+    ``series`` is filled with what each break point carries, since only here is
+    it known which gridpoint a break point was made from.
     """
     gridpoints = _ordered_gridpoints(reach)
     if _has_real_gridpoints(reach):
@@ -184,10 +161,7 @@ def _build_reach_breakpoints(
     breakpoints: list[ReachBreakPoint] = []
     for i, (gp, distances) in enumerate(zip(gridpoints, distances_per_gridpoint)):
         carried = series_by_key[(reach.name, i)]
-        # Under every distance this gridpoint was stretched over, so both of
-        # an EPANET reach's break points name the one series it really has.
-        # Including a distance of None: nothing can ask for that break point by
-        # name, but it is a graph node, and to_dataframe() reads every one.
+        # A None distance included: to_dataframe() reads every graph node.
         for distance in distances:
             series[(gp.reach_name, distance)] = carried
         breakpoints.extend(ReachBreakPoint(gp.reach_name, d) for d in distances)
@@ -203,11 +177,8 @@ def _load_res1d_network(
 ) -> tuple[list[NetworkReach], _Results]:
     """Read a result file as reaches, and as the results a network reads through.
 
-    Both come out of the one walk over ``res.reaches``, and neither touches a
-    timeseries: a location knows what it carries from the file header alone.
-    Returned together so that the series map, whose keys are
-    gridpoint-to-break-point correspondences only this walk knows, is never
-    assembled by a caller.
+    Both come from one walk over ``res.reaches``, since the series map depends
+    on which gridpoint each break point was made from. No timeseries is read.
 
     Parameters
     ----------
@@ -222,8 +193,6 @@ def _load_res1d_network(
     """
     lengths = lengths or {}
 
-    # Filled as the reaches are built, since that is the only place that knows
-    # which gridpoint a break point was made from.
     series: dict[Alias, dict[str, _Series]] = {}
 
     def _init_node(id: str) -> str:
@@ -231,8 +200,7 @@ def _load_res1d_network(
         return id
 
     def _build_reach(reach: ResultReach) -> NetworkReach:
-        # Some formats (.resx) report no end nodes at all, and a reach without
-        # them cannot be placed in a graph.
+        # Some formats (.resx) report no end nodes.
         if reach.start_node is None or reach.end_node is None:
             raise ValueError(
                 f"mikeio1d reported no start/end node for reach {reach.name!r}; "

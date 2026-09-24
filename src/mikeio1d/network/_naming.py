@@ -67,13 +67,10 @@ class _Naming:
         self._by_alias: dict[Alias, int] = {
             graph.nodes[node_id]["alias"]: node_id for node_id in graph.nodes()
         }
-        # Kept as well as the forward map, rather than inverted on demand:
-        # to_dataset() wants the reverse of the whole map on every call.
         self._by_id: dict[int, Alias] = {
             node_id: alias for alias, node_id in self._by_alias.items()
         }
-        # The known break point distances of each reach, ascending, so a
-        # tolerant lookup searches one reach rather than the whole network.
+        # Each reach's known break point distances, ascending, for bisect.
         self._distances: dict[str, list[float]] = {}
         for alias in self._by_alias:
             if _is_break_point(alias) and alias[1] is not None:
@@ -156,9 +153,7 @@ class _Naming:
     def describe_miss(self, alias: Alias, limit: int = 5) -> str:
         """Say what the network holds nearest to an alias it does not.
 
-        An error that lists every name in the network is unreadable on a real
-        model - several thousand of them even in this repository's fixtures - so
-        the few candidates a caller plausibly meant are named instead.
+        Names a few likely candidates rather than every name in the network.
         """
         if _is_break_point(alias):
             reach_id, distance = alias

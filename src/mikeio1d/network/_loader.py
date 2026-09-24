@@ -31,12 +31,7 @@ from ._res1d import _units_of
 def _blame_the_companions(
     res: Res1D, found: Sequence[str | Path | Res1D], err: Exception
 ) -> ValueError:
-    """Name the companions in an error about them, for a caller who asked for none.
-
-    A companion found beside the result file has to be named when it turns out
-    to be the problem, or the error points at files the caller did not know were
-    being read.
-    """
+    """Name the companions in an error about them, for a caller who asked for none."""
     names = ", ".join(f"'{_path_of(companion).name}'" for companion in found)
     return ValueError(
         f"Failed to build a network from '{_path_of(res).name}': {err}\n"
@@ -72,8 +67,6 @@ def _load_network(
     units = _units_of(res)
 
     found, discovered = _companion_paths(res, companions)
-    # Every failure a companion can cause is raised while reading it, so a
-    # fault in the result file itself keeps its own message.
     try:
         extra, lengths = _read_companions(res, found, series_by_key)
     except ValueError as err:
@@ -82,15 +75,13 @@ def _load_network(
         raise _blame_the_companions(res, found, err) from err
 
     if extra is not None:
-        # Onto the main file's locations only: a companion gridpoint the main
-        # reach has no counterpart for has nowhere to be read from. Disjoint
-        # quantities, since a clash was refused when the companion was opened.
+        # Onto the main file's locations only. The quantities are disjoint, as
+        # a clash was refused when the companion was opened.
         series_by_key = {
             key: {**carried, **extra.series_by_key.get(key, {})}
             for key, carried in series_by_key.items()
         }
-        # The main file wins where both spell the same quantity, since it is
-        # the one the network was opened from.
+        # The main file's unit wins where both declare a quantity.
         units = {**extra.units, **units}
 
     return _load_res1d_network(res, series_by_key=series_by_key, units=units, lengths=lengths)

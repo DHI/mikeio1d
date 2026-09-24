@@ -26,12 +26,10 @@ if TYPE_CHECKING:
 class _Series:
     """One timeseries, and the file it has to be read from.
 
-    Addressed by :class:`~mikeio1d.quantities.TimeSeriesId` rather than by the
-    ``ResultQuantity`` it came from. Loading a companion's dynamic data replaces
-    the whole ``ResultNetwork`` it hangs off (see ``ResultReader._load_file``),
-    so any quantity object captured before that point is a stale handle onto a
-    discarded object graph. A ``TimeSeriesId`` is inert, and every read looks it
-    up afresh.
+    Addressed by :class:`~mikeio1d.quantities.TimeSeriesId` rather than by a
+    ``ResultQuantity``: loading a file's dynamic data replaces the
+    ``ResultNetwork`` a quantity hangs off (see ``ResultReader._load_file``),
+    which would leave a captured quantity stale.
     """
 
     res: Res1D
@@ -42,10 +40,7 @@ class _Series:
 class _Results:
     """What a network reads through: where each series sits, and the file header.
 
-    Everything here comes from the headers, so holding it costs nothing, and a
-    network keeps one for as long as it can read. It is shared rather than
-    copied when the network is, since the ``Res1D`` its series point into holds
-    .NET objects that cannot be deep-copied.
+    Everything here comes from the file headers.
 
     Attributes
     ----------
@@ -75,23 +70,17 @@ class _Results:
     def read(self, items: Sequence[tuple[Alias, str]]) -> pd.DataFrame:
         """Read the given pairs, one batched call per file they live in.
 
-        Each pair is one :meth:`quantities_at` has confirmed, under the network's
-        own spelling of the location. The frame has one column per pair, in
-        order and keeping duplicates, and each distinct series is read once
-        however often it was asked for - an EPANET reach's two break points name
-        the same gridpoint, so asking for both is one read, not two.
+        Each pair must be one :meth:`quantities_at` confirms. The frame has one
+        column per pair, in order and keeping duplicates; each distinct series
+        is read once however often it is asked for.
         """
         if not items:
-            # Nothing asked for, nothing opened. The file's own time index would
-            # be the tidier index to carry here, but reading it loads the whole
-            # of the file's dynamic data, which is the one thing asking for
-            # nothing should not do.
+            # Not the file's time index, which would load its dynamic data.
             return pd.DataFrame(index=pd.DatetimeIndex([], name="time"))
 
         series = [self.series[alias][quantity] for alias, quantity in items]
 
-        # Grouped by file, and within a file de-duplicated, so what crosses the
-        # interop boundary is each distinct series exactly once.
+        # Grouped by file and de-duplicated within it.
         by_file: dict[int, tuple[Res1D, list[TimeSeriesId]]] = {}
         for item in series:
             _, tsids = by_file.setdefault(id(item.res), (item.res, []))

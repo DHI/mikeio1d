@@ -62,15 +62,10 @@ class NetworkReach:
         reach places them at their chainage, so it can begin thousands of metres
         in - or below zero.
     breakpoints : tuple of ReachBreakPoint
-        Ascending by distance from the start node, and :class:`Network` relies
-        on it: the first and last are the reach's outermost, and consecutive
-        differences are edge lengths, which a backwards pair would report as
-        negative. A break point is keyed by its reach's id, so a reach that has
-        any gets its own chain of graph nodes and stays distinct from a parallel
-        reach between the same two nodes. A reach with none is a single
-        start-to-end edge instead, and two such reaches between one pair of
-        nodes cannot be told apart - :class:`Network` refuses them rather than
-        dropping one.
+        Ascending by distance; consecutive differences are edge lengths. A reach
+        with break points gets its own chain of graph nodes. A reach with none
+        is a single start-to-end edge, and :class:`Network` refuses two of those
+        between the same pair of nodes.
     """
 
     id: str

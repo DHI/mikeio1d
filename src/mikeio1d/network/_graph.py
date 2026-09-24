@@ -58,18 +58,11 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             bp_keys = [bp.id for bp in reach.breakpoints]
             g0.add_nodes_from(bp_keys)
 
-            # A breakpoint sitting where the reach itself starts (or, on the
-            # other end, where it ends) is not an intermediate point - it is
-            # geometrically the same location as start_key/end_key, one of
-            # the reach's own gridpoints promoted to a breakpoint. Tag that
-            # edge and clamp it to an exact 0.0: the two coordinates in each
-            # difference are each derived from a different upstream source,
-            # so floating-point noise could otherwise leave a spurious tiny
-            # positive or negative edge weight where the true value is
-            # analytically zero. A breakpoint's distance can also be
-            # genuinely unknown (unrelated to whether the reach's own length
-            # is known - a NetworkReach makes no promise the two are
-            # coupled), so both ends guard for None.
+            # A breakpoint at the reach's own end is the same place as the end
+            # node: tag the edge as a boundary and clamp it to 0.0, since the two
+            # positions come from different sources and float noise would leave
+            # a tiny non-zero length. A breakpoint's distance can be unknown
+            # whether or not the reach's length is, so both ends guard for None.
             leading_distance = reach.breakpoints[0].distance
             if leading_distance is None:
                 leading_length = None
@@ -85,10 +78,8 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
                 boundary=leading_is_boundary,
             )
 
-            # Only the final segment needs the total length, through
-            # end_distance. Break point distances are known even when the
-            # total is not, so a reach without a length still gets real
-            # lengths on every edge but this one.
+            # Only this edge needs the reach's length; the others are known
+            # from break point distances alone.
             trailing_distance = reach.breakpoints[-1].distance
             end_distance = reach.end_distance
             if end_distance is None or trailing_distance is None:

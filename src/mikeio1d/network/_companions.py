@@ -106,11 +106,8 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
 class _Companion:
     """A companion result file's series, keyed by the main file's location names.
 
-    Keyed the way the main file's own series are (see ``_res1d._SeriesKey``), so
-    merging the two is a matter of matching keys. Deliberately not the ``Res1D``
-    these came from: a series carries the file it has to be read from (see
-    ``_results._Series``), so nothing downstream has to go back to the companion
-    itself.
+    Keyed as the main file's series are (see ``_res1d._SeriesKey``), so the two
+    merge by key.
     """
 
     series_by_key: dict[_SeriesKey, dict[str, _Series]]
@@ -202,10 +199,7 @@ def _refuse_clashes(
 ) -> None:
     """Refuse a companion carrying a quantity the result file has at the same place.
 
-    Letting one replace the other would read whichever file happened to be
-    merged last, with nothing to say so. Checked from the headers alone, before
-    anything is built, so the failure is raised where every other fault in a
-    companion is.
+    Otherwise whichever file was merged last would silently win.
 
     Parameters
     ----------
@@ -273,15 +267,8 @@ def _companion_paths(
     Returns
     -------
     tuple of (list, bool)
-        The companions to read, and whether they were found rather than named.
-        The flag matters for error reporting: a file the caller never mentioned
-        has to be named when it turns out to be the problem.
-
-    Notes
-    -----
-    Only an EPANET ``.res`` is looked beside. A ``.res1d`` sitting next to an
-    unrelated ``.inp`` of the same stem would otherwise take its reach lengths
-    from another model's input file.
+        The companions to read, and whether they were found rather than named,
+        so an error can name a file the caller never mentioned.
     """
     if companions is not None:
         return list(companions), False
@@ -333,10 +320,7 @@ def _read_companions(
         elif suffix == ".inp":
             if lengths is not None:
                 raise ValueError("Two '.inp' companions were given; a network can read one.")
-            # An '.inp' is read byte-for-byte, so a non-ASCII reach id arrives
-            # spelled the way that file spells it. Reconciled against the result
-            # file, as a companion result's names already are, or the length
-            # would be filed under a name no reach answers to.
+            # Its names may be spelled in another encoding than the result file's.
             lengths = _rekey_by_main_file(_read_companion_lengths(companion), res.reaches)
         else:
             raise ValueError(
