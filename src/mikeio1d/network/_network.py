@@ -419,11 +419,11 @@ class Network:
         """
         faults = []
         for address, quantity in items:
-            node_id = self._naming.id_of(address)
-            if node_id is None:
+            alias = self._naming.canonical(address)
+            if alias is None:
                 faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
                 continue
-            carried = source.quantities_at(self._naming.alias_of(node_id)) or []
+            carried = source.quantities_at(alias) or []
             if quantity in carried:
                 continue
             if carried:
@@ -504,8 +504,7 @@ class Network:
         # pairs it has already confirmed.
         resolved: list[tuple[Alias, str]] = []
         for address, quantity in items:
-            node_id = self._naming.id_of(address)
-            alias = None if node_id is None else self._naming.alias_of(node_id)
+            alias = self._naming.canonical(address)
             carried = None if alias is None else source.quantities_at(alias)
             if carried is None or quantity not in carried:
                 raise self._blame_unreadable(items, source)
@@ -614,12 +613,11 @@ class Network:
         True
         """
         source = self._require_source("resolve()")
-        node_id = self._naming.id_of(address, tol=tol)
-        if node_id is None:
-            return None
-        # Back through the naming rather than echoing the argument, so the
+        # The network's own spelling rather than the argument echoed, so the
         # address that comes out is the one the rest of the surface takes.
-        alias = self._naming.alias_of(node_id)
+        alias = self._naming.canonical(address, tol=tol)
+        if alias is None:
+            return None
         return {"address": alias, "quantities": source.quantities_at(alias) or []}
 
     @overload

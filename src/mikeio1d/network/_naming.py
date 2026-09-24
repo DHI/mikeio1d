@@ -83,8 +83,8 @@ class _Naming:
         """Every alias in the network, mapped to its graph integer."""
         return self._by_alias
 
-    def id_of(self, alias: Alias, *, tol: float | None = None) -> int | None:
-        """Give the graph integer for an alias, or None if there is no such place.
+    def canonical(self, address: Alias, *, tol: float | None = None) -> Alias | None:
+        """Give the network's own spelling of an address, or None if there is no such place.
 
         An exact hit answers immediately. Failing that, a break point is matched
         on distance within ``tol``, defaulting to :data:`_CHAINAGE_TOLERANCE`, so
@@ -94,26 +94,31 @@ class _Naming:
         that is the only one there, but a caller widening the window is snapping
         a measured distance onto the model's, and means the closest.
         """
-        if alias in self._by_alias:
-            return self._by_alias[alias]
+        if address in self._by_alias:
+            return address
         if tol is None:
             tol = _CHAINAGE_TOLERANCE
         elif not math.isfinite(tol) or tol < 0:
             raise ValueError(
                 f"A distance tolerance must be a finite, non-negative number, got {tol!r}."
             )
-        if _is_break_point(alias):
-            reach_id, distance = alias
-            nearest: int | None = None
+        if _is_break_point(address):
+            reach_id, distance = address
+            nearest: Alias | None = None
             nearest_gap = math.inf
-            for key, node_id in self._by_alias.items():
+            for key in self._by_alias:
                 if not (_is_break_point(key) and key[0] == reach_id and key[1] is not None):
                     continue
                 gap = abs(key[1] - distance)
                 if gap <= tol and gap < nearest_gap:
-                    nearest, nearest_gap = node_id, gap
+                    nearest, nearest_gap = key, gap
             return nearest
         return None
+
+    def id_of(self, alias: Alias, *, tol: float | None = None) -> int | None:
+        """Give the graph integer for an alias, or None if there is no such place."""
+        found = self.canonical(alias, tol=tol)
+        return None if found is None else self._by_alias[found]
 
     def endpoint(self, reach_id: str, which: str) -> str:
         """Resolve one end of a reach, named 'start' or 'end', to its node id.
