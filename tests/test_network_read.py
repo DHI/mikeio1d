@@ -97,6 +97,14 @@ class TestWhatQuantitiesMeans:
     def test_a_quantity_carries_its_unit(self, network):
         assert network.quantities["Discharge"] == "m^3/s"
 
+    def test_a_companion_quantity_carries_its_unit(self, epanet):
+        """A quantity the main file never declares still knows what it is in.
+
+        Tank volume is read from the '.resx', so its unit has to come from
+        there too - the '.res' header has nothing to say about it.
+        """
+        assert epanet.quantities["Volume"] == "m^3"
+
     def test_a_topology_only_open_offers_everything_and_holds_nothing(self, network):
         assert set(network.quantities) == {"WaterLevel", "Discharge"}
         assert network.loaded_quantities == []
