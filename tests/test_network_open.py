@@ -15,6 +15,8 @@ from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSION
 from mikeio1d.network._companions import _CompanionConflict, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
 from mikeio1d.network._res1d import _merge_extra_quantities
+from mikeio1d.network._res1d import _merge_extra_series
+from mikeio1d.network._res1d import _Series
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
@@ -269,6 +271,38 @@ class TestWhatACompanionCollisionSays:
 
         with pytest.raises(_CompanionConflict, match=r"\['Volume'\]"):
             _merge_extra_quantities(base, extra, location_id="9")
+
+
+class TestWhatACompanionCollisionSaysBeforeAnythingIsRead:
+    """The same refusal, made where a network records what each location carries.
+
+    A network opened with no timeseries never merges a frame, so this is the only
+    place a collision can be caught for it. Staged directly for the reason
+    :class:`TestWhatACompanionCollisionSays` gives.
+    """
+
+    @pytest.fixture
+    def carried(self):
+        """A location's own series, and a companion's naming one of the same quantities."""
+        base = {"Flow": _Series(res=None, tsid="flow"), "Volume": _Series(res=None, tsid="v")}
+        extra = {"Volume": _Series(res=None, tsid="resx volume")}
+        return base, extra
+
+    def test_it_names_the_location_and_the_quantity(self, carried):
+        base, extra = carried
+
+        with pytest.raises(_CompanionConflict, match=r"'9'.*\['Volume'\]"):
+            _merge_extra_series(base, extra, location_id="9")
+
+    def test_disjoint_quantities_are_merged(self, carried):
+        base, _ = carried
+        extra = {"Pump energy": _Series(res=None, tsid="energy")}
+
+        assert list(_merge_extra_series(base, extra, location_id="9")) == [
+            "Flow",
+            "Volume",
+            "Pump energy",
+        ]
 
 
 class TestExtensionPolicy:
