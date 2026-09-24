@@ -13,44 +13,26 @@ if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterable
     from datetime import datetime
 
+    from pathlib import Path
+
+    from ..res1d import Res1D
     from ._naming import Address
     from ._naming import Alias
     from ._res1d import _Results
 
 from collections.abc import Mapping
 from collections.abc import Sequence
-from pathlib import Path
 from types import MappingProxyType
-from typing import Any
 
 import networkx as nx
 import pandas as pd
 import xarray as xr
 
-from ..res1d import Res1D
-from ._companions import _companion_paths, _read_companions
 from ._graph import _generate_graph
+from ._loader import _load_network
 from ._naming import _Naming, _is_break_point
-from ._policy import _validate_extension
-from ._res1d import _load_res1d_network
 from ._types import Location
 from ._types import NetworkReach
-
-
-def _blame_the_companions(res: Res1D, found: Sequence[Any], err: Exception) -> ValueError:
-    """Name the companions in an error about them, for a caller who asked for none.
-
-    A companion found beside the result file has to be named when it turns out
-    to be the problem, or the error points at files the caller did not know were
-    being read.
-    """
-    names = ", ".join(f"'{Path(str(companion)).name}'" for companion in found)
-    return ValueError(
-        f"Failed to build a network from '{Path(str(res.file_path)).name}': {err}\n"
-        f"Companion files read alongside it, because they share its folder: "
-        f"{names}. Pass companions=[] to read the result file on its own, or "
-        "name the companions you want."
-    )
 
 
 class Network:
@@ -171,29 +153,7 @@ class Network:
         Node timeseries, :meth:`to_dataframe` and :meth:`to_dataset` are
         unaffected.
         """
-        if isinstance(res, (str, Path)):
-            path = Path(res)
-            _validate_extension(path.suffix)
-            res = Res1D(str(path))
-        elif isinstance(res, Res1D):
-            _validate_extension(Path(res.file_path).suffix)
-        else:
-            raise TypeError(f"Expected a str, Path or Res1D object, got {type(res).__name__!r}")
-
-        found, discovered = _companion_paths(res, companions)
-
-        # Every failure a companion can cause is raised while reading it, so a
-        # fault in the result file itself keeps its own message: advice to drop
-        # the companions cannot help with a topology the result file does not
-        # have.
-        try:
-            extra, lengths = _read_companions(res, found)
-        except ValueError as err:
-            if not discovered:
-                raise
-            raise _blame_the_companions(res, found, err) from err
-
-        return cls(*_load_res1d_network(res, extra=extra, lengths=lengths))
+        return cls(*_load_network(res, companions))
 
     @staticmethod
     def _generate_reaches_dict(

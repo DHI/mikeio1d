@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from ..res1d import Res1D
-from ._companions import _units_of
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -33,6 +32,14 @@ if TYPE_CHECKING:
     from ._naming import Alias
 
 from ._types import NetworkNode, NetworkReach, ReachBreakPoint
+
+
+def _units_of(res: Res1D) -> dict[str, str]:
+    """Read the unit abbreviation of every quantity a file declares, from its header."""
+    return {
+        str(quantity.Id): str(quantity.EumQuantity.UnitAbbreviation)
+        for quantity in res.result_data.Quantities
+    }
 
 
 @dataclass(frozen=True)

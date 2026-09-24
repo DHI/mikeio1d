@@ -22,6 +22,8 @@ from typing import Any
 
 from ..res1d import Res1D
 from ._inp import read_pipe_lengths
+from ._policy import _as_res1d, _suffix_of
+from ._res1d import _units_of
 
 _COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
 """Result extensions whose companions can be found by folder and stem.
@@ -98,22 +100,6 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
     return rekeyed
 
 
-def _units_of(res: Res1D) -> dict[str, str]:
-    """Read the unit abbreviation of every quantity a file declares.
-
-    Taken from the header alone, so asking costs nothing beyond the open.
-
-    Returns
-    -------
-    dict of str to str
-        Unit abbreviation per quantity ID.
-    """
-    return {
-        str(quantity.Id): str(quantity.EumQuantity.UnitAbbreviation)
-        for quantity in res.result_data.Quantities
-    }
-
-
 class _Companion:
     """A companion result file, keyed by the main file's location names.
 
@@ -158,23 +144,10 @@ def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
     Raises
     ------
     ValueError
-        If the extension is not ``.resx``, if the file does not come from the
-        same run as ``res``, or if the two carry the same quantity at one
-        location.
+        If the file does not come from the same run as ``res``, or if the two
+        carry the same quantity at one location.
     """
-    if isinstance(resx, (str, Path)):
-        path = Path(resx)
-        if path.suffix.lower() != ".resx":
-            raise ValueError(f"Expected an EPANET '.resx' companion file, got '{path.suffix}'.")
-        extra = Res1D(str(path))
-    elif isinstance(resx, Res1D):
-        if Path(resx.file_path).suffix.lower() != ".resx":
-            raise ValueError(
-                f"Expected an EPANET '.resx' companion file, got '{Path(resx.file_path).suffix}'."
-            )
-        extra = resx
-    else:
-        raise TypeError(f"Expected a str, Path or Res1D object, got {type(resx).__name__!r}")
+    extra = _as_res1d(resx)
 
     # Merging two different runs would line up silently and produce a network
     # that is wrong in a way no later error would reveal.
@@ -275,24 +248,6 @@ def _find_epanet_companions(res: Path) -> tuple[Path | None, Path | None]:
     return sibling(".resx"), sibling(".inp")
 
 
-def _suffix_of(companion: str | Path | Res1D) -> str:
-    """Return a companion's lower-case extension, whatever form it arrives in.
-
-    Parameters
-    ----------
-    companion : str, Path or Res1D
-        A companion file, or one already opened.
-
-    Returns
-    -------
-    str
-        The extension, including its dot.
-    """
-    if isinstance(companion, Res1D):
-        return Path(str(companion.file_path)).suffix.lower()
-    return Path(companion).suffix.lower()
-
-
 def _companion_paths(
     res: Res1D, companions: Sequence[str | Path | Res1D] | None
 ) -> tuple[list[str | Path | Res1D], bool]:
@@ -323,7 +278,7 @@ def _companion_paths(
         return list(companions), False
 
     file_path = res.file_path
-    if file_path is None or _suffix_of(str(file_path)) not in _COMPANION_SEARCH_EXTENSIONS:
+    if file_path is None or _suffix_of(file_path) not in _COMPANION_SEARCH_EXTENSIONS:
         return [], False
 
     found = [path for path in _find_epanet_companions(Path(file_path)) if path is not None]

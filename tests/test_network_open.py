@@ -10,7 +10,7 @@ import pytest
 pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
-from mikeio1d.network import Network, _network
+from mikeio1d.network import Network, _loader
 from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
 from mikeio1d.network import _companions
 from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
@@ -209,7 +209,7 @@ class TestCompanionErrors:
         with its own message and no advice that cannot help.
         """
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
-        monkeypatch.setattr(_network, "_load_res1d_network", _raise(ValueError("no start node")))
+        monkeypatch.setattr(_loader, "_load_res1d_network", _raise(ValueError("no start node")))
 
         with pytest.raises(ValueError, match="no start node") as excinfo:
             Network.open(res)
