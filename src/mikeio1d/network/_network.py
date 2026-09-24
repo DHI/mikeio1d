@@ -197,7 +197,8 @@ class Network:
         -------
         xr.Dataset
             One variable per quantity over ``(time, node)``. ``node`` is the
-            integer index the graph uses, and the ``name``, ``reach`` and
+            integer index the graph uses, not a model node id - break points
+            are graph nodes too - and the ``name``, ``reach`` and
             ``distance`` coordinates carry the names the model gave the same
             locations, so a consumer never has to hold on to the network to know
             what a column is::
@@ -486,7 +487,7 @@ class Network:
         Location or None
             ``None`` if there is no such location. Otherwise its address as the
             network spells it, the quantities readable there, and its graph
-            integer.
+            node - an integer label, not the model's node id.
 
         Raises
         ------
