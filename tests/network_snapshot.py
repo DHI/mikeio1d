@@ -106,7 +106,7 @@ def _carried(df: Any) -> dict[int, list[str]]:
     Parameters
     ----------
     df : pandas.DataFrame
-        What ``to_dataframe()`` returned, with ``(node, quantity)`` columns.
+        What ``to_dataframe()`` returned, relabelled with ``(node, quantity)`` columns.
 
     Returns
     -------
@@ -151,8 +151,7 @@ def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, An
         "edges": edges,
         "nodes": nodes,
         "alias_map": {
-            _alias_key(alias): int(node_id)
-            for node_id, alias in network.graph.nodes(data="alias")
+            _alias_key(alias): int(node_id) for node_id, alias in network.graph.nodes(data="alias")
         },
     }
 
@@ -198,7 +197,7 @@ def _describe_dataframe(df: Any) -> dict[str, Any]:
     Parameters
     ----------
     df : pandas.DataFrame
-        What ``to_dataframe()`` returned.
+        What ``to_dataframe()`` returned, relabelled with ``(node, quantity)`` columns.
 
     Returns
     -------
@@ -278,6 +277,10 @@ def describe(network: Any) -> dict[str, Any]:
     while the values underneath it are pinned by the dataframe digests.
     """
     df = network.to_dataframe()
+    # Keyed by graph integer, as the snapshots were taken, so they pin the same
+    # values whatever the frame's own labels.
+    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="alias")}
+    df.columns = [(by_alias[alias], quantity) for alias, quantity in df.columns]
     carried = _carried(df)
     return {
         "counts": {

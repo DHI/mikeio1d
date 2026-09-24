@@ -211,43 +211,40 @@ class Network:
         return by_id
 
     def to_dataframe(self, sel: str | None = None) -> pd.DataFrame:
-        """Read every series in the network, with graph node ids as column names.
+        """Read every series in the network, labelled the way :meth:`read` labels them.
 
-        It will be multiindex unless 'sel' is passed. Each call reads the result
-        file again; to read only some locations, use :meth:`read`.
+        Each call reads the result file again; to read only some locations, use
+        :meth:`read`.
 
         Parameters
         ----------
-        sel : Optional[str], optional
-            Quantity to select, by default None
+        sel : str, optional
+            Only this quantity. ``None`` *(default)* reads every quantity.
 
         Returns
         -------
         pd.DataFrame
-            Timeseries at every graph node, columns ``(node, quantity)``.
+            Time-indexed. Columns are ``(address, quantity)`` pairs, as
+            :meth:`read` gives them, or just the addresses when ``sel`` is
+            given. A break point whose distance is unknown is labelled
+            ``(reach_id, None)``: no address names it, but it carries a series
+            all the same.
         """
-        results = self._results
-        # Every graph node, including a break point no address can name: it
-        # carries a series all the same, and the graph has a node for it.
-        columns = [
-            (node_id, alias, quantity)
-            for alias, node_id in self._naming.aliases.items()
-            for quantity in (results.quantities_at(alias) or ())
+        items = [
+            (alias, quantity)
+            for alias in self._naming.aliases
+            for quantity in (self._results.quantities_at(alias) or ())
+            if sel is None or quantity == sel
         ]
-        if not columns:
-            index = pd.MultiIndex.from_arrays([[], []], names=["node", "quantity"])
-            return pd.DataFrame(index=pd.Index([], name="time"), columns=index)
-
-        df = results.read([(alias, quantity) for _, alias, quantity in columns])
-        df.columns = pd.MultiIndex.from_tuples(
-            [(node_id, quantity) for node_id, _, quantity in columns], names=["node", "quantity"]
-        )
-        df = df.rename_axis(index="time")
+        df = self._results.read(items).rename_axis(index="time")
         if sel is None:
-            return df
+            df.columns = pd.Index(items, tupleize_cols=False, name="item")
         else:
+            df.columns = pd.Index(
+                [alias for alias, _ in items], tupleize_cols=False, name="address"
+            )
             df.attrs["quantity"] = sel
-            return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
+        return df
 
     def to_dataset(self) -> xr.Dataset:
         """Dataset of the timeseries, with each node's original identity alongside.
@@ -272,15 +269,24 @@ class Network:
 
             Empty when no location carries data.
         """
-        df_raw = self.to_dataframe()
-        if len(df_raw.columns) == 0:
+        df = self.to_dataframe()
+        if len(df.columns) == 0:
             return xr.Dataset()
-        df = df_raw.reorder_levels(["quantity", "node"], axis=1)
-        quantities = df.columns.get_level_values("quantity").unique()
+        positions: dict[str, list[int]] = {}
+        for i, (_, quantity) in enumerate(df.columns):
+            positions.setdefault(quantity, []).append(i)
         ds = xr.Dataset(
             {
-                q: xr.DataArray(df[q], dims=["time", "node"], attrs={"long_name": str(q)})
-                for q in quantities
+                quantity: xr.DataArray(
+                    df.iloc[:, cols].to_numpy(),
+                    coords={
+                        "time": df.index,
+                        "node": [self._naming.aliases[df.columns[i][0]] for i in cols],
+                    },
+                    dims=["time", "node"],
+                    attrs={"long_name": str(quantity)},
+                )
+                for quantity, cols in positions.items()
             }
         )
         return ds.assign_coords(self._naming.identity_coords(ds.node.values))

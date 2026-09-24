@@ -227,7 +227,7 @@ class TestReadingSeries:
 
     def test_a_series_matches_what_the_whole_frame_gives(self, network):
         """Reading one item gives what reading every item gives for it."""
-        expected = network.to_dataframe()[(network.resolve("101").node, "WaterLevel")]
+        expected = network.to_dataframe()[("101", "WaterLevel")]
 
         read = network.read([("101", "WaterLevel")])
 
