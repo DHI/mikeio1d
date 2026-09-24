@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from ..result_network import ResultReach
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -100,6 +101,7 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
     return rekeyed
 
 
+@dataclass(frozen=True)
 class _Companion:
     """A companion result file, keyed by the main file's location names.
 
@@ -110,15 +112,9 @@ class _Companion:
     itself.
     """
 
-    def __init__(
-        self,
-        nodes: dict[str, ResultNode],
-        reaches: dict[str, ResultReach],
-        units: Mapping[str, str],
-    ) -> None:
-        self.nodes = nodes
-        self.reaches = reaches
-        self.units = units
+    nodes: dict[str, ResultNode]
+    reaches: dict[str, ResultReach]
+    units: Mapping[str, str]
 
 
 def _read_companion_lengths(inp: str | Path) -> dict[str, float]:
