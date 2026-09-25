@@ -94,7 +94,7 @@ Every address in a network is a location you can read from, but some formats lea
 
 * **MIKE 1D (`.res1d`)**: nodes and reach grid points both carry data.
 * **MIKE 11 (`.res11`)**: only reach grid points carry data; nodes are empty. To compare a sensor at a node, read a grid point next to it, which `locations(reach=...)` lists.
-* **EPANET (`.res`)**: a pipe's flow is read at the pipe's start, `(pipe_id, 0.0)`. With the `.inp` beside the `.res`, or passed in `companions`, it can also be read at the pipe's end; the two give the same series. A `.resx` beside the `.res` adds tank volumes and pump energy.
+* **EPANET (`.res`)**: a pipe's flow is read at the pipe's start, `(pipe_id, 0.0)`. With the `.inp` beside the `.res` (same folder and stem), or passed in `companions`, it can also be read at the pipe's end; the two give the same series. A `.resx` beside the `.res` adds tank volumes and pump energy. Pass `companions=[]` to read the `.res` alone.
 
 ## Additional resources
 - [MIKE 1D API](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)
