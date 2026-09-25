@@ -82,11 +82,6 @@ class _Results:
     units: Mapping[str, str]
     period: tuple[datetime, datetime]
 
-    @classmethod
-    def empty(cls) -> _Results:
-        """Results with no series at all, for a network that holds topology only."""
-        return cls(series={}, units={}, period=(None, None))
-
     def quantities_at(self, address: Address) -> tuple[str, ...]:
         """Quantity IDs readable at one location; empty where it carries none."""
         return tuple(self.series.get(address, ()))

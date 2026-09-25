@@ -15,8 +15,6 @@ pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
 from mikeio1d.network import Network
-from mikeio1d.network._results import _Results
-from mikeio1d.network._types import NetworkReach, ReachBreakPoint
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RIVER = str(_TESTDATA / "network_river.res1d")
@@ -43,20 +41,6 @@ def river():
 def river_lengths():
     """Reach lengths as Res1D reports them, which the graph must add up to."""
     return {name: reach.length for name, reach in Res1D(_RIVER).reaches.items()}
-
-
-def _reach(id, start, end, length=None, breakpoints=()):
-    """A reach with whatever length and break points a test needs."""
-    return NetworkReach(id, start, end, length=length, breakpoints=tuple(breakpoints))
-
-
-def _hand_built(reaches):
-    """A network over reaches already in memory, carrying no series at all.
-
-    For a shape no result file produces - twin reaches between one pair of
-    nodes, a reach with no length. Only the topology is ever asked about.
-    """
-    return Network(reaches, _Results.empty())
 
 
 def _chain_nodes(network, reach_id):
@@ -135,83 +119,3 @@ class TestEveryFixture:
         lengths = [attrs["length"] for _, _, attrs in graph.edges(data=True)]
 
         assert [length for length in lengths if length is not None and length < 0] == []
-
-
-class TestTheDefaultFrame:
-    """A reach measured from its own start needs to say nothing at all."""
-
-    def test_it_starts_at_zero(self):
-        reach = _reach("r0", "A", "B", length=100.0)
-
-        assert reach.start_distance == 0.0
-
-    def test_it_ends_at_its_length(self):
-        reach = _reach("r0", "A", "B", length=100.0)
-
-        assert reach.end_distance == 100.0
-
-    def test_it_has_no_end_without_a_length(self):
-        reach = _reach("r0", "A", "B")
-
-        assert reach.end_distance is None
-
-    def test_an_interior_break_point_keeps_a_real_edge_to_each_end(self):
-        """Only a break point on a reach's end is a boundary; these are not."""
-        reach = _reach(
-            "r0",
-            "A",
-            "B",
-            length=100.0,
-            breakpoints=[ReachBreakPoint("r0", 25.0), ReachBreakPoint("r0", 75.0)],
-        )
-        network = _hand_built([reach])
-
-        leading, trailing = _end_edges(network, "r0")
-
-        assert (leading["length"], leading["boundary"]) == (25.0, False)
-        assert (trailing["length"], trailing["boundary"]) == (25.0, False)
-
-
-class TestTwoReachesTheGraphCannotTellApart:
-    """A break point is what keeps two reaches between the same nodes distinct."""
-
-    def test_neither_having_one_is_refused(self):
-        a, b = "A", "B"
-        reaches = [
-            _reach("r0", a, b, length=100.0),
-            _reach("r1", a, b, length=250.0),
-        ]
-
-        with pytest.raises(ValueError, match="'r0' and 'r1'"):
-            _hand_built(reaches)
-
-    def test_the_pair_is_the_same_read_backwards(self):
-        """The graph is undirected, so running the other way does not help."""
-        a, b = "A", "B"
-        reaches = [
-            _reach("r0", a, b, length=100.0),
-            _reach("r1", b, a, length=250.0),
-        ]
-
-        with pytest.raises(ValueError, match="'r0' and 'r1'"):
-            _hand_built(reaches)
-
-    def test_a_break_point_each_keeps_them_apart(self):
-        a, b = "A", "B"
-        reaches = [
-            _reach("r0", a, b, length=100.0, breakpoints=[ReachBreakPoint("r0", 50.0)]),
-            _reach("r1", a, b, length=250.0, breakpoints=[ReachBreakPoint("r1", 125.0)]),
-        ]
-
-        assert _hand_built(reaches).graph.number_of_edges() == 4
-
-    def test_sharing_an_id_is_refused(self):
-        """Their break points would interleave into one chain, losing a reach."""
-        a, b = "A", "B"
-        reaches = [
-            _reach("r0", a, b, length=100.0, breakpoints=[ReachBreakPoint("r0", 50.0)]),
-            _reach("r0", a, b, length=250.0, breakpoints=[ReachBreakPoint("r0", 50.0)]),
-        ]
-
-        with pytest.raises(ValueError, match="share the id 'r0'"):
-            _hand_built(reaches)

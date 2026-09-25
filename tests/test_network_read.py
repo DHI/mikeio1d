@@ -30,6 +30,15 @@ _Q_POINT = ("100l1", 23.8413574216414)
 _PIPE_LENGTH = 3209.544
 
 
+def _unread(res):
+    """Whether a Res1D has loaded no timeseries yet.
+
+    Res1D has no public way to say so, and it is not this module's to change,
+    so this is the one place that looks inside it.
+    """
+    return res.reader._loaded is False
+
+
 @pytest.fixture(scope="module")
 def network():
     """A network as opened: its topology, and none of its series read."""
@@ -60,7 +69,7 @@ class TestTheOpenReadsNothing:
         network.resolve("101")
         network.locations(quantity="Discharge")
 
-        assert res.reader._loaded is False
+        assert _unread(res)
 
     def test_opening_with_a_companion_result_leaves_both_files_unread(self):
         res = Res1D(_EPANET_RES)
@@ -68,8 +77,8 @@ class TestTheOpenReadsNothing:
 
         Network.open(res, companions=[resx])
 
-        assert res.reader._loaded is False
-        assert resx.reader._loaded is False
+        assert _unread(res)
+        assert _unread(resx)
 
     def test_a_read_leaves_the_opened_file_unread_too(self):
         """A read opens the file again for just what it asks for."""
@@ -78,7 +87,7 @@ class TestTheOpenReadsNothing:
 
         network.read([("101", "WaterLevel")])
 
-        assert res.reader._loaded is False
+        assert _unread(res)
 
 
 class TestThePeriod:
@@ -315,7 +324,7 @@ class TestReadingSeries:
         read = network.read([])
 
         assert read.empty
-        assert res.reader._loaded is False
+        assert _unread(res)
 
     def test_a_companion_quantity_reads_alongside_a_main_one(self, epanet):
         """The two live in different files, so this spans both in one call."""
