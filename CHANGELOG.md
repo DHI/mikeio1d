@@ -43,9 +43,6 @@
   `Network.release` are gone (#250).
 - A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location`,
   `NetworkReach` and `ReachBreakPoint` are exported from `mikeio1d.network` (#250).
-- modelskill's `NetworkModelResult` needs matching changes: `network.period()` becomes
-  `network.period`, and `resolve()`'s `["address"]`, `["quantities"]` and `["node"]` become
-  attributes (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
