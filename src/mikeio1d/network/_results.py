@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from pathlib import Path
 
-    from ._naming import Alias
+    from ._naming import Address
 
 import pandas as pd
 
@@ -73,7 +73,7 @@ class _Results:
         First and last timestep of the main result file.
     """
 
-    series: Mapping[Alias, Mapping[str, _Series]]
+    series: Mapping[Address, Mapping[str, _Series]]
     units: Mapping[str, str]
     period: tuple[datetime, datetime]
 
@@ -82,11 +82,11 @@ class _Results:
         """Results with no series at all, for a network that holds topology only."""
         return cls(series={}, units={}, period=(None, None))
 
-    def quantities_at(self, alias: Alias) -> tuple[str, ...]:
+    def quantities_at(self, alias: Address) -> tuple[str, ...]:
         """Quantity IDs readable at one location; empty where it carries none."""
         return tuple(self.series.get(alias, ()))
 
-    def read(self, items: Sequence[tuple[Alias, str]]) -> pd.DataFrame:
+    def read(self, items: Sequence[tuple[Address, str]]) -> pd.DataFrame:
         """Read the given pairs, loading only them, one batched call per file.
 
         Each pair must be one :meth:`quantities_at` confirms. The frame has one

@@ -349,12 +349,12 @@ def test_pumps_keep_an_unknown_length_even_with_the_inp(tmp_path):
     assert sum(length is None for length in lengths.values()) == 1
 
 
-def test_a_pipe_the_inp_gives_no_length_for_keeps_both_its_break_points(tmp_path):
+def test_a_pipe_the_inp_gives_no_length_for_has_one_break_point(tmp_path):
     """A zero in [PIPES] says the length is unknown, not that the pipe has none.
 
-    Taken as a real length it would place both of a link-node reach's break
-    points at distance 0.0, and the two would share one key: the graph would
-    get a single node and a zero-length self-loop, one edge short of the count
+    Taken as a real length it would place the reach's second break point at
+    distance 0.0, on top of the first, and the two would share one key: the
+    graph would get a zero-length self-loop, one edge more than the count
     test_network_breakpoints.py checks.
     """
     res = _copy(tmp_path, "epanet", ".res", ".inp")
@@ -369,5 +369,4 @@ def test_a_pipe_the_inp_gives_no_length_for_keeps_both_its_break_points(tmp_path
     assert _lengths(network)[_PIPE] is None
     assert [alias for alias in aliases if isinstance(alias, tuple) and alias[0] == _PIPE] == [
         (_PIPE, 0.0),
-        (_PIPE, None),
     ]

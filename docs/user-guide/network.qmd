@@ -94,9 +94,9 @@ Which locations carry data depends on the product that wrote the file.
 
 * **MIKE 1D (`.res1d`)**: nodes and reach grid points both carry timeseries. Each grid point becomes a break point at its own chainage.
 * **MIKE 11 (`.res11`)**: timeseries sit on reach grid points, not on nodes, so every node carries nothing of its own. `resolve()` answers for a node with an empty `quantities`, and `locations(reach=...)` lists the grid points to read instead.
-* **EPANET (`.res`)**: a link-node model with one synthetic grid point per reach. mikeio1d places a break point at each end of the reach from it, so a reach's own quantities (`Flow`, `Velocity`, ...) can be read the way a MIKE reach's end data can. Both break points are one grid point seen twice, so reading both gives two identical columns from a single read.
-    * Without the `.inp`, no reach has a length, so only the first break point (`distance=0.0`) has an address. The second has a graph node but no name, and the edges around it carry `length=None`.
-    * With the `.inp`, a pipe's second break point sits at the pipe's full length, and both are addressable. Pumps and valves keep an unaddressable second break point even so, since `[PIPES]` is the only section that carries lengths.
+* **EPANET (`.res`)**: a link-node model with one synthetic grid point per reach. mikeio1d places a break point at each end of the reach from it, where the reach's length is known, so a reach's own quantities (`Flow`, `Velocity`, ...) can be read the way a MIKE reach's end data can. Both break points are one grid point seen twice, so reading both gives two identical columns from a single read.
+    * Without the `.inp`, no reach has a length, so each reach gets only the first break point, at `distance=0.0`, and the edge from it to the end node carries `length=None`.
+    * With the `.inp`, a pipe's second break point sits at the pipe's full length. Pumps and valves keep only the first even so, since `[PIPES]` is the only section that carries lengths.
     * A `.resx` beside the `.res` adds tank `Volume` and `Volume Percentage` to its nodes and pump energy quantities to its reaches.
 
 ## Additional resources

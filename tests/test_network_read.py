@@ -217,11 +217,11 @@ class TestListingLocations:
     def test_a_reach_carrying_nothing_for_a_quantity_is_empty(self, network):
         assert network.locations(reach="100l1", quantity="Volume") == []
 
-    def test_an_unaddressable_break_point_is_left_out(self):
-        """Without the .inp a pipe has no length, so its far end has no distance."""
+    def test_a_pipe_without_a_length_has_only_its_near_break_point(self):
+        """Without the .inp a pipe has no length, so there is no distance for its far end."""
         alone = Network.open(_EPANET_RES, companions=[])
 
-        assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0), ("10", None)]
+        assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0)]
         assert alone.locations(reach="10") == [("10", 0.0)]
 
     def test_both_break_points_are_listed_once_the_inp_gives_a_length(self, epanet):

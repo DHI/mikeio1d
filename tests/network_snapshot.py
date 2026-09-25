@@ -68,8 +68,7 @@ def _alias_key(alias: Any) -> str:
     """
     if isinstance(alias, tuple):
         reach, distance = alias
-        rendered = "None" if distance is None else repr(_num(distance))
-        return f"bp:{reach}@{rendered}"
+        return f"bp:{reach}@{_num(distance)!r}"
     return f"node:{alias}"
 
 
@@ -232,14 +231,10 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     dict
         ``find``: the integer ``resolve`` gives each address. ``endpoints``: the
         integer of each reach's start and end node. ``recall``: the name the
-        graph labels each integer with. A breakpoint whose distance is unknown
-        is absent from ``find``: no address names it, which is behaviour
-        recorded under ``reaches`` instead.
+        graph labels each integer with.
     """
     found = {}
     for _, alias in network.graph.nodes(data="alias"):
-        if isinstance(alias, tuple) and alias[1] is None:
-            continue
         found[_alias_key(alias)] = int(network.resolve(alias).node)
 
     endpoints = {}

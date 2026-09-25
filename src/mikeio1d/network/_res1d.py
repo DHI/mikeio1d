@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
-    from ._naming import Alias
+    from ._naming import Address
 
 from ._results import _Results
 from ._results import _Series
@@ -139,7 +139,7 @@ def _build_reach_breakpoints(
     *,
     length: float | None,
     series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
-    series: dict[Alias, dict[str, _Series]],
+    series: dict[Address, dict[str, _Series]],
 ) -> list[ReachBreakPoint]:
     """Build a reach's break points from its mikeio1d gridpoints.
 
@@ -147,9 +147,9 @@ def _build_reach_breakpoints(
     its chainage.
 
     A link-node reach (e.g. EPANET) has one synthetic gridpoint that belongs to
-    neither end. It becomes two break points, at 0.0 and at ``length`` (or
-    ``None`` when the length is unknown), both carrying its series. See
-    https://github.com/DHI/modelskill/issues/680.
+    neither end. It becomes two break points, at 0.0 and at ``length``, both
+    carrying its series - or only the one at 0.0 where the length is unknown.
+    See https://github.com/DHI/modelskill/issues/680.
 
     ``series`` is filled with what each break point carries, since only here is
     it known which gridpoint a break point was made from.
@@ -158,12 +158,12 @@ def _build_reach_breakpoints(
     if _has_real_gridpoints(reach):
         distances_per_gridpoint = [[gp.chainage] for gp in gridpoints]
     else:
-        distances_per_gridpoint = [[0.0, length] for _ in gridpoints]
+        ends = [0.0] if length is None else [0.0, length]
+        distances_per_gridpoint = [ends for _ in gridpoints]
 
     breakpoints: list[ReachBreakPoint] = []
     for i, (gp, distances) in enumerate(zip(gridpoints, distances_per_gridpoint)):
         carried = series_by_key[(reach.name, i)]
-        # A None distance included: to_dataframe() reads every graph node.
         for distance in distances:
             series[(gp.reach_name, distance)] = carried
         breakpoints.extend(ReachBreakPoint(gp.reach_name, d) for d in distances)
@@ -195,7 +195,7 @@ def _load_res1d_network(
     """
     lengths = lengths or {}
 
-    series: dict[Alias, dict[str, _Series]] = {}
+    series: dict[Address, dict[str, _Series]] = {}
 
     def _init_node(id: str) -> str:
         series[id] = series_by_key[id]

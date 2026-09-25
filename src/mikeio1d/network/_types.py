@@ -24,20 +24,18 @@ class ReachBreakPoint:
     ----------
     reach_id : str
         The reach the break point sits on.
-    distance : float or None
-        Position along the reach, in the reach's own frame, or ``None`` where it
-        is genuinely unknown (a link-node reach with no known length). It need
-        not be measured from the start node: a MIKE river reach reports its
-        chainage, a coordinate along the whole branch, so the distance from the
-        start node is ``distance - reach.start_distance``. A break point with an
-        unknown distance has a graph node of its own, but no address names it.
+    distance : float
+        Position along the reach, in the reach's own frame. It need not be
+        measured from the start node: a MIKE river reach reports its chainage, a
+        coordinate along the whole branch, so the distance from the start node
+        is ``distance - reach.start_distance``.
     """
 
     reach_id: str
-    distance: float | None
+    distance: float
 
     @property
-    def id(self) -> tuple[str, float | None]:
+    def id(self) -> tuple[str, float]:
         """``(reach_id, distance)``, which uniquely locates the break point."""
         return (self.reach_id, self.distance)
 

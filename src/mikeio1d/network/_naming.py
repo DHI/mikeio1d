@@ -29,26 +29,17 @@ from ._types import NetworkReach
 # edge whose ends coincide.
 _CHAINAGE_TOLERANCE = 1e-3
 
-Alias = str | tuple[str, float | None]
+Address = str | tuple[str, float]
 """A location under the name its model gave it.
 
-A plain ``str`` is a node id. A ``(reach_id, distance)`` tuple is a break point,
-whose ``distance`` is ``None`` where its position along the reach is genuinely
-unknown. Nothing is both, so the shape says which it is.
-"""
-
-Address = str | tuple[str, float]
-"""A location a caller can name.
-
-The addressable part of :data:`Alias`. A break point whose distance is unknown -
-an EPANET reach read without its ``.inp`` - has an alias and a graph node, but
-nothing can ask for it by name.
+A plain ``str`` is a node id. A ``(reach_id, distance)`` tuple is a break point.
+Nothing is both, so the shape says which it is.
 """
 
 
-def _is_break_point(alias: Alias) -> bool:
-    """Whether an alias names a break point rather than a node."""
-    return isinstance(alias, tuple)
+def _is_break_point(address: Address) -> bool:
+    """Whether an address names a break point rather than a node."""
+    return isinstance(address, tuple)
 
 
 class _Naming:
@@ -64,27 +55,27 @@ class _Naming:
     """
 
     def __init__(self, graph: nx.Graph, reaches: Mapping[str, NetworkReach]):
-        self._by_alias: dict[Alias, int] = {
+        self._by_alias: dict[Address, int] = {
             graph.nodes[node_id]["alias"]: node_id for node_id in graph.nodes()
         }
-        self._by_id: dict[int, Alias] = {
+        self._by_id: dict[int, Address] = {
             node_id: alias for alias, node_id in self._by_alias.items()
         }
         # Each reach's known break point distances, ascending, for bisect.
         self._distances: dict[str, list[float]] = {}
         for alias in self._by_alias:
-            if _is_break_point(alias) and alias[1] is not None:
+            if _is_break_point(alias):
                 self._distances.setdefault(alias[0], []).append(alias[1])
         for known in self._distances.values():
             known.sort()
         self._reaches = reaches
 
     @property
-    def aliases(self) -> Mapping[Alias, int]:
+    def aliases(self) -> Mapping[Address, int]:
         """Every alias in the network, mapped to its graph integer."""
         return self._by_alias
 
-    def canonical(self, address: Alias, *, distance_tol: float | None = None) -> Alias | None:
+    def canonical(self, address: Address, *, distance_tol: float | None = None) -> Address | None:
         """Give the network's own spelling of an address, or None if there is no such place.
 
         An exact hit answers immediately. Failing that, a break point is matched
@@ -104,7 +95,7 @@ class _Naming:
             raise ValueError(
                 f"distance_tol must be a finite, non-negative number, got {distance_tol!r}."
             )
-        if not _is_break_point(address) or address[1] is None:
+        if not _is_break_point(address):
             return None
         reach_id, distance = address
         known = self._distances.get(reach_id, [])
@@ -139,7 +130,7 @@ class _Naming:
                 reach, distance = alias
                 names.append("")
                 reaches.append(reach)
-                distances.append(np.nan if distance is None else distance)
+                distances.append(distance)
             else:
                 names.append(alias)
                 reaches.append("")
@@ -151,7 +142,7 @@ class _Naming:
             "distance": ("node", np.array(distances, dtype=float)),
         }
 
-    def describe_miss(self, alias: Alias, limit: int = 5) -> str:
+    def describe_miss(self, alias: Address, limit: int = 5) -> str:
         """Say what the network holds nearest to an alias it does not.
 
         Names a few likely candidates rather than every name in the network.
@@ -162,7 +153,7 @@ class _Naming:
             if not known:
                 if reach_id not in self._reaches:
                     return f"the network has no reach {reach_id!r}"
-                return f"no break point of reach {reach_id!r} sits at a known distance"
+                return f"reach {reach_id!r} has no break points"
             nearest = sorted(sorted(known, key=lambda d: abs(d - distance))[:limit])
             listed = ", ".join(format(d, "g") for d in nearest)
             return (
