@@ -24,6 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 from ..res1d import Res1D
 from ._companions import _companion_paths
+from ._companions import _merge_companion
 from ._companions import _read_companions
 from ._res1d import _as_res1d
 from ._res1d import _path_of
@@ -130,20 +131,12 @@ def _load_network(
 
     found, discovered = _companion_paths(res, companions)
     try:
-        extra, lengths = _read_companions(res, found, series_by_key)
+        extra, lengths = _read_companions(res, found)
+        if extra is not None:
+            series_by_key, units = _merge_companion(series_by_key, units, extra)
     except ValueError as err:
         if not discovered:
             raise
         raise _blame_the_companions(res, found, err) from err
-
-    if extra is not None:
-        # Onto the main file's locations only. The quantities are disjoint, as
-        # a clash was refused when the companion was opened.
-        series_by_key = {
-            key: {**carried, **extra.series_by_key.get(key, {})}
-            for key, carried in series_by_key.items()
-        }
-        # The main file's unit wins where both declare a quantity.
-        units = {**extra.units, **units}
 
     return _load_res1d_network(res, series_by_key=series_by_key, units=units, lengths=lengths)

@@ -127,12 +127,8 @@ def _read_companion_lengths(inp: str | Path) -> dict[str, float]:
     return read_pipe_lengths(path)
 
 
-def _open_companion_result(
-    res: Res1D, resx: str | Path | Res1D, own: Mapping[_SeriesKey, dict[str, _Series]]
-) -> _Companion:
+def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
     """Open and validate a companion ``.resx`` result file.
-
-    ``own`` is the main file's series, which the companion's must not overlap.
 
     Returns
     -------
@@ -142,8 +138,7 @@ def _open_companion_result(
     Raises
     ------
     ValueError
-        If the file does not come from the same run as ``res``, or if the two
-        carry the same quantity at one location.
+        If the file does not come from the same run as ``res``.
     """
     extra = _as_res1d(resx)
 
@@ -190,8 +185,30 @@ def _open_companion_result(
             key = main_node[key]
         series_by_key[key] = carried
 
-    _refuse_clashes(own, series_by_key)
     return _Companion(series_by_key=series_by_key, units=_units_of(extra))
+
+
+def _merge_companion(
+    own: Mapping[_SeriesKey, dict[str, _Series]],
+    units: Mapping[str, str],
+    extra: _Companion,
+) -> tuple[dict[_SeriesKey, dict[str, _Series]], dict[str, str]]:
+    """Add a companion's series and units to the main file's.
+
+    Onto the main file's locations only. A quantity both files carry at one
+    location is refused rather than merged, since whichever came last would
+    silently win. Where both declare a unit for a quantity, the main file's wins.
+
+    Raises
+    ------
+    ValueError
+        If the two files carry the same quantity at one location.
+    """
+    _refuse_clashes(own, extra.series_by_key)
+    series_by_key = {
+        key: {**carried, **extra.series_by_key.get(key, {})} for key, carried in own.items()
+    }
+    return series_by_key, {**extra.units, **units}
 
 
 def _refuse_clashes(
@@ -285,7 +302,6 @@ def _companion_paths(
 def _read_companions(
     res: Res1D,
     companions: Sequence[str | Path | Res1D],
-    own: Mapping[_SeriesKey, dict[str, _Series]],
 ) -> tuple[_Companion | None, dict[str, float] | None]:
     """Read the companions, sorting them by what each contributes.
 
@@ -295,8 +311,6 @@ def _read_companions(
         The result file the companions belong to.
     companions : sequence of str, Path or Res1D
         The companions to read.
-    own : mapping of _SeriesKey to (dict of str to _Series)
-        The result file's own series, which a companion's must not overlap.
 
     Returns
     -------
@@ -317,7 +331,7 @@ def _read_companions(
         if suffix == ".resx":
             if extra is not None:
                 raise ValueError("Two '.resx' companions were given; a network can read one.")
-            extra = _open_companion_result(res, companion, own)
+            extra = _open_companion_result(res, companion)
         elif suffix == ".inp":
             if lengths is not None:
                 raise ValueError("Two '.inp' companions were given; a network can read one.")
