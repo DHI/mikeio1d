@@ -10,7 +10,8 @@
 - `Network.period`, `Network.quantities`, `Network.resolve`, `Network.locations` and
   `Network.read`, for asking a result file what it holds and reading only the series a
   caller turns out to need, by the names the model used - a node ID, or a reach and a
-  distance along it. A network keeps its result file open for its lifetime to answer (#250).
+  distance along it. A read loads only the variables it asks for, each as its whole time
+  series (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 

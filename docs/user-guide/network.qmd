@@ -70,22 +70,22 @@ network.resolve(("100l1", 23.8), distance_tol=0.1)
 # Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
 ```
 
-`read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and everything asked for crosses to the result file in one batched call:
+`read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and loads only the variables asked for, each as its whole time series, in one batched call per file:
 
 ```python
 points = network.locations(reach="100l1", quantity="Discharge")
 network.read([(point, "Discharge") for point in points])
 ```
 
-A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`.
+A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `distance_tol`, so a measured chainage can be read without resolving it first.
 
 `to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network. `to_dataframe()` labels its columns `(address, quantity)`, as `read()` does; `to_dataset()` indexes locations by their graph integer and carries each one's name alongside.
 
 ::: {.callout-note}
-## The file stays open
-A network holds its result file for its own lifetime, since every series is read from it on request. Drop the network to let go of it; frames already read are your own.
+## Each read goes to the file
+A network keeps the topology and where each variable is, not the file. Each `read()` opens the result file for just the nodes, reaches and quantities it asks for, loads them and lets go, so a handful of locations costs a handful of series, however large the file. A reach is loaded with all of its gridpoints.
 
-MIKE 1D loads a file's whole dynamic data on the first read of anything in it, so what reading late saves is the work of building frames for locations you never asked about, not the file read itself.
+A network opened from a `Res1D` reads from that `Res1D`'s file on disk, so edits made to it in memory with `modify()` are not seen.
 :::
 
 ## Where each format keeps its timeseries

@@ -44,8 +44,9 @@ class Network:
     as the ``alias`` attribute, and :meth:`resolve` gives the integer for a name.
 
     Build one with :meth:`open`, which reads a result file's topology. The
-    timeseries stay in the file until :meth:`read` asks for them. The
-    constructor is internal: it takes what a loader produces, not a file.
+    timeseries stay in the file until :meth:`read` asks for them, and each
+    read loads only those. The constructor is internal: it takes what a loader
+    produces, not a file.
     """
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
@@ -81,7 +82,9 @@ class Network:
         ----------
         res : str, Path or Res1D
             Path to a ``.res1d``, ``.res11`` or ``.res`` result file, or an
-            already-opened :class:`~mikeio1d.Res1D`.
+            already-opened :class:`~mikeio1d.Res1D`. A ``Res1D`` gives the
+            topology; series are read from its file on disk, so edits made to
+            it in memory with ``modify()`` are not seen.
         companions : sequence of str, Path or Res1D, or None, optional
             Files read alongside the result and recognised by their extension:
 
@@ -343,7 +346,10 @@ class Network:
     ) -> pd.DataFrame:
         """Read the series named by ``(address, quantity)`` pairs.
 
-        Everything asked for is read in one batched call per file it lives in.
+        Only the variables asked for are loaded, each as its whole time
+        series, in one batched call per file they live in. Each call opens the
+        file again, so asking for many items at once is cheaper than asking
+        for them one by one.
 
         Parameters
         ----------
