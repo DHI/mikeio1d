@@ -62,10 +62,10 @@ def _hand_built(reaches):
 def _chain_nodes(network, reach_id):
     """A reach's graph nodes in order: start node, its break points, end node.
 
-    A break point's alias names the reach it belongs to, so one reach's chain
+    A break point's address names the reach it belongs to, so one reach's chain
     can be read off the graph without asking the network for its reaches.
     """
-    aliases = {node: network.graph.nodes[node]["alias"] for node in network.graph.nodes}
+    aliases = {node: network.graph.nodes[node]["address"] for node in network.graph.nodes}
     breakpoints = sorted(
         (alias[1], node)
         for node, alias in aliases.items()

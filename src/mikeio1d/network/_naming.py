@@ -1,4 +1,4 @@
-"""Match the names a model gave its locations, and label the graph's integers with them.
+"""Match the names a model gave its locations to the graph's nodes.
 
 A result file names a location the way the model did: a node id, or a reach and
 a distance along it. This module holds the rule for when two distances mean the
@@ -18,8 +18,6 @@ from collections.abc import Mapping
 from difflib import get_close_matches
 
 import networkx as nx
-import numpy as np
-import numpy.typing as npt
 
 from ._types import NetworkReach
 
@@ -43,37 +41,34 @@ def _is_break_point(address: Address) -> bool:
 
 
 class _Naming:
-    """The names in a network, and their graph integers, built once from a graph.
+    """The addresses in a network, and their graph nodes, built once from a graph.
 
     Parameters
     ----------
     graph : nx.Graph
-        The integer-labelled graph, each node carrying its ``alias``.
+        The integer-labelled graph, each node carrying its ``address``.
     reaches : Mapping[str, NetworkReach]
         The network's reaches, by id, for telling a missing reach from a
         missing distance on one.
     """
 
     def __init__(self, graph: nx.Graph, reaches: Mapping[str, NetworkReach]):
-        self._by_alias: dict[Address, int] = {
-            graph.nodes[node_id]["alias"]: node_id for node_id in graph.nodes()
+        self._nodes: dict[Address, int] = {
+            address: node for node, address in graph.nodes(data="address")
         }
-        self._by_id: dict[int, Address] = {
-            node_id: alias for alias, node_id in self._by_alias.items()
-        }
-        # Each reach's known break point distances, ascending, for bisect.
+        # Each reach's break point distances, ascending, for bisect.
         self._distances: dict[str, list[float]] = {}
-        for alias in self._by_alias:
-            if _is_break_point(alias):
-                self._distances.setdefault(alias[0], []).append(alias[1])
+        for address in self._nodes:
+            if _is_break_point(address):
+                self._distances.setdefault(address[0], []).append(address[1])
         for known in self._distances.values():
             known.sort()
         self._reaches = reaches
 
     @property
-    def aliases(self) -> Mapping[Address, int]:
-        """Every alias in the network, mapped to its graph integer."""
-        return self._by_alias
+    def nodes(self) -> Mapping[Address, int]:
+        """Every address in the network, mapped to its graph node."""
+        return self._nodes
 
     def canonical(self, address: Address, *, distance_tol: float | None = None) -> Address | None:
         """Give the network's own spelling of an address, or None if there is no such place.
@@ -87,7 +82,7 @@ class _Naming:
         that is the only one there, but a caller widening the window is snapping
         a measured distance onto the model's, and means the closest.
         """
-        if address in self._by_alias:
+        if address in self._nodes:
             return address
         if distance_tol is None:
             distance_tol = _CHAINAGE_TOLERANCE
@@ -107,48 +102,13 @@ class _Naming:
             return None
         return (reach_id, nearest)
 
-    def identity_coords(self, nodes: npt.ArrayLike) -> dict[str, tuple[str, np.ndarray]]:
-        """Describe each node by the name it had before it became an integer.
-
-        Parameters
-        ----------
-        nodes : array-like of int
-            The integer ids to describe, in the order they appear.
-
-        Returns
-        -------
-        dict
-            ``name``, ``reach`` and ``distance`` arrays along the ``node``
-            dimension. A node fills in ``name`` and leaves the other two empty; a
-            breakpoint fills in ``reach`` and ``distance`` and leaves ``name``
-            empty. Nothing carries both, so the empty half says which it is.
-        """
-        names, reaches, distances = [], [], []
-        for node in np.asarray(nodes):
-            alias = self._by_id[int(node)]
-            if _is_break_point(alias):
-                reach, distance = alias
-                names.append("")
-                reaches.append(reach)
-                distances.append(distance)
-            else:
-                names.append(alias)
-                reaches.append("")
-                distances.append(np.nan)
-
-        return {
-            "name": ("node", np.array(names, dtype=str)),
-            "reach": ("node", np.array(reaches, dtype=str)),
-            "distance": ("node", np.array(distances, dtype=float)),
-        }
-
-    def describe_miss(self, alias: Address, limit: int = 5) -> str:
-        """Say what the network holds nearest to an alias it does not.
+    def describe_miss(self, address: Address, limit: int = 5) -> str:
+        """Say what the network holds nearest to an address it does not.
 
         Names a few likely candidates rather than every name in the network.
         """
-        if _is_break_point(alias):
-            reach_id, distance = alias
+        if _is_break_point(address):
+            reach_id, distance = address
             known = self._distances.get(reach_id, [])
             if not known:
                 if reach_id not in self._reaches:
@@ -161,8 +121,8 @@ class _Naming:
                 "(distance_tol= widens the match)"
             )
 
-        names = [key for key in self._by_alias if not _is_break_point(key)]
-        close = get_close_matches(alias, names, n=limit)
+        names = [key for key in self._nodes if not _is_break_point(key)]
+        close = get_close_matches(address, names, n=limit)
         if close:
             return "did you mean " + ", ".join(repr(name) for name in close) + "?"
-        return f"the network has {len(names)} nodes, none named {alias!r}"
+        return f"the network has {len(names)} nodes, none named {address!r}"

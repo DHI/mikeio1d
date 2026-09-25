@@ -63,7 +63,7 @@ class _Results:
 
     Attributes
     ----------
-    series : mapping of alias to (mapping of str to _Series)
+    series : mapping of address to (mapping of str to _Series)
         Every location's series, by quantity ID. A location absent from it has
         none; one mapped to an empty dict carries nothing, which is every node
         of a MIKE 11 result.
@@ -82,9 +82,9 @@ class _Results:
         """Results with no series at all, for a network that holds topology only."""
         return cls(series={}, units={}, period=(None, None))
 
-    def quantities_at(self, alias: Address) -> tuple[str, ...]:
+    def quantities_at(self, address: Address) -> tuple[str, ...]:
         """Quantity IDs readable at one location; empty where it carries none."""
-        return tuple(self.series.get(alias, ()))
+        return tuple(self.series.get(address, ()))
 
     def read(self, items: Sequence[tuple[Address, str]]) -> pd.DataFrame:
         """Read the given pairs, loading only them, one batched call per file.
@@ -97,7 +97,7 @@ class _Results:
             # Not the file's time index, which would load its dynamic data.
             return pd.DataFrame(index=pd.DatetimeIndex([], name="time"))
 
-        series = [self.series[alias][quantity] for alias, quantity in items]
+        series = [self.series[address][quantity] for address, quantity in items]
 
         # Grouped by file and de-duplicated within it.
         by_file: dict[Path, list[TimeSeriesId]] = {}

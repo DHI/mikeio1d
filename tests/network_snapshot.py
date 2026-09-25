@@ -136,7 +136,7 @@ def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, An
         itself so that the numbering is pinned too.
     """
     graph = network.graph
-    aliases = {node: graph.nodes[node]["alias"] for node in graph.nodes}
+    aliases = {node: graph.nodes[node]["address"] for node in graph.nodes}
 
     edges = []
     for u, v, attrs in graph.edges(data=True):
@@ -150,7 +150,7 @@ def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, An
         "edges": edges,
         "nodes": nodes,
         "alias_map": {
-            _alias_key(alias): int(node_id) for node_id, alias in network.graph.nodes(data="alias")
+            _alias_key(alias): int(node_id) for node_id, alias in network.graph.nodes(data="address")
         },
     }
 
@@ -170,7 +170,7 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
     dict
         One entry per reach id.
     """
-    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="alias")}
+    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="address")}
     described = {}
     for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
@@ -234,7 +234,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
         graph labels each integer with.
     """
     found = {}
-    for _, alias in network.graph.nodes(data="alias"):
+    for _, alias in network.graph.nodes(data="address"):
         found[_alias_key(alias)] = int(network.resolve(alias).node)
 
     endpoints = {}
@@ -243,7 +243,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
             endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).node)
 
     recalled = {}
-    for node_id, alias in sorted(network.graph.nodes(data="alias")):
+    for node_id, alias in sorted(network.graph.nodes(data="address")):
         if isinstance(alias, tuple):
             entry = {"reach": alias[0], "distance": _num(alias[1])}
         else:
@@ -274,7 +274,7 @@ def describe(network: Any) -> dict[str, Any]:
     df = network.to_dataframe()
     # Keyed by graph integer, as the snapshots were taken, so they pin the same
     # values whatever the frame's own labels.
-    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="alias")}
+    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="address")}
     df.columns = [(by_alias[alias], quantity) for alias, quantity in df.columns]
     carried = _carried(df)
     return {

@@ -100,4 +100,4 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
                 boundary=False,
             )
 
-    return nx.convert_node_labels_to_integers(g0, label_attribute="alias")
+    return nx.convert_node_labels_to_integers(g0, label_attribute="address")

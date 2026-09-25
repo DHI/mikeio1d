@@ -24,12 +24,14 @@ from collections.abc import Sequence
 from types import MappingProxyType
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 import xarray as xr
 
 from ._graph import _generate_graph
 from ._loader import _load_network
 from ._naming import _Naming
+from ._naming import _is_break_point
 from ._types import Location
 from ._types import NetworkReach
 
@@ -40,7 +42,8 @@ class Network:
     A result file names a location the way the model did: a node id, or a reach
     and a distance along it, and every member here takes and gives those names.
     :attr:`graph` is labelled with integers instead, each node carrying its name
-    as the ``alias`` attribute, and :meth:`resolve` gives the integer for a name.
+    as the ``address`` attribute, and :meth:`resolve` gives the integer for a
+    name - see :attr:`Location.node`.
 
     Build one with :meth:`open`, which reads a result file's topology. The
     timeseries stay in the file until :meth:`read` asks for them, and each
@@ -167,9 +170,9 @@ class Network:
             :meth:`read` gives them.
         """
         items = [
-            (alias, quantity)
-            for alias in self._naming.aliases
-            for quantity in self._results.quantities_at(alias)
+            (address, quantity)
+            for address in self._naming.nodes
+            for quantity in self._results.quantities_at(address)
         ]
         df = self._results.read(items).rename_axis(index="time")
         df.columns = pd.Index(items, tupleize_cols=False, name="item")
@@ -184,11 +187,11 @@ class Network:
         -------
         xr.Dataset
             One variable per quantity over ``(time, node)``. ``node`` is the
-            integer index the graph uses, not a model node id - break points
-            are graph nodes too - and the ``name``, ``reach`` and
-            ``distance`` coordinates carry the names the model gave the same
-            locations, so a consumer never has to hold on to the network to know
-            what a column is::
+            graph's integer, as :attr:`Location.node` gives it, and the
+            ``name``, ``reach`` and ``distance`` coordinates carry the address,
+            so a consumer never has to hold on to the network to know what a
+            column is. A node fills in ``name``, a break point ``reach`` and
+            ``distance``, and the empty half says which it is::
 
                 Coordinates:
                   * time      datetime64
@@ -205,13 +208,14 @@ class Network:
         positions: dict[str, list[int]] = {}
         for i, (_, quantity) in enumerate(df.columns):
             positions.setdefault(quantity, []).append(i)
+        nodes = self._naming.nodes
         ds = xr.Dataset(
             {
                 quantity: xr.DataArray(
                     df.iloc[:, cols].to_numpy(),
                     coords={
                         "time": df.index,
-                        "node": [self._naming.aliases[df.columns[i][0]] for i in cols],
+                        "node": [nodes[df.columns[i][0]] for i in cols],
                     },
                     dims=["time", "node"],
                     attrs={"long_name": str(quantity)},
@@ -219,7 +223,24 @@ class Network:
                 for quantity, cols in positions.items()
             }
         )
-        return ds.assign_coords(self._naming.identity_coords(ds.node.values))
+
+        names, reaches, distances = [], [], []
+        for node in ds.node.to_numpy():
+            address = self._graph.nodes[int(node)]["address"]
+            if _is_break_point(address):
+                reach, distance = address
+                names.append("")
+                reaches.append(reach)
+                distances.append(distance)
+            else:
+                names.append(address)
+                reaches.append("")
+                distances.append(np.nan)
+        return ds.assign_coords(
+            name=("node", np.array(names, dtype=str)),
+            reach=("node", np.array(reaches, dtype=str)),
+            distance=("node", np.array(distances, dtype=float)),
+        )
 
     @property
     def graph(self) -> nx.Graph:
@@ -292,7 +313,9 @@ class Network:
         results = self._results
         units = results.units
         readable = {
-            quantity for alias in self._naming.aliases for quantity in results.quantities_at(alias)
+            quantity
+            for address in self._naming.nodes
+            for quantity in results.quantities_at(address)
         }
         # In the header's order, so the listing does not depend on the topology.
         ordered = [q for q in units if q in readable]
@@ -312,11 +335,11 @@ class Network:
         """
         faults = []
         for address, quantity in items:
-            alias = self._naming.canonical(address, distance_tol=distance_tol)
-            if alias is None:
+            found = self._naming.canonical(address, distance_tol=distance_tol)
+            if found is None:
                 faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
                 continue
-            carried = results.quantities_at(alias)
+            carried = results.quantities_at(found)
             if quantity in carried:
                 continue
             if carried:
@@ -397,10 +420,10 @@ class Network:
         # Every item is checked before anything is read.
         resolved: list[tuple[Address, str]] = []
         for address, quantity in items:
-            alias = self._naming.canonical(address, distance_tol=distance_tol)
-            if alias is None or quantity not in results.quantities_at(alias):
+            found = self._naming.canonical(address, distance_tol=distance_tol)
+            if found is None or quantity not in results.quantities_at(found):
                 raise self._blame_unreadable(items, results, distance_tol)
-            resolved.append((alias, quantity))
+            resolved.append((found, quantity))
 
         df = results.read(resolved)
         # A flat index: an address can itself be a tuple, which a MultiIndex
@@ -436,15 +459,15 @@ class Network:
         """
         results = self._results
         if reach is None:
-            aliases: Iterable[Address] = self._naming.aliases
+            addresses: Iterable[Address] = self._naming.nodes
         elif reach in self._reaches:
-            aliases = [point.id for point in self._reaches[reach].breakpoints]
+            addresses = [point.id for point in self._reaches[reach].breakpoints]
         else:
             raise KeyError(f"locations() found {self._naming.describe_miss((reach, 0.0))}")
 
         if quantity is None:
-            return list(aliases)
-        return [alias for alias in aliases if quantity in results.quantities_at(alias)]
+            return list(addresses)
+        return [address for address in addresses if quantity in results.quantities_at(address)]
 
     def resolve(self, address: Address, *, distance_tol: float | None = None) -> Location | None:
         """Say whether a location is in this network, what it carries, and where.
@@ -468,7 +491,7 @@ class Network:
         Location or None
             ``None`` if there is no such location. Otherwise its address as the
             network spells it, the quantities readable there, and its graph
-            node - an integer label, not the model's node id.
+            node.
 
         Raises
         ------
@@ -486,11 +509,11 @@ class Network:
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        alias = self._naming.canonical(address, distance_tol=distance_tol)
-        if alias is None:
+        found = self._naming.canonical(address, distance_tol=distance_tol)
+        if found is None:
             return None
         return Location(
-            address=alias,
-            quantities=self._results.quantities_at(alias),
-            node=self._naming.aliases[alias],
+            address=found,
+            quantities=self._results.quantities_at(found),
+            node=self._naming.nodes[found],
         )

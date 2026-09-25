@@ -46,7 +46,7 @@ def test_every_reach_keeps_a_chain_of_its_own(filename):
     # every timeseries of the largest fixture would cost seconds.
     graph = Network.open(path, companions=[]).graph
 
-    breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["alias"], tuple)]
+    breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["address"], tuple)]
 
     assert graph.number_of_edges() == len(Res1D(path).reaches) + len(breakpoints)
 

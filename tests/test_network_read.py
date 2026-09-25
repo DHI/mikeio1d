@@ -143,7 +143,7 @@ class TestResolvingAnAddress:
     def test_the_node_is_the_graph_integer_labelled_with_the_address(self, network):
         resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)
 
-        assert network.graph.nodes[resolved.node]["alias"] == resolved.address
+        assert network.graph.nodes[resolved.node]["address"] == resolved.address
 
     def test_the_node_selects_the_location_in_the_dataset(self, network):
         """The integer is what to_dataset() is indexed by, and names the same place."""

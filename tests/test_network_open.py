@@ -44,12 +44,12 @@ def _raise(error):
 def _lengths(network):
     """Each reach's length as the graph carries it, summed along its own chain.
 
-    A break point's alias names its reach, and every edge of a reach has one at
+    A break point's address names its reach, and every edge of a reach has one at
     an end, so the graph alone says how long each reach came out. None where any
     edge's length is unknown, which is how a reach without a length reads.
     """
     graph = network.graph
-    aliases = {node: graph.nodes[node]["alias"] for node in graph.nodes}
+    aliases = {node: graph.nodes[node]["address"] for node in graph.nodes}
 
     lengths = {}
     for u, v, length in graph.edges(data="length"):
@@ -364,7 +364,7 @@ def test_a_pipe_the_inp_gives_no_length_for_has_one_break_point(tmp_path):
     )
 
     network = Network.open(res)
-    aliases = [network.graph.nodes[node]["alias"] for node in network.graph.nodes]
+    aliases = [network.graph.nodes[node]["address"] for node in network.graph.nodes]
 
     assert _lengths(network)[_PIPE] is None
     assert [alias for alias in aliases if isinstance(alias, tuple) and alias[0] == _PIPE] == [

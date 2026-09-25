@@ -99,9 +99,10 @@ class Location:
         in the network but carries nothing of its own.
     node : int
         The location's graph node: the integer :attr:`Network.graph` and
-        :meth:`Network.to_dataset` label it with. Not a model node's id - a
-        model node is named by its ``address``, and a break point has a graph
-        node too. ``graph.nodes[node]["alias"]`` is the address.
+        :meth:`Network.to_dataset` label it with, which
+        ``graph.nodes[node]["address"]`` turns back into the address. Not a
+        model node's id - a model node is named by its ``address``, and a break
+        point has a graph node too.
     """
 
     address: Address
