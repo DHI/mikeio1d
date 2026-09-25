@@ -14,6 +14,7 @@ end - see :func:`_build_reach_breakpoints` for what becomes of it.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ..res1d import Res1D
@@ -96,7 +97,8 @@ def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
     series = {}
     for quantity_id in location.quantities:
         quantity = _quantity_at(location, quantity_id)
-        series[quantity_id] = _Series(quantity.res1d, quantity.timeseries_id)
+        path = Path(str(quantity.res1d.file_path))
+        series[quantity_id] = _Series(path, quantity.timeseries_id)
     return series
 
 

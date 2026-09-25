@@ -10,30 +10,49 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-import pandas as pd
-
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from collections.abc import Sequence
     from datetime import datetime
+    from pathlib import Path
 
-    from ..res1d import Res1D
-    from ..quantities import TimeSeriesId
     from ._naming import Alias
+
+import pandas as pd
+
+from ..res1d import Res1D
+from ..quantities import TimeSeriesId
+from ..quantities import TimeSeriesIdGroup
+from ._policy import _NO_NAME_FILTER_EXTENSIONS
+from ._policy import _suffix_of
 
 
 @dataclass(frozen=True)
 class _Series:
-    """One timeseries, and the file it has to be read from.
+    """One timeseries: the file it is in, and its id within that file."""
 
-    Addressed by :class:`~mikeio1d.quantities.TimeSeriesId` rather than by a
-    ``ResultQuantity``: loading a file's dynamic data replaces the
-    ``ResultNetwork`` a quantity hangs off (see ``ResultReader._load_file``),
-    which would leave a captured quantity stale.
-    """
-
-    res: Res1D
+    path: Path
     tsid: TimeSeriesId
+
+
+def _open_for(path: Path, tsids: Sequence[TimeSeriesId]) -> Res1D:
+    """Open a result file so that a read loads only these series' elements.
+
+    ``Res1D`` loads the dynamic data of every element its filter lets through,
+    and a filter naming only nodes lets no reach through. A reach loads all of
+    its gridpoints, which is as fine as the filter goes.
+    """
+    nodes, reaches = [], []
+    if _suffix_of(path) not in _NO_NAME_FILTER_EXTENSIONS:
+        nodes = sorted({t.name for t in tsids if t.group == TimeSeriesIdGroup.NODE})
+        reaches = sorted({t.name for t in tsids if t.group == TimeSeriesIdGroup.REACH})
+    return Res1D(
+        str(path),
+        nodes=nodes,
+        reaches=reaches,
+        quantities=sorted({t.quantity for t in tsids}),
+        derived_quantities=[],
+    )
 
 
 @dataclass(frozen=True)
@@ -68,7 +87,7 @@ class _Results:
         return tuple(self.series.get(alias, ()))
 
     def read(self, items: Sequence[tuple[Alias, str]]) -> pd.DataFrame:
-        """Read the given pairs, one batched call per file they live in.
+        """Read the given pairs, loading only them, one batched call per file.
 
         Each pair must be one :meth:`quantities_at` confirms. The frame has one
         column per pair, in order and keeping duplicates; each distinct series
@@ -81,30 +100,30 @@ class _Results:
         series = [self.series[alias][quantity] for alias, quantity in items]
 
         # Grouped by file and de-duplicated within it.
-        by_file: dict[int, tuple[Res1D, list[TimeSeriesId]]] = {}
+        by_file: dict[Path, list[TimeSeriesId]] = {}
         for item in series:
-            _, tsids = by_file.setdefault(id(item.res), (item.res, []))
+            tsids = by_file.setdefault(item.path, [])
             if item.tsid not in tsids:
                 tsids.append(item.tsid)
 
-        columns: dict[tuple[int, TimeSeriesId], pd.Series] = {}
+        columns: dict[tuple[Path, TimeSeriesId], pd.Series] = {}
         index = None
-        for res, tsids in by_file.values():
-            frame = res.read(tsids, column_mode="timeseries")
+        for path, tsids in by_file.items():
+            frame = _open_for(path, tsids).read(tsids, column_mode="timeseries")
             # Concatenating would align two different axes on their timestamps
             # and fill the gaps with NaN, rather than say the files disagree.
             if index is not None and not frame.index.equals(index):
                 raise ValueError(
-                    f"'{res.file_path}' does not share a time axis with the result "
+                    f"'{path}' does not share a time axis with the result "
                     f"file it was read alongside: {len(frame.index)} steps against "
                     f"{len(index)}, so the two are not from the same run."
                 )
             index = frame.index
             for tsid, (_, column) in zip(tsids, frame.items()):
-                columns[(id(res), tsid)] = column
+                columns[(path, tsid)] = column
 
         return pd.concat(
-            [columns[(id(item.res), item.tsid)] for item in series],
+            [columns[(item.path, item.tsid)] for item in series],
             axis=1,
             keys=range(len(series)),
         )

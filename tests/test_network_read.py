@@ -71,13 +71,14 @@ class TestTheOpenReadsNothing:
         assert res.reader._loaded is False
         assert resx.reader._loaded is False
 
-    def test_reading_one_series_is_what_loads_the_file(self):
+    def test_a_read_leaves_the_opened_file_unread_too(self):
+        """A read opens the file again for just what it asks for."""
         res = Res1D(_RES1D)
         network = Network.open(res)
 
         network.read([("101", "WaterLevel")])
 
-        assert res.reader._loaded is True
+        assert res.reader._loaded is False
 
 
 class TestThePeriod:
@@ -241,6 +242,36 @@ class TestReadingSeries:
         read = network.read([("101", "WaterLevel")])
 
         assert np.allclose(read.iloc[:, 0].to_numpy(), expected.to_numpy())
+
+    def test_a_mix_of_nodes_and_break_points_matches_the_result_file(self, network):
+        """Nodes and gridpoints on several reaches, read in one call."""
+        items = [
+            ("101", "WaterLevel"),
+            (_Q_POINT, "Discharge"),
+            (("100l1", 0.0), "WaterLevel"),
+            (network.locations(quantity="Discharge")[-1], "Discharge"),
+        ]
+        res = Res1D(_RES1D)
+        expected = res.read(
+            [
+                res.nodes["101"].WaterLevel.timeseries_id,
+                res.reaches["100l1"][1].Discharge.timeseries_id,
+                res.reaches["100l1"][0].WaterLevel.timeseries_id,
+            ],
+            column_mode="timeseries",
+        )
+
+        read = network.read(items)
+
+        assert np.allclose(read.iloc[:, :3].to_numpy(), expected.to_numpy())
+        assert not read.iloc[:, 3].isna().any()
+
+    def test_a_network_opened_from_a_res1d_reads_what_one_from_the_path_does(self, network):
+        items = [("101", "WaterLevel"), (_Q_POINT, "Discharge")]
+
+        read = Network.open(Res1D(_RES1D)).read(items)
+
+        pd.testing.assert_frame_equal(read, network.read(items))
 
     def test_the_columns_are_the_items_that_were_asked_for(self, network):
         items = [("101", "WaterLevel"), (_Q_POINT, "Discharge")]

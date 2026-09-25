@@ -34,6 +34,13 @@ _COMPANION_RESULT_FILE = (
     "Network.open(res, companions=[resx])."
 )
 
+_NO_NAME_FILTER_EXTENSIONS = frozenset({".resx"})
+"""Result files whose series cannot be picked out by node or reach name.
+
+A '.resx' opened with a node filter reads that node's series as zeros, without
+an error. Its series can still be picked out by quantity.
+"""
+
 # extension -> why no network can be built from it, though Res1D reads it
 _UNSUPPORTED_EXTENSIONS: dict[str, str] = {
     ".out": _TOPOLOGY_IN_COMPANION_FILE,
