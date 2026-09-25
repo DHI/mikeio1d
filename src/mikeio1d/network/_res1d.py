@@ -14,6 +14,7 @@ end - see :func:`_build_reach_breakpoints` for what becomes of it.
 from __future__ import annotations
 
 import math
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -139,9 +140,8 @@ def _build_reach_breakpoints(
     *,
     length: float | None,
     series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
-    series: dict[Address, dict[str, _Series]],
-) -> list[ReachBreakPoint]:
-    """Build a reach's break points from its mikeio1d gridpoints.
+) -> tuple[list[ReachBreakPoint], dict[Address, dict[str, _Series]]]:
+    """Build a reach's break points from its mikeio1d gridpoints, and what each carries.
 
     A reach with gridpoints of its own gets one break point per gridpoint, at
     its chainage.
@@ -151,8 +151,8 @@ def _build_reach_breakpoints(
     carrying its series - or only the one at 0.0 where the length is unknown.
     See https://github.com/DHI/modelskill/issues/680.
 
-    ``series`` is filled with what each break point carries, since only here is
-    it known which gridpoint a break point was made from.
+    The series come back with the break points, since only here is it known
+    which gridpoint a break point was made from.
     """
     gridpoints = _ordered_gridpoints(reach)
     if _has_real_gridpoints(reach):
@@ -162,12 +162,14 @@ def _build_reach_breakpoints(
         distances_per_gridpoint = [ends for _ in gridpoints]
 
     breakpoints: list[ReachBreakPoint] = []
+    series: dict[Address, dict[str, _Series]] = {}
     for i, (gp, distances) in enumerate(zip(gridpoints, distances_per_gridpoint)):
         carried = series_by_key[(reach.name, i)]
         for distance in distances:
-            series[(gp.reach_name, distance)] = carried
-        breakpoints.extend(ReachBreakPoint(gp.reach_name, d) for d in distances)
-    return breakpoints
+            point = ReachBreakPoint(gp.reach_name, distance)
+            breakpoints.append(point)
+            series[point.id] = carried
+    return breakpoints, series
 
 
 def _load_res1d_network(
@@ -182,6 +184,9 @@ def _load_res1d_network(
     Both come from one walk over ``res.reaches``, since the series map depends
     on which gridpoint each break point was made from. No timeseries is read.
 
+    A node is part of the network through the reaches that end at it, so a node
+    no reach ends at is left out, with a warning.
+
     Parameters
     ----------
     res : Res1D
@@ -195,13 +200,9 @@ def _load_res1d_network(
     """
     lengths = lengths or {}
 
+    reaches: list[NetworkReach] = []
     series: dict[Address, dict[str, _Series]] = {}
-
-    def _init_node(id: str) -> str:
-        series[id] = series_by_key[id]
-        return id
-
-    def _build_reach(reach: ResultReach) -> NetworkReach:
+    for reach in res.reaches.values():
         # Some formats (.resx) report no end nodes.
         if reach.start_node is None or reach.end_node is None:
             raise ValueError(
@@ -209,17 +210,34 @@ def _load_res1d_network(
                 "this result format's topology cannot be represented as a Network."
             )
         length = _resolve_reach_length(lengths.get(reach.name), reach)
-        breakpoints = _build_reach_breakpoints(
-            reach, length=length, series_by_key=series_by_key, series=series
+        breakpoints, carried = _build_reach_breakpoints(
+            reach, length=length, series_by_key=series_by_key
         )
-        return NetworkReach(
-            id=reach.name,
-            start=_init_node(reach.start_node),
-            end=_init_node(reach.end_node),
-            length=length,
-            start_distance=_reach_start_distance(reach),
-            breakpoints=tuple(breakpoints),
+        reaches.append(
+            NetworkReach(
+                id=reach.name,
+                start=reach.start_node,
+                end=reach.end_node,
+                length=length,
+                start_distance=_reach_start_distance(reach),
+                breakpoints=tuple(breakpoints),
+            )
+        )
+        series.update(carried)
+
+    for built in reaches:
+        for node in (built.start, built.end):
+            series[node] = series_by_key[node]
+
+    left_out = [node for node in res.nodes if node not in series]
+    if left_out:
+        listed = ", ".join(repr(node) for node in left_out[:10])
+        if len(left_out) > 10:
+            listed += f", ... and {len(left_out) - 10} more"
+        warnings.warn(
+            f"{len(left_out)} node(s) of '{Path(str(res.file_path)).name}' are the end of "
+            f"no reach, so the network leaves them out: {listed}.",
+            stacklevel=4,
         )
 
-    built = [_build_reach(reach) for reach in res.reaches.values()]
-    return built, _Results(series=series, units=units, period=(res.start_time, res.end_time))
+    return reaches, _Results(series=series, units=units, period=(res.start_time, res.end_time))
