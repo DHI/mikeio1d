@@ -63,10 +63,10 @@ network.resolve("manhole_12")                      # Location(address=..., quant
 network.locations(reach="100l1", quantity="Discharge")
 ```
 
-`resolve()` returns `None` for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a `tol` to snap a measured chainage onto the model's:
+`resolve()` returns `None` for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a `distance_tol` to snap a measured chainage onto the model's:
 
 ```python
-network.resolve(("100l1", 23.8), tol=0.1)
+network.resolve(("100l1", 23.8), distance_tol=0.1)
 # Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
 ```
 

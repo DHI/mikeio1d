@@ -140,7 +140,7 @@ class TestResolvingAnAddress:
         assert (resolved.address, resolved.quantities) == ("101", ("WaterLevel",))
 
     def test_the_node_is_the_graph_integer_labelled_with_the_address(self, network):
-        resolved = network.resolve(("100l1", 23.8), tol=0.1)
+        resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)
 
         assert network.graph.nodes[resolved.node]["alias"] == resolved.address
 
@@ -153,7 +153,7 @@ class TestResolvingAnAddress:
         assert str(column["name"].item()) == "101"
 
     def test_a_break_point_snaps_to_the_distance_the_file_stores(self, network):
-        resolved = network.resolve(("100l1", 23.8), tol=0.1)
+        resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)
 
         assert resolved.address == _Q_POINT
 
@@ -166,14 +166,14 @@ class TestResolvingAnAddress:
 
     def test_the_nearest_break_point_in_a_wide_window_wins(self, network):
         """A caller widening the window is snapping a measurement, not sweeping."""
-        resolved = network.resolve(("100l1", 20.0), tol=30.0)
+        resolved = network.resolve(("100l1", 20.0), distance_tol=30.0)
 
         assert resolved.address == _Q_POINT
 
-    @pytest.mark.parametrize("tol", [-1.0, float("nan"), float("inf")])
-    def test_a_tolerance_that_is_not_a_distance_is_refused(self, network, tol):
+    @pytest.mark.parametrize("distance_tol", [-1.0, float("nan"), float("inf")])
+    def test_a_tolerance_that_is_not_a_distance_is_refused(self, network, distance_tol):
         with pytest.raises(ValueError, match="finite, non-negative"):
-            network.resolve(("100l1", 23.8), tol=tol)
+            network.resolve(("100l1", 23.8), distance_tol=distance_tol)
 
     def test_a_location_carrying_nothing_still_resolves(self):
         """MIKE 11 keeps its timeseries on gridpoints, so its nodes hold none.
@@ -249,6 +249,24 @@ class TestReadingSeries:
 
         assert list(read.columns) == items
         assert read[items[1]].shape == (110,)
+
+    def test_a_measured_chainage_snaps_within_the_tolerance(self, network):
+        """The column keeps the address asked for, so df[item] still finds it."""
+        item = (("100l1", 23.8), "Discharge")
+        expected = network.read([(_Q_POINT, "Discharge")]).iloc[:, 0]
+
+        read = network.read([item], distance_tol=0.1)
+
+        assert list(read.columns) == [item]
+        assert np.allclose(read[item].to_numpy(), expected.to_numpy())
+
+    def test_a_measured_chainage_outside_the_default_tolerance_is_refused(self, network):
+        with pytest.raises(KeyError, match="distance_tol"):
+            network.read([(("100l1", 23.8), "Discharge")])
+
+    def test_a_tolerance_that_is_not_a_distance_is_refused(self, network):
+        with pytest.raises(ValueError, match="finite, non-negative"):
+            network.read([(("100l1", 23.8), "Discharge")], distance_tol=-1.0)
 
     def test_a_whole_reach_is_one_call(self, network):
         """A reach observation needs every break point, compared over the series."""

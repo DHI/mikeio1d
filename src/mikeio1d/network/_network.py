@@ -300,7 +300,10 @@ class Network:
         return MappingProxyType({q: units.get(q) for q in ordered})
 
     def _blame_unreadable(
-        self, items: Sequence[tuple[Address, str]], results: _Results
+        self,
+        items: Sequence[tuple[Address, str]],
+        results: _Results,
+        distance_tol: float | None,
     ) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
 
@@ -309,7 +312,7 @@ class Network:
         """
         faults = []
         for address, quantity in items:
-            alias = self._naming.canonical(address)
+            alias = self._naming.canonical(address, distance_tol=distance_tol)
             if alias is None:
                 faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
                 continue
@@ -335,6 +338,8 @@ class Network:
     def read(
         self,
         items: Sequence[tuple[Address, str]],
+        *,
+        distance_tol: float | None = None,
     ) -> pd.DataFrame:
         """Read the series named by ``(address, quantity)`` pairs.
 
@@ -347,13 +352,19 @@ class Network:
             along it, as :meth:`locations` gives and :meth:`resolve` confirms.
             An empty sequence reads nothing at all, and returns an empty frame
             rather than the whole file.
+        distance_tol : float, optional
+            How far a distance may be from a break point's own and still mean
+            it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
+            snap a measured chainage onto the model's; the nearest break point
+            inside the window wins. Ignored for a node ID.
 
         Returns
         -------
         pd.DataFrame
             Time-indexed, one column per element of ``items``, in that order and
-            keeping duplicates. The columns are the items themselves, so
-            ``df[items[i]]`` selects the series asked for.
+            keeping duplicates. The columns are the items themselves, as asked
+            for rather than as snapped, so ``df[items[i]]`` selects the series
+            asked for.
 
         Raises
         ------
@@ -361,12 +372,17 @@ class Network:
             If any item names a location the network does not have, or a
             quantity that location does not carry. Every failing item is named.
         ValueError
-            If the items span the result file and its ``.resx`` companion, and
-            the two turn out to have different time axes.
+            If ``distance_tol`` is negative or not finite, or if the items span
+            the result file and its ``.resx`` companion and the two turn out to
+            have different time axes.
 
         Examples
         --------
         >>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
+
+        A measured chainage, snapped onto the model's nearest break point:
+
+        >>> network.read([(("100l1", 23.8), "Discharge")], distance_tol=0.1)  # doctest: +SKIP
 
         A reach observation, whose break points have to agree before one of them
         can stand for the reach:
@@ -378,9 +394,9 @@ class Network:
         # Every item is checked before anything is read.
         resolved: list[tuple[Alias, str]] = []
         for address, quantity in items:
-            alias = self._naming.canonical(address)
+            alias = self._naming.canonical(address, distance_tol=distance_tol)
             if alias is None or quantity not in results.quantities_at(alias):
-                raise self._blame_unreadable(items, results)
+                raise self._blame_unreadable(items, results, distance_tol)
             resolved.append((alias, quantity))
 
         df = results.read(resolved)
@@ -433,7 +449,7 @@ class Network:
             found.append(alias)
         return found
 
-    def resolve(self, address: Address, *, tol: float | None = None) -> Location | None:
+    def resolve(self, address: Address, *, distance_tol: float | None = None) -> Location | None:
         """Say whether a location is in this network, what it carries, and where.
 
         An address that is not here gives ``None`` rather than an exception.
@@ -444,7 +460,7 @@ class Network:
             A node ID, or a reach ID and a distance along it. A reach's own end
             nodes are named by their IDs, which ``reaches[reach_id].start``
             and ``.end`` give.
-        tol : float, optional
+        distance_tol : float, optional
             How far a distance may be from a break point's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
             snap a measured chainage onto the model's; the nearest break point
@@ -460,20 +476,20 @@ class Network:
         Raises
         ------
         ValueError
-            If ``tol`` is negative or not finite.
+            If ``distance_tol`` is negative or not finite.
 
         Examples
         --------
         >>> network.resolve("101")  # doctest: +SKIP
         Location(address='101', quantities=('WaterLevel',), node=5)
 
-        >>> network.resolve(("100l1", 23.8), tol=0.1)  # doctest: +SKIP
+        >>> network.resolve(("100l1", 23.8), distance_tol=0.1)  # doctest: +SKIP
         Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
 
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        alias = self._naming.canonical(address, tol=tol)
+        alias = self._naming.canonical(address, distance_tol=distance_tol)
         if alias is None:
             return None
         return Location(

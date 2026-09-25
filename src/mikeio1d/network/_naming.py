@@ -84,12 +84,13 @@ class _Naming:
         """Every alias in the network, mapped to its graph integer."""
         return self._by_alias
 
-    def canonical(self, address: Alias, *, tol: float | None = None) -> Alias | None:
+    def canonical(self, address: Alias, *, distance_tol: float | None = None) -> Alias | None:
         """Give the network's own spelling of an address, or None if there is no such place.
 
         An exact hit answers immediately. Failing that, a break point is matched
-        on distance within ``tol``, defaulting to :data:`_CHAINAGE_TOLERANCE`, so
-        a caller need not reproduce a stored float exactly.
+        on distance within ``distance_tol``, defaulting to
+        :data:`_CHAINAGE_TOLERANCE`, so a caller need not reproduce a stored
+        float exactly.
 
         The nearest break point inside the window wins. At the default tolerance
         that is the only one there, but a caller widening the window is snapping
@@ -97,11 +98,11 @@ class _Naming:
         """
         if address in self._by_alias:
             return address
-        if tol is None:
-            tol = _CHAINAGE_TOLERANCE
-        elif not math.isfinite(tol) or tol < 0:
+        if distance_tol is None:
+            distance_tol = _CHAINAGE_TOLERANCE
+        elif not math.isfinite(distance_tol) or distance_tol < 0:
             raise ValueError(
-                f"A distance tolerance must be a finite, non-negative number, got {tol!r}."
+                f"distance_tol must be a finite, non-negative number, got {distance_tol!r}."
             )
         if not _is_break_point(address) or address[1] is None:
             return None
@@ -111,7 +112,7 @@ class _Naming:
         # of two equally near, the lower wins.
         i = bisect.bisect_left(known, distance)
         nearest = min(known[max(i - 1, 0) : i + 1], key=lambda d: abs(d - distance), default=None)
-        if nearest is None or abs(nearest - distance) > tol:
+        if nearest is None or abs(nearest - distance) > distance_tol:
             return None
         return (reach_id, nearest)
 
@@ -164,7 +165,10 @@ class _Naming:
                 return f"no break point of reach {reach_id!r} sits at a known distance"
             nearest = sorted(sorted(known, key=lambda d: abs(d - distance))[:limit])
             listed = ", ".join(format(d, "g") for d in nearest)
-            return f"nearest distances on reach {reach_id!r}: {listed}"
+            return (
+                f"nearest distances on reach {reach_id!r}: {listed} "
+                "(distance_tol= widens the match)"
+            )
 
         names = [key for key in self._by_alias if not _is_break_point(key)]
         close = get_close_matches(alias, names, n=limit)
