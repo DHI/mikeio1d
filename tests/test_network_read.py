@@ -268,13 +268,6 @@ class TestReadingSeries:
         assert read.empty
         assert res.reader._loaded is False
 
-    def test_a_window_trims_the_frame(self, network):
-        items = [("101", "WaterLevel")]
-
-        windowed = network.read(items, start="1994-08-07 17:00", end="1994-08-07 17:30")
-
-        assert len(windowed) == 31
-
     def test_a_companion_quantity_reads_alongside_a_main_one(self, epanet):
         """The two live in different files, so this spans both in one call."""
         read = epanet.read([("9", "Volume"), ("9", "Head")])

@@ -335,9 +335,6 @@ class Network:
     def read(
         self,
         items: Sequence[tuple[Address, str]],
-        *,
-        start: str | datetime | None = None,
-        end: str | datetime | None = None,
     ) -> pd.DataFrame:
         """Read the series named by ``(address, quantity)`` pairs.
 
@@ -350,10 +347,6 @@ class Network:
             along it, as :meth:`locations` gives and :meth:`resolve` confirms.
             An empty sequence reads nothing at all, and returns an empty frame
             rather than the whole file.
-        start, end : str or datetime, optional
-            Trim the returned frame to this window. This selects on the result
-            that came back; it does not read less. MIKE 1D loads a file's whole
-            dynamic data on the first read of anything in it.
 
         Returns
         -------
@@ -394,7 +387,7 @@ class Network:
         # A flat index: an address can itself be a tuple, which a MultiIndex
         # would split.
         df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
-        return df if start is None and end is None else df.loc[start:end]
+        return df
 
     def locations(self, *, reach: str | None = None, quantity: str | None = None) -> list[Address]:
         """List the locations this network can be read at.
