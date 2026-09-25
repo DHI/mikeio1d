@@ -1,240 +1,82 @@
-"""Abstract network elements, and the simplest concrete pair.
+"""The elements a network's topology is made of.
 
-A reader supplies nodes, reaches and breakpoints; :class:`~mikeio1d.network.Network`
-takes them and knows nothing about the file they came from. The abstract classes
-here are that contract, and :class:`BasicNode`/:class:`BasicReach` are enough to
-build a network by hand or in a test.
+Plain records: the loader fills them in from a result file, and
+:class:`~mikeio1d.network.Network` builds its graph from them knowing nothing
+about the file they came from. What a location carries is not recorded here -
+that is the loader's series map to answer.
 """
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-import pandas as pd
+if TYPE_CHECKING:  # pragma: no cover
+    from ._naming import Address
+
+from dataclasses import dataclass
 
 
-class NetworkNode(ABC):
-    """Abstract base class for a node in a network.
+@dataclass(frozen=True)
+class ReachBreakPoint:
+    """A location along a reach, between its two end nodes.
 
-    A node represents a discrete location in the network (e.g. a junction
-    or reservoir) that carries time-series data for one or more physical
-    quantities.
-
-    Two properties must be implemented:
-
-    * :attr:`id` - a unique string identifier for the node.
-    * :attr:`data` - a time-indexed :class:`pandas.DataFrame` whose columns
-      are quantity names.
-
-    The concrete helper :class:`BasicNode` is provided for the common case
-    where the data is already available as a DataFrame.
-
-    See Also
-    --------
-    BasicNode : Ready-to-use concrete implementation.
-    NetworkReach : Connects two NetworkNode instances.
-    Network : Container that assembles nodes and reaches into a graph.
+    Attributes
+    ----------
+    reach_id : str
+        The reach the break point sits on.
+    distance : float
+        Position along the reach, in the reach's own frame. It need not be
+        measured from the start node: a MIKE river reach reports its chainage, a
+        coordinate along the whole branch, so the distance from the start node
+        is ``distance - reach.start_distance``.
     """
 
-    @property
-    @abstractmethod
-    def id(self) -> str:
-        """Unique string identifier for this node."""
+    reach_id: str
+    distance: float
 
     @property
-    @abstractmethod
-    def data(self) -> pd.DataFrame:
-        """Time-indexed DataFrame with one column per quantity."""
-
-    @property
-    def quantities(self) -> list[str]:
-        """List of quantity names available at this node."""
-        return list(self.data.columns)
+    def id(self) -> tuple[str, float]:
+        """``(reach_id, distance)``, which uniquely locates the break point."""
+        return (self.reach_id, self.distance)
 
 
-class ReachBreakPoint(ABC):
-    """Abstract base class for an intermediate break point along a network reach.
+@dataclass(frozen=True)
+class NetworkReach:
+    """A directed connection between two nodes, and the break points along it.
 
-    Break points represent locations between the start and end nodes of a
-    reach (e.g. cross-section chainage points along a river reach) that carry
-    their own time-series data.
-
-    Two properties must be implemented:
-
-    * :attr:`id` - a ``(reach_id, distance)`` tuple that uniquely locates the
-      break point within the network. ``distance`` may be ``None`` when the
-      break point's position along the reach is genuinely unknown (e.g. a
-      link-node reach with no known length).
-    * :attr:`data` - a time-indexed :class:`pandas.DataFrame` whose columns
-      are quantity names.
-
-    The :attr:`distance` convenience property returns ``id[1]`` (the position
-    along the reach in the units used by the parent network, or ``None`` if
-    unknown). It need not be measured from the start node: a MIKE river reach
-    reports its chainage, which is a coordinate along the whole branch, so the
-    distance from the start node is ``distance - reach.start_distance``. A
-    break point with an unknown distance cannot be looked up via
-    ``find(reach=..., distance=<number>)``, but still has a graph node of its
-    own, so it carries data and ``recall()`` names it.
-
-    Examples
-    --------
-    Minimal subclass:
-
-    >>> class MyBreakPoint(ReachBreakPoint):
-    ...     def __init__(self, reach_id, chainage, df):
-    ...         self._id = (reach_id, chainage)
-    ...         self._data = df
-    ...     @property
-    ...     def id(self): return self._id
-    ...     @property
-    ...     def data(self): return self._data
-
-    See Also
-    --------
-    NetworkReach : Owns a list of ReachBreakPoint instances.
-    NetworkNode : Represents a start/end node of a reach.
-    Network : Assembles reaches (and their break points) into a graph.
+    Attributes
+    ----------
+    id : str
+        The id the model gave the reach, unique within the network.
+    start, end : str
+        The ids of the start (upstream) and end (downstream) nodes.
+    length : float or None
+        Total length in network units, or ``None`` where it is undefined. Reach
+        length matters in some domains (rivers, sewer networks) and not in
+        others (link-node water distribution models).
+    start_distance : float
+        Position of the start node, in the frame :attr:`breakpoints` are placed
+        in. Zero where they are measured from the reach's own start; a MIKE river
+        reach places them at their chainage, so it can begin thousands of metres
+        in - or below zero.
+    breakpoints : tuple of ReachBreakPoint
+        Ascending by distance; consecutive differences are edge lengths. A reach
+        with break points gets its own chain of graph nodes. A reach with none
+        is a single start-to-end edge, and :class:`Network` refuses two of those
+        between the same pair of nodes.
     """
 
-    @property
-    @abstractmethod
-    def id(self) -> tuple[str, float | None]:
-        """``(reach_id, distance)`` tuple uniquely identifying this break point."""
-
-    @property
-    @abstractmethod
-    def data(self) -> pd.DataFrame:
-        """Time-indexed DataFrame with one column per quantity."""
-
-    @property
-    def distance(self) -> float | None:
-        """Position along the reach, in the reach's own frame, or None if unknown."""
-        return self.id[1]
-
-    @property
-    def quantities(self) -> list[str]:
-        """List of quantity names available at this break point."""
-        return list(self.data.columns)
-
-
-class NetworkReach(ABC):
-    """Abstract base class for a reach in a network.
-
-    A reach represents a directed connection between two :class:`NetworkNode`
-    instances (e.g. a river reach between two junctions).  It may also carry
-    a list of :class:`ReachBreakPoint` objects for intermediate chainage
-    locations.
-
-    Subclass this to integrate your own network topology.  Four properties
-    must be implemented:
-
-    * :attr:`id` - a unique string identifier for the reach.
-    * :attr:`start` - the upstream/start :class:`NetworkNode`.
-    * :attr:`end` - the downstream/end :class:`NetworkNode`.
-    * :attr:`breakpoints` - list of :class:`ReachBreakPoint` instances ordered
-      by increasing distance from the start node (empty list if none).
-
-    :attr:`length` is optional and defaults to ``None``. Reach length matters
-    in some domains (rivers, sewer networks) and not in others (link-node water
-    distribution models), so override it only where a length exists.
-
-    :attr:`start_distance` and :attr:`end_distance` say where the reach's own
-    ends sit in the frame its break points are placed in. They default to
-    ``0.0`` and the length, which is right wherever break points are measured
-    from the start node; override them where the frame is offset.
-
-    The concrete helper :class:`BasicReach` is provided for the common case
-    where all data is already available in memory.
-
-    Examples
-    --------
-    Minimal subclass, without a length:
-
-    >>> class MyReach(NetworkReach):
-    ...     def __init__(self, rid, start_node, end_node):
-    ...         self._id = rid
-    ...         self._start = start_node
-    ...         self._end = end_node
-    ...     @property
-    ...     def id(self): return self._id
-    ...     @property
-    ...     def start(self): return self._start
-    ...     @property
-    ...     def end(self): return self._end
-    ...     @property
-    ...     def breakpoints(self): return []
-
-    Add a :attr:`length` property on top of that when the domain has one:
-
-    >>> class MyMeasuredReach(MyReach):
-    ...     def __init__(self, rid, start_node, end_node, length):
-    ...         super().__init__(rid, start_node, end_node)
-    ...         self._length = length
-    ...     @property
-    ...     def length(self): return self._length
-
-    See Also
-    --------
-    BasicReach : Ready-to-use concrete implementation.
-    NetworkNode : Represents the start/end of this reach.
-    ReachBreakPoint : Intermediate data points along this reach.
-    Network : Assembles a list of NetworkReach objects into a graph.
-    """
-
-    @property
-    @abstractmethod
-    def id(self) -> str:
-        """Unique string identifier for this reach."""
-
-    @property
-    @abstractmethod
-    def start(self) -> NetworkNode:
-        """Start (upstream) node of this reach."""
-
-    @property
-    @abstractmethod
-    def end(self) -> NetworkNode:
-        """End (downstream) node of this reach."""
-
-    @property
-    def length(self) -> float | None:
-        """Total length of this reach in network units, or ``None`` if undefined."""
-        return None
-
-    @property
-    def start_distance(self) -> float:
-        """Position of the start node, in the frame :attr:`breakpoints` are placed in.
-
-        Zero for a reach whose break points are measured from its own start.
-        Override it where they are not: a MIKE river reach places them at their
-        chainage, a coordinate along the whole branch, so a reach can begin
-        thousands of metres in - or below zero.
-        """
-        return 0.0
+    id: str
+    start: str
+    end: str
+    length: float | None = None
+    start_distance: float = 0.0
+    breakpoints: tuple[ReachBreakPoint, ...] = ()
 
     @property
     def end_distance(self) -> float | None:
         """Position of the end node, or ``None`` where the length is undefined."""
-        length = self.length
-        return None if length is None else self.start_distance + length
-
-    @property
-    @abstractmethod
-    def breakpoints(self) -> list[ReachBreakPoint]:
-        """Ordered list of intermediate :class:`ReachBreakPoint` objects (may be empty).
-
-        Ordered means ascending by distance from the start node, and
-        :class:`Network` relies on it: the first and last are the reach's
-        outermost, and consecutive differences are edge lengths, which a
-        backwards pair would report as negative.
-
-        A break point is keyed by its reach's id, so a reach that has any gets
-        its own chain of graph nodes and stays distinct from a parallel reach
-        between the same two nodes. A reach with none is a single start-to-end
-        edge instead, and two such reaches between one pair of nodes cannot be
-        told apart - :class:`Network` refuses them rather than dropping one.
-        """
+        return None if self.length is None else self.start_distance + self.length
 
     @property
     def n_breakpoints(self) -> int:
@@ -242,99 +84,27 @@ class NetworkReach(ABC):
         return len(self.breakpoints)
 
 
-class BasicNode(NetworkNode):
-    """Concrete :class:`NetworkNode` for programmatic network construction.
+@dataclass(frozen=True)
+class Location:
+    """A location a network has, as :meth:`Network.resolve` answers for it.
 
-    Parameters
+    Attributes
     ----------
-    id : str
-        Unique node identifier.
-    data : pd.DataFrame
-        Time-indexed DataFrame with one column per quantity.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> time = pd.date_range("2020", periods=3, freq="h")
-    >>> node = BasicNode("junction_1", pd.DataFrame({"WaterLevel": [1.0, 1.1, 1.2]}, index=time))
+    address : str or tuple[str, float]
+        The network's own spelling of the location, which the rest of the
+        network takes. A distance is the one the file stores, not the one asked
+        for.
+    quantities : tuple of str
+        The quantity IDs readable there. Empty is an answer: the location is
+        in the network but carries nothing of its own.
+    node : int
+        The location's graph node: the integer :attr:`Network.graph` and
+        :meth:`Network.to_dataset` label it with, which
+        ``graph.nodes[node]["address"]`` turns back into the address. Not a
+        model node's id - a model node is named by its ``address``, and a break
+        point has a graph node too.
     """
 
-    def __init__(
-        self,
-        id: str,
-        data: pd.DataFrame,
-    ) -> None:
-        self._id = id
-        self._data = data
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
-
-
-class BasicReach(NetworkReach):
-    """Concrete :class:`NetworkReach` for programmatic network construction.
-
-    Parameters
-    ----------
-    id : str
-        Unique reach identifier.
-    start : NetworkNode
-        Start node.
-    end : NetworkNode
-        End node.
-    length : float, optional
-        Reach length, by default None (undefined).
-    breakpoints : list[ReachBreakPoint], optional
-        Intermediate break points, by default empty.
-
-    Examples
-    --------
-    >>> reach = BasicReach("reach_1", node_a, node_b, length=250.0)
-
-    Where the domain has no reach length, leave it out:
-
-    >>> reach = BasicReach("pipe_1", node_a, node_b)
-
-    Two of these between the same two nodes - twin pipes, parallel pumps - need
-    a break point each, or the graph cannot tell them apart. See
-    :attr:`NetworkReach.breakpoints`.
-    """
-
-    def __init__(
-        self,
-        id: str,
-        start: NetworkNode,
-        end: NetworkNode,
-        length: float | None = None,
-        breakpoints: list[ReachBreakPoint] | None = None,
-    ) -> None:
-        self._id = id
-        self._start = start
-        self._end = end
-        self._length = length
-        self._breakpoints: list[ReachBreakPoint] = breakpoints or []
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def start(self) -> NetworkNode:
-        return self._start
-
-    @property
-    def end(self) -> NetworkNode:
-        return self._end
-
-    @property
-    def length(self) -> float | None:
-        return self._length
-
-    @property
-    def breakpoints(self) -> list[ReachBreakPoint]:
-        return self._breakpoints
+    address: Address
+    quantities: tuple[str, ...]
+    node: int

@@ -129,11 +129,10 @@ quartodoc:
     desc: 'Needs the network extra.'
     contents:
     - network.Network
-    - network.NetworkNode
+    - network.Address
+    - network.Location
     - network.NetworkReach
     - network.ReachBreakPoint
-    - network.BasicNode
-    - network.BasicReach
     
 format:
   html:

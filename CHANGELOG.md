@@ -4,9 +4,14 @@
 
 ### Added
 - `mikeio1d.network`: build a graph-shaped `Network` from a result file, with
-  `Network.open`, `Network.reaches`, `find`/`recall` between original and graph names,
-  `to_dataframe`/`to_dataset`, and the EPANET `.resx`/`.inp` companions. Needs the new
-  `network` extra (`pip install mikeio1d[network]`).
+  `Network.open`, `Network.reaches`, `Network.graph`, `to_dataframe`/`to_dataset`, and the
+  EPANET `.resx`/`.inp` companions. Needs the new `network` extra
+  (`pip install mikeio1d[network]`).
+- `Network.period`, `Network.quantities`, `Network.resolve`, `Network.locations` and
+  `Network.read`, for asking a result file what it holds and reading only the series a
+  caller turns out to need, by the names the model used - a node ID, or a reach and a
+  distance along it. A read loads only the variables it asks for, each as its whole time
+  series (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 
@@ -18,12 +23,39 @@
 - `Res1D.to_txt` and `Res1D.to_csv` no longer leave the output file open when a write fails (#248).
 
 ### Changed
+- `Network.open` reads the header and the topology and no timeseries. `to_dataframe` and
+  `to_dataset` read every location when they are called. The
+  `nodes`, `reaches` and `quantities` options are gone: read the locations you need with
+  `Network.read` instead (#250).
+- `Network.quantities` now names what can be read somewhere in the network, mapped to its
+  unit. Membership and `sorted()` read as before; indexing does not (#250).
+- A `.resx` carrying a quantity its `.res` already has at the same location is refused
+  however the network is read. It used to be refused only where a frame was built, and
+  otherwise read silently from the `.resx` (#250).
+- `Network.resolve` answers with a `Location` - its `address`, the `quantities` readable there
+  and its graph integer `node` - or `None`. It is the one lookup by name;
+  `graph.nodes[node]["alias"]` goes back (#250).
+- `Network.period` is a property, like `Network.quantities` (#250).
+- `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
+  and its `sel` option is gone: read one quantity with `Network.read` and
+  `Network.locations(quantity=...)`. `to_dataset` keeps its integer `node` dimension (#250).
+- `Network.graph` is read-only; `network.graph.copy()` gives one to edit. `Network.copy` and
+  `Network.release` are gone (#250).
+- A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location`,
+  `NetworkReach` and `ReachBreakPoint` are exported from `mikeio1d.network` (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
 
 ### Removed
 - `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.
+- `network.BasicNode`, `network.BasicReach`, and building a `Network` from a sequence of reaches.
+  A `Network` is now built with `Network.open`, which is how anything ever used it. The
+  abstract element classes are gone too: `Network.reaches` holds plain frozen records with the
+  same attributes (#257).
+- `Network.find` and `Network.recall`. Every member takes the model's names, `resolve` gives the
+  graph integer for one, and each graph node's `alias` attribute names it. A reach's end nodes
+  are `reaches[reach_id].start.id` and `.end.id`, rather than `distance="start"`/`"end"` (#250).
 
 ## [1.3.1] - 2026-07-15
 

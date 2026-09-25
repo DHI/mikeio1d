@@ -1,8 +1,8 @@
 """Adapt a :class:`~mikeio1d.Res1D` result file to the network element classes.
 
-The reading itself belongs to ``Res1D``; this module only presents what it read
-as nodes, reaches and breakpoints, and decides which locations get their
-timeseries loaded.
+The reading itself belongs to ``Res1D``; this module only presents its topology
+as nodes, reaches and breakpoints, and records where each location's timeseries
+sit so they can be read when asked for.
 
 Where a product keeps its timeseries differs, and that is what most of the
 adapting is. MIKE 11 holds them on reach gridpoints rather than on nodes, so the
@@ -14,23 +14,48 @@ end - see :func:`_build_reach_breakpoints` for what becomes of it.
 from __future__ import annotations
 
 import math
+import warnings
+from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
-
 from ..res1d import Res1D
-from ._companions import _CompanionConflict
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
-    from ._companions import _Companion
+    from ._naming import Address
 
-from ._types import NetworkNode, NetworkReach, ReachBreakPoint
+from ._results import _Results
+from ._results import _Series
+from ._types import NetworkReach, ReachBreakPoint
 
-# Topology-only nodes and gridpoints all share this frame instead of each
-# allocating its own. A large network has two per reach, which profiling showed
-# to be the biggest single cost of a filtered load. Never mutate it in place.
-_EMPTY_DATA = pd.DataFrame()
+
+def _path_of(file: str | Path | Res1D) -> Path:
+    """Give the path of a result file, whether named or already open."""
+    if isinstance(file, Res1D):
+        return Path(str(file.file_path))
+    if isinstance(file, (str, Path)):
+        return Path(file)
+    raise TypeError(f"Expected a str, Path or Res1D object, got {type(file).__name__!r}")
+
+
+def _suffix_of(file: str | Path | Res1D) -> str:
+    """Give a result file's lower-case extension, including its dot."""
+    return _path_of(file).suffix.lower()
+
+
+def _as_res1d(file: str | Path | Res1D) -> Res1D:
+    """Open a result file, or take one already open."""
+    return file if isinstance(file, Res1D) else Res1D(str(_path_of(file)))
+
+
+def _units_of(res: Res1D) -> dict[str, str]:
+    """Read the unit abbreviation of every quantity a file declares, from its header."""
+    return {
+        str(quantity.Id): str(quantity.EumQuantity.UnitAbbreviation)
+        for quantity in res.result_data.Quantities
+    }
 
 
 def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> ResultQuantity:
@@ -48,131 +73,13 @@ def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> Result
     return node._creator.result_quantity_map[quantity_id][0]
 
 
-def _simplify_colnames(
-    node: ResultNode | ResultGridPoint, quantities: set[str] | None = None
-) -> pd.DataFrame:
-    # We remove suffixes and indexes so the columns contain only the quantity names
-
-    # Some formats keep no timeseries at all on some locations - MIKE 11, for instance,
-    # stores everything on reach gridpoints, leaving the nodes empty. Asking mikeio1d
-    # for a dataframe there raises, so return an empty one instead.
-    if not node.quantities:
-        return pd.DataFrame()
-
-    # The columns in a Res1D dataframe follow the convention "Quantity:Location:Sublocation"
-    # where Location refers to the node id or the reach id followed by the chainage.
-    RES1D_NAME_SEP = ":"
-
-    available = list(node.quantities)
-    wanted = available if quantities is None else [q for q in available if q in quantities]
-
-    if not wanted:
-        # A location need not carry every requested quantity; it stays topology-only.
-        return _EMPTY_DATA
-
-    if len(wanted) == len(available):
-        # Reading the whole location is one interop call rather than one per quantity.
-        df = node.to_dataframe()
-    else:
-        df = pd.concat([_quantity_at(node, q).to_dataframe() for q in wanted], axis=1)
-
-    renamer_dict = {}
-    for quantity in wanted:
-        column_pairs = [
-            (col, quantity) for col in df.columns if quantity in col.split(RES1D_NAME_SEP)
-        ]
-        if len(column_pairs) != 1:
-            raise ValueError(
-                f"There must be exactly one column per quantity, found {column_pairs}."
-            )
-        old_name, new_name = column_pairs[0]
-        renamer_dict[old_name] = new_name
-    return df.rename(columns=renamer_dict).copy()
-
-
-def _merge_extra_quantities(
-    base: pd.DataFrame, extra: pd.DataFrame, *, location_id: str
-) -> pd.DataFrame:
-    """Append a companion file's quantities to a node's or reach's frame.
-
-    Parameters
-    ----------
-    base : pd.DataFrame
-        The node's or reach's frame from the main result file.
-    extra : pd.DataFrame
-        The same location's frame from the companion file, sharing its time index.
-    location_id : str
-        Node or reach ID, used in error messages.
-
-    Returns
-    -------
-    pd.DataFrame
-
-    Raises
-    ------
-    _CompanionConflict
-        If a quantity appears in both frames. Concatenating would give the
-        location two columns of the same name, which is the state
-        ``_simplify_colnames`` already refuses.
-    """
-    if extra.empty:
-        return base
-
-    overlapping = base.columns.intersection(extra.columns)
-    if len(overlapping) > 0:
-        raise _CompanionConflict(
-            f"Location {location_id!r} already has {sorted(overlapping)} in the "
-            "main result file, so the companion file's copy cannot be merged in."
-        )
-
-    return pd.concat([base, extra], axis=1)
-
-
-class Res1DNode(NetworkNode):
-    def __init__(
-        self,
-        id: str,
-        *,
-        data: pd.DataFrame | None = None,
-    ):
-        self._id = id
-        self._data = _EMPTY_DATA if data is None else data
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
-
-
-class GridPoint(ReachBreakPoint):
-    def __init__(self, reach_id: str, chainage: float | None, data: pd.DataFrame | None = None):
-        self._id = (reach_id, chainage)
-        self._data = _EMPTY_DATA if data is None else data
-
-    @property
-    def id(self) -> tuple[str, float | None]:
-        return self._id
-
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
-
-
 def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | None:
     """Resolve a reach's effective length.
 
-    A length read from a companion input file wins, since mikeio1d has none
-    to offer for the formats that need one. Zero means undefined whichever of
-    the two said it: mikeio1d returns 0 when it cannot read a reach length -
-    link-node models such as EPANET report this for every reach - and an input
-    file is free to carry a 0 in the same spirit. Reported as undefined rather
-    than as a zero-length reach, which would make length-weighted graph
-    algorithms treat the reach as free, and would put a link-node reach's two
-    break points at the same distance, collapsing them onto one. The two cases
-    cannot be told apart upstream.
+    A length read from a companion input file wins. Zero means undefined from
+    either source: mikeio1d returns 0 when it cannot read a length, as for every
+    EPANET reach. A zero-length reach would look free to length-weighted graph
+    algorithms, and would put a link-node reach's two break points on one spot.
     """
     return (length if length is not None else reach.length) or None
 
@@ -181,10 +88,8 @@ def _has_real_gridpoints(reach: ResultReach) -> bool:
     """Whether these are the reach's own gridpoints, or one synthetic stand-in.
 
     mikeio1d invents a single gridpoint for the link-node formats that define
-    none of their own (EPANET, SWMM). Only the source can tell the two cases
-    apart, so ask it: the stand-in went to the reach that reported nothing.
-    Counting what came back cannot, since a reach is free to report as few
-    gridpoints as the stand-in stands for.
+    none of their own (EPANET, SWMM). Counting gridpoints cannot tell the two
+    apart, so this asks the underlying reaches whether they reported any.
     """
     return any(res1d_reach.GridPoints.Count > 0 for res1d_reach in reach.res1d_reaches)
 
@@ -192,196 +97,166 @@ def _has_real_gridpoints(reach: ResultReach) -> bool:
 def _reach_start_distance(reach: ResultReach) -> float:
     """Resolve where the reach's start node sits, in the frame its breakpoints use.
 
-    A MIKE reach's breakpoints are placed at their chainage, which is a
-    coordinate along the whole river branch rather than an offset along this
-    reach: the branch's chainage origin is a survey datum, so a modelled reach
-    commonly starts thousands of metres in, and may even start below zero.
-    A link-node reach has no chainage at all - its two breakpoints are placed
-    0.0 and `length` apart by hand - so its frame starts at zero.
+    A MIKE reach's breakpoints sit at their chainage along the whole branch, so
+    the reach can start thousands of metres in, or below zero. A link-node reach
+    has no chainage, and its frame starts at zero.
     """
     if not _has_real_gridpoints(reach):
         return 0.0
 
-    # EPANET reports -inf rather than a chainage. Nothing places a breakpoint
-    # against it, but an origin that is not a number would poison every edge
-    # length on the reach, so fall back to the frame the breakpoints are in.
+    # EPANET reports -inf rather than a chainage.
     origin = reach.start_chainage
     return origin if math.isfinite(origin) else 0.0
+
+
+def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
+    """Map every quantity a location carries to the series holding it.
+
+    Read from the file header; no timeseries is loaded.
+    """
+    series = {}
+    for quantity_id in location.quantities:
+        quantity = _quantity_at(location, quantity_id)
+        path = Path(str(quantity.res1d.file_path))
+        series[quantity_id] = _Series(path, quantity.timeseries_id)
+    return series
+
+
+_SeriesKey = str | tuple[str, int]
+"""Where a series sits in a result file, before any break point is placed.
+
+A ``str`` is a node id. A ``(reach_id, i)`` tuple is the ``i``-th of the reach's
+:func:`_ordered_gridpoints`. A companion result is keyed the same way, which is
+how its series land on the main file's locations.
+"""
+
+
+def _ordered_gridpoints(reach: ResultReach) -> list[ResultGridPoint]:
+    """Give the gridpoints a reach's break points are made from, in order along it.
+
+    Sorted by chainage, since a multi-segment reach lists its gridpoints segment
+    by segment in no promised order. A link-node reach has only the one
+    synthetic stand-in mikeio1d gave it.
+    """
+    if _has_real_gridpoints(reach):
+        return sorted(reach.gridpoints, key=lambda gp: gp.chainage)
+    return reach.gridpoints[:1]
+
+
+def _series_by_key(res: Res1D) -> dict[_SeriesKey, dict[str, _Series]]:
+    """Map every node and gridpoint of a result file to the series it carries."""
+    found: dict[_SeriesKey, dict[str, _Series]] = {
+        node_id: _series_at(node) for node_id, node in res.nodes.items()
+    }
+    for reach_id, reach in res.reaches.items():
+        for i, gridpoint in enumerate(_ordered_gridpoints(reach)):
+            found[(reach_id, i)] = _series_at(gridpoint)
+    return found
 
 
 def _build_reach_breakpoints(
     reach: ResultReach,
     *,
     length: float | None,
-    quantities: set[str] | None,
-    populate_gridpoints: bool,
-    extra: _Companion | None = None,
-) -> list[ReachBreakPoint]:
-    """Build a reach's break points from its mikeio1d gridpoints.
+    series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
+) -> tuple[list[ReachBreakPoint], dict[Address, dict[str, _Series]]]:
+    """Build a reach's break points from its mikeio1d gridpoints, and what each carries.
 
-    A reach with gridpoints of its own has real, independently-measured
-    start/end points, so every gridpoint becomes a break point at its own
-    chainage (the first/last ones end up coincident with the reach's own
-    start_node/end_node - the graph builder connects them with a zero-length
-    edge).
+    A reach with gridpoints of its own gets one break point per gridpoint, at
+    its chainage.
 
-    A reach with none is a link-node model (e.g. EPANET), and the synthetic
-    gridpoint mikeio1d gave it belongs to neither end - it is duplicated into
-    two break points, one at each end (distance 0.0, and distance `length` if
-    known or None otherwise), so the reach's own quantities (e.g. Flow) are
-    reachable the same way MIKE's are. Decided in
-    https://github.com/DHI/modelskill/issues/680.
+    A link-node reach (e.g. EPANET) has one synthetic gridpoint that belongs to
+    neither end. It becomes two break points, at 0.0 and at ``length``, both
+    carrying its series - or only the one at 0.0 where the length is unknown.
+    See https://github.com/DHI/modelskill/issues/680.
 
-    A companion ``.resx`` result (``extra``) contributes its own reach-level
-    quantities (e.g. pump energy) the same way it already does for nodes,
-    matched to the main file's gridpoints by index - the only real case
-    today is a single-gridpoint reach against a single-gridpoint companion.
+    The series come back with the break points, since only here is it known
+    which gridpoint a break point was made from.
     """
+    gridpoints = _ordered_gridpoints(reach)
     if _has_real_gridpoints(reach):
-        # Sorted rather than taken as they come: a multi-segment reach reports
-        # its gridpoints one segment at a time, in the order the file lists the
-        # segments, which is not promised to be the order they sit in.
-        # ``NetworkReach.breakpoints`` is documented as ascending, and the graph
-        # builder relies on it - the first and last break point are the reach's
-        # outermost, and consecutive differences are edge lengths, which a
-        # backwards pair would report as negative.
-        unique_gridpoints = sorted(reach.gridpoints, key=lambda gp: gp.chainage)
-        distances_per_gridpoint = [[gp.chainage] for gp in unique_gridpoints]
+        distances_per_gridpoint = [[gp.chainage] for gp in gridpoints]
     else:
-        unique_gridpoints = reach.gridpoints[:1]
-        distances_per_gridpoint = [[0.0, length] for _ in unique_gridpoints]
-
-    extra_gridpoints: list[ResultGridPoint] = []
-    if extra is not None and reach.name in extra.reaches:
-        # Sorted the same way, so pairing by index pairs the two files' points
-        # in the same order along the reach.
-        extra_gridpoints = sorted(extra.reaches[reach.name].gridpoints, key=lambda gp: gp.chainage)
+        ends = [0.0] if length is None else [0.0, length]
+        distances_per_gridpoint = [ends for _ in gridpoints]
 
     breakpoints: list[ReachBreakPoint] = []
-    for i, (gp, distances) in enumerate(zip(unique_gridpoints, distances_per_gridpoint)):
-        data = _simplify_colnames(gp, quantities) if populate_gridpoints else None
-        if data is not None and i < len(extra_gridpoints):
-            data = _merge_extra_quantities(
-                data,
-                _simplify_colnames(extra_gridpoints[i], quantities),
-                location_id=reach.name,
-            )
-        breakpoints.extend(GridPoint(gp.reach_name, d, data) for d in distances)
-    return breakpoints
+    series: dict[Address, dict[str, _Series]] = {}
+    for i, (gp, distances) in enumerate(zip(gridpoints, distances_per_gridpoint)):
+        carried = series_by_key[(reach.name, i)]
+        for distance in distances:
+            point = ReachBreakPoint(gp.reach_name, distance)
+            breakpoints.append(point)
+            series[point.id] = carried
+    return breakpoints, series
 
 
-class Res1DReach(NetworkReach):
-    """NetworkReach adapter for a mikeio1d ResultReach."""
+def _load_res1d_network(
+    res: Res1D,
+    *,
+    series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
+    units: Mapping[str, str],
+    lengths: dict[str, float] | None = None,
+) -> tuple[list[NetworkReach], _Results]:
+    """Read a result file as reaches, and as the results a network reads through.
 
-    def __init__(
-        self,
-        reach: ResultReach,
-        start_node: Res1DNode,
-        end_node: Res1DNode,
-        *,
-        length: float | None = None,
-        breakpoints: list[ReachBreakPoint] | None = None,
-    ):
-        self._id = reach.name
+    Both come from one walk over ``res.reaches``, since the series map depends
+    on which gridpoint each break point was made from. No timeseries is read.
 
-        # Must be checked separately: some formats (.resx) report None for both the
-        # reach and the node, which the identity checks below would let through.
+    A node is part of the network through the reaches that end at it, so a node
+    no reach ends at is left out, with a warning.
+
+    Parameters
+    ----------
+    res : Res1D
+        The main result file.
+    series_by_key : mapping of _SeriesKey to (dict of str to _Series)
+        What each node and gridpoint carries, a companion's series included.
+    units : mapping of str to str
+        Unit abbreviation per quantity ID, a companion's included.
+    lengths : dict of str to float, optional
+        Reach lengths from a companion ``.inp``, which no result file carries.
+    """
+    lengths = lengths or {}
+
+    reaches: list[NetworkReach] = []
+    series: dict[Address, dict[str, _Series]] = {}
+    for reach in res.reaches.values():
+        # Some formats (.resx) report no end nodes.
         if reach.start_node is None or reach.end_node is None:
             raise ValueError(
                 f"mikeio1d reported no start/end node for reach {reach.name!r}; "
                 "this result format's topology cannot be represented as a Network."
             )
-
-        if start_node.id != reach.start_node:
-            raise ValueError("Incorrect starting node.")
-        if end_node.id != reach.end_node:
-            raise ValueError("Incorrect ending node.")
-
-        self._start = start_node
-        self._end = end_node
-        self._length = _resolve_reach_length(length, reach)
-        self._start_distance = _reach_start_distance(reach)
-        self._breakpoints = breakpoints or []
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def start(self) -> Res1DNode:
-        return self._start
-
-    @property
-    def end(self) -> Res1DNode:
-        return self._end
-
-    @property
-    def length(self) -> float | None:
-        return self._length
-
-    @property
-    def start_distance(self) -> float:
-        return self._start_distance
-
-    @property
-    def breakpoints(self) -> list[ReachBreakPoint]:
-        return self._breakpoints
-
-
-def _load_res1d_network(
-    res: Res1D,
-    nodes: list[str],
-    reaches: list[str],
-    *,
-    extra: _Companion | None = None,
-    lengths: dict[str, float] | None = None,
-    quantities: set[str] | None = None,
-) -> list[Res1DReach]:
-    nodes_set = set(nodes)
-    reaches_set = set(reaches)
-    lengths = lengths or {}
-
-    # In order to work with bigger files, we might want to select a subset of nodes and avoid
-    # potential memory issues. For this reason, we create this intermediate step that populates
-    # only the data in the passed nodes
-
-    # A node shared by several reaches is visited once per reach endpoint, but
-    # _generate_graph keeps only the first copy of its data, so read it once.
-    node_data: dict[str, pd.DataFrame] = {}
-
-    def _init_node(reach: ResultReach, is_end: bool) -> Res1DNode:
-        id = reach.end_node if is_end else reach.start_node
-        if id in nodes_set:
-            if id not in node_data:
-                df = _simplify_colnames(res.nodes[id], quantities)
-                # Merged here rather than up front so selective loading still
-                # decides what is held in memory.
-                if extra is not None and id in extra.nodes:
-                    df = _merge_extra_quantities(
-                        df,
-                        _simplify_colnames(extra.nodes[id], quantities),
-                        location_id=id,
-                    )
-                node_data[id] = df
-            return Res1DNode(id, data=node_data[id])
-        else:
-            return Res1DNode(id)
-
-    def _build_reach(reach: ResultReach) -> Res1DReach:
-        reach_length = lengths.get(reach.name)
-        breakpoints = _build_reach_breakpoints(
-            reach,
-            length=_resolve_reach_length(reach_length, reach),
-            quantities=quantities,
-            populate_gridpoints=reach.name in reaches_set,
-            extra=extra,
+        length = _resolve_reach_length(lengths.get(reach.name), reach)
+        breakpoints, carried = _build_reach_breakpoints(
+            reach, length=length, series_by_key=series_by_key
         )
-        return Res1DReach(
-            reach,
-            _init_node(reach, False),
-            _init_node(reach, True),
-            length=reach_length,
-            breakpoints=breakpoints,
+        reaches.append(
+            NetworkReach(
+                id=reach.name,
+                start=reach.start_node,
+                end=reach.end_node,
+                length=length,
+                start_distance=_reach_start_distance(reach),
+                breakpoints=tuple(breakpoints),
+            )
+        )
+        series.update(carried)
+
+    for built in reaches:
+        for node in (built.start, built.end):
+            series[node] = series_by_key[node]
+
+    left_out = [node for node in res.nodes if node not in series]
+    if left_out:
+        listed = ", ".join(repr(node) for node in left_out[:10])
+        if len(left_out) > 10:
+            listed += f", ... and {len(left_out) - 10} more"
+        warnings.warn(
+            f"{len(left_out)} node(s) of '{Path(str(res.file_path)).name}' are the end of "
+            f"no reach, so the network leaves them out: {listed}.",
+            stacklevel=4,
         )
 
-    return [_build_reach(reach) for reach in res.reaches.values()]
+    return reaches, _Results(series=series, units=units, period=(res.start_time, res.end_time))

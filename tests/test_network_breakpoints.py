@@ -9,6 +9,7 @@ stand-in that is placed at both of its ends.
 """
 
 # ruff: noqa: E402
+from functools import cache
 from pathlib import Path
 
 import pytest
@@ -17,7 +18,6 @@ pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
 from mikeio1d.network import Network
-from mikeio1d.network._res1d import _build_reach_breakpoints
 
 _TESTDATA = Path(__file__).parent / "testdata"
 
@@ -33,6 +33,16 @@ _FIXTURES = [
 ]
 
 
+@cache
+def _open(filename):
+    """Open a fixture once for every test here, topology only.
+
+    The shape of the graph is the whole subject, and reading every timeseries of
+    the largest fixture would cost seconds.
+    """
+    return Network.open(str(_TESTDATA / filename), companions=[])
+
+
 @pytest.mark.parametrize("filename", _FIXTURES)
 def test_every_reach_keeps_a_chain_of_its_own(filename):
     """A reach of n break points spans n + 1 edges, and shares none of them.
@@ -42,79 +52,47 @@ def test_every_reach_keeps_a_chain_of_its_own(filename):
     ``Network`` refuses when neither has break points to be told apart by.
     """
     path = str(_TESTDATA / filename)
-    # Topology only: the shape of the graph is the whole subject, and reading
-    # every timeseries of the largest fixture would cost seconds.
-    graph = Network.open(path, companions=[], nodes=[], reaches=[], quantities=[]).graph
+    graph = _open(filename).graph
 
-    breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["alias"], tuple)]
+    breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["address"], tuple)]
 
     assert graph.number_of_edges() == len(Res1D(path).reaches) + len(breakpoints)
 
 
-class _Gridpoint:
-    """A gridpoint at a known chainage, carrying no timeseries."""
-
-    def __init__(self, reach_name, chainage):
-        self.reach_name = reach_name
-        self.chainage = chainage
-        self.quantities = {}
+_MIKE_FIXTURES = [f for f in _FIXTURES if f != "epanet.res"]
 
 
-class _Reach:
-    """A reach that reports the gridpoints it was built with as its own."""
+@pytest.mark.parametrize("filename", _FIXTURES)
+def test_every_reach_lists_its_break_points_ascending(filename):
+    """Break points are documented as ascending, and the graph builder counts on it.
 
-    def __init__(self, name, chainages):
-        self.name = name
-        self.gridpoints = [_Gridpoint(name, chainage) for chainage in chainages]
-        self.res1d_reaches = [_Res1DReach(len(chainages))]
-
-
-class _Res1DReach:
-    """Stands in for the .NET reach, which is asked only for its count."""
-
-    def __init__(self, count):
-        self.GridPoints = _GridPoints(count)
-
-
-class _GridPoints:
-    def __init__(self, count):
-        self.Count = count
-
-
-def test_a_two_gridpoint_reach_keeps_both():
-    """Both ends were measured, so neither may be dropped for the other.
-
-    The one case no fixture can put to the loader, and the reason it asks the
-    file for its gridpoint count rather than counting what came back: a reach
-    read as a link-node one would discard its end gridpoint and duplicate the
-    start's data, silently. Nothing in the test data reports as few as two - a
-    MIKE reach carries an h-point at each end with at least one Q-point between
-    - but the count is the file's to choose. The chainages here are a branch
-    coordinate, as a river reach's are, so the two readings cannot agree by
-    accident.
+    It reads the outermost pair as the reach's ends and each consecutive
+    difference as an edge length, so a backwards chain would give negative
+    lengths and nothing would say so. A multi-segment reach lists its gridpoints
+    segment by segment, in no promised order.
     """
-    reach = _Reach("r0", [53100.0, 53200.0])
+    network = _open(filename)
 
-    breakpoints = _build_reach_breakpoints(
-        reach, length=100.0, quantities=None, populate_gridpoints=False
-    )
+    unordered = [
+        reach_id
+        for reach_id, reach in network.reaches.items()
+        if [bp.distance for bp in reach.breakpoints]
+        != sorted(bp.distance for bp in reach.breakpoints)
+    ]
 
-    assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0]
+    assert unordered == []
 
 
-def test_gridpoints_listed_out_of_order_come_out_ascending():
-    """A reach's segments are listed by the file, in whatever order it likes.
+@pytest.mark.parametrize("filename", _MIKE_FIXTURES)
+def test_a_mike_reach_keeps_every_gridpoint(filename):
+    """One break point per gridpoint, so none is dropped as a link-node stand-in.
 
-    Break points are documented as ascending and the graph builder counts on
-    it, reading the outermost pair as the reach's ends and each consecutive
-    difference as an edge length. Taken as they come, a reach whose segments
-    were listed downstream-first would get a backwards chain and negative
-    lengths, and nothing would say so.
+    Read as a link-node reach, a MIKE reach would lose its end gridpoint and
+    carry its start's data there instead, silently.
     """
-    reach = _Reach("r0", [53200.0, 53100.0, 53300.0])
+    path = str(_TESTDATA / filename)
+    network = _open(filename)
 
-    breakpoints = _build_reach_breakpoints(
-        reach, length=200.0, quantities=None, populate_gridpoints=False
-    )
+    counts = {reach_id: len(reach.gridpoints) for reach_id, reach in Res1D(path).reaches.items()}
 
-    assert [bp.distance for bp in breakpoints] == [53100.0, 53200.0, 53300.0]
+    assert {r: reach.n_breakpoints for r, reach in network.reaches.items()} == counts

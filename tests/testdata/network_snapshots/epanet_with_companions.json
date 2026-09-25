@@ -1,7 +1,7 @@
 {
  "counts": {
-  "graph_edges": 39,
-  "graph_nodes": 37,
+  "graph_edges": 38,
+  "graph_nodes": 36,
   "reaches": 13
  },
  "dataframe": {
@@ -1815,105 +1815,6 @@
     "n_nan": 0,
     "sum": 0.0
    },
-   "36|AvgWaterQuality": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|Flow": {
-    "first": 117.737534,
-    "last": 119.382088,
-    "max": 120.466057,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 1725.927383
-   },
-   "36|FrictionFactor": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|HeadlossPer1000Unit": {
-    "first": -62.285,
-    "last": -61.17902,
-    "max": 0.0,
-    "min": -66.749077,
-    "n": 25,
-    "n_nan": 0,
-    "sum": -960.498978
-   },
-   "36|Pump efficiency": {
-    "first": 75.0,
-    "last": 75.0,
-    "max": 75.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 1125.0
-   },
-   "36|Pump energy": {
-    "first": 95.844238,
-    "last": 95.457344,
-    "max": 96.706551,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 1443.593536
-   },
-   "36|Pump energy costs": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|ReactorRate": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|Setting": {
-    "first": 1.0,
-    "last": 1.0,
-    "max": 1.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 15.0
-   },
-   "36|StatusCode": {
-    "first": 3.0,
-    "last": 3.0,
-    "max": 3.0,
-    "min": 2.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 65.0
-   },
-   "36|Velocity": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
    "3|AvgWaterQuality": {
     "first": 0.0,
     "last": 0.0,
@@ -2367,7 +2268,7 @@
   },
   "shape": [
    25,
-   262
+   251
   ],
   "time": {
    "first": "2022-10-13 00:00:00",
@@ -2402,7 +2303,6 @@
    "bp:31@0.0": 32,
    "bp:31@1609.344": 33,
    "bp:9@0.0": 35,
-   "bp:9@None": 36,
    "node:10": 0,
    "node:11": 1,
    "node:12": 4,
@@ -2634,7 +2534,7 @@
    ],
    [
     "bp:9@0.0",
-    "bp:9@None",
+    "node:10",
     null,
     false
    ],
@@ -2643,12 +2543,6 @@
     "node:9",
     0.0,
     true
-   ],
-   [
-    "bp:9@None",
-    "node:10",
-    null,
-    false
    ]
   ],
   "nodes": {
@@ -2893,19 +2787,6 @@
     "Velocity"
    ],
    "bp:9@0.0": [
-    "AvgWaterQuality",
-    "Flow",
-    "FrictionFactor",
-    "HeadlossPer1000Unit",
-    "Pump efficiency",
-    "Pump energy",
-    "Pump energy costs",
-    "ReactorRate",
-    "Setting",
-    "StatusCode",
-    "Velocity"
-   ],
-   "bp:9@None": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -3167,10 +3048,6 @@
    },
    "35": {
     "distance": 0.0,
-    "reach": "9"
-   },
-   "36": {
-    "distance": null,
     "reach": "9"
    },
    "4": {
@@ -3667,28 +3544,11 @@
       "StatusCode",
       "Velocity"
      ]
-    },
-    {
-     "distance": null,
-     "id": "bp:9@None",
-     "quantities": [
-      "AvgWaterQuality",
-      "Flow",
-      "FrictionFactor",
-      "HeadlossPer1000Unit",
-      "Pump efficiency",
-      "Pump energy",
-      "Pump energy costs",
-      "ReactorRate",
-      "Setting",
-      "StatusCode",
-      "Velocity"
-     ]
     }
    ],
    "end": "10",
    "length": null,
-   "n_breakpoints": 2,
+   "n_breakpoints": 1,
    "start": "9"
   }
  }

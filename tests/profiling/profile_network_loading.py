@@ -1,16 +1,15 @@
 """Time one `Network.open` configuration, optionally under cProfile.
 
-Loading a large network is dominated by how much of it is read, so the knobs
-that matter are the companions and the filters. This times one combination of
-them, repeatedly, and reports the minimum and median.
+An open reads the header and the topology, and no timeseries, so the knob that
+matters is the companions. This times one choice of them, repeatedly, and
+reports the minimum and median.
 
 Usage
 -----
 uv run python tests/profiling/profile_network_loading.py --res-path <path-to-result-file>
 
-Companions and a quantities filter are opt-in:
+Name the companions rather than letting them be found:
 uv run python tests/profiling/profile_network_loading.py --res-path <res> --companions <resx> <inp>
-uv run python tests/profiling/profile_network_loading.py --res-path <res> --quantities Pressure
 
 Add --profile for a cProfile pass on top of the timed runs, then inspect it with:
 uv run snakeviz tests/profiling/output/profile.prof
@@ -56,14 +55,6 @@ def _parse_args() -> argparse.Namespace:
         help="Companion files to read alongside the result: a '.resx' for extra "
         "results, an '.inp' for reach lengths. Omit to let them be found beside "
         "the result file; pass with no values to read none.",
-    )
-    parser.add_argument(
-        "--quantities",
-        nargs="+",
-        default=None,
-        help="Quantity name(s) to pass as the 'quantities' filter to "
-        "Network.open, e.g. --quantities Pressure. Omit to load every quantity "
-        "(the default, unfiltered behavior).",
     )
     parser.add_argument(
         "--repeat",
@@ -117,8 +108,6 @@ def main() -> None:
     kwargs: dict[str, object] = {}
     if args.companions is not None:
         kwargs["companions"] = [companion.resolve() for companion in args.companions]
-    if args.quantities is not None:
-        kwargs["quantities"] = args.quantities
 
     res_path = args.res_path.resolve()
 
@@ -185,9 +174,8 @@ def main() -> None:
     print(f"Label:      {args.label}")
     print(f"res:        {res_path}")
     print(f"companions: {kwargs.get('companions', 'found beside the result')}")
-    print(f"quantities: {args.quantities or 'all'}")
     print(f"nodes:      {n_nodes}   reaches: {n_reaches}")
-    print(f"loaded:     {', '.join(quantities)}")
+    print(f"offered:    {', '.join(quantities)}")
     if cold:
         print(f"cold:       {cold[0]:.2f}s (discarded)")
     print(f"seconds:    {', '.join(f'{s:.2f}' for s in seconds)}")

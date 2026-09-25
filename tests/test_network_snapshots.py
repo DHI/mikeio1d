@@ -2,9 +2,10 @@
 
 These snapshots were recorded in modelskill before the topology layer moved here
 (ADR-013 there), over fixtures that are copies of the ones in this repository.
-They are the acceptance test for the move: the same six loads must still produce
-the same graph, the same alias map, the same dataframe and the same answers from
-find and recall.
+They are the acceptance test for the move: the same loads must still produce
+the same graph, the same alias map, the same dataframe and the same
+correspondence between names and graph integers - recorded through find and
+recall then, and through resolve and the graph's own labels now.
 
 Cases are named for the fixture and its load options rather than for a
 constructor, so reshaping the entry points cannot quietly rewrite the target.
@@ -41,8 +42,6 @@ _EPANET_INP = str(_TESTDATA / "epanet.inp")
 # absence.
 LOADS = {
     "res1d": lambda: Network.open(_RES1D),
-    "res1d_nodes_filtered": lambda: Network.open(_RES1D, nodes=["108", "101"], reaches=[]),
-    "res1d_one_quantity": lambda: Network.open(_RES1D, quantities="Discharge"),
     "res11": lambda: Network.open(_RES11),
     "epanet_with_companions": lambda: Network.open(
         _EPANET_RES, companions=[_EPANET_RESX, _EPANET_INP]

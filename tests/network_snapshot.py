@@ -68,8 +68,7 @@ def _alias_key(alias: Any) -> str:
     """
     if isinstance(alias, tuple):
         reach, distance = alias
-        rendered = "None" if distance is None else repr(_num(distance))
-        return f"bp:{reach}@{rendered}"
+        return f"bp:{reach}@{_num(distance)!r}"
     return f"node:{alias}"
 
 
@@ -100,13 +99,34 @@ def _digest(series: Any) -> dict[str, Any]:
     }
 
 
-def _describe_graph(network: Any) -> dict[str, Any]:
+def _carried(df: Any) -> dict[int, list[str]]:
+    """Group a network's dataframe columns by the graph node they belong to.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        What ``to_dataframe()`` returned, relabelled with ``(node, quantity)`` columns.
+
+    Returns
+    -------
+    dict of int to list of str
+        Sorted quantity names per graph node. A node carrying nothing is absent.
+    """
+    carried: dict[int, list[str]] = {}
+    for node, quantity in df.columns:
+        carried.setdefault(int(node), []).append(str(quantity))
+    return {node: sorted(quantities) for node, quantities in carried.items()}
+
+
+def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, Any]:
     """Describe the graph: its edges, and what each node carries.
 
     Parameters
     ----------
     network : Network
         The network to describe.
+    carried : dict of int to list of str
+        What each graph node carries, from :func:`_carried`.
 
     Returns
     -------
@@ -116,7 +136,7 @@ def _describe_graph(network: Any) -> dict[str, Any]:
         itself so that the numbering is pinned too.
     """
     graph = network.graph
-    aliases = {node: graph.nodes[node]["alias"] for node in graph.nodes}
+    aliases = {node: graph.nodes[node]["address"] for node in graph.nodes}
 
     edges = []
     for u, v, attrs in graph.edges(data=True):
@@ -124,52 +144,45 @@ def _describe_graph(network: Any) -> dict[str, Any]:
         edges.append([*ends, _num(attrs.get("length")), bool(attrs.get("boundary"))])
     edges.sort(key=lambda edge: (edge[0], edge[1], str(edge[2])))
 
-    nodes = {}
-    for node in graph.nodes:
-        data = graph.nodes[node]["data"]
-        if data is None:
-            carries: Any = "absent"
-        elif data.empty:
-            carries = "empty"
-        else:
-            carries = sorted(str(column) for column in data.columns)
-        nodes[_alias_key(aliases[node])] = carries
+    nodes = {_alias_key(aliases[node]): carried.get(int(node), "empty") for node in graph.nodes}
 
     return {
         "edges": edges,
         "nodes": nodes,
         "alias_map": {
-            _alias_key(alias): int(node_id)
-            for node_id, alias in network.graph.nodes(data="alias")
+            _alias_key(alias): int(node_id) for node_id, alias in network.graph.nodes(data="address")
         },
     }
 
 
-def _describe_reaches(network: Any) -> dict[str, Any]:
+def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, Any]:
     """Describe every reach: its ends, its length and its breakpoints.
 
     Parameters
     ----------
     network : Network
         The network to describe.
+    carried : dict of int to list of str
+        What each graph node carries, from :func:`_carried`.
 
     Returns
     -------
     dict
         One entry per reach id.
     """
+    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="address")}
     described = {}
     for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
-            "start": str(reach.start.id),
-            "end": str(reach.end.id),
+            "start": str(reach.start),
+            "end": str(reach.end),
             "length": _num(reach.length),
             "n_breakpoints": int(reach.n_breakpoints),
             "breakpoints": [
                 {
                     "id": _alias_key(breakpoint.id),
                     "distance": _num(breakpoint.distance),
-                    "quantities": sorted(str(q) for q in breakpoint.quantities),
+                    "quantities": carried.get(by_alias[breakpoint.id], []),
                 }
                 for breakpoint in reach.breakpoints
             ],
@@ -177,13 +190,13 @@ def _describe_reaches(network: Any) -> dict[str, Any]:
     return described
 
 
-def _describe_dataframe(network: Any) -> dict[str, Any]:
+def _describe_dataframe(df: Any) -> dict[str, Any]:
     """Describe the assembled dataframe, values included as digests.
 
     Parameters
     ----------
-    network : Network
-        The network to describe.
+    df : pandas.DataFrame
+        What ``to_dataframe()`` returned, relabelled with ``(node, quantity)`` columns.
 
     Returns
     -------
@@ -191,7 +204,6 @@ def _describe_dataframe(network: Any) -> dict[str, Any]:
         Shape, time span and a digest per ``(node, quantity)`` column. This is
         the numeric truth the move must not disturb.
     """
-    df = network.to_dataframe()
     index = df.index
     return {
         "shape": list(df.shape),
@@ -207,7 +219,7 @@ def _describe_dataframe(network: Any) -> dict[str, Any]:
 
 
 def _describe_lookups(network: Any) -> dict[str, Any]:
-    """Record the answers ``find`` and ``recall`` give, for every location.
+    """Record how every location's name and graph integer correspond.
 
     Parameters
     ----------
@@ -217,32 +229,25 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     Returns
     -------
     dict
-        ``find`` keyed by the alias it was asked for, the reach endpoint lookups,
-        and ``recall`` keyed by the integer. A breakpoint whose distance is
-        unknown is absent from ``find``: it cannot be looked up by distance at
-        all, which is behaviour recorded under ``reaches`` instead.
+        ``find``: the integer ``resolve`` gives each address. ``endpoints``: the
+        integer of each reach's start and end node. ``recall``: the name the
+        graph labels each integer with.
     """
     found = {}
-    for _, alias in network.graph.nodes(data="alias"):
-        if isinstance(alias, tuple):
-            reach, distance = alias
-            if distance is None:
-                continue
-            answer = network.find(reach=reach, distance=distance)
-        else:
-            answer = network.find(node=alias)
-        found[_alias_key(alias)] = int(answer)
+    for _, alias in network.graph.nodes(data="address"):
+        found[_alias_key(alias)] = int(network.resolve(alias).node)
 
     endpoints = {}
-    for reach_id in network.reaches:
-        for where in ("start", "end"):
-            endpoints[f"{reach_id}@{where}"] = int(network.find(reach=reach_id, distance=where))
+    for reach_id, reach in network.reaches.items():
+        for where, node in (("start", reach.start), ("end", reach.end)):
+            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).node)
 
     recalled = {}
-    for node_id in sorted(network.graph.nodes()):
-        entry = dict(network.recall(int(node_id)))
-        if "distance" in entry:
-            entry["distance"] = _num(entry["distance"])
+    for node_id, alias in sorted(network.graph.nodes(data="address")):
+        if isinstance(alias, tuple):
+            entry = {"reach": alias[0], "distance": _num(alias[1])}
+        else:
+            entry = {"node": alias}
         recalled[str(node_id)] = entry
 
     return {"find": found, "endpoints": endpoints, "recall": recalled}
@@ -266,6 +271,12 @@ def describe(network: Any) -> dict[str, Any]:
     ``to_dataset()`` is deliberately absent. Its coordinates are due to change,
     while the values underneath it are pinned by the dataframe digests.
     """
+    df = network.to_dataframe()
+    # Keyed by graph integer, as the snapshots were taken, so they pin the same
+    # values whatever the frame's own labels.
+    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="address")}
+    df.columns = [(by_alias[alias], quantity) for alias, quantity in df.columns]
+    carried = _carried(df)
     return {
         "counts": {
             "reaches": len(network.reaches),
@@ -273,8 +284,8 @@ def describe(network: Any) -> dict[str, Any]:
             "graph_edges": int(network.graph.number_of_edges()),
         },
         "quantities": sorted(str(q) for q in network.quantities),
-        "graph": _describe_graph(network),
-        "reaches": _describe_reaches(network),
-        "dataframe": _describe_dataframe(network),
+        "graph": _describe_graph(network, carried),
+        "reaches": _describe_reaches(network, carried),
+        "dataframe": _describe_dataframe(df),
         "lookups": _describe_lookups(network),
     }

@@ -6,8 +6,9 @@ section headers, ``;``-prefixed comments (including the ``;;Name  Node1 ...``
 column headers the products write), whitespace-delimited data rows, and blank
 lines to ignore.
 
-Only the sections a network needs are interpreted; everything else is kept as
-raw fields for a caller to use, or ignored.
+Only ``[PIPES]`` is read today, for EPANET reach lengths. The section parser is
+kept separate from it because SWMM topology will need other sections of the
+same layout: https://github.com/DHI/mikeio1d/issues/213.
 """
 
 from __future__ import annotations

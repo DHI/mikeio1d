@@ -29,7 +29,7 @@ Nodes are connected together by reaches. Nodes can represent different entities:
 Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.
 
 ## Reading a network as a graph
-The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and `find()` and `recall()` translate between those names and the integers the graph uses.
+The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and the network is addressed by those names throughout. The graph itself is labelled with integers, each node carrying its name as the `address` attribute; `resolve()` gives the integer for a name, as `Location.node`. That integer is a graph node, not a model node's id: a break point is a graph node too, and a model node is always named by its id. The graph is read-only, since the network's lookups are built from it: `network.graph.copy()` gives one to edit.
 
 ![A reach's own first and last grid point sit exactly where the reach's nodes do, so each is joined to its node by an edge of length `0.0` flagged `boundary`. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.](../images/docs/res1d_network_mapping.svg)
 
@@ -43,6 +43,58 @@ The module needs the `network` extra:
 ```bash
 pip install mikeio1d[network]
 ```
+
+## Reading only what you need
+
+`Network.open` reads the header and the topology, and no timeseries:
+
+```python
+from mikeio1d.network import Network
+
+network = Network.open("model.res1d")
+```
+
+The network then answers from the file header and its own break points, still without reading any:
+
+```python
+network.period                                     # (start, end)
+network.quantities                                 # {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
+network.resolve("manhole_12")                      # Location(address=..., quantities=(...), node=...)
+network.locations(reach="100l1", quantity="Discharge")
+```
+
+`resolve()` returns `None` for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a `distance_tol` to snap a measured chainage onto the model's:
+
+```python
+network.resolve(("100l1", 23.8), distance_tol=0.1)
+# Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
+```
+
+`read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and loads only the variables asked for, each as its whole time series, in one batched call per file:
+
+```python
+points = network.locations(reach="100l1", quantity="Discharge")
+network.read([(point, "Discharge") for point in points])
+```
+
+A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `distance_tol`, so a measured chainage can be read without resolving it first.
+
+`to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network. `to_dataframe()` labels its columns `(address, quantity)`, as `read()` does; `to_dataset()` indexes locations by their graph integer and carries each one's name alongside.
+
+::: {.callout-note}
+## Each read goes to the file
+A network keeps the topology and where each variable is, not the file. Each `read()` opens the result file for just the nodes, reaches and quantities it asks for, loads them and lets go, so a handful of locations costs a handful of series, however large the file. A reach is loaded with all of its gridpoints.
+
+A network opened from a `Res1D` reads from that `Res1D`'s file on disk, so edits made to it in memory with `modify()` are not seen.
+:::
+
+## Not every location carries data
+
+Every address in a network is a location you can read from, but some formats leave some of them empty. `resolve()` still finds such a location, with an empty `quantities`, and `read()` refuses it with a `KeyError`. Check `quantities` when matching a sensor to a location.
+
+* **MIKE 1D (`.res1d`)**: nodes and reach grid points both carry data.
+* **MIKE 11 (`.res11`)**: only reach grid points carry data; nodes are empty. To compare a sensor at a node, read a grid point next to it, which `locations(reach=...)` lists.
+* **EPANET (`.res`)**: a pipe's flow is read at the pipe's start, `(pipe_id, 0.0)`. With the `.inp` beside the `.res` (same folder and stem), or passed in `companions`, it can also be read at the pipe's end; the two give the same series. A `.resx` beside the `.res` adds tank volumes and pump energy. Pass `companions=[]` to read the `.res` alone.
 
 ## Additional resources
 - [MIKE 1D API](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)
