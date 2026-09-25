@@ -23,8 +23,13 @@ import pandas as pd
 from ..res1d import Res1D
 from ..quantities import TimeSeriesId
 from ..quantities import TimeSeriesIdGroup
-from ._policy import _NO_NAME_FILTER_EXTENSIONS
-from ._policy import _suffix_of
+
+_NO_NAME_FILTER_EXTENSIONS = frozenset({".resx"})
+"""Result files whose series cannot be picked out by node or reach name.
+
+A '.resx' opened with a node filter reads that node's series as zeros, without
+an error. Its series can still be picked out by quantity.
+"""
 
 
 @dataclass(frozen=True)
@@ -43,7 +48,7 @@ def _open_for(path: Path, tsids: Sequence[TimeSeriesId]) -> Res1D:
     its gridpoints, which is as fine as the filter goes.
     """
     nodes, reaches = [], []
-    if _suffix_of(path) not in _NO_NAME_FILTER_EXTENSIONS:
+    if path.suffix.lower() not in _NO_NAME_FILTER_EXTENSIONS:
         nodes = sorted({t.name for t in tsids if t.group == TimeSeriesIdGroup.NODE})
         reaches = sorted({t.name for t in tsids if t.group == TimeSeriesIdGroup.REACH})
     return Res1D(

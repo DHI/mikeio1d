@@ -23,7 +23,8 @@ from typing import Any
 
 from ..res1d import Res1D
 from ._inp import read_pipe_lengths
-from ._policy import _as_res1d, _suffix_of
+from ._res1d import _as_res1d
+from ._res1d import _suffix_of
 from ._res1d import _series_by_key
 from ._res1d import _units_of
 

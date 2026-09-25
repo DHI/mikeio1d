@@ -10,7 +10,7 @@ pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
 from mikeio1d.network import Network, _loader
-from mikeio1d.network._policy import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
+from mikeio1d.network._loader import _NETWORK_EXTENSIONS, _UNSUPPORTED_EXTENSIONS
 from mikeio1d.network import _companions
 from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths

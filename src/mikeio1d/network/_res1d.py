@@ -31,6 +31,25 @@ from ._results import _Series
 from ._types import NetworkReach, ReachBreakPoint
 
 
+def _path_of(file: str | Path | Res1D) -> Path:
+    """Give the path of a result file, whether named or already open."""
+    if isinstance(file, Res1D):
+        return Path(str(file.file_path))
+    if isinstance(file, (str, Path)):
+        return Path(file)
+    raise TypeError(f"Expected a str, Path or Res1D object, got {type(file).__name__!r}")
+
+
+def _suffix_of(file: str | Path | Res1D) -> str:
+    """Give a result file's lower-case extension, including its dot."""
+    return _path_of(file).suffix.lower()
+
+
+def _as_res1d(file: str | Path | Res1D) -> Res1D:
+    """Open a result file, or take one already open."""
+    return file if isinstance(file, Res1D) else Res1D(str(_path_of(file)))
+
+
 def _units_of(res: Res1D) -> dict[str, str]:
     """Read the unit abbreviation of every quantity a file declares, from its header."""
     return {
