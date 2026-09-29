@@ -167,7 +167,7 @@ def _load_network(
 
     found, discovered = _companion_paths(res, companions)
     try:
-        extra, lengths = _read_companions(topology, found)
+        extra = _read_companions(topology, found)
         if extra is not None:
             series_by_key, units = _merge_companion(series_by_key, units, extra)
     except ValueError as err:
@@ -175,4 +175,4 @@ def _load_network(
             raise
         raise _blame_the_companions(res, found, err) from err
 
-    return _load_res1d_network(topology, series_by_key=series_by_key, units=units, lengths=lengths)
+    return _load_res1d_network(topology, series_by_key=series_by_key, units=units)

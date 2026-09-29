@@ -123,17 +123,15 @@ def _link_length(reach: ResultReach) -> float | None:
     return float(str(np.float32(sum(lengths))))
 
 
-def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | None:
+def _resolve_reach_length(reach: ResultReach) -> float | None:
     """Resolve a reach's effective length.
 
-    A length read from a companion input file wins, then an EPANET link's own,
-    then the one mikeio1d adds up from gridpoints. Zero means undefined from
-    any source: an EPANET pump or valve has length 0. A zero-length reach would
-    look free to length-weighted graph algorithms, and would put a link-node
-    reach's two breakpoints on one spot.
+    An EPANET link's own, or else the one mikeio1d adds up from gridpoints.
+    Zero means undefined from either source: an EPANET pump or valve has length
+    0. A zero-length reach would look free to length-weighted graph algorithms,
+    and would put a link-node reach's two breakpoints on one spot.
     """
-    if length is None:
-        length = _link_length(reach)
+    length = _link_length(reach)
     return (length if length is not None else reach.length) or None
 
 
@@ -267,7 +265,6 @@ def _load_res1d_network(
     *,
     series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
     units: Mapping[str, str],
-    lengths: dict[str, float] | None = None,
 ) -> tuple[list[NetworkReach], _Results]:
     """Read a result file as reaches, and as the results a network reads through.
 
@@ -285,11 +282,7 @@ def _load_res1d_network(
         What each node and gridpoint carries, a companion's series included.
     units : mapping of str to str
         Unit abbreviation per quantity ID, a companion's included.
-    lengths : dict of str to float, optional
-        Reach lengths from a companion ``.inp``, which no result file carries.
     """
-    lengths = lengths or {}
-
     reaches: list[NetworkReach] = []
     series: dict[Address, dict[str, _Series]] = {}
     for reach in res.reaches.values():
@@ -299,7 +292,7 @@ def _load_res1d_network(
                 f"mikeio1d reported no start/end node for reach {reach.name!r}; "
                 "this result format's topology cannot be represented as a Network."
             )
-        length = _resolve_reach_length(lengths.get(reach.name), reach)
+        length = _resolve_reach_length(reach)
         breakpoints, carried = _build_reach_breakpoints(
             reach, length=length, series_by_key=series_by_key
         )

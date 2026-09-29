@@ -1,9 +1,10 @@
 """Files read alongside a result file, and the names they use.
 
-An EPANET run writes up to three files worth reading: the ``.res`` holding the
-network and its main results, a ``.resx`` holding extra results for the same
-network, and the ``.inp`` input file, which is the only one carrying reach
-lengths. A companion is found by sharing the result file's folder and stem.
+An EPANET run writes two result files: the ``.res`` holding the network, its
+reach lengths and its main results, and a ``.resx`` holding extra results for
+the same network. A companion is found by sharing the result file's folder and
+stem. The ``.inp`` input file beside them is not read: everything a network
+needs from it is in the ``.res`` too.
 """
 
 from __future__ import annotations
@@ -22,7 +23,6 @@ from pathlib import Path
 from typing import Any
 
 from ..res1d import Res1D
-from ._inp import read_pipe_lengths
 from ._res1d import _as_res1d
 from ._res1d import _suffix_of
 from ._res1d import _series_by_key
@@ -32,10 +32,9 @@ _COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
 """Result extensions whose companions can be found by folder and stem.
 
 Only EPANET's ``.res``, because no other product this reader knows writes
-companions worth looking for. A MIKE result sitting beside an unrelated ``.inp``
-is the case this keeps out: found companions are read without the caller asking,
-so the search has to be narrow enough that finding one is good evidence it
-belongs.
+companions worth looking for. Found companions are read without the caller
+asking, so the search has to be narrow enough that finding one is good evidence
+it belongs.
 """
 
 # The encodings a companion file's text is worth re-reading as. mikeio1d hands
@@ -82,8 +81,7 @@ def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
     ----------
     locations : mapping of str to value
         What the companion file said, keyed by its own spelling of each name:
-        the node or reach names of a companion result, or the reach lengths
-        read from an input file.
+        the node or reach names of a companion result.
     known : container of str
         The main file's names for the same kind of location.
 
@@ -113,18 +111,6 @@ class _Companion:
 
     series_by_key: dict[_SeriesKey, dict[str, _Series]]
     units: Mapping[str, str]
-
-
-def _read_companion_lengths(inp: str | Path) -> dict[str, float]:
-    """Read reach lengths from a companion ``.inp`` input file."""
-    path = Path(inp)
-    if path.suffix.lower() != ".inp":
-        raise ValueError(
-            f"Expected an EPANET '.inp' input file, got '{path.suffix}'. "
-            "This argument reads reach lengths from the model input, not "
-            "from a result file."
-        )
-    return read_pipe_lengths(path)
 
 
 def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
@@ -239,11 +225,10 @@ def _refuse_clashes(
             )
 
 
-def _find_epanet_companions(res: Path) -> tuple[Path | None, Path | None]:
-    """Find the ``.resx`` and ``.inp`` files sitting beside an EPANET ``.res``.
+def _find_epanet_companion(res: Path) -> Path | None:
+    """Find the ``.resx`` sitting beside an EPANET ``.res``.
 
     A companion is recognised by sharing the result file's directory and stem.
-    Either may be missing, in which case ``None`` takes its place.
 
     Parameters
     ----------
@@ -252,21 +237,17 @@ def _find_epanet_companions(res: Path) -> tuple[Path | None, Path | None]:
 
     Returns
     -------
-    tuple of (Path or None, Path or None)
-        The ``.resx`` and ``.inp`` companions, in that order.
+    Path or None
+        The ``.resx`` companion, or None if there is none.
     """
-
-    def sibling(suffix: str) -> Path | None:
-        for candidate in sorted(res.parent.iterdir()):
-            if (
-                candidate.is_file()
-                and candidate.stem == res.stem
-                and candidate.suffix.lower() == suffix
-            ):
-                return candidate
-        return None
-
-    return sibling(".resx"), sibling(".inp")
+    for candidate in sorted(res.parent.iterdir()):
+        if (
+            candidate.is_file()
+            and candidate.stem == res.stem
+            and candidate.suffix.lower() == ".resx"
+        ):
+            return candidate
+    return None
 
 
 def _companion_paths(
@@ -295,15 +276,15 @@ def _companion_paths(
     if file_path is None or _suffix_of(file_path) not in _COMPANION_SEARCH_EXTENSIONS:
         return [], False
 
-    found = [path for path in _find_epanet_companions(Path(file_path)) if path is not None]
-    return list(found), bool(found)
+    found = _find_epanet_companion(Path(file_path))
+    return ([found], True) if found is not None else ([], False)
 
 
 def _read_companions(
     res: Res1D,
     companions: Sequence[str | Path | Res1D],
-) -> tuple[_Companion | None, dict[str, float] | None]:
-    """Read the companions, sorting them by what each contributes.
+) -> _Companion | None:
+    """Read the companions.
 
     Parameters
     ----------
@@ -314,17 +295,16 @@ def _read_companions(
 
     Returns
     -------
-    tuple of (_Companion or None, dict or None)
-        Extra results and reach lengths, each None when no companion supplied it.
+    _Companion or None
+        The extra results, or None when no companion was given.
 
     Raises
     ------
     ValueError
-        If an extension is not one a companion can have, or if two companions
-        would supply the same thing.
+        If an extension is not one a companion can have, or if two ``.resx``
+        companions are given.
     """
     extra: _Companion | None = None
-    lengths: dict[str, float] | None = None
 
     for companion in companions:
         suffix = _suffix_of(companion)
@@ -333,14 +313,14 @@ def _read_companions(
                 raise ValueError("Two '.resx' companions were given; a network can read one.")
             extra = _open_companion_result(res, companion)
         elif suffix == ".inp":
-            if lengths is not None:
-                raise ValueError("Two '.inp' companions were given; a network can read one.")
-            # Its names may be spelled in another encoding than the result file's.
-            lengths = _rekey_by_main_file(_read_companion_lengths(companion), res.reaches)
+            raise ValueError(
+                "An '.inp' is no longer a companion: the '.res' stores every reach length "
+                "itself, so the input file adds nothing. Leave it out of companions."
+            )
         else:
             raise ValueError(
                 f"'{suffix}' is not a companion a network can read. Expected '.resx' for "
-                "extra results or '.inp' for reach lengths."
+                "extra results."
             )
 
-    return extra, lengths
+    return extra
