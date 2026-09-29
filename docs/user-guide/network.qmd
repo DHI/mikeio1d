@@ -99,4 +99,5 @@ Every address in a network is a location you can read from, but some formats lea
 ## Additional resources
 - [MIKE 1D API](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/)
 - [`Network` API reference](../api/index.qmd)
+- [Glossary of the network module's terms](https://github.com/DHI/mikeio1d/blob/main/CONTEXT.md)
 - [Network notebook](https://nbviewer.jupyter.org/github/DHI/mikeio1d/blob/main/notebooks/network.ipynb)
