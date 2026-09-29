@@ -5,7 +5,7 @@
 ### Added
 - `mikeio1d.network`: build a graph-shaped `Network` from a result file, with
   `Network.open`, `Network.reaches`, `to_networkx`, `to_dataframe`/`to_dataset`, and the
-  EPANET `.resx`/`.inp` companions. Needs the new `network` extra
+  EPANET `.resx` companion. Needs the new `network` extra
   (`pip install mikeio1d[network]`).
 - `Network.period`, `Network.quantities`, `Network.resolve`, `Network.addresses` and
   `Network.read`, for asking a result file what it holds and reading only the series a
@@ -54,13 +54,15 @@
   `NetworkReach` are exported from `mikeio1d.network` (#250).
 - `ReachBreakpoint` is gone: `NetworkReach.breakpoints` holds the breakpoints' addresses,
   `(reach_id, position)` pairs that `Network.read` takes as they are (#250).
-- A position past the last breakpoint of a reach of unknown length, such as an EPANET pipe's
-  far end without its `.inp`, is refused with a message saying why, rather than one inviting a
-  wider `position_tol` (#250).
+- A position past the last breakpoint of a reach of unknown length, such as an EPANET pump's
+  far end, is refused with a message saying why, rather than one inviting a wider
+  `position_tol` (#250).
 - A reach of unknown length has one breakpoint, at its start, rather than one at each end:
-  its far end has no known position. An EPANET network read without its `.inp` has 24 graph
-  nodes where it had 37, and 36 with its companions, since link `9` has no length in the
-  `.inp` either (#250).
+  its far end has no known position. The EPANET test network has 36 graph nodes where it had
+  37, since pump `9` has no length (#250).
+- EPANET reach lengths are read from the `.res` itself, so a pipe has its end address without
+  the `.inp`. The `.inp` is no longer a companion: `Network.open` does not look for it, and
+  refuses one passed in `companions` with a `ValueError` (#250).
 - `Network.read` snaps each item's position only onto a breakpoint carrying the item's
   quantity, so a caller need not know the grid is staggered to choose a `position_tol`.
   `Network.resolve` takes `quantity=` to do the same, and answers `None` exactly when `read`
