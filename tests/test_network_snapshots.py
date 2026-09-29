@@ -18,6 +18,8 @@ Where the baseline differs from modelskill's recording:
 - Names changed, values did not: alias became address, the graph integer
   graph_node, and distance position. The res1d and res11 snapshots are
   otherwise modelskill's.
+- The river snapshot is new here. modelskill recorded none, so it holds this
+  module's own output from when it was added.
 
 Cases are named for the fixture and its load options rather than for a
 constructor, so reshaping the entry points cannot quietly rewrite the target.
@@ -43,6 +45,7 @@ _TESTDATA = Path(__file__).parent / "testdata"
 _SNAPSHOTS = _TESTDATA / "network_snapshots"
 
 _RES1D = str(_TESTDATA / "network.res1d")
+_RIVER = str(_TESTDATA / "network_river.res1d")
 _RES11 = str(_TESTDATA / "network_cali.res11")
 _EPANET_RES = str(_TESTDATA / "epanet.res")
 _EPANET_RESX = str(_TESTDATA / "epanet.resx")
@@ -54,6 +57,7 @@ _EPANET_INP = str(_TESTDATA / "epanet.inp")
 # absence.
 LOADS = {
     "res1d": lambda: Network.open(_RES1D),
+    "res1d_river": lambda: Network.open(_RIVER),
     "res11": lambda: Network.open(_RES11),
     "epanet_with_companions": lambda: Network.open(
         _EPANET_RES, companions=[_EPANET_RESX, _EPANET_INP]
