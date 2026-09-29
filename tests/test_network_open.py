@@ -48,11 +48,55 @@ class TestWhatOpenAccepts:
         """Res1D documents a Path file_path, so a network has to cope with one."""
         network = Network.open(Res1D(Path(_RES1D)))
 
-        assert network.to_networkx().number_of_nodes() == Network.open(_RES1D).to_networkx().number_of_nodes()
+        assert (
+            network.to_networkx().number_of_nodes()
+            == Network.open(_RES1D).to_networkx().number_of_nodes()
+        )
 
     def test_anything_else_is_a_type_error(self):
         with pytest.raises(TypeError, match="str, Path or Res1D"):
             Network.open(42)
+
+
+class TestAFilteredRes1D:
+    """A filter decides which series a network carries, not what the network is."""
+
+    def test_a_name_filter_keeps_the_whole_network(self):
+        filtered = Network.open(Res1D(_RES1D, nodes=["1"], reaches=["100l1"]))
+
+        assert (
+            filtered.to_networkx().number_of_nodes()
+            == Network.open(_RES1D).to_networkx().number_of_nodes()
+        )
+
+    def test_a_location_the_filter_leaves_out_carries_nothing(self):
+        filtered = Network.open(Res1D(_RES1D, nodes=["1"], reaches=["100l1"]))
+
+        assert filtered.resolve("100").quantities == ()
+        assert filtered.resolve("1").quantities == ("WaterLevel",)
+        assert filtered.addresses(quantity="Discharge") == [("100l1", 23.8413574216414)]
+
+    def test_a_location_the_filter_keeps_reads_as_unfiltered(self):
+        filtered = Network.open(Res1D(_RES1D, nodes=["1"], reaches=["100l1"]))
+        items = [("1", "WaterLevel"), (("100l1", 23.8413574216414), "Discharge")]
+
+        assert filtered.read(items).equals(Network.open(_RES1D).read(items))
+
+    def test_a_quantity_filter_leaves_only_its_quantities(self):
+        filtered = Network.open(Res1D(_RES1D, quantities=["WaterLevel"]))
+
+        assert list(filtered.quantities) == ["WaterLevel"]
+
+    @pytest.mark.parametrize(
+        "time_filter", [{"time": slice("1994-08-07 17:00", None)}, {"step_every": 2}]
+    )
+    def test_a_time_filter_is_not_implemented(self, time_filter):
+        with pytest.raises(NotImplementedError, match="time or step_every"):
+            Network.open(Res1D(_RES1D, **time_filter))
+
+    def test_a_time_filtered_companion_is_not_implemented(self):
+        with pytest.raises(NotImplementedError, match="time or step_every"):
+            Network.open(_EPANET_RES, companions=[Res1D(_EPANET_RESX, step_every=2)])
 
 
 class TestCompanionDiscovery:
@@ -236,7 +280,9 @@ def test_a_pipe_the_inp_gives_no_length_for_has_one_breakpoint(tmp_path):
     addresses = [address for _, address in network.to_networkx().nodes(data="address")]
 
     assert _lengths(network)[_PIPE] is None
-    assert [address for address in addresses if isinstance(address, tuple) and address[0] == _PIPE] == [
+    assert [
+        address for address in addresses if isinstance(address, tuple) and address[0] == _PIPE
+    ] == [
         (_PIPE, 0.0),
     ]
 

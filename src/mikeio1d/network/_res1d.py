@@ -18,9 +18,12 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from ..filter import StepEveryFilter
+from ..filter import TimeFilter
 from ..res1d import Res1D
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from collections.abc import Mapping
 
     from ..result_network import ResultGridPoint, ResultNode, ResultQuantity, ResultReach
@@ -46,8 +49,36 @@ def _suffix_of(file: str | Path | Res1D) -> str:
 
 
 def _as_res1d(file: str | Path | Res1D) -> Res1D:
-    """Open a result file, or take one already open."""
-    return file if isinstance(file, Res1D) else Res1D(str(_path_of(file)))
+    """Open a result file, or take one already open.
+
+    Raises
+    ------
+    NotImplementedError
+        If a ``Res1D`` was opened with a ``time`` or ``step_every`` filter.
+    """
+    if not isinstance(file, Res1D):
+        return Res1D(str(_path_of(file)))
+    # A network reads its series from the file on disk, over the whole period,
+    # so a time filter would be dropped without a word.
+    if any(
+        isinstance(sub_filter, (TimeFilter, StepEveryFilter)) and sub_filter.use_filter()
+        for sub_filter in file.filter.sub_filters
+    ):
+        raise NotImplementedError(
+            f"'{_path_of(file).name}' was opened with a time or step_every filter, which a "
+            "network cannot keep yet: it reads whole time series. Pass the path, or a Res1D "
+            "opened without time= and step_every=."
+        )
+    return file
+
+
+def _unfiltered(res: Res1D) -> Res1D:
+    """Give the same file with no filter, whose nodes and reaches are the whole network.
+
+    A name filter leaves out of ``res.nodes`` and ``res.reaches`` every element
+    it does not name, so the file is opened again, reading its header only.
+    """
+    return Res1D(str(_path_of(res))) if res.filter.use_filter() else res
 
 
 def _units_of(res: Res1D) -> dict[str, str]:
@@ -143,15 +174,33 @@ def _ordered_gridpoints(reach: ResultReach) -> list[ResultGridPoint]:
     return reach.gridpoints[:1]
 
 
-def _series_by_key(res: Res1D) -> dict[_SeriesKey, dict[str, _Series]]:
-    """Map every node and gridpoint of a result file to the series it carries."""
-    found: dict[_SeriesKey, dict[str, _Series]] = {
-        node_id: _series_at(node) for node_id, node in res.nodes.items()
-    }
+def _locations(res: Res1D) -> Iterator[tuple[_SeriesKey, ResultNode | ResultGridPoint]]:
+    """Give every node and gridpoint of a result file, under its key."""
+    yield from res.nodes.items()
     for reach_id, reach in res.reaches.items():
         for i, gridpoint in enumerate(_ordered_gridpoints(reach)):
-            found[(reach_id, i)] = _series_at(gridpoint)
-    return found
+            yield (reach_id, i), gridpoint
+
+
+def _series_by_key(res: Res1D) -> dict[_SeriesKey, dict[str, _Series]]:
+    """Map every node and gridpoint of a result file to the series it carries.
+
+    Only what the file's filter lets through: a node or reach it leaves out is
+    absent, and a quantity it leaves out is carried nowhere.
+    """
+    return {key: _series_at(location) for key, location in _locations(res)}
+
+
+def _series_by_key_within(topology: Res1D, res: Res1D) -> dict[_SeriesKey, dict[str, _Series]]:
+    """Map every location of ``topology`` to the series ``res`` carries there.
+
+    ``res`` is the same file as ``topology``, maybe filtered; a location its
+    filter leaves out is kept, carrying nothing.
+    """
+    found = _series_by_key(res)
+    if topology is res:
+        return found
+    return {key: found.get(key, {}) for key, _ in _locations(topology)}
 
 
 def _build_reach_breakpoints(

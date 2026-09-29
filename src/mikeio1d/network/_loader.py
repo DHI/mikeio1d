@@ -29,7 +29,8 @@ from ._companions import _read_companions
 from ._res1d import _as_res1d
 from ._res1d import _path_of
 from ._res1d import _load_res1d_network
-from ._res1d import _series_by_key
+from ._res1d import _series_by_key_within
+from ._res1d import _unfiltered
 from ._res1d import _units_of
 
 _NETWORK_EXTENSIONS = frozenset({".res1d", ".res11", ".res"})
@@ -125,13 +126,15 @@ def _load_network(
     # Before opening, so a file no network can come from is refused unread.
     _validate_extension(_path_of(res).suffix)
     res = _as_res1d(res)
+    # A filtered Res1D decides which series are read, not what the network is.
+    topology = _unfiltered(res)
 
-    series_by_key = _series_by_key(res)
+    series_by_key = _series_by_key_within(topology, res)
     units = _units_of(res)
 
     found, discovered = _companion_paths(res, companions)
     try:
-        extra, lengths = _read_companions(res, found)
+        extra, lengths = _read_companions(topology, found)
         if extra is not None:
             series_by_key, units = _merge_companion(series_by_key, units, extra)
     except ValueError as err:
@@ -139,4 +142,4 @@ def _load_network(
             raise
         raise _blame_the_companions(res, found, err) from err
 
-    return _load_res1d_network(res, series_by_key=series_by_key, units=units, lengths=lengths)
+    return _load_res1d_network(topology, series_by_key=series_by_key, units=units, lengths=lengths)

@@ -83,9 +83,13 @@ class Network:
         ----------
         res : str, Path or Res1D
             Path to a ``.res1d``, ``.res11`` or ``.res`` result file, or an
-            already-opened :class:`~mikeio1d.Res1D`. A ``Res1D`` gives the
-            topology; series are read from its file on disk, so edits made to
-            it in memory with ``modify()`` are not seen.
+            already-opened :class:`~mikeio1d.Res1D`. Series are read from the
+            file on disk, so edits made to a ``Res1D`` in memory with
+            ``modify()`` are not seen. A ``Res1D`` opened with ``nodes=``,
+            ``reaches=`` or ``quantities=`` still gives the whole network, but
+            only the series its filter lets through: a location it leaves out
+            is there, carrying nothing. One opened with ``time=`` or
+            ``step_every=`` is not supported yet.
         companions : sequence of str, Path or Res1D, or None, optional
             Files read alongside the result and recognised by their extension:
 
@@ -100,7 +104,8 @@ class Network:
 
             ``None`` *(default)* looks for them beside the result file, matching
             its folder and stem; ``[]`` reads none; a list reads exactly those.
-            Only EPANET results are looked beside.
+            Only EPANET results are looked beside. A companion passed as a
+            ``Res1D`` follows the same rules for filters as ``res``.
 
         Returns
         -------
@@ -109,7 +114,9 @@ class Network:
         Raises
         ------
         NotImplementedError
-            If no network can be built from the file's extension.
+            If no network can be built from the file's extension, or if the
+            result or a companion is a ``Res1D`` opened with ``time=`` or
+            ``step_every=``.
         ValueError
             If a companion has an extension this reader does not know, if two
             companions of the same kind are given, or if a ``.resx`` does not
