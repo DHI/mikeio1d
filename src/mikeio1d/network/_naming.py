@@ -54,7 +54,7 @@ class _Naming:
 
     def __init__(self, graph: nx.Graph, reaches: Mapping[str, NetworkReach]):
         self._graph_nodes: dict[Address, int] = {
-            address: node for node, address in graph.nodes(data="address")
+            address: graph_node for graph_node, address in graph.nodes(data="address")
         }
         # Each reach's breakpoint positions, ascending, for bisect.
         self._positions: dict[str, list[float]] = {}

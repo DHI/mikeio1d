@@ -206,9 +206,9 @@ class Network:
         df = self.to_dataframe()
         if len(df.columns) == 0:
             return xr.Dataset()
-        positions: dict[str, list[int]] = {}
+        columns_by_quantity: dict[str, list[int]] = {}
         for i, (_, quantity) in enumerate(df.columns):
-            positions.setdefault(quantity, []).append(i)
+            columns_by_quantity.setdefault(quantity, []).append(i)
         graph_nodes = self._naming.graph_nodes
         ds = xr.Dataset(
             {
@@ -221,7 +221,7 @@ class Network:
                     dims=["time", "graph_node"],
                     attrs={"long_name": str(quantity)},
                 )
-                for quantity, cols in positions.items()
+                for quantity, cols in columns_by_quantity.items()
             }
         )
 
