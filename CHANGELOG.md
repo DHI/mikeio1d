@@ -67,6 +67,9 @@
   would refuse. A position within 1e-3 of a breakpoint names it, is given back in the file's
   spelling, and is never snapped away from it; `position_tol` only widens that window, and is
   checked on every call (#250).
+- `Network.open` refuses a result holding catchments and no reaches, which used to open as an
+  empty network. Catchments beside a network are left out with a warning naming their
+  quantities, since a catchment has no address in a network (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
