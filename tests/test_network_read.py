@@ -116,7 +116,16 @@ class TestWhatQuantitiesMeans:
     def test_it_names_what_the_network_carries(self, network):
         assert set(network.quantities) == {"WaterLevel", "Discharge"}
 
-    def test_a_header_quantity_no_location_carries_is_left_out(self, river):
+    @pytest.mark.parametrize(
+        "quantity",
+        [
+            "Discharge:Sensor:SensorGauge1",
+            "DischargeInStructure",
+            "FlowAreaInStructure",
+            "FlowVelocityInStructure",
+        ],
+    )
+    def test_a_header_quantity_no_location_carries_is_left_out(self, river, quantity):
         """A river result keeps sensor and structure quantities off the network.
 
         Nothing in a network can address them, so advertising them would leave
@@ -124,8 +133,8 @@ class TestWhatQuantitiesMeans:
         """
         declared = {str(q.Id) for q in Res1D(_RIVER).result_data.Quantities}
 
-        assert "Discharge:Sensor:SensorGauge1" in declared
-        assert "Discharge:Sensor:SensorGauge1" not in river.quantities
+        assert quantity in declared
+        assert quantity not in river.quantities
 
     def test_everything_offered_is_readable_somewhere(self, river):
         somewhere = {
@@ -498,6 +507,38 @@ class TestReadingOneQuantity:
     def test_a_tolerance_with_a_quantity_is_refused(self, network):
         with pytest.raises(TypeError, match="position_tol only with items"):
             network.read(quantity="Discharge", position_tol=0.1)
+
+
+class TestStructures:
+    """A structure is read where its reach carries it, not by its own id."""
+
+    @pytest.mark.parametrize(
+        "reach_id, structure_id, position",
+        [("Weir:119w1", "119w1", 0.5), ("Pump:115p1", "115p1", 41.214)],
+    )
+    def test_an_urban_structure_is_read_at_its_reachs_middle(
+        self, network, reach_id, structure_id, position
+    ):
+        """Res1D names the structure without the type prefix its reach carries."""
+        (address,) = network.addresses(reach=reach_id, quantity="Discharge")
+        expected = Res1D(_RES1D).structures[structure_id].Discharge.read()
+
+        read = network.read([(address, "Discharge")])
+
+        assert address == (reach_id, pytest.approx(position, abs=1e-3))
+        np.testing.assert_array_equal(read.iloc[:, 0].to_numpy(), expected.iloc[:, 0].to_numpy())
+
+    def test_a_river_structure_is_read_at_the_gridpoint_it_sits_on(self, river):
+        """bridge1 sits on the river at 53126.75, where a gridpoint carries Discharge."""
+        address = ("river", 53126.75)
+        res = Res1D(_RIVER)
+        (gridpoint,) = [gp for gp in res.reaches["river"].gridpoints if gp.chainage == 53126.75]
+        expected = res.read([gridpoint.Discharge.timeseries_id], column_mode="timeseries")
+
+        read = river.read([(address, "Discharge")])
+
+        assert "Discharge" in river.resolve(address).quantities
+        np.testing.assert_array_equal(read.iloc[:, 0].to_numpy(), expected.iloc[:, 0].to_numpy())
 
 
 class TestTheGraph:
