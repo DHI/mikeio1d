@@ -15,13 +15,12 @@ from mikeio1d.network import Network
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _EPANET_RES = str(_TESTDATA / "epanet.res")
-_EPANET_INP = str(_TESTDATA / "epanet.inp")
 _RIVER = str(_TESTDATA / "network_river.res1d")
 
 
 @pytest.fixture
 def epanet():
-    return Network.open(_EPANET_RES, companions=[_EPANET_INP])
+    return Network.open(_EPANET_RES, companions=[])
 
 
 def _at(ds, graph_node):

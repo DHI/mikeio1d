@@ -47,7 +47,7 @@ def network():
 
 @pytest.fixture(scope="module")
 def epanet():
-    """EPANET, whose companions bring both extra quantities and reach lengths."""
+    """EPANET, whose .resx companion brings extra quantities."""
     return Network.open(_EPANET_RES)
 
 
@@ -298,14 +298,13 @@ class TestListingAddresses:
     def test_a_reach_carrying_nothing_for_a_quantity_is_empty(self, network):
         assert network.addresses(reach="100l1", quantity="Volume") == []
 
-    def test_a_pipe_without_a_length_has_only_its_near_breakpoint(self):
-        """Without the .inp a pipe has no length, so there is no position for its far end."""
-        alone = Network.open(_EPANET_RES, companions=[])
+    def test_a_pump_has_only_its_near_breakpoint(self, epanet):
+        """A pump has no length, so there is no position for its far end."""
+        assert epanet.reaches["9"].breakpoints == (("9", 0.0),)
+        assert epanet.addresses(reach="9") == [("9", 0.0)]
 
-        assert alone.reaches["10"].breakpoints == (("10", 0.0),)
-        assert alone.addresses(reach="10") == [("10", 0.0)]
-
-    def test_both_breakpoints_are_listed_once_the_inp_gives_a_length(self, epanet):
+    def test_a_pipe_lists_both_breakpoints(self, epanet):
+        """Its length comes from the .res itself."""
         assert epanet.addresses(reach="10") == [("10", 0.0), ("10", _PIPE_LENGTH)]
 
     def test_a_reach_that_is_not_here_is_named(self, network):
@@ -435,12 +434,10 @@ class TestReadingSeries:
         with pytest.raises(KeyError, match="none named 'no_such_node'"):
             network.read([("no_such_node", "WaterLevel")])
 
-    def test_the_far_end_of_a_pipe_without_a_length_says_why_it_is_missing(self):
+    def test_the_far_end_of_a_pump_says_why_it_is_missing(self, epanet):
         """Widening position_tol would snap the far end onto the near one."""
-        alone = Network.open(_EPANET_RES, companions=[])
-
         with pytest.raises(KeyError, match="no known length.*however wide position_tol"):
-            alone.read([(("10", _PIPE_LENGTH), "Flow")])
+            epanet.read([(("9", 10.0), "Flow")])
 
     def test_a_location_lacking_the_quantity_says_what_it_has(self, network):
         with pytest.raises(KeyError, match=r"carries \['WaterLevel'\], not 'Discharge'"):

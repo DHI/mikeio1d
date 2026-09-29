@@ -11,8 +11,12 @@ Where the baseline differs from modelskill's recording:
 
 - A reach of unknown length has one breakpoint, at its start, not a second at
   distance None (e7f205a). Both EPANET snapshots were re-recorded: alone, every
-  pipe loses its far breakpoint (37 graph nodes to 24); with companions, only
-  link 9, which the .inp gives no length either (37 to 36).
+  pipe lost its far breakpoint (37 graph nodes to 24); with companions, only
+  link 9, which the .inp gave no length either (37 to 36).
+- EPANET lengths come from the .res, not the .inp, which is no longer a
+  companion (f3e94c8). The snapshot with companions held still; the one alone
+  was re-recorded and now has the same graph (36 graph nodes), differing only
+  in the .resx quantities.
 - The loads filtered by node or quantity are gone, with the open options they
   used (41cb850). A filtered read is Network.read's to test.
 - Names changed, values did not: alias became address, the graph integer
@@ -49,19 +53,15 @@ _RIVER = str(_TESTDATA / "network_river.res1d")
 _RES11 = str(_TESTDATA / "network_cali.res11")
 _EPANET_RES = str(_TESTDATA / "epanet.res")
 _EPANET_RESX = str(_TESTDATA / "epanet.resx")
-_EPANET_INP = str(_TESTDATA / "epanet.inp")
 
 # Each case is a fixture plus the options it is loaded with. The lone EPANET load
 # has to say companions=[] where modelskill said nothing at all: discovery finds
-# the .resx and .inp sitting beside the fixture, and that load is about their
-# absence.
+# the .resx sitting beside the fixture, and that load is about its absence.
 LOADS = {
     "res1d": lambda: Network.open(_RES1D),
     "res1d_river": lambda: Network.open(_RIVER),
     "res11": lambda: Network.open(_RES11),
-    "epanet_with_companions": lambda: Network.open(
-        _EPANET_RES, companions=[_EPANET_RESX, _EPANET_INP]
-    ),
+    "epanet_with_companions": lambda: Network.open(_EPANET_RES, companions=[_EPANET_RESX]),
     "epanet_alone": lambda: Network.open(_EPANET_RES, companions=[]),
 }
 
@@ -130,23 +130,3 @@ def test_loader_output_is_unchanged(case, update_snapshots):
 
     problems = _mismatches(actual, expected)
     assert not problems, "\n".join([f"'{case}' has changed:", *problems[:40]])
-
-
-def test_a_companion_is_read_the_same_whichever_line_endings_it_has(tmp_path):
-    """The snapshots only transfer if the ``.inp`` parser cannot tell them apart.
-
-    They came from a repository whose copy of ``epanet.inp`` has CRLF endings,
-    while this one keeps LF.
-    """
-    lf_end, crlf_end = bytes([10]), bytes([13, 10])
-    lf = Path(_EPANET_INP).read_bytes().replace(crlf_end, lf_end)
-    crlf = lf.replace(lf_end, crlf_end)
-    assert lf != crlf
-
-    as_lf, as_crlf = tmp_path / "lf.inp", tmp_path / "crlf.inp"
-    as_lf.write_bytes(lf)
-    as_crlf.write_bytes(crlf)
-
-    assert describe(Network.open(_EPANET_RES, companions=[as_lf])) == describe(
-        Network.open(_EPANET_RES, companions=[as_crlf])
-    )
