@@ -32,6 +32,7 @@ from ._graph import _generate_graph
 from ._loader import _load_network
 from ._naming import _Naming
 from ._naming import _is_breakpoint
+from ._naming import _window
 from ._types import Location
 from ._types import NetworkReach
 
@@ -522,9 +523,11 @@ class Network:
             ``[(a, quantity) for a in addresses(quantity=quantity)]``.
         position_tol : float, optional
             How far a position may be from a breakpoint's own and still mean
-            it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
-            snap a measured chainage onto the model's; the nearest breakpoint
-            inside the window wins. Ignored for a node ID. Only with ``items``.
+            it. Defaults to 1e-3, enough to absorb a rounded float, and never
+            narrows below it: a position that close to a breakpoint names it.
+            Widen it to snap a measured chainage onto the model's; the nearest
+            breakpoint inside the window wins. Checked for a node ID too, but
+            not used. Only with ``items``.
 
         Returns
         -------
@@ -587,6 +590,7 @@ class Network:
         if quantity is not None:
             return self._read_quantity(quantity, position_tol)
 
+        _window(position_tol)
         results = self._results
         # Every item is checked before anything is read.
         resolved: list[tuple[Address, str]] = []
@@ -692,9 +696,11 @@ class Network:
             file gives it, as in ``("Weir:119w1", 0.5)``.
         position_tol : float, optional
             How far a position may be from a breakpoint's own and still mean
-            it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
-            snap a measured chainage onto the model's; the nearest breakpoint
-            inside the window wins. Ignored for a node ID.
+            it. Defaults to 1e-3, enough to absorb a rounded float, and never
+            narrows below it: a position that close to a breakpoint names it.
+            Widen it to snap a measured chainage onto the model's; the nearest
+            breakpoint inside the window wins. Checked for a node ID too, but
+            not used.
 
         Returns
         -------

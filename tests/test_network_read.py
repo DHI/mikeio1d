@@ -185,6 +185,27 @@ class TestResolvingAnAddress:
         with pytest.raises(ValueError, match="finite, non-negative"):
             network.resolve(("100l1", 23.8), position_tol=position_tol)
 
+    @pytest.mark.parametrize("address", ["101", _Q_POINT], ids=["node", "breakpoint"])
+    def test_the_tolerance_is_checked_even_for_an_exact_hit(self, network, address):
+        with pytest.raises(ValueError, match="finite, non-negative"):
+            network.resolve(address, position_tol=-1.0)
+
+    def test_an_exact_hit_gives_the_position_the_file_stores(self, network):
+        """("100l1", 0) and ("100l1", 0.0) are the same key, but only one is the file's."""
+        resolved = network.resolve(("100l1", 0))
+
+        assert type(resolved.address[1]) is float
+
+    def test_a_rounded_position_names_the_breakpoint_the_file_stores(self, network):
+        resolved = network.resolve(("100l1", round(_Q_POINT[1], 4)))
+
+        assert resolved.address == _Q_POINT
+
+    def test_a_tolerance_below_the_default_does_not_narrow_it(self, network):
+        resolved = network.resolve(("100l1", round(_Q_POINT[1], 4)), position_tol=0.0)
+
+        assert resolved.address == _Q_POINT
+
     def test_a_location_carrying_nothing_still_resolves(self):
         """MIKE 11 keeps its timeseries on gridpoints, so its nodes hold none.
 
@@ -312,6 +333,13 @@ class TestReadingSeries:
     def test_a_tolerance_that_is_not_a_distance_is_refused(self, network):
         with pytest.raises(ValueError, match="finite, non-negative"):
             network.read([(("100l1", 23.8), "Discharge")], position_tol=-1.0)
+
+    @pytest.mark.parametrize(
+        "items", [[("101", "WaterLevel")], []], ids=["exact hit", "no items"]
+    )
+    def test_the_tolerance_is_checked_whatever_the_items(self, network, items):
+        with pytest.raises(ValueError, match="finite, non-negative"):
+            network.read(items, position_tol=-1.0)
 
     def test_a_whole_reach_is_one_call(self, network):
         """A reach observation needs every breakpoint, compared over the series."""

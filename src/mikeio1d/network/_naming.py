@@ -49,6 +49,30 @@ def _is_breakpoint(address: Address) -> bool:
     return isinstance(address, tuple)
 
 
+def _window(position_tol: float | None) -> float:
+    """Give the snapping window a caller's ``position_tol`` asks for.
+
+    Raises ValueError for a value that is not a distance. A value below
+    :data:`_POSITION_TOLERANCE` gives that tolerance, within which a position
+    names the breakpoint itself anyway.
+    """
+    if position_tol is None:
+        return _POSITION_TOLERANCE
+    if not math.isfinite(position_tol) or position_tol < 0:
+        raise ValueError(
+            f"position_tol must be a finite, non-negative number, got {position_tol!r}."
+        )
+    return max(position_tol, _POSITION_TOLERANCE)
+
+
+def _nearest(known: list[float], position: float) -> float | None:
+    """Find the position in an ascending list nearest to one given; None if it is empty."""
+    # Only the two positions either side of the one asked for can be nearest;
+    # of two equally near, the lower wins.
+    i = bisect.bisect_left(known, position)
+    return min(known[max(i - 1, 0) : i + 1], key=lambda d: abs(d - position), default=None)
+
+
 class _Naming:
     """The addresses in a network, and their graph nodes, built once from a graph.
 
@@ -82,32 +106,39 @@ class _Naming:
     def canonical(self, address: Address, *, position_tol: float | None = None) -> Address | None:
         """Give the network's own spelling of an address, or None if there is no such place.
 
-        An exact hit answers immediately. Failing that, a breakpoint is matched
-        on position within ``position_tol``, defaulting to
-        :data:`_POSITION_TOLERANCE`, so a caller need not reproduce a stored
-        float exactly.
+        ``position_tol`` is checked first, whatever the address. An address that
+        names a location itself, within :data:`_POSITION_TOLERANCE` for a
+        breakpoint, answers with that location. Failing that, a breakpoint is
+        matched on position within ``position_tol``, so a caller can snap a
+        measured position onto the model's. The window never narrows below
+        :data:`_POSITION_TOLERANCE`.
 
         The nearest breakpoint inside the window wins. At the default tolerance
         that is the only one there, but a caller widening the window is snapping
         a measured position onto the model's, and means the closest.
         """
-        if address in self._graph_nodes:
-            return address
-        if position_tol is None:
-            position_tol = _POSITION_TOLERANCE
-        elif not math.isfinite(position_tol) or position_tol < 0:
-            raise ValueError(
-                f"position_tol must be a finite, non-negative number, got {position_tol!r}."
-            )
-        if not _is_breakpoint(address):
-            return None
+        window = _window(position_tol)
+        named = self.named(address)
+        if named is not None or not _is_breakpoint(address):
+            return named
         reach_id, position = address
-        known = self._positions.get(reach_id, [])
-        # Only the two positions either side of the one asked for can be nearest;
-        # of two equally near, the lower wins.
-        i = bisect.bisect_left(known, position)
-        nearest = min(known[max(i - 1, 0) : i + 1], key=lambda d: abs(d - position), default=None)
-        if nearest is None or abs(nearest - position) > position_tol:
+        nearest = _nearest(self._positions.get(reach_id, []), position)
+        if nearest is None or abs(nearest - position) > window:
+            return None
+        return (reach_id, nearest)
+
+    def named(self, address: Address) -> Address | None:
+        """Give the location an address names itself, in the network's spelling, or None.
+
+        A node ID names a node. A position names the breakpoint within
+        :data:`_POSITION_TOLERANCE` of it, so ``("10", 0)`` names ``("10", 0.0)``
+        and a rounded float names the one the file stores.
+        """
+        if not _is_breakpoint(address):
+            return address if address in self._graph_nodes else None
+        reach_id, position = address
+        nearest = _nearest(self._positions.get(reach_id, []), position)
+        if nearest is None or abs(nearest - position) > _POSITION_TOLERANCE:
             return None
         return (reach_id, nearest)
 
