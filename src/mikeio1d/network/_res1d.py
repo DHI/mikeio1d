@@ -18,6 +18,8 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 from ..filter import StepEveryFilter
 from ..filter import TimeFilter
 from ..res1d import Res1D
@@ -32,6 +34,8 @@ if TYPE_CHECKING:
 from ._results import _Results
 from ._results import _Series
 from ._types import NetworkReach
+
+from DHI.Mike1D.ResultDataAccess.Epanet import IRes1DTypedReach
 
 
 def _path_of(file: str | Path | Res1D) -> Path:
@@ -104,14 +108,32 @@ def _quantity_at(node: ResultNode | ResultGridPoint, quantity_id: str) -> Result
     return node._creator.result_quantity_map[quantity_id][0]
 
 
+def _link_length(reach: ResultReach) -> float | None:
+    """Read an EPANET link's length from the result file, or None if it is no EPANET link.
+
+    ``ResultReach.length`` adds up gridpoints, and an EPANET link has none, so it
+    reports 0 for every one. The ``.res`` stores each link's length in its
+    header, as a float32. It is given back as the shortest decimal that is the
+    same float32, which is what the model wrote: ``3209.544`` rather than
+    ``3209.5439453125``.
+    """
+    lengths = [r.Len for r in reach.res1d_reaches if isinstance(r, IRes1DTypedReach)]
+    if not lengths:
+        return None
+    return float(str(np.float32(sum(lengths))))
+
+
 def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | None:
     """Resolve a reach's effective length.
 
-    A length read from a companion input file wins. Zero means undefined from
-    either source: mikeio1d returns 0 when it cannot read a length, as for every
-    EPANET reach. A zero-length reach would look free to length-weighted graph
-    algorithms, and would put a link-node reach's two breakpoints on one spot.
+    A length read from a companion input file wins, then an EPANET link's own,
+    then the one mikeio1d adds up from gridpoints. Zero means undefined from
+    any source: an EPANET pump or valve has length 0. A zero-length reach would
+    look free to length-weighted graph algorithms, and would put a link-node
+    reach's two breakpoints on one spot.
     """
+    if length is None:
+        length = _link_length(reach)
     return (length if length is not None else reach.length) or None
 
 
