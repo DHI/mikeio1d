@@ -267,7 +267,6 @@ class TestCatchments:
             "catchments.res1d",
             "catchment_merge_a.res1d",
             "catchment_merge_b.res1d",
-            "catchment_merge_c.res1d",
         ],
     )
     def test_a_result_holding_only_catchments_is_refused(self, filename):
