@@ -10,11 +10,13 @@ import pytest
 pytest.importorskip("networkx")
 pytest.importorskip("xarray")
 
+from mikeio1d import Res1D
 from mikeio1d.network import Network
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _EPANET_RES = str(_TESTDATA / "epanet.res")
 _EPANET_INP = str(_TESTDATA / "epanet.inp")
+_RIVER = str(_TESTDATA / "network_river.res1d")
 
 
 @pytest.fixture
@@ -69,3 +71,12 @@ class TestIdentityCoordinates:
 
         assert ds["Flow"].attrs["long_name"] == "Flow"
 
+
+def test_a_network_carrying_nothing_gives_an_empty_dataset():
+    """A structure quantity lets the whole river through, and none of its series."""
+    network = Network.open(Res1D(_RIVER, quantities=["DischargeInStructure"]))
+
+    assert len(network.reaches) == 9
+    assert dict(network.quantities) == {}
+    assert network.to_dataframe().empty
+    assert len(network.to_dataset().data_vars) == 0
