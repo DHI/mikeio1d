@@ -240,6 +240,11 @@ class TestListingAddresses:
         with pytest.raises(KeyError, match="no reach"):
             network.addresses(reach="no_such_reach")
 
+    def test_a_bare_structure_id_points_at_its_prefixed_reach(self, network):
+        """A structure's reach keeps its type prefix; Res1D.structures does not."""
+        with pytest.raises(KeyError, match="did you mean 'Weir:119w1'"):
+            network.addresses(reach="119w1")
+
 
 class TestReadingSeries:
     """The one member that touches data."""

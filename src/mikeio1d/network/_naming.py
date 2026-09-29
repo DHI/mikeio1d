@@ -110,9 +110,9 @@ class _Naming:
         if _is_breakpoint(address):
             reach_id, position = address
             known = self._positions.get(reach_id, [])
+            if reach_id not in self._reaches:
+                return self._describe_missing_reach(reach_id, limit)
             if not known:
-                if reach_id not in self._reaches:
-                    return f"the network has no reach {reach_id!r}"
                 return f"reach {reach_id!r} has no breakpoints"
             nearest = sorted(sorted(known, key=lambda d: abs(d - position))[:limit])
             listed = ", ".join(format(d, "g") for d in nearest)
@@ -126,3 +126,14 @@ class _Naming:
         if close:
             return "did you mean " + ", ".join(repr(name) for name in close) + "?"
         return f"the network has {len(names)} nodes, none named {address!r}"
+
+    def _describe_missing_reach(self, reach_id: str, limit: int) -> str:
+        # A structure reach keeps the type prefix its file gives it
+        # ("Weir:119w1"), which a caller holding the bare structure id, as
+        # Res1D.structures gives it, has not typed.
+        close = [known for known in self._reaches if known.partition(":")[2] == reach_id]
+        close = close or get_close_matches(reach_id, list(self._reaches), n=limit)
+        if close:
+            listed = ", ".join(repr(known) for known in close[:limit])
+            return f"the network has no reach {reach_id!r}; did you mean {listed}?"
+        return f"the network has no reach {reach_id!r}"

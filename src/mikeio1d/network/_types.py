@@ -48,7 +48,10 @@ class NetworkReach:
     Attributes
     ----------
     id : str
-        The id the model gave the reach, unique within the network.
+        The id the model gave the reach, unique within the network. A
+        structure's reach keeps the type prefix its file gives it, such as
+        ``"Weir:119w1"`` or ``"Pump:115p1"``, which keeps a weir and a pump that
+        share an id apart.
     start, end : str
         The ids of the start (upstream) and end (downstream) nodes.
     length : float or None

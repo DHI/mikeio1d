@@ -444,7 +444,10 @@ class Network:
         reach : str, optional
             Only the breakpoints along this reach, in the order they sit. The
             reach's own end nodes are not among them - they are nodes, and a
-            node is named by its own ID. ``None`` *(default)* lists everything.
+            node is named by its own ID. A structure's reach keeps the type
+            prefix the file gives it: ``"Weir:119w1"``, where
+            ``Res1D.structures`` says ``"119w1"``. ``None`` *(default)* lists
+            everything.
         quantity : str, optional
             Only locations carrying this quantity. ``None`` *(default)* does not
             filter.
@@ -485,7 +488,8 @@ class Network:
         address : str or tuple[str, float]
             A node ID, or a reach ID and a position along it. A reach's own end
             nodes are named by their IDs, which ``reaches[reach_id].start``
-            and ``.end`` give.
+            and ``.end`` give. A structure's reach ID keeps the type prefix the
+            file gives it, as in ``("Weir:119w1", 0.5)``.
         position_tol : float, optional
             How far a position may be from a breakpoint's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
