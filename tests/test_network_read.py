@@ -206,6 +206,48 @@ class TestResolvingAnAddress:
 
         assert resolved.address == _Q_POINT
 
+    def test_a_quantity_snaps_past_a_nearer_breakpoint_lacking_it(self, network):
+        """5.0 is nearest the water level point at 0.0; discharge sits at 23.84."""
+        resolved = network.resolve(("100l1", 5.0), position_tol=30.0, quantity="Discharge")
+
+        assert resolved.address == _Q_POINT
+
+    def test_a_named_breakpoint_lacking_the_quantity_is_not_snapped_away(self, network):
+        resolved = network.resolve(("100l1", 0.0), position_tol=30.0, quantity="Discharge")
+
+        assert resolved is None
+
+    def test_a_node_lacking_the_quantity_is_not_here(self, network):
+        assert network.resolve("101", quantity="Discharge") is None
+
+    def test_a_quantity_leaves_every_quantity_in_the_answer(self, epanet):
+        resolved = epanet.resolve("9", quantity="Volume")
+
+        assert set(resolved.quantities) > {"Volume"}
+
+    @pytest.mark.parametrize(
+        ("address", "quantity", "position_tol"),
+        [
+            ("101", "WaterLevel", None),
+            ("101", "Discharge", None),
+            (("100l1", 5.0), "Discharge", 30.0),
+            (("100l1", 0.0), "Discharge", 30.0),
+            (("100l1", 5.0), "Discharge", None),
+            (("100l1", 5.0), "Volume", 30.0),
+            (("no_such_reach", 5.0), "Discharge", 30.0),
+        ],
+    )
+    def test_it_answers_exactly_when_read_would(self, network, address, quantity, position_tol):
+        """resolve(..., quantity=) is the check a caller makes before reading."""
+        resolved = network.resolve(address, position_tol=position_tol, quantity=quantity)
+        try:
+            network.read([(address, quantity)], position_tol=position_tol)
+            readable = True
+        except KeyError:
+            readable = False
+
+        assert (resolved is not None) == readable
+
     def test_a_location_carrying_nothing_still_resolves(self):
         """MIKE 11 keeps its timeseries on gridpoints, so its nodes hold none.
 
@@ -334,12 +376,18 @@ class TestReadingSeries:
         with pytest.raises(ValueError, match="finite, non-negative"):
             network.read([(("100l1", 23.8), "Discharge")], position_tol=-1.0)
 
-    @pytest.mark.parametrize(
-        "items", [[("101", "WaterLevel")], []], ids=["exact hit", "no items"]
-    )
+    @pytest.mark.parametrize("items", [[("101", "WaterLevel")], []], ids=["exact hit", "no items"])
     def test_the_tolerance_is_checked_whatever_the_items(self, network, items):
         with pytest.raises(ValueError, match="finite, non-negative"):
             network.read(items, position_tol=-1.0)
+
+    def test_a_measured_chainage_snaps_onto_the_quantity_it_asks_for(self, network):
+        """The case the staggered grid makes: the nearest breakpoint lacks discharge."""
+        expected = network.read([(_Q_POINT, "Discharge")]).iloc[:, 0]
+
+        read = network.read([(("100l1", 5.0), "Discharge")], position_tol=30.0)
+
+        assert np.allclose(read.iloc[:, 0].to_numpy(), expected.to_numpy())
 
     def test_a_whole_reach_is_one_call(self, network):
         """A reach observation needs every breakpoint, compared over the series."""
@@ -388,6 +436,29 @@ class TestReadingSeries:
     def test_a_location_lacking_the_quantity_says_what_it_has(self, network):
         with pytest.raises(KeyError, match=r"carries \['WaterLevel'\], not 'Discharge'"):
             network.read([("101", "Discharge")])
+
+    def test_a_named_breakpoint_lacking_the_quantity_says_where_it_is(self, network):
+        with pytest.raises(
+            KeyError, match="not snapped away from it. Nearest carrying 'Discharge': 23.8414"
+        ):
+            network.read([(("100l1", 0.0), "Discharge")], position_tol=30.0)
+
+    def test_a_window_without_the_quantity_names_where_it_is(self, network):
+        """The message is about the position asked for, not a breakpoint near it."""
+        with pytest.raises(KeyError) as failure:
+            network.read([(("100l1", 5.0), "Discharge")])
+
+        message = str(failure.value)
+        assert (
+            "('100l1', 5.0) - no breakpoint carrying 'Discharge' within position_tol=0.001"
+            in message
+        )
+        assert "nearest carrying it: 23.8414" in message
+        assert "WaterLevel" not in message
+
+    def test_a_reach_without_the_quantity_does_not_invite_a_wider_window(self, network):
+        with pytest.raises(KeyError, match="reach '100l1' carries 'Volume' at no breakpoint"):
+            network.read([(("100l1", 5.0), "Volume")], position_tol=30.0)
 
     def test_a_location_carrying_nothing_points_at_the_gridpoints(self):
         res11 = Network.open(_RES11)

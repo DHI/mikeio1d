@@ -79,7 +79,7 @@ class Network:
         # Before the graph, whose error for a duplicate id would not name it.
         self._reaches = self._generate_reaches_dict(reaches)
         self._graph = _generate_graph(reaches)
-        self._naming = _Naming(self._graph, self._reaches)
+        self._naming = _Naming(self._graph, self._reaches, results.quantities_at)
 
     def __repr__(self) -> str:
         out = [
@@ -462,7 +462,6 @@ class Network:
     def _blame_unreadable(
         self,
         items: Sequence[tuple[Address, str]],
-        results: _Results,
         position_tol: float | None,
     ) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
@@ -473,20 +472,16 @@ class Network:
         """
         faults = []
         for address, quantity in items:
-            found = self._naming.canonical(address, position_tol=position_tol)
-            if found is None:
-                faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
+            found = self._naming.canonical(address, position_tol=position_tol, quantity=quantity)
+            if found is not None:
                 continue
-            carried = results.quantities_at(found)
-            if quantity in carried:
-                continue
-            if carried:
-                faults.append(f"{address!r} carries {sorted(carried)}, not {quantity!r}")
-            else:
-                faults.append(
-                    f"{address!r} carries no quantities of its own, so {quantity!r} cannot be "
-                    "read there; addresses(reach=...) lists the breakpoints that can be"
-                )
+            described = self._naming.describe_miss(
+                address, position_tol=position_tol, quantity=quantity
+            )
+            # A location that is here is described by what it carries; one
+            # that is not, by what is near it.
+            joint = " " if self._naming.named(address) is not None else " - "
+            faults.append(f"{address!r}{joint}{described}")
         shown = "; ".join(faults[:10])
         if len(faults) > 10:
             shown += f"; ... and {len(faults) - 10} more"
@@ -524,10 +519,11 @@ class Network:
         position_tol : float, optional
             How far a position may be from a breakpoint's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float, and never
-            narrows below it: a position that close to a breakpoint names it.
-            Widen it to snap a measured chainage onto the model's; the nearest
-            breakpoint inside the window wins. Checked for a node ID too, but
-            not used. Only with ``items``.
+            narrows below it: a position that close to a breakpoint names it,
+            and is read there or refused. Widen it to snap a measured chainage
+            onto the model's; the nearest breakpoint inside the window carrying
+            the item's quantity wins. Checked for a node ID too, but not used.
+            Only with ``items``.
 
         Returns
         -------
@@ -591,16 +587,17 @@ class Network:
             return self._read_quantity(quantity, position_tol)
 
         _window(position_tol)
-        results = self._results
         # Every item is checked before anything is read.
         resolved: list[tuple[Address, str]] = []
         for address, item_quantity in items:
-            found = self._naming.canonical(address, position_tol=position_tol)
-            if found is None or item_quantity not in results.quantities_at(found):
-                raise self._blame_unreadable(items, results, position_tol)
+            found = self._naming.canonical(
+                address, position_tol=position_tol, quantity=item_quantity
+            )
+            if found is None:
+                raise self._blame_unreadable(items, position_tol)
             resolved.append((found, item_quantity))
 
-        df = results.read(resolved)
+        df = self._results.read(resolved)
         # A flat index: an address can itself be a tuple, which a MultiIndex
         # would split.
         df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
@@ -682,7 +679,13 @@ class Network:
             return list(addresses)
         return [address for address in addresses if quantity in results.quantities_at(address)]
 
-    def resolve(self, address: Address, *, position_tol: float | None = None) -> Location | None:
+    def resolve(
+        self,
+        address: Address,
+        *,
+        position_tol: float | None = None,
+        quantity: str | None = None,
+    ) -> Location | None:
         """Say whether a location is in this network, what it carries, and where.
 
         An address that is not here gives ``None`` rather than an exception.
@@ -701,13 +704,21 @@ class Network:
             Widen it to snap a measured chainage onto the model's; the nearest
             breakpoint inside the window wins. Checked for a node ID too, but
             not used.
+        quantity : str, optional
+            Only a location carrying this quantity. A position snaps onto the
+            nearest breakpoint that carries it, so a caller need not know
+            which quantities sit where on a staggered grid. A position naming a
+            breakpoint that lacks it, or a node lacking it, gives ``None``
+            rather than a neighbour. ``None`` *(default)* snaps onto any
+            breakpoint.
 
         Returns
         -------
         Location or None
-            ``None`` if there is no such location. Otherwise its address as the
-            network spells it, the quantities readable there, and its graph
-            node.
+            ``None`` if there is no such location, or none carrying
+            ``quantity``: exactly when :meth:`read` would refuse the address
+            with that quantity. Otherwise its address as the network spells it,
+            every quantity readable there, and its graph node.
 
         Raises
         ------
@@ -731,6 +742,18 @@ class Network:
         >>> network.resolve(("100l1", 23.8), position_tol=0.1)
         Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 
+        With a quantity, a position snaps only onto a breakpoint carrying it.
+        On this staggered grid 5.0 is nearest the water level point at 0.0, but
+        discharge sits at 23.84:
+
+        >>> network.resolve(("100l1", 5.0), position_tol=30, quantity="Discharge").address
+        ('100l1', 23.8413574216414)
+
+        A position naming a breakpoint is not snapped away from it:
+
+        >>> network.resolve(("100l1", 0.0), position_tol=30, quantity="Discharge") is None
+        True
+
         >>> network.resolve("no_such_node") is None
         True
 
@@ -739,7 +762,7 @@ class Network:
         >>> Network.open("tests/testdata/network_cali.res11").resolve("0 CALI")
         Location(address='0 CALI', quantities=(), graph_node=0)
         """
-        found = self._naming.canonical(address, position_tol=position_tol)
+        found = self._naming.canonical(address, position_tol=position_tol, quantity=quantity)
         if found is None:
             return None
         return Location(

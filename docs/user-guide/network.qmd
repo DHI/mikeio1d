@@ -70,6 +70,13 @@ network.resolve(("100l1", 23.8), position_tol=0.1)
 # Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 ```
 
+A result's grid is often staggered: on `100l1` the water level sits at 0.0 and 47.68 and the discharge at 23.84 between them. Give `resolve()` the quantity too, and a position snaps only onto a breakpoint that carries it. A position within 1e-3 of a breakpoint names that breakpoint, and is never snapped away from it, however wide the window:
+
+```python
+network.resolve(("100l1", 5.0), position_tol=30, quantity="Discharge")  # ('100l1', 23.84...)
+network.resolve(("100l1", 0.0), position_tol=30, quantity="Discharge")  # None
+```
+
 `read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed. Each call opens the file once, however many pairs it asks for, so one call with many pairs is faster than many calls with one each:
 
 ```python
@@ -77,7 +84,7 @@ points = network.addresses(reach="100l1", quantity="Discharge")
 network.read([(point, "Discharge") for point in points])
 ```
 
-A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `position_tol`, so a measured chainage can be read without resolving it first.
+A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `position_tol`, and snaps each item onto a breakpoint carrying its quantity, so a measured chainage can be read without resolving it first.
 
 To read one quantity at every location that carries it, pass it on its own: `network.read(quantity="Discharge")`.
 
