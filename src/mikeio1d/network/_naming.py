@@ -53,12 +53,12 @@ class _Naming:
     """
 
     def __init__(self, graph: nx.Graph, reaches: Mapping[str, NetworkReach]):
-        self._nodes: dict[Address, int] = {
+        self._graph_nodes: dict[Address, int] = {
             address: node for node, address in graph.nodes(data="address")
         }
         # Each reach's break point distances, ascending, for bisect.
         self._distances: dict[str, list[float]] = {}
-        for address in self._nodes:
+        for address in self._graph_nodes:
             if _is_break_point(address):
                 self._distances.setdefault(address[0], []).append(address[1])
         for known in self._distances.values():
@@ -66,9 +66,9 @@ class _Naming:
         self._reaches = reaches
 
     @property
-    def nodes(self) -> Mapping[Address, int]:
+    def graph_nodes(self) -> Mapping[Address, int]:
         """Every address in the network, mapped to its graph node."""
-        return self._nodes
+        return self._graph_nodes
 
     def canonical(self, address: Address, *, distance_tol: float | None = None) -> Address | None:
         """Give the network's own spelling of an address, or None if there is no such place.
@@ -82,7 +82,7 @@ class _Naming:
         that is the only one there, but a caller widening the window is snapping
         a measured distance onto the model's, and means the closest.
         """
-        if address in self._nodes:
+        if address in self._graph_nodes:
             return address
         if distance_tol is None:
             distance_tol = _CHAINAGE_TOLERANCE
@@ -121,7 +121,7 @@ class _Naming:
                 "(distance_tol= widens the match)"
             )
 
-        names = [key for key in self._nodes if not _is_break_point(key)]
+        names = [key for key in self._graph_nodes if not _is_break_point(key)]
         close = get_close_matches(address, names, n=limit)
         if close:
             return "did you mean " + ", ".join(repr(name) for name in close) + "?"

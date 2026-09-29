@@ -235,12 +235,12 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     """
     found = {}
     for _, alias in network.graph.nodes(data="address"):
-        found[_alias_key(alias)] = int(network.resolve(alias).node)
+        found[_alias_key(alias)] = int(network.resolve(alias).graph_node)
 
     endpoints = {}
     for reach_id, reach in network.reaches.items():
         for where, node in (("start", reach.start), ("end", reach.end)):
-            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).node)
+            endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).graph_node)
 
     recalled = {}
     for node_id, alias in sorted(network.graph.nodes(data="address")):

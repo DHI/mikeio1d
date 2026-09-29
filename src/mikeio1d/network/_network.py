@@ -43,7 +43,7 @@ class Network:
     and a distance along it, and every member here takes and gives those names.
     :attr:`graph` is labelled with integers instead, each node carrying its name
     as the ``address`` attribute, and :meth:`resolve` gives the integer for a
-    name - see :attr:`Location.node`.
+    name - see :attr:`Location.graph_node`.
 
     Build one with :meth:`open`, which reads a result file's topology. The
     timeseries stay in the file until :meth:`read` asks for them, and each
@@ -171,7 +171,7 @@ class Network:
         """
         items = [
             (address, quantity)
-            for address in self._naming.nodes
+            for address in self._naming.graph_nodes
             for quantity in self._results.quantities_at(address)
         ]
         df = self._results.read(items).rename_axis(index="time")
@@ -179,26 +179,27 @@ class Network:
         return df
 
     def to_dataset(self) -> xr.Dataset:
-        """Dataset of the timeseries, with each node's original identity alongside.
+        """Dataset of the timeseries, with each location's address alongside.
 
         Reads every series, as :meth:`to_dataframe` does.
 
         Returns
         -------
         xr.Dataset
-            One variable per quantity over ``(time, node)``. ``node`` is the
-            graph's integer, as :attr:`Location.node` gives it, and the
-            ``name``, ``reach`` and ``distance`` coordinates carry the address,
-            so a consumer never has to hold on to the network to know what a
-            column is. A node fills in ``name``, a break point ``reach`` and
-            ``distance``, and the empty half says which it is::
+            One variable per quantity over ``(time, graph_node)``.
+            ``graph_node`` is the graph's integer, as :attr:`Location.graph_node`
+            gives it, and the ``name``, ``reach`` and ``distance`` coordinates
+            carry the address, so a consumer never has to hold on to the
+            network to know what a column is. A node fills in ``name``, a break
+            point ``reach`` and ``distance``, and the empty half says which it
+            is::
 
                 Coordinates:
-                  * time      datetime64
-                  * node      int64     0 1 2 3 ...
-                    name      <U16      'J1' 'J2' '' ''
-                    reach     <U16      '' '' 'r1' 'r1'
-                    distance  float64   nan nan 0.0 24.5
+                  * time        datetime64
+                  * graph_node  int64       0 1 2 3 ...
+                    name        <U16        'J1' 'J2' '' ''
+                    reach       <U16        '' '' 'r1' 'r1'
+                    distance    float64     nan nan 0.0 24.5
 
             Empty when no location carries data.
         """
@@ -208,16 +209,16 @@ class Network:
         positions: dict[str, list[int]] = {}
         for i, (_, quantity) in enumerate(df.columns):
             positions.setdefault(quantity, []).append(i)
-        nodes = self._naming.nodes
+        graph_nodes = self._naming.graph_nodes
         ds = xr.Dataset(
             {
                 quantity: xr.DataArray(
                     df.iloc[:, cols].to_numpy(),
                     coords={
                         "time": df.index,
-                        "node": [nodes[df.columns[i][0]] for i in cols],
+                        "graph_node": [graph_nodes[df.columns[i][0]] for i in cols],
                     },
-                    dims=["time", "node"],
+                    dims=["time", "graph_node"],
                     attrs={"long_name": str(quantity)},
                 )
                 for quantity, cols in positions.items()
@@ -225,8 +226,8 @@ class Network:
         )
 
         names, reaches, distances = [], [], []
-        for node in ds.node.to_numpy():
-            address = self._graph.nodes[int(node)]["address"]
+        for graph_node in ds.graph_node.to_numpy():
+            address = self._graph.nodes[int(graph_node)]["address"]
             if _is_break_point(address):
                 reach, distance = address
                 names.append("")
@@ -237,9 +238,9 @@ class Network:
                 reaches.append("")
                 distances.append(np.nan)
         return ds.assign_coords(
-            name=("node", np.array(names, dtype=str)),
-            reach=("node", np.array(reaches, dtype=str)),
-            distance=("node", np.array(distances, dtype=float)),
+            name=("graph_node", np.array(names, dtype=str)),
+            reach=("graph_node", np.array(reaches, dtype=str)),
+            distance=("graph_node", np.array(distances, dtype=float)),
         )
 
     @property
@@ -314,7 +315,7 @@ class Network:
         units = results.units
         readable = {
             quantity
-            for address in self._naming.nodes
+            for address in self._naming.graph_nodes
             for quantity in results.quantities_at(address)
         }
         # In the header's order, so the listing does not depend on the topology.
@@ -464,7 +465,7 @@ class Network:
         """
         results = self._results
         if reach is None:
-            addresses: Iterable[Address] = self._naming.nodes
+            addresses: Iterable[Address] = self._naming.graph_nodes
         elif reach in self._reaches:
             addresses = [point.id for point in self._reaches[reach].breakpoints]
         else:
@@ -506,10 +507,10 @@ class Network:
         Examples
         --------
         >>> network.resolve("101")  # doctest: +SKIP
-        Location(address='101', quantities=('WaterLevel',), node=5)
+        Location(address='101', quantities=('WaterLevel',), graph_node=5)
 
         >>> network.resolve(("100l1", 23.8), distance_tol=0.1)  # doctest: +SKIP
-        Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), node=3)
+        Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
@@ -520,5 +521,5 @@ class Network:
         return Location(
             address=found,
             quantities=self._results.quantities_at(found),
-            node=self._naming.nodes[found],
+            graph_node=self._naming.graph_nodes[found],
         )

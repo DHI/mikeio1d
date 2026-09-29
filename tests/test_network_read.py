@@ -149,16 +149,16 @@ class TestResolvingAnAddress:
 
         assert (resolved.address, resolved.quantities) == ("101", ("WaterLevel",))
 
-    def test_the_node_is_the_graph_integer_labelled_with_the_address(self, network):
+    def test_the_graph_node_is_the_integer_labelled_with_the_address(self, network):
         resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)
 
-        assert network.graph.nodes[resolved.node]["address"] == resolved.address
+        assert network.graph.nodes[resolved.graph_node]["address"] == resolved.address
 
-    def test_the_node_selects_the_location_in_the_dataset(self, network):
+    def test_the_graph_node_selects_the_location_in_the_dataset(self, network):
         """The integer is what to_dataset() is indexed by, and names the same place."""
-        node = network.resolve("101").node
+        graph_node = network.resolve("101").graph_node
 
-        column = network.to_dataset()["WaterLevel"].sel(node=node)
+        column = network.to_dataset()["WaterLevel"].sel(graph_node=graph_node)
 
         assert str(column["name"].item()) == "101"
 

@@ -69,8 +69,8 @@ class TestCompanionDiscovery:
     def test_the_graph_carries_the_length_read_from_the_inp(self, tmp_path):
         """A link-node reach's two break points sit one reach length apart."""
         network = Network.open(_copy(tmp_path, "epanet", ".res", ".inp"))
-        start = network.resolve((_PIPE, 0.0)).node
-        end = network.resolve((_PIPE, _PIPE_LENGTH)).node
+        start = network.resolve((_PIPE, 0.0)).graph_node
+        end = network.resolve((_PIPE, _PIPE_LENGTH)).graph_node
 
         assert network.graph.edges[start, end]["length"] == pytest.approx(_PIPE_LENGTH)
 

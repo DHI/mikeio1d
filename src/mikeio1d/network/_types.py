@@ -97,14 +97,12 @@ class Location:
     quantities : tuple of str
         The quantity IDs readable there. Empty is an answer: the location is
         in the network but carries nothing of its own.
-    node : int
-        The location's graph node: the integer :attr:`Network.graph` and
-        :meth:`Network.to_dataset` label it with, which
-        ``graph.nodes[node]["address"]`` turns back into the address. Not a
-        model node's id - a model node is named by its ``address``, and a break
-        point has a graph node too.
+    graph_node : int
+        The integer :attr:`Network.graph` and :meth:`Network.to_dataset` label
+        the location with, which ``graph.nodes[graph_node]["address"]`` turns
+        back into the address. Every location has one, a break point too.
     """
 
     address: Address
     quantities: tuple[str, ...]
-    node: int
+    graph_node: int
