@@ -13,11 +13,12 @@ in its sibling ``.res``, and the rest have no fixture here to verify against.
 
 from __future__ import annotations
 
+import warnings
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Sequence
-    from pathlib import Path
 
     from ._results import _Results
     from ._types import NetworkReach
@@ -92,6 +93,37 @@ def _validate_extension(suffix: str) -> None:
         )
 
 
+def _refuse_or_warn_catchments(res: Res1D) -> None:
+    """Refuse a file of catchments alone, and warn about catchments beside a network.
+
+    A catchment is tied to no node or reach a network has, so it has no address.
+    A file of catchments alone would open as an empty network, which looks like
+    a network with nothing in it rather than one that could not be built.
+
+    Raises
+    ------
+    NotImplementedError
+        If the file holds catchments and no reaches.
+    """
+    catchments = res.catchments
+    if not catchments:
+        return
+
+    name = Path(str(res.file_path)).name
+    if not res.reaches:
+        raise NotImplementedError(
+            f"'{name}' holds {len(catchments)} catchment(s) and no reaches: catchments "
+            "are not part of a network yet."
+        )
+
+    quantities = sorted({q for catchment in catchments.values() for q in catchment.quantities})
+    warnings.warn(
+        f"'{name}' holds {len(catchments)} catchment(s), which are not part of a network "
+        f"yet, so the network leaves them and their quantities out: {quantities}.",
+        stacklevel=4,
+    )
+
+
 def _blame_the_companions(
     res: Res1D, found: Sequence[str | Path | Res1D], err: Exception
 ) -> ValueError:
@@ -128,6 +160,7 @@ def _load_network(
     res = _as_res1d(res)
     # A filtered Res1D decides which series are read, not what the network is.
     topology = _unfiltered(res)
+    _refuse_or_warn_catchments(topology)
 
     series_by_key = _series_by_key_within(topology, res)
     units = _units_of(res)

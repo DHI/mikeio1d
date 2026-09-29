@@ -3,6 +3,7 @@
 # ruff: noqa: E402
 import shutil
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -12,6 +13,7 @@ from mikeio1d import Res1D
 from mikeio1d.network import Network
 from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
+from mikeio1d.network._loader import _refuse_or_warn_catchments
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
@@ -218,6 +220,24 @@ class TestExtensionPolicy:
             Network.open(str(_TESTDATA / "xsections.xns11"))
 
 
+class TestCatchments:
+    """A catchment has no address in a network, so a network does not quietly drop it."""
+
+    @pytest.mark.parametrize(
+        "filename",
+        [
+            "catchments.res1d",
+            "catchment_merge_a.res1d",
+            "catchment_merge_b.res1d",
+            "catchment_merge_c.res1d",
+        ],
+    )
+    def test_a_result_holding_only_catchments_is_refused(self, filename):
+        """Rather than opening as an empty network, which looks like a network."""
+        with pytest.raises(NotImplementedError, match="catchments are not part of a network"):
+            Network.open(str(_TESTDATA / filename))
+
+
 class TestQuantityIdsThatAreNoIdentifiers:
     """A quantity is read by its MIKE ID, not by the attribute name mikeio1d gives it."""
 
@@ -346,3 +366,14 @@ class TestWhatNoFixtureCanReach:
 
         with pytest.raises(ValueError, match=r"'9'.*\['Energy'\]"):
             _refuse_clashes(res, companion)
+
+    def test_catchments_beside_a_network_are_left_out_with_a_warning(self):
+        """No fixture holds both: every catchment fixture holds catchments alone."""
+        res = SimpleNamespace(
+            file_path="model.res1d",
+            reaches={"r1": None},
+            catchments={"c1": SimpleNamespace(quantities=["TotalRunOff"])},
+        )
+
+        with pytest.warns(UserWarning, match=r"1 catchment\(s\).*\['TotalRunOff'\]"):
+            _refuse_or_warn_catchments(res)

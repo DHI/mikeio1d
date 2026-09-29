@@ -138,14 +138,21 @@ class Network:
         Raises
         ------
         NotImplementedError
-            If no network can be built from the file's extension, or if the
-            result or a companion is a ``Res1D`` opened with ``time=`` or
-            ``step_every=``.
+            If no network can be built from the file's extension, if the file
+            holds catchments and no reaches, or if the result or a companion is
+            a ``Res1D`` opened with ``time=`` or ``step_every=``.
         ValueError
             If a companion has an extension this reader does not know, if two
             companions of the same kind are given, if a ``.resx`` covers a
             different period from the result file, or if the two carry the same
             quantity at one location.
+
+        Warns
+        -----
+        UserWarning
+            If the file holds catchments beside its reaches, which the network
+            leaves out with their quantities, or nodes that end no reach, which
+            it leaves out too.
 
         Examples
         --------
@@ -430,8 +437,9 @@ class Network:
         The union over every location the network has, so everything named here
         can be read at some address - see :meth:`addresses`. A result file's
         header may declare more than this: a MIKE river result carries structure
-        and sensor quantities that sit on neither a node nor a gridpoint, and
-        nothing in a network can address them.
+        and sensor quantities that sit on neither a node nor a gridpoint, and a
+        result may carry catchment quantities. Nothing in a network can address
+        them.
 
         Read-only, and read from the file header.
 
