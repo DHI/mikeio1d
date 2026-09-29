@@ -142,9 +142,9 @@ class Network:
             ``step_every=``.
         ValueError
             If a companion has an extension this reader does not know, if two
-            companions of the same kind are given, or if a ``.resx`` does not
-            come from the same run as the result file, or if the two carry the
-            same quantity at one location.
+            companions of the same kind are given, if a ``.resx`` covers a
+            different period from the result file, or if the two carry the same
+            quantity at one location.
 
         Examples
         --------
@@ -179,6 +179,10 @@ class Network:
         -----
         Which locations carry series depends on the format; see
         :class:`Network`.
+
+        A ``.resx`` and its result file are compared on their periods here, but
+        on their time steps only when a :meth:`read` uses both: neither header
+        gives the steps, and reading them would read the timeseries.
         """
         return cls(*_load_network(res, companions))
 
