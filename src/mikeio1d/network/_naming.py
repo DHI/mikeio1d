@@ -114,6 +114,15 @@ class _Naming:
                 return self._describe_missing_reach(reach_id, limit)
             if not known:
                 return f"reach {reach_id!r} has no breakpoints"
+            # Past the last breakpoint of a reach of unknown length there is no
+            # end position to match, and widening the window would only snap
+            # onto a breakpoint nearer the start.
+            if self._reaches[reach_id].length is None and position > known[-1]:
+                return (
+                    f"reach {reach_id!r} has no known length, so a position past its last "
+                    f"breakpoint ({known[-1]:g}) cannot be matched, however wide position_tol "
+                    "is; a length can come from Network.open's companions"
+                )
             nearest = sorted(sorted(known, key=lambda d: abs(d - position))[:limit])
             listed = ", ".join(format(d, "g") for d in nearest)
             return (

@@ -350,6 +350,13 @@ class TestReadingSeries:
         with pytest.raises(KeyError, match="none named 'no_such_node'"):
             network.read([("no_such_node", "WaterLevel")])
 
+    def test_the_far_end_of_a_pipe_without_a_length_says_why_it_is_missing(self):
+        """Widening position_tol would snap the far end onto the near one."""
+        alone = Network.open(_EPANET_RES, companions=[])
+
+        with pytest.raises(KeyError, match="no known length.*however wide position_tol"):
+            alone.read([(("10", _PIPE_LENGTH), "Flow")])
+
     def test_a_location_lacking_the_quantity_says_what_it_has(self, network):
         with pytest.raises(KeyError, match=r"carries \['WaterLevel'\], not 'Discharge'"):
             network.read([("101", "Discharge")])
