@@ -10,8 +10,8 @@ frame, so an offset frame - a MIKE river reach reporting chainages along the
 whole branch - cancels out.
 
 Two reaches between the same pair of nodes - parallel pumps, a battery of
-orifices - stay apart because each one's break points are keyed by its own id,
-so each gets its own chain of graph nodes. A reach with no break points has only
+orifices - stay apart because each one's breakpoints are keyed by its own id,
+so each gets its own chain of graph nodes. A reach with no breakpoints has only
 the one start-to-end edge, which is why :func:`_generate_graph` refuses two of
 those between the same nodes rather than collapsing them into one.
 """
@@ -29,7 +29,7 @@ from ._types import NetworkReach
 def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
     g0 = nx.Graph()
     # Which reach claimed each node pair with a bare start-to-end edge. Every
-    # other edge this builds has a break point key - a (reach_id, position)
+    # other edge this builds has a breakpoint key - a (reach_id, position)
     # tuple - at one end at least, so no two reaches can land on it.
     lone_reach_by_pair: dict[frozenset[str], str] = {}
     for reach in reaches:
@@ -47,9 +47,9 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             if claimed_by is not None:
                 raise ValueError(
                     f"Reaches {claimed_by!r} and {reach.id!r} both run between nodes "
-                    f"{start_key!r} and {end_key!r}, and neither has break points, so the "
+                    f"{start_key!r} and {end_key!r}, and neither has breakpoints, so the "
                     "graph cannot keep them apart. Give each of them at least one break "
-                    "point: a reach with break points gets its own chain of graph nodes, "
+                    "point: a reach with breakpoints gets its own chain of graph nodes, "
                     "which is how a result file's parallel pumps and orifices stay distinct."
                 )
             lone_reach_by_pair[pair] = reach.id
@@ -73,7 +73,7 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             )
 
             # Only this edge needs the reach's length, which can be unknown;
-            # the others are known from break point positions alone.
+            # the others are known from breakpoint positions alone.
             end_position = reach.end_position
             if end_position is None:
                 tail_length = None

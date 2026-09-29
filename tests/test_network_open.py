@@ -67,7 +67,7 @@ class TestCompanionDiscovery:
         assert "Volume" in network.quantities
 
     def test_the_graph_carries_the_length_read_from_the_inp(self, tmp_path):
-        """A link-node reach's two break points sit one reach length apart."""
+        """A link-node reach's two breakpoints sit one reach length apart."""
         network = Network.open(_copy(tmp_path, "epanet", ".res", ".inp"))
         start = network.resolve((_PIPE, 0.0)).graph_node
         end = network.resolve((_PIPE, _PIPE_LENGTH)).graph_node
@@ -218,10 +218,10 @@ def test_pumps_keep_an_unknown_length_even_with_the_inp(tmp_path):
     assert sum(length is None for length in lengths.values()) == 1
 
 
-def test_a_pipe_the_inp_gives_no_length_for_has_one_break_point(tmp_path):
+def test_a_pipe_the_inp_gives_no_length_for_has_one_breakpoint(tmp_path):
     """A zero in [PIPES] says the length is unknown, not that the pipe has none.
 
-    Taken as a real length it would place the reach's second break point at
+    Taken as a real length it would place the reach's second breakpoint at
     position 0.0, on top of the first, and the two would share one key: the
     graph would get a zero-length self-loop, one edge more than the count
     test_network_breakpoints.py checks.

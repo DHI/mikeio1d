@@ -17,15 +17,15 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class ReachBreakPoint:
+class ReachBreakpoint:
     """A location along a reach, between its two end nodes.
 
     Attributes
     ----------
     reach_id : str
-        The reach the break point sits on.
+        The reach the breakpoint sits on.
     position : float
-        Where the break point sits along the reach, in the reach's own frame: a
+        Where the breakpoint sits along the reach, in the reach's own frame: a
         place, not a size. It need not be measured from the start node: a MIKE
         river reach reports its chainage, a coordinate along the whole branch,
         so the distance from the start node is
@@ -37,13 +37,13 @@ class ReachBreakPoint:
 
     @property
     def id(self) -> tuple[str, float]:
-        """``(reach_id, position)``, which uniquely locates the break point."""
+        """``(reach_id, position)``, which uniquely locates the breakpoint."""
         return (self.reach_id, self.position)
 
 
 @dataclass(frozen=True)
 class NetworkReach:
-    """A directed connection between two nodes, and the break points along it.
+    """A directed connection between two nodes, and the breakpoints along it.
 
     Attributes
     ----------
@@ -60,9 +60,9 @@ class NetworkReach:
         in. Zero where they are measured from the reach's own start; a MIKE river
         reach places them at their chainage, so it can begin thousands of metres
         in - or below zero.
-    breakpoints : tuple of ReachBreakPoint
+    breakpoints : tuple of ReachBreakpoint
         Ascending by position; consecutive differences are edge lengths. A reach
-        with break points gets its own chain of graph nodes. A reach with none
+        with breakpoints gets its own chain of graph nodes. A reach with none
         is a single start-to-end edge, and :class:`Network` refuses two of those
         between the same pair of nodes.
     """
@@ -72,7 +72,7 @@ class NetworkReach:
     end: str
     length: float | None = None
     start_position: float = 0.0
-    breakpoints: tuple[ReachBreakPoint, ...] = ()
+    breakpoints: tuple[ReachBreakpoint, ...] = ()
 
     @property
     def end_position(self) -> float | None:
@@ -81,7 +81,7 @@ class NetworkReach:
 
     @property
     def n_breakpoints(self) -> int:
-        """Number of break points in the reach."""
+        """Number of breakpoints in the reach."""
         return len(self.breakpoints)
 
 
@@ -101,7 +101,7 @@ class Location:
     graph_node : int
         The integer :attr:`Network.graph` and :meth:`Network.to_dataset` label
         the location with, which ``graph.nodes[graph_node]["address"]`` turns
-        back into the address. Every location has one, a break point too.
+        back into the address. Every location has one, a breakpoint too.
     """
 
     address: Address

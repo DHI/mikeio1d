@@ -31,7 +31,7 @@ import xarray as xr
 from ._graph import _generate_graph
 from ._loader import _load_network
 from ._naming import _Naming
-from ._naming import _is_break_point
+from ._naming import _is_breakpoint
 from ._types import Location
 from ._types import NetworkReach
 
@@ -149,7 +149,7 @@ class Network:
             if reach.id in by_id:
                 raise ValueError(
                     f"Two reaches share the id {reach.id!r}. A reach is addressed by its "
-                    "id, and its break points are keyed by it, so keeping both would drop "
+                    "id, and its breakpoints are keyed by it, so keeping both would drop "
                     "one of them and interleave their edges."
                 )
             by_id[reach.id] = reach
@@ -190,9 +190,9 @@ class Network:
             ``graph_node`` is the graph's integer, as :attr:`Location.graph_node`
             gives it, and the ``node_id``, ``reach`` and ``position`` coordinates
             carry the address, so a consumer never has to hold on to the
-            network to know what a column is. A node fills in ``node_id``, a break
-            point ``reach`` and ``position``, and the empty half says which it
-            is::
+            network to know what a column is. A node fills in ``node_id``, a
+            breakpoint ``reach`` and ``position``, and the empty half says
+            which it is::
 
                 Coordinates:
                   * time        datetime64
@@ -228,7 +228,7 @@ class Network:
         node_ids, reaches, positions = [], [], []
         for graph_node in ds.graph_node.to_numpy():
             address = self._graph.nodes[int(graph_node)]["address"]
-            if _is_break_point(address):
+            if _is_breakpoint(address):
                 reach, position = address
                 node_ids.append("")
                 reaches.append(reach)
@@ -348,7 +348,7 @@ class Network:
             else:
                 faults.append(
                     f"{address!r} carries no quantities of its own, so {quantity!r} cannot be "
-                    "read there; addresses(reach=...) lists the break points that can be"
+                    "read there; addresses(reach=...) lists the breakpoints that can be"
                 )
         shown = "; ".join(faults[:10])
         if len(faults) > 10:
@@ -380,9 +380,9 @@ class Network:
             An empty sequence reads nothing at all, and returns an empty frame
             rather than the whole file.
         position_tol : float, optional
-            How far a position may be from a break point's own and still mean
+            How far a position may be from a breakpoint's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
-            snap a measured chainage onto the model's; the nearest break point
+            snap a measured chainage onto the model's; the nearest breakpoint
             inside the window wins. Ignored for a node ID.
 
         Returns
@@ -407,11 +407,11 @@ class Network:
         --------
         >>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
 
-        A measured chainage, snapped onto the model's nearest break point:
+        A measured chainage, snapped onto the model's nearest breakpoint:
 
         >>> network.read([(("100l1", 23.8), "Discharge")], position_tol=0.1)  # doctest: +SKIP
 
-        A reach observation, whose break points have to agree before one of them
+        A reach observation, whose breakpoints have to agree before one of them
         can stand for the reach:
 
         >>> points = network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
@@ -442,7 +442,7 @@ class Network:
         Parameters
         ----------
         reach : str, optional
-            Only the break points along this reach, in the order they sit. The
+            Only the breakpoints along this reach, in the order they sit. The
             reach's own end nodes are not among them - they are nodes, and a
             node is named by its own ID. ``None`` *(default)* lists everything.
         quantity : str, optional
@@ -457,7 +457,7 @@ class Network:
 
         Examples
         --------
-        Every break point of a reach that carries discharge, which is the batch
+        Every breakpoint of a reach that carries discharge, which is the batch
         a reach observation has to be scored against:
 
         >>> network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
@@ -487,9 +487,9 @@ class Network:
             nodes are named by their IDs, which ``reaches[reach_id].start``
             and ``.end`` give.
         position_tol : float, optional
-            How far a position may be from a break point's own and still mean
+            How far a position may be from a breakpoint's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
-            snap a measured chainage onto the model's; the nearest break point
+            snap a measured chainage onto the model's; the nearest breakpoint
             inside the window wins. Ignored for a node ID.
 
         Returns

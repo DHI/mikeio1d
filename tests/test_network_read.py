@@ -1,7 +1,7 @@
 """Test reading series from a network after the open, rather than during it.
 
 Topology is cheap and series are not, so a network answers where a quantity
-lives from the file header and its own break points, and reads only what it is
+lives from the file header and its own breakpoints, and reads only what it is
 then asked for. The point of the split is when absence is discovered: a location
 that carries nothing is an answer while the file is still open, not a reload.
 """
@@ -25,7 +25,7 @@ _RIVER = str(_TESTDATA / "network_river.res1d")
 _RES11 = str(_TESTDATA / "network_cali.res11")
 _EPANET_RES = str(_TESTDATA / "epanet.res")
 
-# The break point of 100l1 that carries discharge, and the reach's own length.
+# The breakpoint of 100l1 that carries discharge, and the reach's own length.
 _Q_POINT = ("100l1", 23.8413574216414)
 _PIPE_LENGTH = 3209.544
 
@@ -162,7 +162,7 @@ class TestResolvingAnAddress:
 
         assert str(column["node_id"].item()) == "101"
 
-    def test_a_break_point_snaps_to_the_position_the_file_stores(self, network):
+    def test_a_breakpoint_snaps_to_the_position_the_file_stores(self, network):
         resolved = network.resolve(("100l1", 23.8), position_tol=0.1)
 
         assert resolved.address == _Q_POINT
@@ -174,7 +174,7 @@ class TestResolvingAnAddress:
         """What makes resolve() usable for deciding whether to read at all."""
         assert network.resolve("no_such_node") is None
 
-    def test_the_nearest_break_point_in_a_wide_window_wins(self, network):
+    def test_the_nearest_breakpoint_in_a_wide_window_wins(self, network):
         """A caller widening the window is snapping a measurement, not sweeping."""
         resolved = network.resolve(("100l1", 20.0), position_tol=30.0)
 
@@ -218,7 +218,7 @@ class TestListingAddresses:
         assert len(discharge) == 129
         assert not set(water_level) & set(discharge)
 
-    def test_a_reach_gives_its_break_points_and_not_its_nodes(self, network):
+    def test_a_reach_gives_its_breakpoints_and_not_its_nodes(self, network):
         points = network.addresses(reach="100l1")
 
         assert points == [("100l1", 0.0), _Q_POINT, ("100l1", 47.6827148432828)]
@@ -226,14 +226,14 @@ class TestListingAddresses:
     def test_a_reach_carrying_nothing_for_a_quantity_is_empty(self, network):
         assert network.addresses(reach="100l1", quantity="Volume") == []
 
-    def test_a_pipe_without_a_length_has_only_its_near_break_point(self):
+    def test_a_pipe_without_a_length_has_only_its_near_breakpoint(self):
         """Without the .inp a pipe has no length, so there is no position for its far end."""
         alone = Network.open(_EPANET_RES, companions=[])
 
         assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0)]
         assert alone.addresses(reach="10") == [("10", 0.0)]
 
-    def test_both_break_points_are_listed_once_the_inp_gives_a_length(self, epanet):
+    def test_both_breakpoints_are_listed_once_the_inp_gives_a_length(self, epanet):
         assert epanet.addresses(reach="10") == [("10", 0.0), ("10", _PIPE_LENGTH)]
 
     def test_a_reach_that_is_not_here_is_named(self, network):
@@ -252,7 +252,7 @@ class TestReadingSeries:
 
         assert np.allclose(read.iloc[:, 0].to_numpy(), expected.to_numpy())
 
-    def test_a_mix_of_nodes_and_break_points_matches_the_result_file(self, network):
+    def test_a_mix_of_nodes_and_breakpoints_matches_the_result_file(self, network):
         """Nodes and gridpoints on several reaches, read in one call."""
         items = [
             ("101", "WaterLevel"),
@@ -309,7 +309,7 @@ class TestReadingSeries:
             network.read([(("100l1", 23.8), "Discharge")], position_tol=-1.0)
 
     def test_a_whole_reach_is_one_call(self, network):
-        """A reach observation needs every break point, compared over the series."""
+        """A reach observation needs every breakpoint, compared over the series."""
         points = network.addresses(reach="100l1", quantity="WaterLevel")
 
         read = network.read([(point, "WaterLevel") for point in points])
@@ -333,7 +333,7 @@ class TestReadingSeries:
         assert read.shape[1] == 2
         assert not read.isna().all().any()
 
-    def test_two_break_points_on_one_gridpoint_give_one_series_twice(self, epanet):
+    def test_two_breakpoints_on_one_gridpoint_give_one_series_twice(self, epanet):
         items = [(("10", 0.0), "Flow"), (("10", _PIPE_LENGTH), "Flow")]
 
         read = epanet.read(items)

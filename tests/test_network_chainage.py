@@ -1,6 +1,6 @@
-"""Test the frame a reach places its break points in, and the edges built from it.
+"""Test the frame a reach places its breakpoints in, and the edges built from it.
 
-A break point's position is a place, not a size. Which frame it is a position
+A breakpoint's position is a place, not a size. Which frame it is a position
 in belongs to the reach: an urban link measures from its own start, while a MIKE
 river reach reports chainages along the whole branch it belongs to. Every edge
 length has to come out the same either way.
@@ -44,9 +44,9 @@ def river_lengths():
 
 
 def _chain_nodes(network, reach_id):
-    """A reach's graph nodes in order: start node, its break points, end node.
+    """A reach's graph nodes in order: start node, its breakpoints, end node.
 
-    A break point's address names the reach it belongs to, so one reach's chain
+    A breakpoint's address names the reach it belongs to, so one reach's chain
     can be read off the graph without asking the network for its reaches.
     """
     addresses = {node: network.graph.nodes[node]["address"] for node in network.graph.nodes}
@@ -65,7 +65,7 @@ def _chain_nodes(network, reach_id):
 
 
 def _end_edges(network, reach_id):
-    """The two edges joining a reach's own nodes to its outermost break points."""
+    """The two edges joining a reach's own nodes to its outermost breakpoints."""
     chain = _chain_nodes(network, reach_id)
 
     return network.graph.edges[chain[0], chain[1]], network.graph.edges[chain[-2], chain[-1]]
@@ -95,11 +95,11 @@ class TestAReachThatDoesNotStartAtZero:
 
         assert sum(_chain_lengths(river, reach_id)) == pytest.approx(expected)
 
-    def test_a_break_point_below_its_branch_zero_keeps_its_sign(self, river):
+    def test_a_breakpoint_below_its_branch_zero_keeps_its_sign(self, river):
         """A position can sit below its frame's origin, where a size cannot.
 
         'basin_right' is modelled 10 m upstream of its branch's chainage zero,
-        so its first two break points are negative. Reading their position as
+        so its first two breakpoints are negative. Reading their position as
         a size - the old ``abs(distance)`` - put them 10 m and 5 m from a start
         node they in fact sit on.
         """

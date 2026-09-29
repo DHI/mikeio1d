@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 from ._results import _Results
 from ._results import _Series
-from ._types import NetworkReach, ReachBreakPoint
+from ._types import NetworkReach, ReachBreakpoint
 
 
 def _path_of(file: str | Path | Res1D) -> Path:
@@ -79,7 +79,7 @@ def _resolve_reach_length(length: float | None, reach: ResultReach) -> float | N
     A length read from a companion input file wins. Zero means undefined from
     either source: mikeio1d returns 0 when it cannot read a length, as for every
     EPANET reach. A zero-length reach would look free to length-weighted graph
-    algorithms, and would put a link-node reach's two break points on one spot.
+    algorithms, and would put a link-node reach's two breakpoints on one spot.
     """
     return (length if length is not None else reach.length) or None
 
@@ -123,7 +123,7 @@ def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
 
 
 _SeriesKey = str | tuple[str, int]
-"""Where a series sits in a result file, before any break point is placed.
+"""Where a series sits in a result file, before any breakpoint is placed.
 
 A ``str`` is a node id. A ``(reach_id, i)`` tuple is the ``i``-th of the reach's
 :func:`_ordered_gridpoints`. A companion result is keyed the same way, which is
@@ -132,7 +132,7 @@ how its series land on the main file's locations.
 
 
 def _ordered_gridpoints(reach: ResultReach) -> list[ResultGridPoint]:
-    """Give the gridpoints a reach's break points are made from, in order along it.
+    """Give the gridpoints a reach's breakpoints are made from, in order along it.
 
     Sorted by chainage, since a multi-segment reach lists its gridpoints segment
     by segment in no promised order. A link-node reach has only the one
@@ -159,19 +159,19 @@ def _build_reach_breakpoints(
     *,
     length: float | None,
     series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
-) -> tuple[list[ReachBreakPoint], dict[Address, dict[str, _Series]]]:
-    """Build a reach's break points from its mikeio1d gridpoints, and what each carries.
+) -> tuple[list[ReachBreakpoint], dict[Address, dict[str, _Series]]]:
+    """Build a reach's breakpoints from its mikeio1d gridpoints, and what each carries.
 
-    A reach with gridpoints of its own gets one break point per gridpoint, at
+    A reach with gridpoints of its own gets one breakpoint per gridpoint, at
     its chainage.
 
     A link-node reach (e.g. EPANET) has one synthetic gridpoint that belongs to
-    neither end. It becomes two break points, at 0.0 and at ``length``, both
+    neither end. It becomes two breakpoints, at 0.0 and at ``length``, both
     carrying its series - or only the one at 0.0 where the length is unknown.
     See https://github.com/DHI/modelskill/issues/680.
 
-    The series come back with the break points, since only here is it known
-    which gridpoint a break point was made from.
+    The series come back with the breakpoints, since only here is it known
+    which gridpoint a breakpoint was made from.
     """
     gridpoints = _ordered_gridpoints(reach)
     if _has_real_gridpoints(reach):
@@ -180,12 +180,12 @@ def _build_reach_breakpoints(
         ends = [0.0] if length is None else [0.0, length]
         positions_per_gridpoint = [ends for _ in gridpoints]
 
-    breakpoints: list[ReachBreakPoint] = []
+    breakpoints: list[ReachBreakpoint] = []
     series: dict[Address, dict[str, _Series]] = {}
     for i, (gp, positions) in enumerate(zip(gridpoints, positions_per_gridpoint)):
         carried = series_by_key[(reach.name, i)]
         for position in positions:
-            point = ReachBreakPoint(gp.reach_name, position)
+            point = ReachBreakpoint(gp.reach_name, position)
             breakpoints.append(point)
             series[point.id] = carried
     return breakpoints, series
@@ -201,7 +201,7 @@ def _load_res1d_network(
     """Read a result file as reaches, and as the results a network reads through.
 
     Both come from one walk over ``res.reaches``, since the series map depends
-    on which gridpoint each break point was made from. No timeseries is read.
+    on which gridpoint each breakpoint was made from. No timeseries is read.
 
     A node is part of the network through the reaches that end at it, so a node
     no reach ends at is left out, with a warning.

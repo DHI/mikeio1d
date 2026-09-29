@@ -30,13 +30,13 @@ _POSITION_TOLERANCE = 1e-3
 Address = str | tuple[str, float]
 """A location under the name its model gave it.
 
-A plain ``str`` is a node id. A ``(reach_id, position)`` tuple is a break point.
+A plain ``str`` is a node id. A ``(reach_id, position)`` tuple is a breakpoint.
 Nothing is both, so the shape says which it is.
 """
 
 
-def _is_break_point(address: Address) -> bool:
-    """Whether an address names a break point rather than a node."""
+def _is_breakpoint(address: Address) -> bool:
+    """Whether an address names a breakpoint rather than a node."""
     return isinstance(address, tuple)
 
 
@@ -56,10 +56,10 @@ class _Naming:
         self._graph_nodes: dict[Address, int] = {
             address: node for node, address in graph.nodes(data="address")
         }
-        # Each reach's break point positions, ascending, for bisect.
+        # Each reach's breakpoint positions, ascending, for bisect.
         self._distances: dict[str, list[float]] = {}
         for address in self._graph_nodes:
-            if _is_break_point(address):
+            if _is_breakpoint(address):
                 self._distances.setdefault(address[0], []).append(address[1])
         for known in self._distances.values():
             known.sort()
@@ -73,12 +73,12 @@ class _Naming:
     def canonical(self, address: Address, *, position_tol: float | None = None) -> Address | None:
         """Give the network's own spelling of an address, or None if there is no such place.
 
-        An exact hit answers immediately. Failing that, a break point is matched
+        An exact hit answers immediately. Failing that, a breakpoint is matched
         on position within ``position_tol``, defaulting to
         :data:`_POSITION_TOLERANCE`, so a caller need not reproduce a stored
         float exactly.
 
-        The nearest break point inside the window wins. At the default tolerance
+        The nearest breakpoint inside the window wins. At the default tolerance
         that is the only one there, but a caller widening the window is snapping
         a measured position onto the model's, and means the closest.
         """
@@ -90,7 +90,7 @@ class _Naming:
             raise ValueError(
                 f"position_tol must be a finite, non-negative number, got {position_tol!r}."
             )
-        if not _is_break_point(address):
+        if not _is_breakpoint(address):
             return None
         reach_id, position = address
         known = self._distances.get(reach_id, [])
@@ -107,13 +107,13 @@ class _Naming:
 
         Names a few likely candidates rather than every name in the network.
         """
-        if _is_break_point(address):
+        if _is_breakpoint(address):
             reach_id, position = address
             known = self._distances.get(reach_id, [])
             if not known:
                 if reach_id not in self._reaches:
                     return f"the network has no reach {reach_id!r}"
-                return f"reach {reach_id!r} has no break points"
+                return f"reach {reach_id!r} has no breakpoints"
             nearest = sorted(sorted(known, key=lambda d: abs(d - position))[:limit])
             listed = ", ".join(format(d, "g") for d in nearest)
             return (
@@ -121,7 +121,7 @@ class _Naming:
                 "(position_tol= widens the match)"
             )
 
-        names = [key for key in self._graph_nodes if not _is_break_point(key)]
+        names = [key for key in self._graph_nodes if not _is_breakpoint(key)]
         close = get_close_matches(address, names, n=limit)
         if close:
             return "did you mean " + ", ".join(repr(name) for name in close) + "?"

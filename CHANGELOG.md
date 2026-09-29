@@ -42,11 +42,11 @@
   `graph_node`, and its coordinate for a model node's id `node_id` (#250).
 - `Network.graph` is read-only; `network.graph.copy()` gives one to edit. `Network.copy` and
   `Network.release` are gone (#250).
-- A place along a reach is a `position`, not a `distance`: `ReachBreakPoint.position`,
+- A place along a reach is a `position`, not a `distance`: `ReachBreakpoint.position`,
   `NetworkReach.start_position` and `end_position`, the `position_tol` argument of `resolve`
   and `read`, and `to_dataset`'s `position` coordinate (#250).
 - A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location`,
-  `NetworkReach` and `ReachBreakPoint` are exported from `mikeio1d.network` (#250).
+  `NetworkReach` and `ReachBreakpoint` are exported from `mikeio1d.network` (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.

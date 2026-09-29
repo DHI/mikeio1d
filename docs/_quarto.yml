@@ -132,7 +132,7 @@ quartodoc:
     - network.Address
     - network.Location
     - network.NetworkReach
-    - network.ReachBreakPoint
+    - network.ReachBreakpoint
     
 format:
   html:

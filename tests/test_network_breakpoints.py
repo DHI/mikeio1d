@@ -1,8 +1,8 @@
-"""Test that every reach comes out of a file with break points of its own.
+"""Test that every reach comes out of a file with breakpoints of its own.
 
-A break point is keyed by its reach's id, so a reach that has any gets a chain
+A breakpoint is keyed by its reach's id, so a reach that has any gets a chain
 of graph nodes to itself and stays distinct from a parallel reach between the
-same two nodes. ``Network`` refuses two reaches with no break points between one
+same two nodes. ``Network`` refuses two reaches with no breakpoints between one
 pair of nodes, and no result file can reach that state: a MIKE reach brings its
 own gridpoints, and a link-node reach (EPANET, SWMM) is handed one synthetic
 stand-in that is placed at both of its ends.
@@ -45,11 +45,11 @@ def _open(filename):
 
 @pytest.mark.parametrize("filename", _FIXTURES)
 def test_every_reach_keeps_a_chain_of_its_own(filename):
-    """A reach of n break points spans n + 1 edges, and shares none of them.
+    """A reach of n breakpoints spans n + 1 edges, and shares none of them.
 
-    So the edge count is one per reach plus one per break point. Two reaches
+    So the edge count is one per reach plus one per breakpoint. Two reaches
     landing on a single edge would leave it short, which is the collision
-    ``Network`` refuses when neither has break points to be told apart by.
+    ``Network`` refuses when neither has breakpoints to be told apart by.
     """
     path = str(_TESTDATA / filename)
     graph = _open(filename).graph
@@ -63,8 +63,8 @@ _MIKE_FIXTURES = [f for f in _FIXTURES if f != "epanet.res"]
 
 
 @pytest.mark.parametrize("filename", _FIXTURES)
-def test_every_reach_lists_its_break_points_ascending(filename):
-    """Break points are documented as ascending, and the graph builder counts on it.
+def test_every_reach_lists_its_breakpoints_ascending(filename):
+    """Breakpoints are documented as ascending, and the graph builder counts on it.
 
     It reads the outermost pair as the reach's ends and each consecutive
     difference as an edge length, so a backwards chain would give negative
@@ -85,7 +85,7 @@ def test_every_reach_lists_its_break_points_ascending(filename):
 
 @pytest.mark.parametrize("filename", _MIKE_FIXTURES)
 def test_a_mike_reach_keeps_every_gridpoint(filename):
-    """One break point per gridpoint, so none is dropped as a link-node stand-in.
+    """One breakpoint per gridpoint, so none is dropped as a link-node stand-in.
 
     Read as a link-node reach, a MIKE reach would lose its end gridpoint and
     carry its start's data there instead, silently.
