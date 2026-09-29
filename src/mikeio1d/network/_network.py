@@ -48,6 +48,18 @@ class Network:
     Build one with :meth:`open`, which reads no timeseries. They stay in the
     file until :meth:`read` asks for them. The constructor is internal: it
     takes what a loader produces, not a file.
+
+    Notes
+    -----
+    Which locations carry series depends on the format:
+
+    * MIKE 1D (``.res1d``): nodes and reach gridpoints both carry them.
+    * MIKE 11 (``.res11``): only gridpoints do. A node carries nothing, so an
+      observation at a node is read at a gridpoint beside it, which
+      ``addresses(reach=...)`` lists.
+    * EPANET (``.res``): a node carries its own. A pipe's are read at its start,
+      ``(pipe_id, 0.0)``, and at its end too once its length is known from the
+      ``.inp`` companion; the two give the same series.
     """
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
@@ -141,8 +153,8 @@ class Network:
 
         Notes
         -----
-        Where a format keeps its timeseries, and so which locations carry
-        them, is described per format in the user guide's network page.
+        Which locations carry series depends on the format; see
+        :class:`Network`.
         """
         return cls(*_load_network(res, companions))
 
@@ -463,6 +475,11 @@ class Network:
             the result file and its ``.resx`` companion and the two turn out to
             have different time axes.
 
+        Notes
+        -----
+        A node of a MIKE 11 result carries nothing; see :class:`Network` for
+        which locations carry series in each format.
+
         Examples
         --------
         >>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
@@ -596,6 +613,12 @@ class Network:
         ------
         ValueError
             If ``position_tol`` is negative or not finite.
+
+        Notes
+        -----
+        A node of a MIKE 11 result carries nothing, so it resolves with empty
+        ``quantities``; see :class:`Network` for which locations carry series in
+        each format.
 
         Examples
         --------
