@@ -59,8 +59,8 @@ class Network:
       observation at a node is read at a gridpoint beside it, which
       ``addresses(reach=...)`` lists.
     * EPANET (``.res``): a node carries its own. A pipe's are read at its start,
-      ``(pipe_id, 0.0)``, and at its end too once its length is known from the
-      ``.inp`` companion; the two give the same series.
+      ``(pipe_id, 0.0)``, and at its end, ``(pipe_id, length)``; the two give
+      the same series. A pump or valve has no length, so only its start.
 
     Examples
     --------
@@ -115,21 +115,18 @@ class Network:
             is there, carrying nothing. One opened with ``time=`` or
             ``step_every=`` is not supported yet.
         companions : sequence of str, Path or Res1D, or None, optional
-            Files read alongside the result and recognised by their extension:
+            Files read alongside the result. The one kind is ``.resx``: extra
+            EPANET results for the same network. Its node quantities (tank
+            ``Volume`` and ``Volume Percentage``) are merged onto the matching
+            nodes, and its reach quantities (pump ``efficiency``, ``energy``
+            and ``energy costs``) onto the matching reach's breakpoints.
 
-            * ``.resx`` -- extra EPANET results for the same network. Its node
-              quantities (tank ``Volume`` and ``Volume Percentage``) are merged
-              onto the matching nodes, and its reach quantities (pump
-              ``efficiency``, ``energy`` and ``energy costs``) onto the matching
-              reach's breakpoints.
-            * ``.inp`` -- the EPANET input file, read for its ``[PIPES]``
-              lengths. No result file carries a reach length, so without this one
-              no reach has one.
-
-            ``None`` *(default)* looks for them beside the result file, matching
+            ``None`` *(default)* looks for one beside the result file, matching
             its folder and stem; ``[]`` reads none; a list reads exactly those.
             Only EPANET results are looked beside. A companion passed as a
-            ``Res1D`` follows the same rules for filters as ``res``.
+            ``Res1D`` follows the same rules for filters as ``res``. The
+            EPANET ``.inp`` input file is not a companion: reach lengths come
+            from the ``.res`` itself.
 
         Returns
         -------
@@ -142,8 +139,8 @@ class Network:
             holds catchments and no reaches, or if the result or a companion is
             a ``Res1D`` opened with ``time=`` or ``step_every=``.
         ValueError
-            If a companion has an extension this reader does not know, if two
-            companions of the same kind are given, if a ``.resx`` covers a
+            If a companion has an extension this reader does not know or is an
+            ``.inp``, if two ``.resx`` are given, if a ``.resx`` covers a
             different period from the result file, or if the two carry the same
             quantity at one location.
 
@@ -166,12 +163,20 @@ class Network:
 
         >>> epanet = Network.open(
         ...     "tests/testdata/epanet.res",
-        ...     companions=["tests/testdata/epanet.inp"],
+        ...     companions=["tests/testdata/epanet.resx"],
         ... )
-        >>> epanet.reaches["10"].length
-        3209.544
+        >>> "Volume" in epanet.quantities
+        True
         >>> alone = Network.open("tests/testdata/epanet.res", companions=[])
-        >>> alone.reaches["10"].length is None
+        >>> "Volume" in alone.quantities
+        False
+
+        An EPANET reach's length comes from the ``.res`` itself. A pump or valve
+        has none:
+
+        >>> alone.reaches["10"].length
+        3209.544
+        >>> alone.reaches["9"].length is None
         True
 
         A filtered ``Res1D`` gives the whole network, carrying only what its
@@ -345,7 +350,7 @@ class Network:
             * edge ``length`` -- the distance between the edge's two ends, in
               the reach's own units. ``None`` where the reach's length is not
               known, which is only on the edge into its end node: an EPANET
-              pipe read without its ``.inp`` has no length. networkx treats an
+              pump or valve has no length. networkx treats an
               edge whose weight is ``None`` as absent, so a route weighted by
               ``length`` goes around it.
             * edge ``boundary`` -- ``True`` where both ends are the same place,
@@ -377,15 +382,16 @@ class Network:
         >>> graph.edges[route[0], route[1]]
         {'length': 0.0, 'boundary': True}
 
-        A route by length skips an edge whose length is ``None``, as for EPANET
-        without its ``.inp``, and finds none where that edge was the only way:
+        A route by length skips an edge whose length is ``None``, as for an
+        EPANET pump, and finds none where that edge was the only way:
 
-        >>> alone = Network.open("tests/testdata/epanet.res", companions=[])
-        >>> start, end = alone.resolve("10").graph_node, alone.resolve("11").graph_node
-        >>> nx.shortest_path(alone.to_networkx(), start, end, weight="length")
+        >>> epanet = Network.open("tests/testdata/epanet.res")
+        >>> pump = epanet.reaches["9"]
+        >>> start, end = epanet.resolve(pump.start).graph_node, epanet.resolve(pump.end).graph_node
+        >>> nx.shortest_path(epanet.to_networkx(), start, end, weight="length")
         Traceback (most recent call last):
         ...
-        networkx.exception.NetworkXNoPath: No path between 0 and 1.
+        networkx.exception.NetworkXNoPath: No path between 34 and 0.
         """
         return self._graph.copy()
 

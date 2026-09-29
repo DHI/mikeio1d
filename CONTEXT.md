@@ -47,7 +47,7 @@ The words the network module's API and docs use, and what each one means.
 
 **Length**
 : A size: a reach's `length`, or an edge's, the distance between two positions. `None`
-  where it is not known, as for an EPANET pipe without its `.inp`.
+  where it is not known, as for an EPANET pump or valve.
 
 **Quantity**
 : A variable a result file holds, by its id (`WaterLevel`, `Discharge`).
@@ -62,6 +62,6 @@ The words the network module's API and docs use, and what each one means.
   labels its columns with them.
 
 **Companion**
-: A file read alongside an EPANET result: a `.resx` with extra results for the same run,
-  or the `.inp` input file, read for its pipe lengths. `Network.open` looks for them beside
-  the result file unless told otherwise.
+: A file read alongside an EPANET result: a `.resx` with extra results for the same run.
+  `Network.open` looks for it beside the result file unless told otherwise. The `.inp`
+  input file is not one: the `.res` holds the reach lengths too.

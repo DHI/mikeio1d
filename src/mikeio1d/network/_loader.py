@@ -6,8 +6,8 @@ network, which companions to read beside it, and how to say which one failed
 all happen here.
 
 ``Res1D`` reads more formats than a network can be mapped onto, and the
-difference is not a matter of taste: a ``.out`` keeps its connectivity in a
-companion input file nobody parses yet, a ``.resx`` describes a network defined
+difference is not a matter of taste: a ``.out`` needs its sibling input file
+for connectivity and still reports no reach lengths, a ``.resx`` describes a network defined
 in its sibling ``.res``, and the rest have no fixture here to verify against.
 """
 
@@ -41,11 +41,12 @@ _NO_FIXTURE = (
     "{product} results are not supported yet: there is no test fixture for this "
     "format, so support cannot be verified. Please open an issue if you need it."
 )
-# A result file that holds timeseries but no topology of its own. The connectivity
-# is in a companion file we do not parse yet.
+# A result file that holds timeseries but no topology of its own. MIKE 1D reads
+# the connectivity from the sibling '.inp' when there is one, but a reach length
+# from neither file.
 _TOPOLOGY_IN_COMPANION_FILE = (
     "SWMM '.out' files carry no reach connectivity of their own - it lives in the "
-    "companion '.inp' input file, which is not read as topology yet. Tracked in "
+    "sibling '.inp' input file - and no reach lengths are read for them. Tracked in "
     "https://github.com/DHI/mikeio1d/issues/213."
 )
 # A companion result file: readable, but it describes a network defined elsewhere.

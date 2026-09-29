@@ -202,7 +202,7 @@ class _Naming:
             return (
                 f"reach {reach_id!r} has no known length, so a position past its last "
                 f"breakpoint ({known[-1]:g}) cannot be matched, however wide position_tol "
-                "is; a length can come from Network.open's companions"
+                "is; an EPANET pump or valve has none"
             )
         if quantity is None:
             listed = self._list_nearest(known, position, limit)
