@@ -45,6 +45,20 @@ class NetworkReach:
         with breakpoints gets its own chain of graph nodes. A reach with none
         is a single start-to-end edge, and :class:`Network` refuses two of those
         between the same pair of nodes.
+
+    Examples
+    --------
+    >>> from mikeio1d.network import Network
+    >>> network = Network.open("tests/testdata/network.res1d")
+    >>> network.reaches["100l1"]  # doctest: +NORMALIZE_WHITESPACE
+    NetworkReach(id='100l1', start='100', end='99', length=47.6827148432828,
+        start_position=0.0, breakpoints=(('100l1', 0.0), ('100l1', 23.8413574216414),
+        ('100l1', 47.6827148432828)))
+
+    A breakpoint is an address as it stands:
+
+    >>> network.read([(network.reaches["100l1"].breakpoints[1], "Discharge")]).shape
+    (110, 1)
     """
 
     id: str
@@ -56,12 +70,31 @@ class NetworkReach:
 
     @property
     def end_position(self) -> float | None:
-        """Position of the end node, or ``None`` where the length is undefined."""
+        """Position of the end node, or ``None`` where the length is undefined.
+
+        Examples
+        --------
+        A MIKE river reach whose chainage starts below zero:
+
+        >>> from mikeio1d.network import Network
+        >>> river = Network.open("tests/testdata/network_river.res1d")
+        >>> reach = river.reaches["basin_right"]
+        >>> reach.start_position, reach.length, reach.end_position
+        (-10.0, 730.0, 720.0)
+        """
         return None if self.length is None else self.start_position + self.length
 
     @property
     def n_breakpoints(self) -> int:
-        """Number of breakpoints in the reach."""
+        """Number of breakpoints in the reach.
+
+        Examples
+        --------
+        >>> from mikeio1d.network import Network
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.reaches["100l1"].n_breakpoints
+        3
+        """
         return len(self.breakpoints)
 
 
@@ -82,6 +115,16 @@ class Location:
         The integer :meth:`Network.to_networkx` and :meth:`Network.to_dataset` label
         the location with, which ``graph.nodes[graph_node]["address"]`` turns
         back into the address. Every location has one, a breakpoint too.
+
+    Examples
+    --------
+    >>> from mikeio1d.network import Network
+    >>> network = Network.open("tests/testdata/network.res1d")
+    >>> location = network.resolve(("100l1", 23.8), position_tol=0.1)
+    >>> location.address, location.quantities
+    (('100l1', 23.8413574216414), ('Discharge',))
+    >>> network.to_networkx().nodes[location.graph_node]["address"]
+    ('100l1', 23.8413574216414)
     """
 
     address: Address

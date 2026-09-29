@@ -32,6 +32,15 @@ Address = str | tuple[str, float]
 
 A plain ``str`` is a node id. A ``(reach_id, position)`` tuple is a breakpoint.
 Nothing is both, so the shape says which it is.
+
+Examples
+--------
+>>> from mikeio1d.network import Network
+>>> network = Network.open("tests/testdata/network.res1d")
+>>> network.resolve("101").address
+'101'
+>>> network.resolve(("100l1", 23.8413574216414)).address
+('100l1', 23.8413574216414)
 """
 
 

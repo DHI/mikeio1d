@@ -13,9 +13,11 @@ installs::
 Examples
 --------
 >>> from mikeio1d.network import Network
->>> network = Network.open("tests/testdata/network.res1d")  # doctest: +SKIP
->>> network.resolve("101")  # doctest: +SKIP
->>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
+>>> network = Network.open("tests/testdata/network.res1d")
+>>> network.resolve("101")
+Location(address='101', quantities=('WaterLevel',), graph_node=5)
+>>> network.read([("101", "WaterLevel")]).shape
+(110, 1)
 """
 
 try:

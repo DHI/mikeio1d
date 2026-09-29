@@ -60,6 +60,17 @@ class Network:
     * EPANET (``.res``): a node carries its own. A pipe's are read at its start,
       ``(pipe_id, 0.0)``, and at its end too once its length is known from the
       ``.inp`` companion; the two give the same series.
+
+    Examples
+    --------
+    >>> from mikeio1d.network import Network
+    >>> network = Network.open("tests/testdata/network.res1d")
+    >>> print(network)
+    <Network>
+    Reaches: 118
+    Nodes: 495
+    Quantities: ['WaterLevel', 'Discharge']
+    Time: 1994-08-07 16:35:00 - 1994-08-07 18:35:00
     """
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
@@ -138,18 +149,31 @@ class Network:
         Examples
         --------
         >>> from mikeio1d.network import Network
-        >>> network = Network.open("model.res1d")  # doctest: +SKIP
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.reaches["100l1"].start
+        '100'
 
-        Read only the two nodes where observations exist:
+        Name the companions rather than letting them be found, or pass ``[]`` to
+        read the result file on its own:
 
-        >>> network.read([("node_a", "WaterLevel"), ("node_b", "WaterLevel")])  # doctest: +SKIP
-
-        Name the companions rather than letting them be found:
-
-        >>> network = Network.open(  # doctest: +SKIP
-        ...     "model.res",
-        ...     companions=["other.resx", "other.inp"],
+        >>> epanet = Network.open(
+        ...     "tests/testdata/epanet.res",
+        ...     companions=["tests/testdata/epanet.inp"],
         ... )
+        >>> epanet.reaches["10"].length
+        3209.544
+        >>> alone = Network.open("tests/testdata/epanet.res", companions=[])
+        >>> alone.reaches["10"].length is None
+        True
+
+        A filtered ``Res1D`` gives the whole network, carrying only what its
+        filter lets through:
+
+        >>> from mikeio1d import Res1D
+        >>> res = Res1D("tests/testdata/network.res1d", nodes=["1"], reaches=["100l1"])
+        >>> filtered = Network.open(res)
+        >>> filtered.resolve("1").quantities, filtered.resolve("101").quantities
+        (('WaterLevel',), ())
 
         Notes
         -----
@@ -187,6 +211,15 @@ class Network:
         pd.DataFrame
             Time-indexed. Columns are ``(address, quantity)`` pairs, as
             :meth:`read` gives them.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> df = network.to_dataframe()
+        >>> df.shape
+        (110, 495)
+        >>> df.columns[:2].tolist()
+        [('100', 'WaterLevel'), ('99', 'WaterLevel')]
         """
         items = [
             (address, quantity)
@@ -224,6 +257,20 @@ class Network:
                     position    float64     nan nan 0.0 24.5
 
             Empty when no location carries data.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> ds = network.to_dataset()
+        >>> list(ds.data_vars), dict(ds.sizes)
+        (['WaterLevel', 'Discharge'], {'time': 110, 'graph_node': 495})
+
+        A column's address, from its coordinates:
+
+        >>> graph_node = network.resolve(("100l1", 23.8), position_tol=0.1).graph_node
+        >>> column = ds.sel(graph_node=graph_node)
+        >>> column.node_id.item(), column.reach.item(), column.position.item()
+        ('', '100l1', 23.8413574216414)
         """
         df = self.to_dataframe()
         if len(df.columns) == 0:
@@ -286,28 +333,47 @@ class Network:
             * edge ``length`` -- the distance between the edge's two ends, in
               the reach's own units. ``None`` where the reach's length is not
               known, which is only on the edge into its end node: an EPANET
-              pipe read without its ``.inp`` has no length.
+              pipe read without its ``.inp`` has no length. networkx treats an
+              edge whose weight is ``None`` as absent, so a route weighted by
+              ``length`` goes around it.
             * edge ``boundary`` -- ``True`` where both ends are the same place,
               a breakpoint sitting on its reach's end node. Its length is
               ``0.0``.
 
         Examples
         --------
-        >>> graph = network.to_networkx()  # doctest: +SKIP
+        >>> import networkx as nx
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> graph = network.to_networkx()
 
         From a graph node back to its address:
 
-        >>> graph.nodes[network.resolve("101").graph_node]["address"]  # doctest: +SKIP
+        >>> graph.nodes[network.resolve("101").graph_node]["address"]
         '101'
 
-        The shortest route between two nodes by length. It fails where an
-        edge's length is ``None``, as for EPANET without its ``.inp``:
+        The shortest route between two nodes by length:
 
-        >>> start = network.resolve("100").graph_node  # doctest: +SKIP
-        >>> end = network.resolve("99").graph_node  # doctest: +SKIP
-        >>> route = nx.shortest_path(graph, start, end, weight="length")  # doctest: +SKIP
-        >>> [graph.nodes[n]["address"] for n in route]  # doctest: +SKIP
+        >>> start = network.resolve("100").graph_node
+        >>> end = network.resolve("99").graph_node
+        >>> route = nx.shortest_path(graph, start, end, weight="length")
+        >>> [graph.nodes[n]["address"] for n in route]
         ['100', ('100l1', 0.0), ('100l1', 23.8413574216414), ('100l1', 47.6827148432828), '99']
+
+        Its first edge is a boundary edge, since the reach's first breakpoint
+        sits on its start node:
+
+        >>> graph.edges[route[0], route[1]]
+        {'length': 0.0, 'boundary': True}
+
+        A route by length skips an edge whose length is ``None``, as for EPANET
+        without its ``.inp``, and finds none where that edge was the only way:
+
+        >>> alone = Network.open("tests/testdata/epanet.res", companions=[])
+        >>> start, end = alone.resolve("10").graph_node, alone.resolve("11").graph_node
+        >>> nx.shortest_path(alone.to_networkx(), start, end, weight="length")
+        Traceback (most recent call last):
+        ...
+        networkx.exception.NetworkXNoPath: No path between 0 and 1.
         """
         return self._graph.copy()
 
@@ -325,8 +391,10 @@ class Network:
 
         Examples
         --------
-        >>> network.reaches["10"].length  # doctest: +SKIP
-        304.8
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> reach = network.reaches["100l1"]
+        >>> reach.start, reach.end, reach.length
+        ('100', '99', 47.6827148432828)
         """
         return MappingProxyType(self._reaches)
 
@@ -344,7 +412,8 @@ class Network:
 
         Examples
         --------
-        >>> network.period  # doctest: +SKIP
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.period
         (datetime.datetime(1994, 8, 7, 16, 35), datetime.datetime(1994, 8, 7, 18, 35))
         """
         return self._results.period
@@ -369,7 +438,8 @@ class Network:
 
         Examples
         --------
-        >>> network.quantities  # doctest: +SKIP
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> dict(network.quantities)
         {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
         """
         results = self._results
@@ -482,21 +552,31 @@ class Network:
 
         Examples
         --------
-        >>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> df = network.read([("101", "WaterLevel")])
+        >>> df.shape
+        (110, 1)
+        >>> df.columns.tolist()
+        [('101', 'WaterLevel')]
 
         One quantity at every location that carries it:
 
-        >>> network.read(quantity="Discharge")  # doctest: +SKIP
+        >>> network.read(quantity="Discharge").shape
+        (110, 129)
 
-        A measured chainage, snapped onto the model's nearest breakpoint:
+        A measured chainage, snapped onto the model's nearest breakpoint. The
+        column keeps the address asked for:
 
-        >>> network.read([(("100l1", 23.8), "Discharge")], position_tol=0.1)  # doctest: +SKIP
+        >>> df = network.read([(("100l1", 23.8), "Discharge")], position_tol=0.1)
+        >>> df.columns.tolist()
+        [(('100l1', 23.8), 'Discharge')]
 
         A reach observation, whose breakpoints have to agree before one of them
         can stand for the reach:
 
-        >>> points = network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
-        >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
+        >>> points = network.addresses(reach="100l1", quantity="Discharge")
+        >>> network.read([(point, "Discharge") for point in points]).columns.tolist()
+        [(('100l1', 23.8413574216414), 'Discharge')]
         """
         if (items is None) == (quantity is None):
             raise TypeError("read() takes either items or quantity, not both and not neither.")
@@ -564,12 +644,22 @@ class Network:
             :meth:`read` takes. A sequence: it has a length, can be indexed and
             can be iterated more than once. Pass it to ``list()`` for a list.
 
+        Raises
+        ------
+        KeyError
+            If ``reach`` is not a reach of this network. The message suggests
+            the reach meant, such as the prefixed id of a structure's reach.
+
         Examples
         --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.addresses(reach="100l1")
+        [('100l1', 0.0), ('100l1', 23.8413574216414), ('100l1', 47.6827148432828)]
+
         Every breakpoint of a reach that carries discharge, which is the batch
         a reach observation has to be scored against:
 
-        >>> network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
+        >>> network.addresses(reach="100l1", quantity="Discharge")
         [('100l1', 23.8413574216414)]
         """
         results = self._results
@@ -622,14 +712,22 @@ class Network:
 
         Examples
         --------
-        >>> network.resolve("101")  # doctest: +SKIP
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.resolve("101")
         Location(address='101', quantities=('WaterLevel',), graph_node=5)
 
-        >>> network.resolve(("100l1", 23.8), position_tol=0.1)  # doctest: +SKIP
+        A measured chainage, snapped onto the breakpoint the file stores:
+
+        >>> network.resolve(("100l1", 23.8), position_tol=0.1)
         Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 
-        >>> network.resolve("no_such_node") is None  # doctest: +SKIP
+        >>> network.resolve("no_such_node") is None
         True
+
+        A node of a MIKE 11 result is in the network, carrying nothing:
+
+        >>> Network.open("tests/testdata/network_cali.res11").resolve("0 CALI")
+        Location(address='0 CALI', quantities=(), graph_node=0)
         """
         found = self._naming.canonical(address, position_tol=position_tol)
         if found is None:
