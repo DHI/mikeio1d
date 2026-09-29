@@ -9,7 +9,7 @@ Usage
 uv run python tests/profiling/profile_network_loading.py --res-path <path-to-result-file>
 
 Name the companions rather than letting them be found:
-uv run python tests/profiling/profile_network_loading.py --res-path <res> --companions <resx> <inp>
+uv run python tests/profiling/profile_network_loading.py --res-path <res> --companions <resx>
 
 Add --profile for a cProfile pass on top of the timed runs, then inspect it with:
 uv run snakeviz tests/profiling/output/profile.prof
@@ -53,8 +53,8 @@ def _parse_args() -> argparse.Namespace:
         type=Path,
         default=None,
         help="Companion files to read alongside the result: a '.resx' for extra "
-        "results, an '.inp' for reach lengths. Omit to let them be found beside "
-        "the result file; pass with no values to read none.",
+        "results. Omit to let it be found beside the result file; pass with no "
+        "values to read none.",
     )
     parser.add_argument(
         "--repeat",
