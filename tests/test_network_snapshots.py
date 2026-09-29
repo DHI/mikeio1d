@@ -1,4 +1,4 @@
-"""Demand of this module exactly what modelskill's loader did.
+"""Hold this module to what modelskill's loader did, except where it deliberately parts from it.
 
 These snapshots were recorded in modelskill before the topology layer moved here
 (ADR-013 there), over fixtures that are copies of the ones in this repository.
@@ -6,6 +6,18 @@ They are the acceptance test for the move: the same loads must still produce
 the same graph, the same address map, the same dataframe and the same
 correspondence between names and graph integers - recorded through find and
 recall then, and through resolve and the graph's own labels now.
+
+Where the baseline differs from modelskill's recording:
+
+- A reach of unknown length has one breakpoint, at its start, not a second at
+  distance None (e7f205a). Both EPANET snapshots were re-recorded: alone, every
+  pipe loses its far breakpoint (37 graph nodes to 24); with companions, only
+  link 9, which the .inp gives no length either (37 to 36).
+- The loads filtered by node or quantity are gone, with the open options they
+  used (41cb850). A filtered read is Network.read's to test.
+- Names changed, values did not: alias became address, the graph integer
+  graph_node, and distance position. The res1d and res11 snapshots are
+  otherwise modelskill's.
 
 Cases are named for the fixture and its load options rather than for a
 constructor, so reshaping the entry points cannot quietly rewrite the target.

@@ -62,8 +62,7 @@ class TestIdentityCoordinates:
                 assert np.isnan(position)
             else:
                 assert (node_id, reach) == ("", address[0])
-                expected = address[1]
-                assert np.isnan(position) if expected is None else position == expected
+                assert position == address[1]
 
     def test_a_quantity_keeps_its_long_name(self, epanet):
         ds = epanet.to_dataset()
