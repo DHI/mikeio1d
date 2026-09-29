@@ -159,9 +159,9 @@ class Network:
         """Read every series in the network, labelled the way :meth:`read` labels them.
 
         Each call reads the result file again. To read only some locations, or
-        one quantity, use :meth:`read`, which :meth:`locations` feeds::
+        one quantity, use :meth:`read`, which :meth:`addresses` feeds::
 
-            network.read([(a, "Discharge") for a in network.locations(quantity="Discharge")])
+            network.read([(a, "Discharge") for a in network.addresses(quantity="Discharge")])
 
         Returns
         -------
@@ -292,7 +292,7 @@ class Network:
         """Quantities readable somewhere in this network, by their units.
 
         The union over every location the network has, so everything named here
-        can be read at some address - see :meth:`locations`. A result file's
+        can be read at some address - see :meth:`addresses`. A result file's
         header may declare more than this: a MIKE river result carries structure
         and sensor quantities that sit on neither a node nor a gridpoint, and
         nothing in a network can address them.
@@ -347,14 +347,14 @@ class Network:
             else:
                 faults.append(
                     f"{address!r} carries no quantities of its own, so {quantity!r} cannot be "
-                    "read there; locations(reach=...) lists the break points that can be"
+                    "read there; addresses(reach=...) lists the break points that can be"
                 )
         shown = "; ".join(faults[:10])
         if len(faults) > 10:
             shown += f"; ... and {len(faults) - 10} more"
         return KeyError(
             f"read() cannot read {len(faults)} of the {len(items)} items asked for: {shown}. "
-            "resolve() says what one location carries, and locations(quantity=...) says where "
+            "resolve() says what one location carries, and addresses(quantity=...) says where "
             "a quantity is, both without reading anything."
         )
 
@@ -375,7 +375,7 @@ class Network:
         ----------
         items : sequence of (address, quantity)
             What to read. An address is a node ID, or a reach ID and a distance
-            along it, as :meth:`locations` gives and :meth:`resolve` confirms.
+            along it, as :meth:`addresses` gives and :meth:`resolve` confirms.
             An empty sequence reads nothing at all, and returns an empty frame
             rather than the whole file.
         distance_tol : float, optional
@@ -413,7 +413,7 @@ class Network:
         A reach observation, whose break points have to agree before one of them
         can stand for the reach:
 
-        >>> points = network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
+        >>> points = network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
         """
         results = self._results
@@ -431,8 +431,12 @@ class Network:
         df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
         return df
 
-    def locations(self, *, reach: str | None = None, quantity: str | None = None) -> list[Address]:
-        """List the locations this network can be read at.
+    def addresses(self, *, reach: str | None = None, quantity: str | None = None) -> list[Address]:
+        """List the addresses this network can be read at.
+
+        Where :meth:`resolve` goes from an address to what the network knows
+        about the location, this gives the addresses themselves: the names
+        :meth:`read` takes.
 
         Parameters
         ----------
@@ -447,14 +451,15 @@ class Network:
         Returns
         -------
         list[str | tuple[str, float]]
-            Addresses, each of which :meth:`resolve` answers for.
+            Addresses, each of which :meth:`resolve` answers for and
+            :meth:`read` takes.
 
         Examples
         --------
         Every break point of a reach that carries discharge, which is the batch
         a reach observation has to be scored against:
 
-        >>> network.locations(reach="100l1", quantity="Discharge")  # doctest: +SKIP
+        >>> network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         [('100l1', 23.8413574216414)]
         """
         results = self._results
@@ -463,7 +468,7 @@ class Network:
         elif reach in self._reaches:
             addresses = [point.id for point in self._reaches[reach].breakpoints]
         else:
-            raise KeyError(f"locations() found {self._naming.describe_miss((reach, 0.0))}")
+            raise KeyError(f"addresses() found {self._naming.describe_miss((reach, 0.0))}")
 
         if quantity is None:
             return list(addresses)

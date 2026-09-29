@@ -67,7 +67,7 @@ class TestTheOpenReadsNothing:
         _ = network.period
         dict(network.quantities)
         network.resolve("101")
-        network.locations(quantity="Discharge")
+        network.addresses(quantity="Discharge")
 
         assert _unread(res)
 
@@ -130,7 +130,7 @@ class TestWhatQuantitiesMeans:
     def test_everything_offered_is_readable_somewhere(self, river):
         somewhere = {
             quantity
-            for address in river.locations()
+            for address in river.addresses()
             for quantity in river.resolve(address).quantities
         }
 
@@ -204,41 +204,41 @@ class TestResolvingAnAddress:
         assert epanet.resolve(("10", 0.0)).address == ("10", 0.0)
 
 
-class TestListingLocations:
+class TestListingAddresses:
     """Where a quantity is, from topology alone."""
 
     def test_every_listed_address_resolves(self, network):
-        assert all(network.resolve(address) is not None for address in network.locations())
+        assert all(network.resolve(address) is not None for address in network.addresses())
 
     def test_a_quantity_splits_the_network(self, network):
-        water_level = network.locations(quantity="WaterLevel")
-        discharge = network.locations(quantity="Discharge")
+        water_level = network.addresses(quantity="WaterLevel")
+        discharge = network.addresses(quantity="Discharge")
 
         assert len(water_level) == 366
         assert len(discharge) == 129
         assert not set(water_level) & set(discharge)
 
     def test_a_reach_gives_its_break_points_and_not_its_nodes(self, network):
-        points = network.locations(reach="100l1")
+        points = network.addresses(reach="100l1")
 
         assert points == [("100l1", 0.0), _Q_POINT, ("100l1", 47.6827148432828)]
 
     def test_a_reach_carrying_nothing_for_a_quantity_is_empty(self, network):
-        assert network.locations(reach="100l1", quantity="Volume") == []
+        assert network.addresses(reach="100l1", quantity="Volume") == []
 
     def test_a_pipe_without_a_length_has_only_its_near_break_point(self):
         """Without the .inp a pipe has no length, so there is no distance for its far end."""
         alone = Network.open(_EPANET_RES, companions=[])
 
         assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0)]
-        assert alone.locations(reach="10") == [("10", 0.0)]
+        assert alone.addresses(reach="10") == [("10", 0.0)]
 
     def test_both_break_points_are_listed_once_the_inp_gives_a_length(self, epanet):
-        assert epanet.locations(reach="10") == [("10", 0.0), ("10", _PIPE_LENGTH)]
+        assert epanet.addresses(reach="10") == [("10", 0.0), ("10", _PIPE_LENGTH)]
 
     def test_a_reach_that_is_not_here_is_named(self, network):
         with pytest.raises(KeyError, match="no reach"):
-            network.locations(reach="no_such_reach")
+            network.addresses(reach="no_such_reach")
 
 
 class TestReadingSeries:
@@ -258,7 +258,7 @@ class TestReadingSeries:
             ("101", "WaterLevel"),
             (_Q_POINT, "Discharge"),
             (("100l1", 0.0), "WaterLevel"),
-            (network.locations(quantity="Discharge")[-1], "Discharge"),
+            (network.addresses(quantity="Discharge")[-1], "Discharge"),
         ]
         res = Res1D(_RES1D)
         expected = res.read(
@@ -310,7 +310,7 @@ class TestReadingSeries:
 
     def test_a_whole_reach_is_one_call(self, network):
         """A reach observation needs every break point, compared over the series."""
-        points = network.locations(reach="100l1", quantity="WaterLevel")
+        points = network.addresses(reach="100l1", quantity="WaterLevel")
 
         read = network.read([(point, "WaterLevel") for point in points])
 

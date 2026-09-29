@@ -7,7 +7,7 @@
   `Network.open`, `Network.reaches`, `Network.graph`, `to_dataframe`/`to_dataset`, and the
   EPANET `.resx`/`.inp` companions. Needs the new `network` extra
   (`pip install mikeio1d[network]`).
-- `Network.period`, `Network.quantities`, `Network.resolve`, `Network.locations` and
+- `Network.period`, `Network.quantities`, `Network.resolve`, `Network.addresses` and
   `Network.read`, for asking a result file what it holds and reading only the series a
   caller turns out to need, by the names the model used - a node ID, or a reach and a
   distance along it. A read loads only the variables it asks for, each as its whole time
@@ -38,7 +38,7 @@
 - `Network.period` is a property, like `Network.quantities` (#250).
 - `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
   and its `sel` option is gone: read one quantity with `Network.read` and
-  `Network.locations(quantity=...)`. `to_dataset` keeps its integer `node` dimension (#250).
+  `Network.addresses(quantity=...)`. `to_dataset` keeps its integer `node` dimension (#250).
 - `Network.graph` is read-only; `network.graph.copy()` gives one to edit. `Network.copy` and
   `Network.release` are gone (#250).
 - A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location`,
