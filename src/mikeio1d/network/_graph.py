@@ -22,14 +22,14 @@ from collections.abc import Sequence
 
 import networkx as nx
 
-from ._naming import _CHAINAGE_TOLERANCE
+from ._naming import _POSITION_TOLERANCE
 from ._types import NetworkReach
 
 
 def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
     g0 = nx.Graph()
     # Which reach claimed each node pair with a bare start-to-end edge. Every
-    # other edge this builds has a break point key - a (reach_id, distance)
+    # other edge this builds has a break point key - a (reach_id, position)
     # tuple - at one end at least, so no two reaches can land on it.
     lone_reach_by_pair: dict[frozenset[str], str] = {}
     for reach in reaches:
@@ -62,8 +62,8 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             # node: tag the edge as a boundary and clamp it to 0.0, since the two
             # positions come from different sources and float noise would leave
             # a tiny non-zero length.
-            leading_diff = reach.breakpoints[0].distance - reach.start_distance
-            leading_is_boundary = abs(leading_diff) <= _CHAINAGE_TOLERANCE
+            leading_diff = reach.breakpoints[0].position - reach.start_position
+            leading_is_boundary = abs(leading_diff) <= _POSITION_TOLERANCE
             leading_length = 0.0 if leading_is_boundary else leading_diff
             g0.add_edge(
                 start_key,
@@ -73,14 +73,14 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             )
 
             # Only this edge needs the reach's length, which can be unknown;
-            # the others are known from break point distances alone.
-            end_distance = reach.end_distance
-            if end_distance is None:
+            # the others are known from break point positions alone.
+            end_position = reach.end_position
+            if end_position is None:
                 tail_length = None
                 tail_is_boundary = False
             else:
-                tail_diff = end_distance - reach.breakpoints[-1].distance
-                tail_is_boundary = abs(tail_diff) <= _CHAINAGE_TOLERANCE
+                tail_diff = end_position - reach.breakpoints[-1].position
+                tail_is_boundary = abs(tail_diff) <= _POSITION_TOLERANCE
                 tail_length = 0.0 if tail_is_boundary else tail_diff
             g0.add_edge(
                 bp_keys[-1],
@@ -96,7 +96,7 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             g0.add_edge(
                 current_.id,
                 next_.id,
-                length=next_.distance - current_.distance,
+                length=next_.position - current_.position,
                 boundary=False,
             )
 

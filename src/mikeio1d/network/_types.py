@@ -24,20 +24,21 @@ class ReachBreakPoint:
     ----------
     reach_id : str
         The reach the break point sits on.
-    distance : float
-        Position along the reach, in the reach's own frame. It need not be
-        measured from the start node: a MIKE river reach reports its chainage, a
-        coordinate along the whole branch, so the distance from the start node
-        is ``distance - reach.start_distance``.
+    position : float
+        Where the break point sits along the reach, in the reach's own frame: a
+        place, not a size. It need not be measured from the start node: a MIKE
+        river reach reports its chainage, a coordinate along the whole branch,
+        so the distance from the start node is
+        ``position - reach.start_position``.
     """
 
     reach_id: str
-    distance: float
+    position: float
 
     @property
     def id(self) -> tuple[str, float]:
-        """``(reach_id, distance)``, which uniquely locates the break point."""
-        return (self.reach_id, self.distance)
+        """``(reach_id, position)``, which uniquely locates the break point."""
+        return (self.reach_id, self.position)
 
 
 @dataclass(frozen=True)
@@ -54,13 +55,13 @@ class NetworkReach:
         Total length in network units, or ``None`` where it is undefined. Reach
         length matters in some domains (rivers, sewer networks) and not in
         others (link-node water distribution models).
-    start_distance : float
+    start_position : float
         Position of the start node, in the frame :attr:`breakpoints` are placed
         in. Zero where they are measured from the reach's own start; a MIKE river
         reach places them at their chainage, so it can begin thousands of metres
         in - or below zero.
     breakpoints : tuple of ReachBreakPoint
-        Ascending by distance; consecutive differences are edge lengths. A reach
+        Ascending by position; consecutive differences are edge lengths. A reach
         with break points gets its own chain of graph nodes. A reach with none
         is a single start-to-end edge, and :class:`Network` refuses two of those
         between the same pair of nodes.
@@ -70,13 +71,13 @@ class NetworkReach:
     start: str
     end: str
     length: float | None = None
-    start_distance: float = 0.0
+    start_position: float = 0.0
     breakpoints: tuple[ReachBreakPoint, ...] = ()
 
     @property
-    def end_distance(self) -> float | None:
+    def end_position(self) -> float | None:
         """Position of the end node, or ``None`` where the length is undefined."""
-        return None if self.length is None else self.start_distance + self.length
+        return None if self.length is None else self.start_position + self.length
 
     @property
     def n_breakpoints(self) -> int:
@@ -92,7 +93,7 @@ class Location:
     ----------
     address : str or tuple[str, float]
         The network's own spelling of the location, which the rest of the
-        network takes. A distance is the one the file stores, not the one asked
+        network takes. A position is the one the file stores, not the one asked
         for.
     quantities : tuple of str
         The quantity IDs readable there. Empty is an answer: the location is

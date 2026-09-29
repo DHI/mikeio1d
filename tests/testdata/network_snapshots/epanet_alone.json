@@ -1796,7 +1796,7 @@
     "node": "11"
    },
    "10": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "112"
    },
    "11": {
@@ -1806,69 +1806,69 @@
     "node": "23"
    },
    "13": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "113"
    },
    "14": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "12"
    },
    "15": {
     "node": "31"
    },
    "16": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "121"
    },
    "17": {
     "node": "32"
    },
    "18": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "122"
    },
    "19": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "21"
    },
    "2": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "10"
    },
    "20": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "22"
    },
    "21": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "31"
    },
    "22": {
     "node": "9"
    },
    "23": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "9"
    },
    "3": {
     "node": "12"
    },
    "4": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "11"
    },
    "5": {
     "node": "2"
    },
    "6": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "110"
    },
    "7": {
     "node": "21"
    },
    "8": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "111"
    },
    "9": {
@@ -1894,7 +1894,7 @@
   "10": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:10@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -1916,7 +1916,7 @@
   "11": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:11@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -1938,7 +1938,7 @@
   "110": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:110@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -1960,7 +1960,7 @@
   "111": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:111@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -1982,7 +1982,7 @@
   "112": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:112@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2004,7 +2004,7 @@
   "113": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:113@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2026,7 +2026,7 @@
   "12": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:12@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2048,7 +2048,7 @@
   "121": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:121@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2070,7 +2070,7 @@
   "122": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:122@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2092,7 +2092,7 @@
   "21": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:21@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2114,7 +2114,7 @@
   "22": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:22@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2136,7 +2136,7 @@
   "31": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:31@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -2158,7 +2158,7 @@
   "9": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:9@0.0",
      "quantities": [
       "AvgWaterQuality",

@@ -150,7 +150,7 @@ class TestResolvingAnAddress:
         assert (resolved.address, resolved.quantities) == ("101", ("WaterLevel",))
 
     def test_the_graph_node_is_the_integer_labelled_with_the_address(self, network):
-        resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)
+        resolved = network.resolve(("100l1", 23.8), position_tol=0.1)
 
         assert network.graph.nodes[resolved.graph_node]["address"] == resolved.address
 
@@ -162,12 +162,12 @@ class TestResolvingAnAddress:
 
         assert str(column["node_id"].item()) == "101"
 
-    def test_a_break_point_snaps_to_the_distance_the_file_stores(self, network):
-        resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)
+    def test_a_break_point_snaps_to_the_position_the_file_stores(self, network):
+        resolved = network.resolve(("100l1", 23.8), position_tol=0.1)
 
         assert resolved.address == _Q_POINT
 
-    def test_a_distance_outside_the_tolerance_is_not_here(self, network):
+    def test_a_position_outside_the_tolerance_is_not_here(self, network):
         assert network.resolve(("100l1", 23.8)) is None
 
     def test_an_unknown_name_is_answered_rather_than_raised(self, network):
@@ -176,14 +176,14 @@ class TestResolvingAnAddress:
 
     def test_the_nearest_break_point_in_a_wide_window_wins(self, network):
         """A caller widening the window is snapping a measurement, not sweeping."""
-        resolved = network.resolve(("100l1", 20.0), distance_tol=30.0)
+        resolved = network.resolve(("100l1", 20.0), position_tol=30.0)
 
         assert resolved.address == _Q_POINT
 
-    @pytest.mark.parametrize("distance_tol", [-1.0, float("nan"), float("inf")])
-    def test_a_tolerance_that_is_not_a_distance_is_refused(self, network, distance_tol):
+    @pytest.mark.parametrize("position_tol", [-1.0, float("nan"), float("inf")])
+    def test_a_tolerance_that_is_not_a_distance_is_refused(self, network, position_tol):
         with pytest.raises(ValueError, match="finite, non-negative"):
-            network.resolve(("100l1", 23.8), distance_tol=distance_tol)
+            network.resolve(("100l1", 23.8), position_tol=position_tol)
 
     def test_a_location_carrying_nothing_still_resolves(self):
         """MIKE 11 keeps its timeseries on gridpoints, so its nodes hold none.
@@ -227,7 +227,7 @@ class TestListingAddresses:
         assert network.addresses(reach="100l1", quantity="Volume") == []
 
     def test_a_pipe_without_a_length_has_only_its_near_break_point(self):
-        """Without the .inp a pipe has no length, so there is no distance for its far end."""
+        """Without the .inp a pipe has no length, so there is no position for its far end."""
         alone = Network.open(_EPANET_RES, companions=[])
 
         assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0)]
@@ -295,18 +295,18 @@ class TestReadingSeries:
         item = (("100l1", 23.8), "Discharge")
         expected = network.read([(_Q_POINT, "Discharge")]).iloc[:, 0]
 
-        read = network.read([item], distance_tol=0.1)
+        read = network.read([item], position_tol=0.1)
 
         assert list(read.columns) == [item]
         assert np.allclose(read[item].to_numpy(), expected.to_numpy())
 
     def test_a_measured_chainage_outside_the_default_tolerance_is_refused(self, network):
-        with pytest.raises(KeyError, match="distance_tol"):
+        with pytest.raises(KeyError, match="position_tol"):
             network.read([(("100l1", 23.8), "Discharge")])
 
     def test_a_tolerance_that_is_not_a_distance_is_refused(self, network):
         with pytest.raises(ValueError, match="finite, non-negative"):
-            network.read([(("100l1", 23.8), "Discharge")], distance_tol=-1.0)
+            network.read([(("100l1", 23.8), "Discharge")], position_tol=-1.0)
 
     def test_a_whole_reach_is_one_call(self, network):
         """A reach observation needs every break point, compared over the series."""

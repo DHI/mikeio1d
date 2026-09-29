@@ -29,7 +29,7 @@ Nodes are connected together by reaches. Nodes can represent different entities:
 Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.
 
 ## Reading a network as a graph
-The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and the network is addressed by those names throughout. The graph itself is labelled with integers, each node carrying its name as the `address` attribute; `resolve()` gives the integer for a name, as `Location.graph_node`. A graph node is not a model node: every location has one, a break point too, and a model node is always named by its id. The graph is read-only, since the network's lookups are built from it: `network.graph.copy()` gives one to edit.
+The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a position along it, and the network is addressed by those names throughout. The graph itself is labelled with integers, each node carrying its name as the `address` attribute; `resolve()` gives the integer for a name, as `Location.graph_node`. A graph node is not a model node: every location has one, a break point too, and a model node is always named by its id. The graph is read-only, since the network's lookups are built from it: `network.graph.copy()` gives one to edit.
 
 ![A reach's own first and last grid point sit exactly where the reach's nodes do, so each is joined to its node by an edge of length `0.0` flagged `boundary`. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.](../images/docs/res1d_network_mapping.svg)
 
@@ -63,10 +63,10 @@ network.resolve("manhole_12")                      # Location(address=..., quant
 network.addresses(reach="100l1", quantity="Discharge")
 ```
 
-`resolve()` returns `None` for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a `distance_tol` to snap a measured chainage onto the model's:
+`resolve()` returns `None` for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a `position_tol` to snap a measured chainage onto the model's:
 
 ```python
-network.resolve(("100l1", 23.8), distance_tol=0.1)
+network.resolve(("100l1", 23.8), position_tol=0.1)
 # Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 ```
 
@@ -77,7 +77,7 @@ points = network.addresses(reach="100l1", quantity="Discharge")
 network.read([(point, "Discharge") for point in points])
 ```
 
-A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `distance_tol`, so a measured chainage can be read without resolving it first.
+A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `position_tol`, so a measured chainage can be read without resolving it first.
 
 `to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network. `to_dataframe()` labels its columns `(address, quantity)`, as `read()` does; `to_dataset()` indexes locations by their graph integer and carries each one's name alongside.
 

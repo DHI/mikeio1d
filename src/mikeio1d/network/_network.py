@@ -1,7 +1,7 @@
 """A network of nodes and reaches, addressable by the names it came with.
 
 Reading a result file gives locations named the way the model named them: a node
-id, or a reach and a distance along it. :class:`Network` is addressed by those
+id, or a reach and a position along it. :class:`Network` is addressed by those
 names throughout; the integers its graph is labelled with stay the graph's own.
 """
 
@@ -40,7 +40,7 @@ class Network:
     """A network of nodes and reaches, addressable by the names it came with.
 
     A result file names a location the way the model did: a node id, or a reach
-    and a distance along it, and every member here takes and gives those names.
+    and a position along it, and every member here takes and gives those names.
     :attr:`graph` is labelled with integers instead, each node carrying its name
     as the ``address`` attribute, and :meth:`resolve` gives the integer for a
     name - see :attr:`Location.graph_node`.
@@ -188,10 +188,10 @@ class Network:
         xr.Dataset
             One variable per quantity over ``(time, graph_node)``.
             ``graph_node`` is the graph's integer, as :attr:`Location.graph_node`
-            gives it, and the ``node_id``, ``reach`` and ``distance`` coordinates
+            gives it, and the ``node_id``, ``reach`` and ``position`` coordinates
             carry the address, so a consumer never has to hold on to the
             network to know what a column is. A node fills in ``node_id``, a break
-            point ``reach`` and ``distance``, and the empty half says which it
+            point ``reach`` and ``position``, and the empty half says which it
             is::
 
                 Coordinates:
@@ -199,7 +199,7 @@ class Network:
                   * graph_node  int64       0 1 2 3 ...
                     node_id     <U16        'J1' 'J2' '' ''
                     reach       <U16        '' '' 'r1' 'r1'
-                    distance    float64     nan nan 0.0 24.5
+                    position    float64     nan nan 0.0 24.5
 
             Empty when no location carries data.
         """
@@ -225,22 +225,22 @@ class Network:
             }
         )
 
-        node_ids, reaches, distances = [], [], []
+        node_ids, reaches, positions = [], [], []
         for graph_node in ds.graph_node.to_numpy():
             address = self._graph.nodes[int(graph_node)]["address"]
             if _is_break_point(address):
-                reach, distance = address
+                reach, position = address
                 node_ids.append("")
                 reaches.append(reach)
-                distances.append(distance)
+                positions.append(position)
             else:
                 node_ids.append(address)
                 reaches.append("")
-                distances.append(np.nan)
+                positions.append(np.nan)
         return ds.assign_coords(
             node_id=("graph_node", np.array(node_ids, dtype=str)),
             reach=("graph_node", np.array(reaches, dtype=str)),
-            distance=("graph_node", np.array(distances, dtype=float)),
+            position=("graph_node", np.array(positions, dtype=float)),
         )
 
     @property
@@ -327,7 +327,7 @@ class Network:
         self,
         items: Sequence[tuple[Address, str]],
         results: _Results,
-        distance_tol: float | None,
+        position_tol: float | None,
     ) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
 
@@ -336,7 +336,7 @@ class Network:
         """
         faults = []
         for address, quantity in items:
-            found = self._naming.canonical(address, distance_tol=distance_tol)
+            found = self._naming.canonical(address, position_tol=position_tol)
             if found is None:
                 faults.append(f"{address!r} - {self._naming.describe_miss(address)}")
                 continue
@@ -363,7 +363,7 @@ class Network:
         self,
         items: Sequence[tuple[Address, str]],
         *,
-        distance_tol: float | None = None,
+        position_tol: float | None = None,
     ) -> pd.DataFrame:
         """Read the series named by ``(address, quantity)`` pairs.
 
@@ -375,12 +375,12 @@ class Network:
         Parameters
         ----------
         items : sequence of (address, quantity)
-            What to read. An address is a node ID, or a reach ID and a distance
+            What to read. An address is a node ID, or a reach ID and a position
             along it, as :meth:`addresses` gives and :meth:`resolve` confirms.
             An empty sequence reads nothing at all, and returns an empty frame
             rather than the whole file.
-        distance_tol : float, optional
-            How far a distance may be from a break point's own and still mean
+        position_tol : float, optional
+            How far a position may be from a break point's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
             snap a measured chainage onto the model's; the nearest break point
             inside the window wins. Ignored for a node ID.
@@ -399,7 +399,7 @@ class Network:
             If any item names a location the network does not have, or a
             quantity that location does not carry. Every failing item is named.
         ValueError
-            If ``distance_tol`` is negative or not finite, or if the items span
+            If ``position_tol`` is negative or not finite, or if the items span
             the result file and its ``.resx`` companion and the two turn out to
             have different time axes.
 
@@ -409,7 +409,7 @@ class Network:
 
         A measured chainage, snapped onto the model's nearest break point:
 
-        >>> network.read([(("100l1", 23.8), "Discharge")], distance_tol=0.1)  # doctest: +SKIP
+        >>> network.read([(("100l1", 23.8), "Discharge")], position_tol=0.1)  # doctest: +SKIP
 
         A reach observation, whose break points have to agree before one of them
         can stand for the reach:
@@ -421,9 +421,9 @@ class Network:
         # Every item is checked before anything is read.
         resolved: list[tuple[Address, str]] = []
         for address, quantity in items:
-            found = self._naming.canonical(address, distance_tol=distance_tol)
+            found = self._naming.canonical(address, position_tol=position_tol)
             if found is None or quantity not in results.quantities_at(found):
-                raise self._blame_unreadable(items, results, distance_tol)
+                raise self._blame_unreadable(items, results, position_tol)
             resolved.append((found, quantity))
 
         df = results.read(resolved)
@@ -475,7 +475,7 @@ class Network:
             return list(addresses)
         return [address for address in addresses if quantity in results.quantities_at(address)]
 
-    def resolve(self, address: Address, *, distance_tol: float | None = None) -> Location | None:
+    def resolve(self, address: Address, *, position_tol: float | None = None) -> Location | None:
         """Say whether a location is in this network, what it carries, and where.
 
         An address that is not here gives ``None`` rather than an exception.
@@ -483,11 +483,11 @@ class Network:
         Parameters
         ----------
         address : str or tuple[str, float]
-            A node ID, or a reach ID and a distance along it. A reach's own end
+            A node ID, or a reach ID and a position along it. A reach's own end
             nodes are named by their IDs, which ``reaches[reach_id].start``
             and ``.end`` give.
-        distance_tol : float, optional
-            How far a distance may be from a break point's own and still mean
+        position_tol : float, optional
+            How far a position may be from a break point's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
             snap a measured chainage onto the model's; the nearest break point
             inside the window wins. Ignored for a node ID.
@@ -502,20 +502,20 @@ class Network:
         Raises
         ------
         ValueError
-            If ``distance_tol`` is negative or not finite.
+            If ``position_tol`` is negative or not finite.
 
         Examples
         --------
         >>> network.resolve("101")  # doctest: +SKIP
         Location(address='101', quantities=('WaterLevel',), graph_node=5)
 
-        >>> network.resolve(("100l1", 23.8), distance_tol=0.1)  # doctest: +SKIP
+        >>> network.resolve(("100l1", 23.8), position_tol=0.1)  # doctest: +SKIP
         Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 
         >>> network.resolve("no_such_node") is None  # doctest: +SKIP
         True
         """
-        found = self._naming.canonical(address, distance_tol=distance_tol)
+        found = self._naming.canonical(address, position_tol=position_tol)
         if found is None:
             return None
         return Location(

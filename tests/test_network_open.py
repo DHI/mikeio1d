@@ -222,7 +222,7 @@ def test_a_pipe_the_inp_gives_no_length_for_has_one_break_point(tmp_path):
     """A zero in [PIPES] says the length is unknown, not that the pipe has none.
 
     Taken as a real length it would place the reach's second break point at
-    distance 0.0, on top of the first, and the two would share one key: the
+    position 0.0, on top of the first, and the two would share one key: the
     graph would get a zero-length self-loop, one edge more than the count
     test_network_breakpoints.py checks.
     """

@@ -25,7 +25,7 @@ def epanet():
 def _at(ds, graph_node):
     """Return the identity coordinates of one location, as plain Python values."""
     at = ds.sel(graph_node=graph_node)
-    return str(at.node_id.values), str(at.reach.values), float(at.distance.values)
+    return str(at.node_id.values), str(at.reach.values), float(at.position.values)
 
 
 class TestIdentityCoordinates:
@@ -34,36 +34,36 @@ class TestIdentityCoordinates:
     def test_a_node_carries_its_id(self, epanet):
         graph_node = epanet.resolve("10").graph_node
 
-        node_id, reach, distance = _at(epanet.to_dataset(), graph_node)
+        node_id, reach, position = _at(epanet.to_dataset(), graph_node)
 
         assert node_id == "10"
         assert reach == ""
-        assert np.isnan(distance)
+        assert np.isnan(position)
 
     def test_a_breakpoint_carries_its_reach_and_distance(self, epanet):
         graph_node = epanet.resolve(("10", 0.0)).graph_node
 
-        node_id, reach, distance = _at(epanet.to_dataset(), graph_node)
+        node_id, reach, position = _at(epanet.to_dataset(), graph_node)
 
         assert node_id == ""
         assert reach == "10"
-        assert distance == pytest.approx(0.0)
+        assert position == pytest.approx(0.0)
 
     def test_the_coordinates_agree_with_the_graph(self, epanet):
         """The graph's alias is the same answer, so the two must never drift apart."""
         ds = epanet.to_dataset()
 
         for graph_node in ds.graph_node.values:
-            node_id, reach, distance = _at(ds, graph_node)
+            node_id, reach, position = _at(ds, graph_node)
             alias = epanet.graph.nodes[int(graph_node)]["address"]
 
             if isinstance(alias, str):
                 assert (node_id, reach) == (alias, "")
-                assert np.isnan(distance)
+                assert np.isnan(position)
             else:
                 assert (node_id, reach) == ("", alias[0])
                 expected = alias[1]
-                assert np.isnan(distance) if expected is None else distance == expected
+                assert np.isnan(position) if expected is None else position == expected
 
     def test_a_quantity_keeps_its_long_name(self, epanet):
         ds = epanet.to_dataset()

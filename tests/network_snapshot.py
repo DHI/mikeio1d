@@ -57,18 +57,18 @@ def _alias_key(alias: Any) -> str:
     Parameters
     ----------
     alias : str or tuple
-        A node id, or a ``(reach, distance)`` breakpoint pair.
+        A node id, or a ``(reach, position)`` breakpoint pair.
 
     Returns
     -------
     str
-        ``node:<id>`` or ``bp:<reach>@<distance>``. The prefix keeps the two
+        ``node:<id>`` or ``bp:<reach>@<position>``. The prefix keeps the two
         spaces apart, so a node named like a reach cannot collide with a
         breakpoint on it.
     """
     if isinstance(alias, tuple):
-        reach, distance = alias
-        return f"bp:{reach}@{_num(distance)!r}"
+        reach, position = alias
+        return f"bp:{reach}@{_num(position)!r}"
     return f"node:{alias}"
 
 
@@ -181,7 +181,7 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
             "breakpoints": [
                 {
                     "id": _alias_key(breakpoint.id),
-                    "distance": _num(breakpoint.distance),
+                    "position": _num(breakpoint.position),
                     "quantities": carried.get(by_alias[breakpoint.id], []),
                 }
                 for breakpoint in reach.breakpoints
@@ -245,7 +245,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
     recalled = {}
     for node_id, alias in sorted(network.graph.nodes(data="address")):
         if isinstance(alias, tuple):
-            entry = {"reach": alias[0], "distance": _num(alias[1])}
+            entry = {"reach": alias[0], "position": _num(alias[1])}
         else:
             entry = {"node": alias}
         recalled[str(node_id)] = entry

@@ -2949,22 +2949,22 @@
     "node": "21"
    },
    "11": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "111"
    },
    "12": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "111"
    },
    "13": {
     "node": "22"
    },
    "14": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "112"
    },
    "15": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "112"
    },
    "16": {
@@ -2974,102 +2974,102 @@
     "node": "23"
    },
    "18": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "113"
    },
    "19": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "113"
    },
    "2": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "10"
    },
    "20": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "12"
    },
    "21": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "12"
    },
    "22": {
     "node": "31"
    },
    "23": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "121"
    },
    "24": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "121"
    },
    "25": {
     "node": "32"
    },
    "26": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "122"
    },
    "27": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "122"
    },
    "28": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "21"
    },
    "29": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "21"
    },
    "3": {
-    "distance": 3209.544,
+    "position": 3209.544,
     "reach": "10"
    },
    "30": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "22"
    },
    "31": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "22"
    },
    "32": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "31"
    },
    "33": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "31"
    },
    "34": {
     "node": "9"
    },
    "35": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "9"
    },
    "4": {
     "node": "12"
    },
    "5": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "11"
    },
    "6": {
-    "distance": 1609.344,
+    "position": 1609.344,
     "reach": "11"
    },
    "7": {
     "node": "2"
    },
    "8": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "110"
    },
    "9": {
-    "distance": 60.96,
+    "position": 60.96,
     "reach": "110"
    }
   }
@@ -3097,7 +3097,7 @@
   "10": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:10@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3111,7 +3111,7 @@
      ]
     },
     {
-     "distance": 3209.544,
+     "position": 3209.544,
      "id": "bp:10@3209.544",
      "quantities": [
       "AvgWaterQuality",
@@ -3133,7 +3133,7 @@
   "11": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:11@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3147,7 +3147,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:11@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3169,7 +3169,7 @@
   "110": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:110@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3183,7 +3183,7 @@
      ]
     },
     {
-     "distance": 60.96,
+     "position": 60.96,
      "id": "bp:110@60.96",
      "quantities": [
       "AvgWaterQuality",
@@ -3205,7 +3205,7 @@
   "111": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:111@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3219,7 +3219,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:111@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3241,7 +3241,7 @@
   "112": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:112@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3255,7 +3255,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:112@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3277,7 +3277,7 @@
   "113": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:113@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3291,7 +3291,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:113@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3313,7 +3313,7 @@
   "12": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:12@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3327,7 +3327,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:12@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3349,7 +3349,7 @@
   "121": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:121@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3363,7 +3363,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:121@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3385,7 +3385,7 @@
   "122": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:122@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3399,7 +3399,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:122@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3421,7 +3421,7 @@
   "21": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:21@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3435,7 +3435,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:21@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3457,7 +3457,7 @@
   "22": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:22@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3471,7 +3471,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:22@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3493,7 +3493,7 @@
   "31": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:31@0.0",
      "quantities": [
       "AvgWaterQuality",
@@ -3507,7 +3507,7 @@
      ]
     },
     {
-     "distance": 1609.344,
+     "position": 1609.344,
      "id": "bp:31@1609.344",
      "quantities": [
       "AvgWaterQuality",
@@ -3529,7 +3529,7 @@
   "9": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:9@0.0",
      "quantities": [
       "AvgWaterQuality",

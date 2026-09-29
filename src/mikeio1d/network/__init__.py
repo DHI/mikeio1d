@@ -1,7 +1,7 @@
 """Build a graph-shaped network from a result file.
 
 A result file describes a network as locations with the names the model gave
-them: a node id, or a reach and a distance along it. This module turns that into
+them: a node id, or a reach and a position along it. This module turns that into
 a :class:`Network`: a networkx graph of those locations, addressed by the same
 names, that reads the timeseries each location holds only when asked for them.
 

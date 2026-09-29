@@ -1534,301 +1534,301 @@
     "node": "108080 CALI"
    },
    "10": {
-    "distance": 35220.0,
+    "position": 35220.0,
     "reach": "CALI"
    },
    "11": {
-    "distance": 39790.0,
+    "position": 39790.0,
     "reach": "CALI"
    },
    "12": {
-    "distance": 44360.0,
+    "position": 44360.0,
     "reach": "CALI"
    },
    "13": {
-    "distance": 48930.0,
+    "position": 48930.0,
     "reach": "CALI"
    },
    "14": {
-    "distance": 53500.0,
+    "position": 53500.0,
     "reach": "CALI"
    },
    "15": {
-    "distance": 58070.0,
+    "position": 58070.0,
     "reach": "CALI"
    },
    "16": {
-    "distance": 62640.0,
+    "position": 62640.0,
     "reach": "CALI"
    },
    "17": {
-    "distance": 67184.0,
+    "position": 67184.0,
     "reach": "CALI"
    },
    "18": {
-    "distance": 71728.0,
+    "position": 71728.0,
     "reach": "CALI"
    },
    "19": {
-    "distance": 76272.0,
+    "position": 76272.0,
     "reach": "CALI"
    },
    "2": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "CALI"
    },
    "20": {
-    "distance": 80816.0,
+    "position": 80816.0,
     "reach": "CALI"
    },
    "21": {
-    "distance": 85360.0,
+    "position": 85360.0,
     "reach": "CALI"
    },
    "22": {
-    "distance": 89904.0,
+    "position": 89904.0,
     "reach": "CALI"
    },
    "23": {
-    "distance": 94448.0,
+    "position": 94448.0,
     "reach": "CALI"
    },
    "24": {
-    "distance": 98992.0,
+    "position": 98992.0,
     "reach": "CALI"
    },
    "25": {
-    "distance": 103536.0,
+    "position": 103536.0,
     "reach": "CALI"
    },
    "26": {
-    "distance": 108080.0,
+    "position": 108080.0,
     "reach": "CALI"
    },
    "27": {
     "node": "95075 OLD_CALI"
    },
    "28": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "OLD_CALI"
    },
    "29": {
-    "distance": 4183.0,
+    "position": 4183.0,
     "reach": "OLD_CALI"
    },
    "3": {
-    "distance": 4402.5,
+    "position": 4402.5,
     "reach": "CALI"
    },
    "30": {
-    "distance": 8366.0,
+    "position": 8366.0,
     "reach": "OLD_CALI"
    },
    "31": {
-    "distance": 12549.0,
+    "position": 12549.0,
     "reach": "OLD_CALI"
    },
    "32": {
-    "distance": 16732.0,
+    "position": 16732.0,
     "reach": "OLD_CALI"
    },
    "33": {
-    "distance": 20915.0,
+    "position": 20915.0,
     "reach": "OLD_CALI"
    },
    "34": {
-    "distance": 25098.0,
+    "position": 25098.0,
     "reach": "OLD_CALI"
    },
    "35": {
-    "distance": 29281.0,
+    "position": 29281.0,
     "reach": "OLD_CALI"
    },
    "36": {
-    "distance": 33464.0,
+    "position": 33464.0,
     "reach": "OLD_CALI"
    },
    "37": {
-    "distance": 37647.0,
+    "position": 37647.0,
     "reach": "OLD_CALI"
    },
    "38": {
-    "distance": 41830.0,
+    "position": 41830.0,
     "reach": "OLD_CALI"
    },
    "39": {
-    "distance": 46267.082031,
+    "position": 46267.082031,
     "reach": "OLD_CALI"
    },
    "4": {
-    "distance": 8805.0,
+    "position": 8805.0,
     "reach": "CALI"
    },
    "40": {
-    "distance": 50704.167969,
+    "position": 50704.167969,
     "reach": "OLD_CALI"
    },
    "41": {
-    "distance": 55141.25,
+    "position": 55141.25,
     "reach": "OLD_CALI"
    },
    "42": {
-    "distance": 59578.332031,
+    "position": 59578.332031,
     "reach": "OLD_CALI"
    },
    "43": {
-    "distance": 64015.417969,
+    "position": 64015.417969,
     "reach": "OLD_CALI"
    },
    "44": {
-    "distance": 68452.5,
+    "position": 68452.5,
     "reach": "OLD_CALI"
    },
    "45": {
-    "distance": 72889.585938,
+    "position": 72889.585938,
     "reach": "OLD_CALI"
    },
    "46": {
-    "distance": 77326.664062,
+    "position": 77326.664062,
     "reach": "OLD_CALI"
    },
    "47": {
-    "distance": 81763.75,
+    "position": 81763.75,
     "reach": "OLD_CALI"
    },
    "48": {
-    "distance": 86200.835938,
+    "position": 86200.835938,
     "reach": "OLD_CALI"
    },
    "49": {
-    "distance": 90637.914062,
+    "position": 90637.914062,
     "reach": "OLD_CALI"
    },
    "5": {
-    "distance": 13207.5,
+    "position": 13207.5,
     "reach": "CALI"
    },
    "50": {
-    "distance": 95075.0,
+    "position": 95075.0,
     "reach": "OLD_CALI"
    },
    "51": {
     "node": "113901 NEW_CALI"
    },
    "52": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "NEW_CALI"
    },
    "53": {
-    "distance": 4560.833496,
+    "position": 4560.833496,
     "reach": "NEW_CALI"
    },
    "54": {
-    "distance": 9121.666992,
+    "position": 9121.666992,
     "reach": "NEW_CALI"
    },
    "55": {
-    "distance": 13682.5,
+    "position": 13682.5,
     "reach": "NEW_CALI"
    },
    "56": {
-    "distance": 18243.333984,
+    "position": 18243.333984,
     "reach": "NEW_CALI"
    },
    "57": {
-    "distance": 22804.166016,
+    "position": 22804.166016,
     "reach": "NEW_CALI"
    },
    "58": {
-    "distance": 27365.0,
+    "position": 27365.0,
     "reach": "NEW_CALI"
    },
    "59": {
-    "distance": 31925.833984,
+    "position": 31925.833984,
     "reach": "NEW_CALI"
    },
    "6": {
-    "distance": 17610.0,
+    "position": 17610.0,
     "reach": "CALI"
    },
    "60": {
-    "distance": 36486.667969,
+    "position": 36486.667969,
     "reach": "NEW_CALI"
    },
    "61": {
-    "distance": 41047.5,
+    "position": 41047.5,
     "reach": "NEW_CALI"
    },
    "62": {
-    "distance": 45608.332031,
+    "position": 45608.332031,
     "reach": "NEW_CALI"
    },
    "63": {
-    "distance": 50169.167969,
+    "position": 50169.167969,
     "reach": "NEW_CALI"
    },
    "64": {
-    "distance": 54730.0,
+    "position": 54730.0,
     "reach": "NEW_CALI"
    },
    "65": {
-    "distance": 59660.917969,
+    "position": 59660.917969,
     "reach": "NEW_CALI"
    },
    "66": {
-    "distance": 64591.832031,
+    "position": 64591.832031,
     "reach": "NEW_CALI"
    },
    "67": {
-    "distance": 69522.75,
+    "position": 69522.75,
     "reach": "NEW_CALI"
    },
    "68": {
-    "distance": 74453.664062,
+    "position": 74453.664062,
     "reach": "NEW_CALI"
    },
    "69": {
-    "distance": 79384.585938,
+    "position": 79384.585938,
     "reach": "NEW_CALI"
    },
    "7": {
-    "distance": 22012.5,
+    "position": 22012.5,
     "reach": "CALI"
    },
    "70": {
-    "distance": 84315.5,
+    "position": 84315.5,
     "reach": "NEW_CALI"
    },
    "71": {
-    "distance": 89246.414062,
+    "position": 89246.414062,
     "reach": "NEW_CALI"
    },
    "72": {
-    "distance": 94177.335938,
+    "position": 94177.335938,
     "reach": "NEW_CALI"
    },
    "73": {
-    "distance": 99108.25,
+    "position": 99108.25,
     "reach": "NEW_CALI"
    },
    "74": {
-    "distance": 104039.164062,
+    "position": 104039.164062,
     "reach": "NEW_CALI"
    },
    "75": {
-    "distance": 108970.085938,
+    "position": 108970.085938,
     "reach": "NEW_CALI"
    },
    "76": {
-    "distance": 113901.0,
+    "position": 113901.0,
     "reach": "NEW_CALI"
    },
    "8": {
-    "distance": 26415.0,
+    "position": 26415.0,
     "reach": "CALI"
    },
    "9": {
-    "distance": 30817.5,
+    "position": 30817.5,
     "reach": "CALI"
    }
   }
@@ -1841,175 +1841,175 @@
   "CALI": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:CALI@0.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 4402.5,
+     "position": 4402.5,
      "id": "bp:CALI@4402.5",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 8805.0,
+     "position": 8805.0,
      "id": "bp:CALI@8805.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 13207.5,
+     "position": 13207.5,
      "id": "bp:CALI@13207.5",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 17610.0,
+     "position": 17610.0,
      "id": "bp:CALI@17610.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 22012.5,
+     "position": 22012.5,
      "id": "bp:CALI@22012.5",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 26415.0,
+     "position": 26415.0,
      "id": "bp:CALI@26415.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 30817.5,
+     "position": 30817.5,
      "id": "bp:CALI@30817.5",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 35220.0,
+     "position": 35220.0,
      "id": "bp:CALI@35220.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 39790.0,
+     "position": 39790.0,
      "id": "bp:CALI@39790.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 44360.0,
+     "position": 44360.0,
      "id": "bp:CALI@44360.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 48930.0,
+     "position": 48930.0,
      "id": "bp:CALI@48930.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 53500.0,
+     "position": 53500.0,
      "id": "bp:CALI@53500.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 58070.0,
+     "position": 58070.0,
      "id": "bp:CALI@58070.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 62640.0,
+     "position": 62640.0,
      "id": "bp:CALI@62640.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 67184.0,
+     "position": 67184.0,
      "id": "bp:CALI@67184.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 71728.0,
+     "position": 71728.0,
      "id": "bp:CALI@71728.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 76272.0,
+     "position": 76272.0,
      "id": "bp:CALI@76272.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 80816.0,
+     "position": 80816.0,
      "id": "bp:CALI@80816.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 85360.0,
+     "position": 85360.0,
      "id": "bp:CALI@85360.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 89904.0,
+     "position": 89904.0,
      "id": "bp:CALI@89904.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 94448.0,
+     "position": 94448.0,
      "id": "bp:CALI@94448.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 98992.0,
+     "position": 98992.0,
      "id": "bp:CALI@98992.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 103536.0,
+     "position": 103536.0,
      "id": "bp:CALI@103536.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 108080.0,
+     "position": 108080.0,
      "id": "bp:CALI@108080.0",
      "quantities": [
       "Water Level"
@@ -2024,175 +2024,175 @@
   "NEW_CALI": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:NEW_CALI@0.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 4560.833496,
+     "position": 4560.833496,
      "id": "bp:NEW_CALI@4560.833496",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 9121.666992,
+     "position": 9121.666992,
      "id": "bp:NEW_CALI@9121.666992",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 13682.5,
+     "position": 13682.5,
      "id": "bp:NEW_CALI@13682.5",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 18243.333984,
+     "position": 18243.333984,
      "id": "bp:NEW_CALI@18243.333984",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 22804.166016,
+     "position": 22804.166016,
      "id": "bp:NEW_CALI@22804.166016",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 27365.0,
+     "position": 27365.0,
      "id": "bp:NEW_CALI@27365.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 31925.833984,
+     "position": 31925.833984,
      "id": "bp:NEW_CALI@31925.833984",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 36486.667969,
+     "position": 36486.667969,
      "id": "bp:NEW_CALI@36486.667969",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 41047.5,
+     "position": 41047.5,
      "id": "bp:NEW_CALI@41047.5",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 45608.332031,
+     "position": 45608.332031,
      "id": "bp:NEW_CALI@45608.332031",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 50169.167969,
+     "position": 50169.167969,
      "id": "bp:NEW_CALI@50169.167969",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 54730.0,
+     "position": 54730.0,
      "id": "bp:NEW_CALI@54730.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 59660.917969,
+     "position": 59660.917969,
      "id": "bp:NEW_CALI@59660.917969",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 64591.832031,
+     "position": 64591.832031,
      "id": "bp:NEW_CALI@64591.832031",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 69522.75,
+     "position": 69522.75,
      "id": "bp:NEW_CALI@69522.75",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 74453.664062,
+     "position": 74453.664062,
      "id": "bp:NEW_CALI@74453.664062",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 79384.585938,
+     "position": 79384.585938,
      "id": "bp:NEW_CALI@79384.585938",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 84315.5,
+     "position": 84315.5,
      "id": "bp:NEW_CALI@84315.5",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 89246.414062,
+     "position": 89246.414062,
      "id": "bp:NEW_CALI@89246.414062",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 94177.335938,
+     "position": 94177.335938,
      "id": "bp:NEW_CALI@94177.335938",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 99108.25,
+     "position": 99108.25,
      "id": "bp:NEW_CALI@99108.25",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 104039.164062,
+     "position": 104039.164062,
      "id": "bp:NEW_CALI@104039.164062",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 108970.085938,
+     "position": 108970.085938,
      "id": "bp:NEW_CALI@108970.085938",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 113901.0,
+     "position": 113901.0,
      "id": "bp:NEW_CALI@113901.0",
      "quantities": [
       "Water Level"
@@ -2207,161 +2207,161 @@
   "OLD_CALI": {
    "breakpoints": [
     {
-     "distance": 0.0,
+     "position": 0.0,
      "id": "bp:OLD_CALI@0.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 4183.0,
+     "position": 4183.0,
      "id": "bp:OLD_CALI@4183.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 8366.0,
+     "position": 8366.0,
      "id": "bp:OLD_CALI@8366.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 12549.0,
+     "position": 12549.0,
      "id": "bp:OLD_CALI@12549.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 16732.0,
+     "position": 16732.0,
      "id": "bp:OLD_CALI@16732.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 20915.0,
+     "position": 20915.0,
      "id": "bp:OLD_CALI@20915.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 25098.0,
+     "position": 25098.0,
      "id": "bp:OLD_CALI@25098.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 29281.0,
+     "position": 29281.0,
      "id": "bp:OLD_CALI@29281.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 33464.0,
+     "position": 33464.0,
      "id": "bp:OLD_CALI@33464.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 37647.0,
+     "position": 37647.0,
      "id": "bp:OLD_CALI@37647.0",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 41830.0,
+     "position": 41830.0,
      "id": "bp:OLD_CALI@41830.0",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 46267.082031,
+     "position": 46267.082031,
      "id": "bp:OLD_CALI@46267.082031",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 50704.167969,
+     "position": 50704.167969,
      "id": "bp:OLD_CALI@50704.167969",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 55141.25,
+     "position": 55141.25,
      "id": "bp:OLD_CALI@55141.25",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 59578.332031,
+     "position": 59578.332031,
      "id": "bp:OLD_CALI@59578.332031",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 64015.417969,
+     "position": 64015.417969,
      "id": "bp:OLD_CALI@64015.417969",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 68452.5,
+     "position": 68452.5,
      "id": "bp:OLD_CALI@68452.5",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 72889.585938,
+     "position": 72889.585938,
      "id": "bp:OLD_CALI@72889.585938",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 77326.664062,
+     "position": 77326.664062,
      "id": "bp:OLD_CALI@77326.664062",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 81763.75,
+     "position": 81763.75,
      "id": "bp:OLD_CALI@81763.75",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 86200.835938,
+     "position": 86200.835938,
      "id": "bp:OLD_CALI@86200.835938",
      "quantities": [
       "Water Level"
      ]
     },
     {
-     "distance": 90637.914062,
+     "position": 90637.914062,
      "id": "bp:OLD_CALI@90637.914062",
      "quantities": [
       "Discharge"
      ]
     },
     {
-     "distance": 95075.0,
+     "position": 95075.0,
      "id": "bp:OLD_CALI@95075.0",
      "quantities": [
       "Water Level"

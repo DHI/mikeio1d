@@ -1,6 +1,6 @@
 """Test the frame a reach places its break points in, and the edges built from it.
 
-A break point's distance is a position, not a size. Which frame it is a position
+A break point's position is a place, not a size. Which frame it is a position
 in belongs to the reach: an urban link measures from its own start, while a MIKE
 river reach reports chainages along the whole branch it belongs to. Every edge
 length has to come out the same either way.
@@ -99,7 +99,7 @@ class TestAReachThatDoesNotStartAtZero:
         """A position can sit below its frame's origin, where a size cannot.
 
         'basin_right' is modelled 10 m upstream of its branch's chainage zero,
-        so its first two break points are negative. Reading their distance as
+        so its first two break points are negative. Reading their position as
         a size - the old ``abs(distance)`` - put them 10 m and 5 m from a start
         node they in fact sit on.
         """

@@ -94,7 +94,7 @@ def _has_real_gridpoints(reach: ResultReach) -> bool:
     return any(res1d_reach.GridPoints.Count > 0 for res1d_reach in reach.res1d_reaches)
 
 
-def _reach_start_distance(reach: ResultReach) -> float:
+def _reach_start_position(reach: ResultReach) -> float:
     """Resolve where the reach's start node sits, in the frame its breakpoints use.
 
     A MIKE reach's breakpoints sit at their chainage along the whole branch, so
@@ -175,17 +175,17 @@ def _build_reach_breakpoints(
     """
     gridpoints = _ordered_gridpoints(reach)
     if _has_real_gridpoints(reach):
-        distances_per_gridpoint = [[gp.chainage] for gp in gridpoints]
+        positions_per_gridpoint = [[gp.chainage] for gp in gridpoints]
     else:
         ends = [0.0] if length is None else [0.0, length]
-        distances_per_gridpoint = [ends for _ in gridpoints]
+        positions_per_gridpoint = [ends for _ in gridpoints]
 
     breakpoints: list[ReachBreakPoint] = []
     series: dict[Address, dict[str, _Series]] = {}
-    for i, (gp, distances) in enumerate(zip(gridpoints, distances_per_gridpoint)):
+    for i, (gp, positions) in enumerate(zip(gridpoints, positions_per_gridpoint)):
         carried = series_by_key[(reach.name, i)]
-        for distance in distances:
-            point = ReachBreakPoint(gp.reach_name, distance)
+        for position in positions:
+            point = ReachBreakPoint(gp.reach_name, position)
             breakpoints.append(point)
             series[point.id] = carried
     return breakpoints, series
@@ -238,7 +238,7 @@ def _load_res1d_network(
                 start=reach.start_node,
                 end=reach.end_node,
                 length=length,
-                start_distance=_reach_start_distance(reach),
+                start_position=_reach_start_position(reach),
                 breakpoints=tuple(breakpoints),
             )
         )
