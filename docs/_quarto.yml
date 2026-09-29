@@ -130,7 +130,7 @@ quartodoc:
     contents:
     - network.Network
     - network.Address
-    - network.Location
+    - network.NetworkLocation
     - network.NetworkReach
     
 format:

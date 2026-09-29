@@ -10,18 +10,14 @@ The words the network module's API and docs use, and what each one means.
   `(reach_id, position)` tuple is a breakpoint. `Network.addresses()` lists them, and
   `Network.read()` takes them.
 
-**`Location`**
-: What `Network.resolve(address)` answers for an address it has: the address as the
-  network spells it, the quantities it carries, and its graph node.
-
 **Model node**
 : A node as the model has it (a manhole, a junction, a tank), named by its id. "Node" on
   its own always means a model node.
 
 **Graph node**
 : The integer that labels a location in `Network.to_networkx()`. Every location has one, a
-  breakpoint too. `Location.graph_node` gives it, `to_dataset()` is indexed by it, and
-  `graph.nodes[graph_node]["address"]` turns it back into the address.
+  breakpoint too. `NetworkLocation.graph_node` gives it, `to_dataset()` is indexed by it,
+  and `graph.nodes[graph_node]["address"]` turns it back into the address.
 
 **Reach**
 : A directed connection between two model nodes, with the breakpoints along it.

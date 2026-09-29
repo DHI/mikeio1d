@@ -99,7 +99,7 @@ class NetworkReach:
 
 
 @dataclass(frozen=True)
-class Location:
+class NetworkLocation:
     """A location a network has, as :meth:`Network.resolve` answers for it.
 
     Attributes

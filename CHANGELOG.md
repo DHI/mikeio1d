@@ -38,8 +38,8 @@
 - A `.resx` carrying a quantity its `.res` already has at the same location is refused
   however the network is read. It used to be refused only where a frame was built, and
   otherwise read silently from the `.resx` (#250).
-- `Network.resolve` answers with a `Location` - its `address`, the `quantities` readable there
-  and its graph integer `graph_node` - or `None`. It is the one lookup by name;
+- `Network.resolve` answers with a `NetworkLocation` - its `address`, the `quantities`
+  readable there and its graph integer `graph_node` - or `None`. It is the one lookup by name;
   `graph.nodes[graph_node]["address"]` goes back (#250).
 - `Network.period` is a property, like `Network.quantities` (#250).
 - `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
@@ -50,8 +50,8 @@
 - A place along a reach is a `position`, not a `distance`:
   `NetworkReach.start_position` and `end_position`, the `position_tol` argument of `resolve`
   and `read`, and `to_dataset`'s `position` coordinate (#250).
-- A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone. `Location` and
-  `NetworkReach` are exported from `mikeio1d.network` (#250).
+- A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone.
+  `NetworkLocation` and `NetworkReach` are exported from `mikeio1d.network` (#250).
 - `ReachBreakpoint` is gone: `NetworkReach.breakpoints` holds the breakpoints' addresses,
   `(reach_id, position)` pairs that `Network.read` takes as they are (#250).
 - A position past the last breakpoint of a reach of unknown length, such as an EPANET pump's

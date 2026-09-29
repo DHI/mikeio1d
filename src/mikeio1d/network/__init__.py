@@ -15,7 +15,7 @@ Examples
 >>> from mikeio1d.network import Network
 >>> network = Network.open("tests/testdata/network.res1d")
 >>> network.resolve("101")
-Location(address='101', quantities=('WaterLevel',), graph_node=5)
+NetworkLocation(address='101', quantities=('WaterLevel',), graph_node=5)
 >>> network.read([("101", "WaterLevel")]).shape
 (110, 1)
 """
@@ -34,12 +34,12 @@ except ImportError as err:
 
 from ._naming import Address
 from ._network import Network
-from ._types import Location
+from ._types import NetworkLocation
 from ._types import NetworkReach
 
 __all__ = [
     "Address",
-    "Location",
     "Network",
+    "NetworkLocation",
     "NetworkReach",
 ]

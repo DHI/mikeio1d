@@ -33,7 +33,7 @@ from ._loader import _load_network
 from ._naming import _Naming
 from ._naming import _is_breakpoint
 from ._naming import _window
-from ._types import Location
+from ._types import NetworkLocation
 from ._types import NetworkReach
 
 
@@ -44,7 +44,7 @@ class Network:
     and a position along it, and every member here takes and gives those names.
     :meth:`to_networkx` is labelled with integers instead, each node carrying its name
     as the ``address`` attribute, and :meth:`resolve` gives the integer for a
-    name - see :attr:`Location.graph_node`.
+    name - see :attr:`NetworkLocation.graph_node`.
 
     Build one with :meth:`open`, which reads no timeseries. They stay in the
     file until :meth:`read` asks for them. The constructor is internal: it
@@ -260,8 +260,8 @@ class Network:
             share one ``graph_node`` axis, holding every location that carries
             any quantity; a variable is NaN where its location does not carry
             it. ``graph_node`` is the graph's integer, as
-            :attr:`Location.graph_node` gives it, and the ``node_id``, ``reach``
-            and ``position`` coordinates carry the address, so a consumer never
+            :attr:`NetworkLocation.graph_node` gives it, and the ``node_id``,
+            ``reach`` and ``position`` coordinates carry the address, so a consumer never
             has to hold on to the network to know what a column is. A node fills in ``node_id``, a
             breakpoint ``reach`` and ``position``, and the empty half says
             which it is::
@@ -342,7 +342,7 @@ class Network:
         Returns
         -------
         nx.Graph
-            Nodes are graph nodes, the integers :attr:`Location.graph_node`
+            Nodes are graph nodes, the integers :attr:`NetworkLocation.graph_node`
             gives. Nodes and edges carry at least these attributes:
 
             * node ``address`` -- the location's address: a model node's id,
@@ -699,7 +699,7 @@ class Network:
         *,
         position_tol: float | None = None,
         quantity: str | None = None,
-    ) -> Location | None:
+    ) -> NetworkLocation | None:
         """Say whether a location is in this network, what it carries, and where.
 
         An address that is not here gives ``None`` rather than an exception.
@@ -728,7 +728,7 @@ class Network:
 
         Returns
         -------
-        Location or None
+        NetworkLocation or None
             ``None`` if there is no such location, or none carrying
             ``quantity``: exactly when :meth:`read` would refuse the address
             with that quantity. Otherwise its address as the network spells it,
@@ -749,12 +749,12 @@ class Network:
         --------
         >>> network = Network.open("tests/testdata/network.res1d")
         >>> network.resolve("101")
-        Location(address='101', quantities=('WaterLevel',), graph_node=5)
+        NetworkLocation(address='101', quantities=('WaterLevel',), graph_node=5)
 
         A measured chainage, snapped onto the breakpoint the file stores:
 
         >>> network.resolve(("100l1", 23.8), position_tol=0.1)
-        Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
+        NetworkLocation(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 
         With a quantity, a position snaps only onto a breakpoint carrying it.
         On this staggered grid 5.0 is nearest the water level point at 0.0, but
@@ -774,12 +774,12 @@ class Network:
         A node of a MIKE 11 result is in the network, carrying nothing:
 
         >>> Network.open("tests/testdata/network_cali.res11").resolve("0 CALI")
-        Location(address='0 CALI', quantities=(), graph_node=0)
+        NetworkLocation(address='0 CALI', quantities=(), graph_node=0)
         """
         found = self._naming.canonical(address, position_tol=position_tol, quantity=quantity)
         if found is None:
             return None
-        return Location(
+        return NetworkLocation(
             address=found,
             quantities=self._results.quantities_at(found),
             graph_node=self._naming.graph_nodes[found],

@@ -29,7 +29,7 @@ Nodes are connected together by reaches. Nodes can represent different entities:
 Catchments are areas connected to either nodes or grid points, and act as boundary conditions for inputting loads to the network.
 
 ## Reading a network as a graph
-The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its breakpoints in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a position along it, and the network is addressed by those names throughout. `to_networkx()` gives the graph, labelled with integers, each node carrying its name as the `address` attribute; `resolve()` gives the integer for a name, as `Location.graph_node`. A graph node is not a model node: every location has one, a breakpoint too, and a model node is always named by its id. The graph is undirected, and each call builds a new one, which the caller is free to edit.
+The `mikeio1d.network` module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its breakpoints in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a position along it, and the network is addressed by those names throughout. `to_networkx()` gives the graph, labelled with integers, each node carrying its name as the `address` attribute; `resolve()` gives the integer for a name, as `NetworkLocation.graph_node`. A graph node is not a model node: every location has one, a breakpoint too, and a model node is always named by its id. The graph is undirected, and each call builds a new one, which the caller is free to edit.
 
 ![A reach's own first and last grid point sit exactly where the reach's nodes do, so each is joined to its node by an edge of length `0.0` flagged `boundary`. Drawn for a MIKE network: a link-node model such as EPANET has one synthetic grid point per reach, which is placed at both ends instead.](../images/docs/res1d_network_mapping.svg)
 
@@ -59,7 +59,7 @@ The network then answers from the file header and its own breakpoints, still wit
 ```python
 network.period                                     # (start, end)
 network.quantities                                 # {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
-network.resolve("manhole_12")                      # Location(address=..., quantities=(...), graph_node=...)
+network.resolve("manhole_12")                      # NetworkLocation(address=..., quantities=(...), graph_node=...)
 network.addresses(reach="100l1", quantity="Discharge")
 ```
 
@@ -67,7 +67,7 @@ network.addresses(reach="100l1", quantity="Discharge")
 
 ```python
 network.resolve(("100l1", 23.8), position_tol=0.1)
-# Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
+# NetworkLocation(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 ```
 
 A result's grid is often staggered: on `100l1` the water level sits at 0.0 and 47.68 and the discharge at 23.84 between them. Give `resolve()` the quantity too, and a position snaps only onto a breakpoint that carries it. A position within 1e-3 of a breakpoint names that breakpoint, and is never snapped away from it, however wide the window:
