@@ -51,12 +51,12 @@ def _num(value: Any) -> float | int | None:
     return round(value, _DECIMALS)
 
 
-def _alias_key(alias: Any) -> str:
-    """Render a node or breakpoint alias as a string, for use as a JSON key.
+def _address_key(address: Any) -> str:
+    """Render a node or breakpoint address as a string, for use as a JSON key.
 
     Parameters
     ----------
-    alias : str or tuple
+    address : str or tuple
         A node id, or a ``(reach, position)`` breakpoint pair.
 
     Returns
@@ -66,10 +66,10 @@ def _alias_key(alias: Any) -> str:
         spaces apart, so a node named like a reach cannot collide with a
         breakpoint on it.
     """
-    if isinstance(alias, tuple):
-        reach, position = alias
+    if isinstance(address, tuple):
+        reach, position = address
         return f"bp:{reach}@{_num(position)!r}"
-    return f"node:{alias}"
+    return f"node:{address}"
 
 
 def _digest(series: Any) -> dict[str, Any]:
@@ -131,26 +131,26 @@ def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, An
     Returns
     -------
     dict
-        Edges keyed by alias rather than by the integer label, so an edge stays
-        recognisable even if the numbering were to change, plus the alias map
+        Edges keyed by address rather than by the integer label, so an edge stays
+        recognisable even if the numbering were to change, plus the address map
         itself so that the numbering is pinned too.
     """
     graph = network.graph
-    aliases = {node: graph.nodes[node]["address"] for node in graph.nodes}
+    addresses = {node: graph.nodes[node]["address"] for node in graph.nodes}
 
     edges = []
     for u, v, attrs in graph.edges(data=True):
-        ends = sorted((_alias_key(aliases[u]), _alias_key(aliases[v])))
+        ends = sorted((_address_key(addresses[u]), _address_key(addresses[v])))
         edges.append([*ends, _num(attrs.get("length")), bool(attrs.get("boundary"))])
     edges.sort(key=lambda edge: (edge[0], edge[1], str(edge[2])))
 
-    nodes = {_alias_key(aliases[node]): carried.get(int(node), "empty") for node in graph.nodes}
+    nodes = {_address_key(addresses[node]): carried.get(int(node), "empty") for node in graph.nodes}
 
     return {
         "edges": edges,
         "nodes": nodes,
-        "alias_map": {
-            _alias_key(alias): int(node_id) for node_id, alias in network.graph.nodes(data="address")
+        "address_map": {
+            _address_key(address): int(graph_node) for graph_node, address in network.graph.nodes(data="address")
         },
     }
 
@@ -170,7 +170,7 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
     dict
         One entry per reach id.
     """
-    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="address")}
+    by_address = {address: int(node) for node, address in network.graph.nodes(data="address")}
     described = {}
     for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
@@ -180,9 +180,9 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
             "n_breakpoints": int(reach.n_breakpoints),
             "breakpoints": [
                 {
-                    "id": _alias_key(breakpoint.id),
+                    "id": _address_key(breakpoint.id),
                     "position": _num(breakpoint.position),
-                    "quantities": carried.get(by_alias[breakpoint.id], []),
+                    "quantities": carried.get(by_address[breakpoint.id], []),
                 }
                 for breakpoint in reach.breakpoints
             ],
@@ -234,8 +234,8 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
         graph labels each integer with.
     """
     found = {}
-    for _, alias in network.graph.nodes(data="address"):
-        found[_alias_key(alias)] = int(network.resolve(alias).graph_node)
+    for _, address in network.graph.nodes(data="address"):
+        found[_address_key(address)] = int(network.resolve(address).graph_node)
 
     endpoints = {}
     for reach_id, reach in network.reaches.items():
@@ -243,12 +243,12 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
             endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).graph_node)
 
     recalled = {}
-    for node_id, alias in sorted(network.graph.nodes(data="address")):
-        if isinstance(alias, tuple):
-            entry = {"reach": alias[0], "position": _num(alias[1])}
+    for graph_node, address in sorted(network.graph.nodes(data="address")):
+        if isinstance(address, tuple):
+            entry = {"reach": address[0], "position": _num(address[1])}
         else:
-            entry = {"node": alias}
-        recalled[str(node_id)] = entry
+            entry = {"node": address}
+        recalled[str(graph_node)] = entry
 
     return {"find": found, "endpoints": endpoints, "recall": recalled}
 
@@ -274,8 +274,8 @@ def describe(network: Any) -> dict[str, Any]:
     df = network.to_dataframe()
     # Keyed by graph integer, as the snapshots were taken, so they pin the same
     # values whatever the frame's own labels.
-    by_alias = {alias: int(node) for node, alias in network.graph.nodes(data="address")}
-    df.columns = [(by_alias[alias], quantity) for alias, quantity in df.columns]
+    by_address = {address: int(node) for node, address in network.graph.nodes(data="address")}
+    df.columns = [(by_address[address], quantity) for address, quantity in df.columns]
     carried = _carried(df)
     return {
         "counts": {

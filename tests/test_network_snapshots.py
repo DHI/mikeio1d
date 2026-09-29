@@ -3,7 +3,7 @@
 These snapshots were recorded in modelskill before the topology layer moved here
 (ADR-013 there), over fixtures that are copies of the ones in this repository.
 They are the acceptance test for the move: the same loads must still produce
-the same graph, the same alias map, the same dataframe and the same
+the same graph, the same address map, the same dataframe and the same
 correspondence between names and graph integers - recorded through find and
 recall then, and through resolve and the graph's own labels now.
 

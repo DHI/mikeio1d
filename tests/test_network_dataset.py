@@ -50,19 +50,19 @@ class TestIdentityCoordinates:
         assert position == pytest.approx(0.0)
 
     def test_the_coordinates_agree_with_the_graph(self, epanet):
-        """The graph's alias is the same answer, so the two must never drift apart."""
+        """The graph's address is the same answer, so the two must never drift apart."""
         ds = epanet.to_dataset()
 
         for graph_node in ds.graph_node.values:
             node_id, reach, position = _at(ds, graph_node)
-            alias = epanet.graph.nodes[int(graph_node)]["address"]
+            address = epanet.graph.nodes[int(graph_node)]["address"]
 
-            if isinstance(alias, str):
-                assert (node_id, reach) == (alias, "")
+            if isinstance(address, str):
+                assert (node_id, reach) == (address, "")
                 assert np.isnan(position)
             else:
-                assert (node_id, reach) == ("", alias[0])
-                expected = alias[1]
+                assert (node_id, reach) == ("", address[0])
+                expected = address[1]
                 assert np.isnan(position) if expected is None else position == expected
 
     def test_a_quantity_keeps_its_long_name(self, epanet):

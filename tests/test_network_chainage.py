@@ -49,18 +49,18 @@ def _chain_nodes(network, reach_id):
     A break point's address names the reach it belongs to, so one reach's chain
     can be read off the graph without asking the network for its reaches.
     """
-    aliases = {node: network.graph.nodes[node]["address"] for node in network.graph.nodes}
+    addresses = {node: network.graph.nodes[node]["address"] for node in network.graph.nodes}
     breakpoints = sorted(
-        (alias[1], node)
-        for node, alias in aliases.items()
-        if isinstance(alias, tuple) and alias[0] == reach_id
+        (address[1], node)
+        for node, address in addresses.items()
+        if isinstance(address, tuple) and address[0] == reach_id
     )
-    by_alias = {alias: node for node, alias in aliases.items()}
+    by_address = {address: node for node, address in addresses.items()}
     reach = network.reaches[reach_id]
     return [
-        by_alias[reach.start],
+        by_address[reach.start],
         *(node for _, node in breakpoints),
-        by_alias[reach.end],
+        by_address[reach.end],
     ]
 
 

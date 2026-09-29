@@ -233,10 +233,10 @@ def test_a_pipe_the_inp_gives_no_length_for_has_one_break_point(tmp_path):
     )
 
     network = Network.open(res)
-    aliases = [network.graph.nodes[node]["address"] for node in network.graph.nodes]
+    addresses = [network.graph.nodes[node]["address"] for node in network.graph.nodes]
 
     assert _lengths(network)[_PIPE] is None
-    assert [alias for alias in aliases if isinstance(alias, tuple) and alias[0] == _PIPE] == [
+    assert [address for address in addresses if isinstance(address, tuple) and address[0] == _PIPE] == [
         (_PIPE, 0.0),
     ]
 

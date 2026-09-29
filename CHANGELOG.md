@@ -34,7 +34,7 @@
   otherwise read silently from the `.resx` (#250).
 - `Network.resolve` answers with a `Location` - its `address`, the `quantities` readable there
   and its graph integer `graph_node` - or `None`. It is the one lookup by name;
-  `graph.nodes[node]["alias"]` goes back (#250).
+  `graph.nodes[graph_node]["address"]` goes back (#250).
 - `Network.period` is a property, like `Network.quantities` (#250).
 - `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
   and its `sel` option is gone: read one quantity with `Network.read` and
@@ -58,8 +58,8 @@
   abstract element classes are gone too: `Network.reaches` holds plain frozen records with the
   same attributes (#257).
 - `Network.find` and `Network.recall`. Every member takes the model's names, `resolve` gives the
-  graph integer for one, and each graph node's `alias` attribute names it. A reach's end nodes
-  are `reaches[reach_id].start.id` and `.end.id`, rather than `distance="start"`/`"end"` (#250).
+  graph integer for one, and each graph node's `address` attribute names it. A reach's end nodes
+  are `reaches[reach_id].start` and `.end`, rather than `distance="start"`/`"end"` (#250).
 
 ## [1.3.1] - 2026-07-15
 
