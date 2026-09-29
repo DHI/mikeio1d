@@ -40,7 +40,7 @@ class TestIdentityCoordinates:
         assert reach == ""
         assert np.isnan(position)
 
-    def test_a_breakpoint_carries_its_reach_and_distance(self, epanet):
+    def test_a_breakpoint_carries_its_reach_and_position(self, epanet):
         graph_node = epanet.resolve(("10", 0.0)).graph_node
 
         node_id, reach, position = _at(epanet.to_dataset(), graph_node)

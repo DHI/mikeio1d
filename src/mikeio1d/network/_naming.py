@@ -57,11 +57,11 @@ class _Naming:
             address: node for node, address in graph.nodes(data="address")
         }
         # Each reach's breakpoint positions, ascending, for bisect.
-        self._distances: dict[str, list[float]] = {}
+        self._positions: dict[str, list[float]] = {}
         for address in self._graph_nodes:
             if _is_breakpoint(address):
-                self._distances.setdefault(address[0], []).append(address[1])
-        for known in self._distances.values():
+                self._positions.setdefault(address[0], []).append(address[1])
+        for known in self._positions.values():
             known.sort()
         self._reaches = reaches
 
@@ -93,7 +93,7 @@ class _Naming:
         if not _is_breakpoint(address):
             return None
         reach_id, position = address
-        known = self._distances.get(reach_id, [])
+        known = self._positions.get(reach_id, [])
         # Only the two positions either side of the one asked for can be nearest;
         # of two equally near, the lower wins.
         i = bisect.bisect_left(known, position)
@@ -109,7 +109,7 @@ class _Naming:
         """
         if _is_breakpoint(address):
             reach_id, position = address
-            known = self._distances.get(reach_id, [])
+            known = self._positions.get(reach_id, [])
             if not known:
                 if reach_id not in self._reaches:
                     return f"the network has no reach {reach_id!r}"
