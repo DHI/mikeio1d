@@ -11,6 +11,7 @@ pytest.importorskip("networkx")
 
 from mikeio1d import Res1D
 from mikeio1d.network import Network
+from mikeio1d.network import _companions
 from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
 from mikeio1d.network._loader import _refuse_or_warn_catchments
@@ -163,11 +164,12 @@ class TestCompanionErrors:
         with pytest.raises(ValueError, match="not a companion"):
             Network.open(_EPANET_RES, companions=[_RES1D])
 
-    def test_two_of_a_kind_are_refused(self):
-        inp = str(_TESTDATA / "epanet.inp")
+    @pytest.mark.parametrize("suffix", [".inp", ".resx"])
+    def test_two_of_a_kind_are_refused(self, suffix):
+        companion = str(_TESTDATA / f"epanet{suffix}")
 
-        with pytest.raises(ValueError, match="Two '.inp' companions"):
-            Network.open(_EPANET_RES, companions=[inp, inp])
+        with pytest.raises(ValueError, match=f"Two '{suffix}' companions"):
+            Network.open(_EPANET_RES, companions=[companion, companion])
 
     def test_an_opened_result_that_is_not_a_companion_is_refused(self):
         with pytest.raises(ValueError, match="not a companion"):
@@ -314,6 +316,23 @@ rør1 1 2 250 300 100
 """One pipe, named outside ASCII. Fields are whitespace-delimited either way."""
 
 
+@pytest.fixture(scope="module")
+def epanet_res():
+    """The EPANET result a stub companion is checked against."""
+    return Res1D(_EPANET_RES)
+
+
+def _resx_like(res, **changes):
+    """A stand-in for a '.resx' of the same run as res, but for what changes."""
+    fields = {
+        "start_time": res.start_time,
+        "end_time": res.end_time,
+        "nodes": dict.fromkeys(res.nodes),
+        "reaches": dict.fromkeys(res.reaches),
+    }
+    return SimpleNamespace(**{**fields, **changes})
+
+
 def _carrying(*quantities):
     """What a node or gridpoint carries, as a header describes it."""
     return dict.fromkeys(quantities)
@@ -377,3 +396,19 @@ class TestWhatNoFixtureCanReach:
 
         with pytest.warns(UserWarning, match=r"1 catchment\(s\).*\['TotalRunOff'\]"):
             _refuse_or_warn_catchments(res)
+
+    @pytest.mark.parametrize(
+        "changes, message",
+        [
+            ({"end_time": "2099-01-01"}, "same period"),
+            ({"nodes": {"ghost": None}}, r"holds nodes \['ghost'\]"),
+            ({"reaches": {"ghost": None}}, r"holds reaches \['ghost'\]"),
+        ],
+        ids=["period", "node", "reach"],
+    )
+    def test_a_resx_from_another_run_is_refused(self, monkeypatch, epanet_res, changes, message):
+        """The one '.resx' fixture belongs to the one '.res', so the others are stubs."""
+        monkeypatch.setattr(_companions, "_as_res1d", lambda file: file)
+
+        with pytest.raises(ValueError, match=message):
+            _companions._open_companion_result(epanet_res, _resx_like(epanet_res, **changes))
