@@ -45,10 +45,9 @@ class Network:
     as the ``address`` attribute, and :meth:`resolve` gives the integer for a
     name - see :attr:`Location.graph_node`.
 
-    Build one with :meth:`open`, which reads a result file's topology. The
-    timeseries stay in the file until :meth:`read` asks for them, and each
-    read loads only those. The constructor is internal: it takes what a loader
-    produces, not a file.
+    Build one with :meth:`open`, which reads no timeseries. They stay in the
+    file until :meth:`read` asks for them. The constructor is internal: it
+    takes what a loader produces, not a file.
     """
 
     def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
@@ -77,8 +76,8 @@ class Network:
     ) -> Network:
         """Read a network from a result file.
 
-        Only the header and the topology are read. No timeseries is, until
-        :meth:`read`, :meth:`to_dataframe` or :meth:`to_dataset` asks for one.
+        Opening reads no timeseries. :meth:`read`, :meth:`to_dataframe` and
+        :meth:`to_dataset` read them when asked.
 
         Parameters
         ----------
@@ -158,8 +157,9 @@ class Network:
     def to_dataframe(self) -> pd.DataFrame:
         """Read every series in the network, labelled the way :meth:`read` labels them.
 
-        Each call reads the result file again. To read only some locations, or
-        one quantity, use :meth:`read`, which :meth:`addresses` feeds::
+        Meant for small networks: it holds every series in memory at once, and
+        each call reads the file again. To read only some locations, or one
+        quantity, use :meth:`read`, which :meth:`addresses` feeds::
 
             network.read([(a, "Discharge") for a in network.addresses(quantity="Discharge")])
 
@@ -181,16 +181,19 @@ class Network:
     def to_dataset(self) -> xr.Dataset:
         """Dataset of the timeseries, with each location's address alongside.
 
-        Reads every series, as :meth:`to_dataframe` does.
+        Meant for small networks: it reads every series, as :meth:`to_dataframe`
+        does.
 
         Returns
         -------
         xr.Dataset
-            One variable per quantity over ``(time, graph_node)``.
-            ``graph_node`` is the graph's integer, as :attr:`Location.graph_node`
-            gives it, and the ``node_id``, ``reach`` and ``position`` coordinates
-            carry the address, so a consumer never has to hold on to the
-            network to know what a column is. A node fills in ``node_id``, a
+            One variable per quantity over ``(time, graph_node)``. All of them
+            share one ``graph_node`` axis, holding every location that carries
+            any quantity; a variable is NaN where its location does not carry
+            it. ``graph_node`` is the graph's integer, as
+            :attr:`Location.graph_node` gives it, and the ``node_id``, ``reach``
+            and ``position`` coordinates carry the address, so a consumer never
+            has to hold on to the network to know what a column is. A node fills in ``node_id``, a
             breakpoint ``reach`` and ``position``, and the empty half says
             which it is::
 
@@ -293,7 +296,8 @@ class Network:
     def reaches(self) -> Mapping[str, NetworkReach]:
         """The network's reaches, by the id the model gave them.
 
-        Read-only.
+        Read-only. A mapping rather than a dict, so a reach's record may be
+        built when it is looked up rather than when the network is opened.
 
         Returns
         -------
@@ -368,8 +372,9 @@ class Network:
     ) -> KeyError:
         """Say which of the requested items cannot be read, and why each cannot.
 
-        All of them in one error. Kept to one line, since a KeyError renders its
-        message through repr and would show newlines raw.
+        One error for all of them: how many fail, and the first ones by name.
+        Kept to one line, since a KeyError renders its message through repr
+        and would show newlines raw.
         """
         faults = []
         for address, quantity in items:
@@ -404,10 +409,8 @@ class Network:
     ) -> pd.DataFrame:
         """Read the series named by ``(address, quantity)`` pairs.
 
-        Only the variables asked for are loaded, each as its whole time
-        series, in one batched call per file they live in. Each call opens the
-        file again, so asking for many items at once is cheaper than asking
-        for them one by one.
+        Each call opens the file once, however many items it asks for. So one
+        call with many items is faster than many calls with one item each.
 
         Parameters
         ----------
@@ -425,16 +428,17 @@ class Network:
         Returns
         -------
         pd.DataFrame
-            Time-indexed, one column per element of ``items``, in that order and
-            keeping duplicates. The columns are the items themselves, as asked
-            for rather than as snapped, so ``df[items[i]]`` selects the series
-            asked for.
+            Time-indexed over the file's whole period, one column per element
+            of ``items``, in that order and keeping duplicates. The columns are
+            the items themselves, as asked for rather than as snapped, so
+            ``df[items[i]]`` selects the series asked for.
 
         Raises
         ------
         KeyError
             If any item names a location the network does not have, or a
-            quantity that location does not carry. Every failing item is named.
+            quantity that location does not carry. The message says how many
+            items fail and names the first ones.
         ValueError
             If ``position_tol`` is negative or not finite, or if the items span
             the result file and its ``.resx`` companion and the two turn out to

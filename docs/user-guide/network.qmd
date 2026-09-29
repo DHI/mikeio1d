@@ -70,7 +70,7 @@ network.resolve(("100l1", 23.8), position_tol=0.1)
 # Location(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
 ```
 
-`read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed, and loads only the variables asked for, each as its whole time series, in one batched call per file:
+`read()` is what touches data. It takes `(address, quantity)` pairs, so the cross product is never formed. Each call opens the file once, however many pairs it asks for, so one call with many pairs is faster than many calls with one each:
 
 ```python
 points = network.addresses(reach="100l1", quantity="Discharge")
