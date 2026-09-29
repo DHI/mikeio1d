@@ -160,7 +160,7 @@ class TestResolvingAnAddress:
 
         column = network.to_dataset()["WaterLevel"].sel(graph_node=graph_node)
 
-        assert str(column["name"].item()) == "101"
+        assert str(column["node_id"].item()) == "101"
 
     def test_a_break_point_snaps_to_the_distance_the_file_stores(self, network):
         resolved = network.resolve(("100l1", 23.8), distance_tol=0.1)

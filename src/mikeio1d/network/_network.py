@@ -188,16 +188,16 @@ class Network:
         xr.Dataset
             One variable per quantity over ``(time, graph_node)``.
             ``graph_node`` is the graph's integer, as :attr:`Location.graph_node`
-            gives it, and the ``name``, ``reach`` and ``distance`` coordinates
+            gives it, and the ``node_id``, ``reach`` and ``distance`` coordinates
             carry the address, so a consumer never has to hold on to the
-            network to know what a column is. A node fills in ``name``, a break
+            network to know what a column is. A node fills in ``node_id``, a break
             point ``reach`` and ``distance``, and the empty half says which it
             is::
 
                 Coordinates:
                   * time        datetime64
                   * graph_node  int64       0 1 2 3 ...
-                    name        <U16        'J1' 'J2' '' ''
+                    node_id     <U16        'J1' 'J2' '' ''
                     reach       <U16        '' '' 'r1' 'r1'
                     distance    float64     nan nan 0.0 24.5
 
@@ -225,20 +225,20 @@ class Network:
             }
         )
 
-        names, reaches, distances = [], [], []
+        node_ids, reaches, distances = [], [], []
         for graph_node in ds.graph_node.to_numpy():
             address = self._graph.nodes[int(graph_node)]["address"]
             if _is_break_point(address):
                 reach, distance = address
-                names.append("")
+                node_ids.append("")
                 reaches.append(reach)
                 distances.append(distance)
             else:
-                names.append(address)
+                node_ids.append(address)
                 reaches.append("")
                 distances.append(np.nan)
         return ds.assign_coords(
-            name=("graph_node", np.array(names, dtype=str)),
+            node_id=("graph_node", np.array(node_ids, dtype=str)),
             reach=("graph_node", np.array(reaches, dtype=str)),
             distance=("graph_node", np.array(distances, dtype=float)),
         )
