@@ -57,6 +57,16 @@
 - A position past the last breakpoint of a reach of unknown length, such as an EPANET pipe's
   far end without its `.inp`, is refused with a message saying why, rather than one inviting a
   wider `position_tol` (#250).
+- A reach of unknown length has one breakpoint, at its start, rather than one at each end:
+  its far end has no known position. An EPANET network read without its `.inp` has 24 graph
+  nodes where it had 37, and 36 with its companions, since link `9` has no length in the
+  `.inp` either (#250).
+- `Network.read` snaps each item's position only onto a breakpoint carrying the item's
+  quantity, so a caller need not know the grid is staggered to choose a `position_tol`.
+  `Network.resolve` takes `quantity=` to do the same, and answers `None` exactly when `read`
+  would refuse. A position within 1e-3 of a breakpoint names it, is given back in the file's
+  spelling, and is never snapped away from it; `position_tol` only widens that window, and is
+  checked on every call (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
@@ -66,7 +76,7 @@
 - `network.BasicNode`, `network.BasicReach`, and building a `Network` from a sequence of reaches.
   A `Network` is now built with `Network.open`, which is how anything ever used it. The
   abstract element classes are gone too: `Network.reaches` holds plain frozen records with the
-  same attributes (#257).
+  same attributes (#250; #257 tracks bringing it back).
 - `Network.find` and `Network.recall`. Every member takes the model's names, `resolve` gives the
   graph integer for one, and each graph node's `address` attribute names it. A reach's end nodes
   are `reaches[reach_id].start` and `.end`, rather than `distance="start"`/`"end"` (#250).
