@@ -13,6 +13,11 @@
   position along it. A read loads only the variables it asks for, each as its whole time
   series (#250).
 - `Network.read(quantity=...)` reads one quantity at every location that carries it (#250).
+- `Network.open` takes a `Res1D` opened with `nodes=`, `reaches=` or `quantities=` as the
+  whole network, carrying only the series its filter lets through. It used to fail with a
+  bare `KeyError` on the first reach whose end node the filter left out. A `Res1D` opened with
+  `time=` or `step_every=` raises `NotImplementedError` (#250).
+- Every public member of `mikeio1d.network` has an example that runs as a doctest (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 
@@ -49,6 +54,9 @@
   `NetworkReach` are exported from `mikeio1d.network` (#250).
 - `ReachBreakpoint` is gone: `NetworkReach.breakpoints` holds the breakpoints' addresses,
   `(reach_id, position)` pairs that `Network.read` takes as they are (#250).
+- A position past the last breakpoint of a reach of unknown length, such as an EPANET pipe's
+  far end without its `.inp`, is refused with a message saying why, rather than one inviting a
+  wider `position_tol` (#250).
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
