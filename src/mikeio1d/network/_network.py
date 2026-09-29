@@ -469,7 +469,9 @@ class Network:
         df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
         return df
 
-    def addresses(self, *, reach: str | None = None, quantity: str | None = None) -> list[Address]:
+    def addresses(
+        self, *, reach: str | None = None, quantity: str | None = None
+    ) -> Sequence[Address]:
         """List the addresses this network can be read at.
 
         Where :meth:`resolve` goes from an address to what the network knows
@@ -491,9 +493,10 @@ class Network:
 
         Returns
         -------
-        list[str | tuple[str, float]]
+        Sequence[str | tuple[str, float]]
             Addresses, each of which :meth:`resolve` answers for and
-            :meth:`read` takes.
+            :meth:`read` takes. A sequence: it has a length, can be indexed and
+            can be iterated more than once. Pass it to ``list()`` for a list.
 
         Examples
         --------
