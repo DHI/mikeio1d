@@ -180,9 +180,9 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
             "n_breakpoints": int(reach.n_breakpoints),
             "breakpoints": [
                 {
-                    "id": _address_key(breakpoint.id),
-                    "position": _num(breakpoint.position),
-                    "quantities": carried.get(by_address[breakpoint.id], []),
+                    "id": _address_key(breakpoint),
+                    "position": _num(breakpoint[1]),
+                    "quantities": carried.get(by_address[breakpoint], []),
                 }
                 for breakpoint in reach.breakpoints
             ],

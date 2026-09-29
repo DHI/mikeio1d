@@ -551,7 +551,7 @@ class Network:
         if reach is None:
             addresses: Iterable[Address] = self._naming.graph_nodes
         elif reach in self._reaches:
-            addresses = [point.id for point in self._reaches[reach].breakpoints]
+            addresses = self._reaches[reach].breakpoints
         else:
             raise KeyError(f"addresses() found {self._naming.describe_miss((reach, 0.0))}")
 

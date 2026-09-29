@@ -34,12 +34,10 @@ from ._naming import Address
 from ._network import Network
 from ._types import Location
 from ._types import NetworkReach
-from ._types import ReachBreakpoint
 
 __all__ = [
     "Address",
     "Location",
     "Network",
     "NetworkReach",
-    "ReachBreakpoint",
 ]

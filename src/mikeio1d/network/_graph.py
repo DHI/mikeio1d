@@ -55,14 +55,14 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             lone_reach_by_pair[pair] = reach.id
             g0.add_edge(start_key, end_key, length=reach.length, boundary=False)
         else:
-            bp_keys = [bp.id for bp in reach.breakpoints]
+            bp_keys = list(reach.breakpoints)
             g0.add_nodes_from(bp_keys)
 
             # A breakpoint at the reach's own end is the same place as the end
             # node: tag the edge as a boundary and clamp it to 0.0, since the two
             # positions come from different sources and float noise would leave
             # a tiny non-zero length.
-            leading_diff = reach.breakpoints[0].position - reach.start_position
+            leading_diff = reach.breakpoints[0][1] - reach.start_position
             leading_is_boundary = abs(leading_diff) <= _POSITION_TOLERANCE
             leading_length = 0.0 if leading_is_boundary else leading_diff
             g0.add_edge(
@@ -79,7 +79,7 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
                 tail_length = None
                 tail_is_boundary = False
             else:
-                tail_diff = end_position - reach.breakpoints[-1].position
+                tail_diff = end_position - reach.breakpoints[-1][1]
                 tail_is_boundary = abs(tail_diff) <= _POSITION_TOLERANCE
                 tail_length = 0.0 if tail_is_boundary else tail_diff
             g0.add_edge(
@@ -94,9 +94,9 @@ def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
             current_ = reach.breakpoints[i]
             next_ = reach.breakpoints[i + 1]
             g0.add_edge(
-                current_.id,
-                next_.id,
-                length=next_.position - current_.position,
+                current_,
+                next_,
+                length=next_[1] - current_[1],
                 boundary=False,
             )
 

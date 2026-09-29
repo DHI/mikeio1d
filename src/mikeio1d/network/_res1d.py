@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 from ._results import _Results
 from ._results import _Series
-from ._types import NetworkReach, ReachBreakpoint
+from ._types import NetworkReach
 
 
 def _path_of(file: str | Path | Res1D) -> Path:
@@ -159,7 +159,7 @@ def _build_reach_breakpoints(
     *,
     length: float | None,
     series_by_key: Mapping[_SeriesKey, dict[str, _Series]],
-) -> tuple[list[ReachBreakpoint], dict[Address, dict[str, _Series]]]:
+) -> tuple[list[tuple[str, float]], dict[Address, dict[str, _Series]]]:
     """Build a reach's breakpoints from its mikeio1d gridpoints, and what each carries.
 
     A reach with gridpoints of its own gets one breakpoint per gridpoint, at
@@ -180,14 +180,14 @@ def _build_reach_breakpoints(
         ends = [0.0] if length is None else [0.0, length]
         positions_per_gridpoint = [ends for _ in gridpoints]
 
-    breakpoints: list[ReachBreakpoint] = []
+    breakpoints: list[tuple[str, float]] = []
     series: dict[Address, dict[str, _Series]] = {}
     for i, (gp, positions) in enumerate(zip(gridpoints, positions_per_gridpoint)):
         carried = series_by_key[(reach.name, i)]
         for position in positions:
-            point = ReachBreakpoint(gp.reach_name, position)
+            point = (gp.reach_name, position)
             breakpoints.append(point)
-            series[point.id] = carried
+            series[point] = carried
     return breakpoints, series
 
 

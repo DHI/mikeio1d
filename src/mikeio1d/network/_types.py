@@ -17,31 +17,6 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class ReachBreakpoint:
-    """A location along a reach, between its two end nodes.
-
-    Attributes
-    ----------
-    reach_id : str
-        The reach the breakpoint sits on.
-    position : float
-        Where the breakpoint sits along the reach, in the reach's own frame: a
-        place, not a size. It need not be measured from the start node: a MIKE
-        river reach reports its chainage, a coordinate along the whole branch,
-        so the distance from the start node is
-        ``position - reach.start_position``.
-    """
-
-    reach_id: str
-    position: float
-
-    @property
-    def id(self) -> tuple[str, float]:
-        """``(reach_id, position)``, which uniquely locates the breakpoint."""
-        return (self.reach_id, self.position)
-
-
-@dataclass(frozen=True)
 class NetworkReach:
     """A directed connection between two nodes, and the breakpoints along it.
 
@@ -63,7 +38,9 @@ class NetworkReach:
         in. Zero where they are measured from the reach's own start; a MIKE river
         reach places them at their chainage, so it can begin thousands of metres
         in - or below zero.
-    breakpoints : tuple of ReachBreakpoint
+    breakpoints : tuple of (str, float)
+        The addresses of the breakpoints along the reach, each a
+        ``(reach_id, position)`` pair as :meth:`Network.read` takes it.
         Ascending by position; consecutive differences are edge lengths. A reach
         with breakpoints gets its own chain of graph nodes. A reach with none
         is a single start-to-end edge, and :class:`Network` refuses two of those
@@ -75,7 +52,7 @@ class NetworkReach:
     end: str
     length: float | None = None
     start_position: float = 0.0
-    breakpoints: tuple[ReachBreakpoint, ...] = ()
+    breakpoints: tuple[tuple[str, float], ...] = ()
 
     @property
     def end_position(self) -> float | None:

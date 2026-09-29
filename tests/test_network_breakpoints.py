@@ -76,8 +76,8 @@ def test_every_reach_lists_its_breakpoints_ascending(filename):
     unordered = [
         reach_id
         for reach_id, reach in network.reaches.items()
-        if [bp.position for bp in reach.breakpoints]
-        != sorted(bp.position for bp in reach.breakpoints)
+        if [position for _, position in reach.breakpoints]
+        != sorted(position for _, position in reach.breakpoints)
     ]
 
     assert unordered == []

@@ -230,7 +230,7 @@ class TestListingAddresses:
         """Without the .inp a pipe has no length, so there is no position for its far end."""
         alone = Network.open(_EPANET_RES, companions=[])
 
-        assert [point.id for point in alone.reaches["10"].breakpoints] == [("10", 0.0)]
+        assert alone.reaches["10"].breakpoints == (("10", 0.0),)
         assert alone.addresses(reach="10") == [("10", 0.0)]
 
     def test_both_breakpoints_are_listed_once_the_inp_gives_a_length(self, epanet):
