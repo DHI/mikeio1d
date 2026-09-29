@@ -135,7 +135,7 @@ def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, An
         recognisable even if the numbering were to change, plus the address map
         itself so that the numbering is pinned too.
     """
-    graph = network.graph
+    graph = network.to_networkx()
     addresses = {node: graph.nodes[node]["address"] for node in graph.nodes}
 
     edges = []
@@ -150,7 +150,7 @@ def _describe_graph(network: Any, carried: dict[int, list[str]]) -> dict[str, An
         "edges": edges,
         "nodes": nodes,
         "address_map": {
-            _address_key(address): int(graph_node) for graph_node, address in network.graph.nodes(data="address")
+            _address_key(address): int(graph_node) for graph_node, address in graph.nodes(data="address")
         },
     }
 
@@ -170,7 +170,7 @@ def _describe_reaches(network: Any, carried: dict[int, list[str]]) -> dict[str, 
     dict
         One entry per reach id.
     """
-    by_address = {address: int(node) for node, address in network.graph.nodes(data="address")}
+    by_address = {address: int(node) for node, address in network.to_networkx().nodes(data="address")}
     described = {}
     for reach_id, reach in network.reaches.items():
         described[str(reach_id)] = {
@@ -234,7 +234,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
         graph labels each integer with.
     """
     found = {}
-    for _, address in network.graph.nodes(data="address"):
+    for _, address in network.to_networkx().nodes(data="address"):
         found[_address_key(address)] = int(network.resolve(address).graph_node)
 
     endpoints = {}
@@ -243,7 +243,7 @@ def _describe_lookups(network: Any) -> dict[str, Any]:
             endpoints[f"{reach_id}@{where}"] = int(network.resolve(node).graph_node)
 
     recalled = {}
-    for graph_node, address in sorted(network.graph.nodes(data="address")):
+    for graph_node, address in sorted(network.to_networkx().nodes(data="address")):
         if isinstance(address, tuple):
             entry = {"reach": address[0], "position": _num(address[1])}
         else:
@@ -274,14 +274,15 @@ def describe(network: Any) -> dict[str, Any]:
     df = network.to_dataframe()
     # Keyed by graph integer, as the snapshots were taken, so they pin the same
     # values whatever the frame's own labels.
-    by_address = {address: int(node) for node, address in network.graph.nodes(data="address")}
+    graph = network.to_networkx()
+    by_address = {address: int(node) for node, address in graph.nodes(data="address")}
     df.columns = [(by_address[address], quantity) for address, quantity in df.columns]
     carried = _carried(df)
     return {
         "counts": {
             "reaches": len(network.reaches),
-            "graph_nodes": int(network.graph.number_of_nodes()),
-            "graph_edges": int(network.graph.number_of_edges()),
+            "graph_nodes": int(graph.number_of_nodes()),
+            "graph_edges": int(graph.number_of_edges()),
         },
         "quantities": sorted(str(q) for q in network.quantities),
         "graph": _describe_graph(network, carried),

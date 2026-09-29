@@ -152,7 +152,7 @@ class TestResolvingAnAddress:
     def test_the_graph_node_is_the_integer_labelled_with_the_address(self, network):
         resolved = network.resolve(("100l1", 23.8), position_tol=0.1)
 
-        assert network.graph.nodes[resolved.graph_node]["address"] == resolved.address
+        assert network.to_networkx().nodes[resolved.graph_node]["address"] == resolved.address
 
     def test_the_graph_node_selects_the_location_in_the_dataset(self, network):
         """The integer is what to_dataset() is indexed by, and names the same place."""
@@ -372,13 +372,9 @@ class TestReadingSeries:
 class TestTheGraph:
     """What the graph lets a caller do to it."""
 
-    def test_it_cannot_be_edited_under_the_lookups(self, network):
-        with pytest.raises(nx.NetworkXError, match="Frozen"):
-            network.graph.add_node(-1)
-
-    def test_a_copy_of_it_can(self, network):
-        graph = network.graph.copy()
+    def test_editing_it_leaves_the_network_as_it_was(self, network):
+        graph = network.to_networkx()
 
         graph.add_node(-1)
 
-        assert -1 not in network.graph
+        assert -1 not in network.to_networkx()

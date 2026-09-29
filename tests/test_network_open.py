@@ -42,13 +42,13 @@ class TestWhatOpenAccepts:
         from_str = Network.open(_RES1D)
         from_path = Network.open(Path(_RES1D))
 
-        assert from_str.graph.number_of_nodes() == from_path.graph.number_of_nodes()
+        assert from_str.to_networkx().number_of_nodes() == from_path.to_networkx().number_of_nodes()
 
     def test_a_res1d_opened_with_a_path_is_read(self):
         """Res1D documents a Path file_path, so a network has to cope with one."""
         network = Network.open(Res1D(Path(_RES1D)))
 
-        assert network.graph.number_of_nodes() == Network.open(_RES1D).graph.number_of_nodes()
+        assert network.to_networkx().number_of_nodes() == Network.open(_RES1D).to_networkx().number_of_nodes()
 
     def test_anything_else_is_a_type_error(self):
         with pytest.raises(TypeError, match="str, Path or Res1D"):
@@ -72,7 +72,7 @@ class TestCompanionDiscovery:
         start = network.resolve((_PIPE, 0.0)).graph_node
         end = network.resolve((_PIPE, _PIPE_LENGTH)).graph_node
 
-        assert network.graph.edges[start, end]["length"] == pytest.approx(_PIPE_LENGTH)
+        assert network.to_networkx().edges[start, end]["length"] == pytest.approx(_PIPE_LENGTH)
 
     def test_an_empty_list_refuses_them(self, tmp_path):
         res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
@@ -233,7 +233,7 @@ def test_a_pipe_the_inp_gives_no_length_for_has_one_breakpoint(tmp_path):
     )
 
     network = Network.open(res)
-    addresses = [network.graph.nodes[node]["address"] for node in network.graph.nodes]
+    addresses = [address for _, address in network.to_networkx().nodes(data="address")]
 
     assert _lengths(network)[_PIPE] is None
     assert [address for address in addresses if isinstance(address, tuple) and address[0] == _PIPE] == [

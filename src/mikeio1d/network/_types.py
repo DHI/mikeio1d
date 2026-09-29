@@ -102,7 +102,7 @@ class Location:
         The quantity IDs readable there. Empty is an answer: the location is
         in the network but carries nothing of its own.
     graph_node : int
-        The integer :attr:`Network.graph` and :meth:`Network.to_dataset` label
+        The integer :meth:`Network.to_networkx` and :meth:`Network.to_dataset` label
         the location with, which ``graph.nodes[graph_node]["address"]`` turns
         back into the address. Every location has one, a breakpoint too.
     """

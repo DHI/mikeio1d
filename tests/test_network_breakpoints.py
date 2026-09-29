@@ -52,7 +52,7 @@ def test_every_reach_keeps_a_chain_of_its_own(filename):
     ``Network`` refuses when neither has breakpoints to be told apart by.
     """
     path = str(_TESTDATA / filename)
-    graph = _open(filename).graph
+    graph = _open(filename).to_networkx()
 
     breakpoints = [node for node in graph.nodes if isinstance(graph.nodes[node]["address"], tuple)]
 

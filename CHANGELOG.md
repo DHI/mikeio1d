@@ -4,7 +4,7 @@
 
 ### Added
 - `mikeio1d.network`: build a graph-shaped `Network` from a result file, with
-  `Network.open`, `Network.reaches`, `Network.graph`, `to_dataframe`/`to_dataset`, and the
+  `Network.open`, `Network.reaches`, `to_networkx`, `to_dataframe`/`to_dataset`, and the
   EPANET `.resx`/`.inp` companions. Needs the new `network` extra
   (`pip install mikeio1d[network]`).
 - `Network.period`, `Network.quantities`, `Network.resolve`, `Network.addresses` and
@@ -40,8 +40,8 @@
   and its `sel` option is gone: read one quantity with `Network.read` and
   `Network.addresses(quantity=...)`. `to_dataset`'s integer dimension is named
   `graph_node`, and its coordinate for a model node's id `node_id` (#250).
-- `Network.graph` is read-only; `network.graph.copy()` gives one to edit. `Network.copy` and
-  `Network.release` are gone (#250).
+- `Network.graph` is now the method `Network.to_networkx()`, which builds a new graph the
+  caller is free to edit on each call. `Network.copy` and `Network.release` are gone (#250).
 - A place along a reach is a `position`, not a `distance`: `ReachBreakpoint.position`,
   `NetworkReach.start_position` and `end_position`, the `position_tol` argument of `resolve`
   and `read`, and `to_dataset`'s `position` coordinate (#250).

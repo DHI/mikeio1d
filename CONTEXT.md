@@ -19,7 +19,7 @@ The words the network module's API and docs use, and what each one means.
   its own always means a model node.
 
 **Graph node**
-: The integer that labels a location in `Network.graph`. Every location has one, a
+: The integer that labels a location in `Network.to_networkx()`. Every location has one, a
   breakpoint too. `Location.graph_node` gives it, `to_dataset()` is indexed by it, and
   `graph.nodes[graph_node]["address"]` turns it back into the address.
 

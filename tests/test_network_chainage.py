@@ -49,7 +49,7 @@ def _chain_nodes(network, reach_id):
     A breakpoint's address names the reach it belongs to, so one reach's chain
     can be read off the graph without asking the network for its reaches.
     """
-    addresses = {node: network.graph.nodes[node]["address"] for node in network.graph.nodes}
+    addresses = dict(network.to_networkx().nodes(data="address"))
     breakpoints = sorted(
         (address[1], node)
         for node, address in addresses.items()
@@ -67,14 +67,15 @@ def _chain_nodes(network, reach_id):
 def _end_edges(network, reach_id):
     """The two edges joining a reach's own nodes to its outermost breakpoints."""
     chain = _chain_nodes(network, reach_id)
-
-    return network.graph.edges[chain[0], chain[1]], network.graph.edges[chain[-2], chain[-1]]
+    graph = network.to_networkx()
+    return graph.edges[chain[0], chain[1]], graph.edges[chain[-2], chain[-1]]
 
 
 def _chain_lengths(network, reach_id):
     """Every edge length along one reach, start node through to end node."""
     chain = _chain_nodes(network, reach_id)
-    return [network.graph.edges[a, b]["length"] for a, b in zip(chain, chain[1:])]
+    graph = network.to_networkx()
+    return [graph.edges[a, b]["length"] for a, b in zip(chain, chain[1:])]
 
 
 class TestAReachThatDoesNotStartAtZero:
@@ -114,7 +115,7 @@ class TestEveryFixture:
     @pytest.mark.parametrize("filename", _EVERY_FIXTURE)
     def test_no_edge_has_a_negative_length(self, filename):
         """A negative length is a chainage read in the wrong frame."""
-        graph = Network.open(str(_TESTDATA / filename)).graph
+        graph = Network.open(str(_TESTDATA / filename)).to_networkx()
 
         lengths = [attrs["length"] for _, _, attrs in graph.edges(data=True)]
 

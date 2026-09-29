@@ -41,7 +41,7 @@ class Network:
 
     A result file names a location the way the model did: a node id, or a reach
     and a position along it, and every member here takes and gives those names.
-    :attr:`graph` is labelled with integers instead, each node carrying its name
+    :meth:`to_networkx` is labelled with integers instead, each node carrying its name
     as the ``address`` attribute, and :meth:`resolve` gives the integer for a
     name - see :attr:`Location.graph_node`.
 
@@ -243,14 +243,51 @@ class Network:
             position=("graph_node", np.array(positions, dtype=float)),
         )
 
-    @property
-    def graph(self) -> nx.Graph:
-        """Graph of the network, read-only.
+    def to_networkx(self) -> nx.Graph:
+        """Build the network as an undirected networkx graph.
 
-        Its lookups are built from it once, so it cannot change under them.
-        ``network.graph.copy()`` gives a graph to edit.
+        Each call builds a new graph, which the caller is free to edit. Hold on
+        to it rather than calling this again.
+
+        A reach becomes a chain of edges: its start node, its breakpoints in
+        order, its end node. The graph is undirected; which way a reach runs is
+        in ``reaches[reach_id].start`` and ``.end``.
+
+        Returns
+        -------
+        nx.Graph
+            Nodes are graph nodes, the integers :attr:`Location.graph_node`
+            gives. Nodes and edges carry at least these attributes:
+
+            * node ``address`` -- the location's address: a model node's id,
+              or a ``(reach_id, position)`` breakpoint.
+            * edge ``length`` -- the distance between the edge's two ends, in
+              the reach's own units. ``None`` where the reach's length is not
+              known, which is only on the edge into its end node: an EPANET
+              pipe read without its ``.inp`` has no length.
+            * edge ``boundary`` -- ``True`` where both ends are the same place,
+              a breakpoint sitting on its reach's end node. Its length is
+              ``0.0``.
+
+        Examples
+        --------
+        >>> graph = network.to_networkx()  # doctest: +SKIP
+
+        From a graph node back to its address:
+
+        >>> graph.nodes[network.resolve("101").graph_node]["address"]  # doctest: +SKIP
+        '101'
+
+        The shortest route between two nodes by length. It fails where an
+        edge's length is ``None``, as for EPANET without its ``.inp``:
+
+        >>> start = network.resolve("100").graph_node  # doctest: +SKIP
+        >>> end = network.resolve("99").graph_node  # doctest: +SKIP
+        >>> route = nx.shortest_path(graph, start, end, weight="length")  # doctest: +SKIP
+        >>> [graph.nodes[n]["address"] for n in route]  # doctest: +SKIP
+        ['100', ('100l1', 0.0), ('100l1', 23.8413574216414), ('100l1', 47.6827148432828), '99']
         """
-        return nx.freeze(self._graph)
+        return self._graph.copy()
 
     @property
     def reaches(self) -> Mapping[str, NetworkReach]:

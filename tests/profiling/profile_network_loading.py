@@ -124,7 +124,7 @@ def main() -> None:
         summary = (
             elapsed,
             elapsed_cpu,
-            network.graph.number_of_nodes(),
+            network.to_networkx().number_of_nodes(),
             len(network.reaches),
             sorted(network.quantities),
         )

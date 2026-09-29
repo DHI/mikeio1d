@@ -55,7 +55,7 @@ class TestIdentityCoordinates:
 
         for graph_node in ds.graph_node.values:
             node_id, reach, position = _at(ds, graph_node)
-            address = epanet.graph.nodes[int(graph_node)]["address"]
+            address = epanet.to_networkx().nodes[int(graph_node)]["address"]
 
             if isinstance(address, str):
                 assert (node_id, reach) == (address, "")
