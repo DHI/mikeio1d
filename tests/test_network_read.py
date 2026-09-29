@@ -369,6 +369,31 @@ class TestReadingSeries:
         assert "cannot read 2 of the 2" in str(failure.value)
 
 
+class TestReadingOneQuantity:
+    """read(quantity=...) as the short form of listing a quantity's addresses."""
+
+    def test_it_reads_what_the_listed_addresses_read(self, network):
+        items = [(a, "Discharge") for a in network.addresses(quantity="Discharge")]
+
+        pd.testing.assert_frame_equal(network.read(quantity="Discharge"), network.read(items))
+
+    def test_a_quantity_carried_nowhere_is_refused_with_what_is_carried(self, network):
+        with pytest.raises(KeyError, match="no location carrying 'Volume'.*WaterLevel"):
+            network.read(quantity="Volume")
+
+    def test_neither_items_nor_quantity_is_refused(self, network):
+        with pytest.raises(TypeError, match="either items or quantity"):
+            network.read()
+
+    def test_both_items_and_quantity_are_refused(self, network):
+        with pytest.raises(TypeError, match="either items or quantity"):
+            network.read([("101", "WaterLevel")], quantity="WaterLevel")
+
+    def test_a_tolerance_with_a_quantity_is_refused(self, network):
+        with pytest.raises(TypeError, match="position_tol only with items"):
+            network.read(quantity="Discharge", position_tol=0.1)
+
+
 class TestTheGraph:
     """What the graph lets a caller do to it."""
 

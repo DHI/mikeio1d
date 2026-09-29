@@ -79,6 +79,8 @@ network.read([(point, "Discharge") for point in points])
 
 A location that does not carry the quantity asked for is a `KeyError` naming what it does carry, not a column of `NaN`. `read()` also takes a `position_tol`, so a measured chainage can be read without resolving it first.
 
+To read one quantity at every location that carries it, pass it on its own: `network.read(quantity="Discharge")`.
+
 `to_dataframe()` and `to_dataset()` read every location in the same way, for a caller that does want the whole network. `to_dataframe()` labels its columns `(address, quantity)`, as `read()` does; `to_dataset()` indexes locations by their graph integer and carries each one's name alongside.
 
 ::: {.callout-note}

@@ -12,6 +12,7 @@
   caller turns out to need, by the names the model used - a node ID, or a reach and a
   position along it. A read loads only the variables it asks for, each as its whole time
   series (#250).
+- `Network.read(quantity=...)` reads one quantity at every location that carries it (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
 
@@ -37,8 +38,7 @@
   `graph.nodes[graph_node]["address"]` goes back (#250).
 - `Network.period` is a property, like `Network.quantities` (#250).
 - `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
-  and its `sel` option is gone: read one quantity with `Network.read` and
-  `Network.addresses(quantity=...)`. `to_dataset`'s integer dimension is named
+  and its `sel` option is gone: read one quantity with `Network.read(quantity=...)`. `to_dataset`'s integer dimension is named
   `graph_node`, and its coordinate for a model node's id `node_id` (#250).
 - `Network.graph` is now the method `Network.to_networkx()`, which builds a new graph the
   caller is free to edit on each call. `Network.copy` and `Network.release` are gone (#250).

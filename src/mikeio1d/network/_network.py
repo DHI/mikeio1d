@@ -159,9 +159,9 @@ class Network:
 
         Meant for small networks: it holds every series in memory at once, and
         each call reads the file again. To read only some locations, or one
-        quantity, use :meth:`read`, which :meth:`addresses` feeds::
+        quantity, use :meth:`read`::
 
-            network.read([(a, "Discharge") for a in network.addresses(quantity="Discharge")])
+            network.read(quantity="Discharge")
 
         Returns
         -------
@@ -403,11 +403,14 @@ class Network:
 
     def read(
         self,
-        items: Sequence[tuple[Address, str]],
+        items: Sequence[tuple[Address, str]] | None = None,
         *,
+        quantity: str | None = None,
         position_tol: float | None = None,
     ) -> pd.DataFrame:
-        """Read the series named by ``(address, quantity)`` pairs.
+        """Read the series named by ``(address, quantity)`` pairs, or one quantity everywhere.
+
+        Pass either ``items`` or ``quantity``, not both.
 
         Each call opens the file once, however many items it asks for. So one
         call with many items is faster than many calls with one item each.
@@ -419,11 +422,15 @@ class Network:
             along it, as :meth:`addresses` gives and :meth:`resolve` confirms.
             An empty sequence reads nothing at all, and returns an empty frame
             rather than the whole file.
+        quantity : str, optional
+            A quantity to read at every location that carries it, in place of
+            ``items``. The same as passing
+            ``[(a, quantity) for a in addresses(quantity=quantity)]``.
         position_tol : float, optional
             How far a position may be from a breakpoint's own and still mean
             it. Defaults to 1e-3, enough to absorb a rounded float. Widen it to
             snap a measured chainage onto the model's; the nearest breakpoint
-            inside the window wins. Ignored for a node ID.
+            inside the window wins. Ignored for a node ID. Only with ``items``.
 
         Returns
         -------
@@ -438,7 +445,11 @@ class Network:
         KeyError
             If any item names a location the network does not have, or a
             quantity that location does not carry. The message says how many
-            items fail and names the first ones.
+            items fail and names the first ones. For ``quantity``, if no
+            location in the network carries it.
+        TypeError
+            If neither or both of ``items`` and ``quantity`` are given, or
+            ``position_tol`` is given with ``quantity``.
         ValueError
             If ``position_tol`` is negative or not finite, or if the items span
             the result file and its ``.resx`` companion and the two turn out to
@@ -447,6 +458,10 @@ class Network:
         Examples
         --------
         >>> network.read([("101", "WaterLevel")])  # doctest: +SKIP
+
+        One quantity at every location that carries it:
+
+        >>> network.read(quantity="Discharge")  # doctest: +SKIP
 
         A measured chainage, snapped onto the model's nearest breakpoint:
 
@@ -458,19 +473,41 @@ class Network:
         >>> points = network.addresses(reach="100l1", quantity="Discharge")  # doctest: +SKIP
         >>> network.read([(point, "Discharge") for point in points])  # doctest: +SKIP
         """
+        if (items is None) == (quantity is None):
+            raise TypeError("read() takes either items or quantity, not both and not neither.")
+        if quantity is not None:
+            return self._read_quantity(quantity, position_tol)
+
         results = self._results
         # Every item is checked before anything is read.
         resolved: list[tuple[Address, str]] = []
-        for address, quantity in items:
+        for address, item_quantity in items:
             found = self._naming.canonical(address, position_tol=position_tol)
-            if found is None or quantity not in results.quantities_at(found):
+            if found is None or item_quantity not in results.quantities_at(found):
                 raise self._blame_unreadable(items, results, position_tol)
-            resolved.append((found, quantity))
+            resolved.append((found, item_quantity))
 
         df = results.read(resolved)
         # A flat index: an address can itself be a tuple, which a MultiIndex
         # would split.
         df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
+        return df
+
+    def _read_quantity(self, quantity: str, position_tol: float | None) -> pd.DataFrame:
+        if position_tol is not None:
+            raise TypeError(
+                "read() takes position_tol only with items: a quantity is read at the "
+                "addresses the network already has, so there is no position to snap."
+            )
+        items = [(address, quantity) for address in self.addresses(quantity=quantity)]
+        if not items:
+            raise KeyError(
+                f"read() found no location carrying {quantity!r}. The network carries "
+                f"{list(self.quantities)}."
+            )
+        # The addresses come from the network, so they need no resolving.
+        df = self._results.read(items)
+        df.columns = pd.Index(items, tupleize_cols=False, name="item")
         return df
 
     def addresses(
