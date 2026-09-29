@@ -15,9 +15,13 @@ from mikeio1d.network import _companions
 from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
 from mikeio1d.network._inp import read_pipe_lengths
 from mikeio1d.network._loader import _refuse_or_warn_catchments
+from mikeio1d.network._res1d import _load_res1d_network
+from mikeio1d.network._results import _Results
+from mikeio1d.network._results import _Series
 
 _TESTDATA = Path(__file__).parent / "testdata"
 _RES1D = str(_TESTDATA / "network.res1d")
+_RIVER = str(_TESTDATA / "network_river.res1d")
 _EPANET_RES = str(_TESTDATA / "epanet.res")
 _EPANET_RESX = str(_TESTDATA / "epanet.resx")
 _PIPE, _PUMP = "10", "9"
@@ -412,3 +416,36 @@ class TestWhatNoFixtureCanReach:
 
         with pytest.raises(ValueError, match=message):
             _companions._open_companion_result(epanet_res, _resx_like(epanet_res, **changes))
+
+    @pytest.mark.parametrize(
+        "count, listed",
+        [(1, r"'n0'\.$"), (12, r"'n9', \.\.\. and 2 more\.$")],
+    )
+    def test_a_node_no_reach_ends_at_is_left_out_with_a_warning(self, epanet_res, count, listed):
+        """Every fixture's nodes all end some reach."""
+        res = SimpleNamespace(
+            file_path="model.res1d",
+            nodes=dict.fromkeys(f"n{i}" for i in range(count)),
+            reaches={},
+            start_time=epanet_res.start_time,
+            end_time=epanet_res.end_time,
+        )
+
+        with pytest.warns(UserWarning, match=rf"{count} node\(s\) of 'model.res1d'.*{listed}"):
+            _load_res1d_network(res, series_by_key={}, units={})
+
+    def test_two_files_on_different_time_axes_are_not_read_together(self):
+        """A .resx on another axis but the same period would reach this; no fixture is one."""
+        own = Res1D(_RES1D).nodes["101"].WaterLevel.timeseries_id
+        other = Res1D(_RIVER).nodes["'basin_left1', 0"].WaterLevel.timeseries_id
+        results = _Results(
+            series={
+                "101": {"WaterLevel": _Series(Path(_RES1D), own)},
+                "basin": {"WaterLevel": _Series(Path(_RIVER), other)},
+            },
+            units={},
+            period=(None, None),
+        )
+
+        with pytest.raises(ValueError, match="does not share a time axis"):
+            results.read([("101", "WaterLevel"), ("basin", "WaterLevel")])
