@@ -320,14 +320,15 @@ class Network:
 
     @property
     def period(self) -> tuple[datetime, datetime]:
-        """First and last timestep of the result file.
+        """First and last timestep of the series this network reads.
 
-        Read from the file header, so no timeseries is loaded.
+        Every frame :meth:`read` returns spans it. Read from the file header, so
+        no timeseries is loaded.
 
         Returns
         -------
         tuple[datetime, datetime]
-            Start and end of the result file's time axis.
+            Start and end of the network's time axis.
 
         Examples
         --------
@@ -442,7 +443,7 @@ class Network:
         Returns
         -------
         pd.DataFrame
-            Time-indexed over the file's whole period, one column per element
+            Time-indexed over :attr:`period`, one column per element
             of ``items``, in that order and keeping duplicates. The columns are
             the items themselves, as asked for rather than as snapped, so
             ``df[items[i]]`` selects the series asked for.
