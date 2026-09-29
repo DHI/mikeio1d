@@ -13,7 +13,6 @@ from mikeio1d import Res1D
 from mikeio1d.network import Network
 from mikeio1d.network import _companions
 from mikeio1d.network._companions import _refuse_clashes, _rekey_by_main_file
-from mikeio1d.network._inp import read_pipe_lengths
 from mikeio1d.network._loader import _refuse_or_warn_catchments
 from mikeio1d.network._res1d import _load_res1d_network
 from mikeio1d.network._results import _Results
@@ -107,40 +106,30 @@ class TestAFilteredRes1D:
 
 
 class TestCompanionDiscovery:
-    """Left alone, a load picks up the companions beside the result file."""
+    """Left alone, a load picks up the companion beside the result file."""
 
-    def test_both_companions_are_found(self, tmp_path):
-        res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
+    def test_the_resx_is_found(self, tmp_path):
+        res = _copy(tmp_path, "epanet", ".res", ".resx")
 
         network = Network.open(res)
 
-        assert _lengths(network)[_PIPE] == pytest.approx(_PIPE_LENGTH)
         assert "Volume" in network.quantities
 
-    def test_the_graph_carries_the_length_read_from_the_inp(self, tmp_path):
-        """A link-node reach's two breakpoints sit one reach length apart."""
-        network = Network.open(_copy(tmp_path, "epanet", ".res", ".inp"))
-        start = network.resolve((_PIPE, 0.0)).graph_node
-        end = network.resolve((_PIPE, _PIPE_LENGTH)).graph_node
-
-        assert network.to_networkx().edges[start, end]["length"] == pytest.approx(_PIPE_LENGTH)
-
-    def test_an_empty_list_refuses_them(self, tmp_path):
-        res = _copy(tmp_path, "epanet", ".res", ".resx", ".inp")
+    def test_an_empty_list_refuses_it(self, tmp_path):
+        res = _copy(tmp_path, "epanet", ".res", ".resx")
 
         network = Network.open(res, companions=[])
 
-        assert _lengths(network)[_PIPE] is None
         assert "Volume" not in network.quantities
 
     def test_a_named_companion_need_not_be_a_sibling(self, tmp_path):
         res = _copy(tmp_path, "epanet", ".res")
-        elsewhere = tmp_path / "elsewhere.inp"
-        shutil.copy(_TESTDATA / "epanet.inp", elsewhere)
+        elsewhere = tmp_path / "elsewhere.resx"
+        shutil.copy(_TESTDATA / "epanet.resx", elsewhere)
 
         network = Network.open(res, companions=[elsewhere])
 
-        assert _lengths(network)[_PIPE] == pytest.approx(_PIPE_LENGTH)
+        assert "Volume" in network.quantities
 
     def test_an_opened_companion_is_accepted(self, tmp_path):
         res = _copy(tmp_path, "epanet", ".res", ".resx")
@@ -149,16 +138,59 @@ class TestCompanionDiscovery:
 
         assert "Volume" in network.quantities
 
-    def test_a_mike_result_ignores_an_inp_beside_it(self, tmp_path):
+    def test_an_inp_beside_the_result_is_not_read(self, tmp_path):
+        """The '.res' carries the lengths, so an input file beside it is no companion."""
+        res = _copy(tmp_path, "epanet", ".res")
+        (tmp_path / "model.inp").write_text("[JUNCTIONS]\n", encoding="utf-8")
+
+        network = Network.open(res)
+
+        assert _lengths(network) == _lengths(Network.open(_EPANET_RES, companions=[]))
+
+    def test_a_mike_result_ignores_a_resx_beside_it(self, tmp_path):
         """Only EPANET writes companions this reader knows.
 
-        A ``.res1d`` sharing a folder and stem with somebody else's EPANET input
-        would otherwise take its reach lengths from another model.
+        A ``.res1d`` sharing a folder and stem with somebody else's EPANET result
+        would otherwise take on another model's series.
         """
         res = _copy(tmp_path, "network", ".res1d")
-        shutil.copy(_TESTDATA / "epanet.inp", tmp_path / "model.inp")
+        shutil.copy(_TESTDATA / "epanet.resx", tmp_path / "model.resx")
 
-        assert _lengths(Network.open(res)) == _lengths(Network.open(_RES1D))
+        assert list(Network.open(res).quantities) == list(Network.open(_RES1D).quantities)
+
+
+class TestLengths:
+    """An EPANET reach's length comes from the '.res' itself."""
+
+    def test_a_pipe_has_the_length_the_model_gave_it(self):
+        """Stored as a float32, and given back as the model wrote it."""
+        network = Network.open(_EPANET_RES, companions=[])
+
+        assert network.reaches[_PIPE].length == _PIPE_LENGTH
+
+    def test_the_graph_carries_it_between_the_pipe_ends(self):
+        """A link-node reach's two breakpoints sit one reach length apart."""
+        network = Network.open(_EPANET_RES, companions=[])
+        start = network.resolve((_PIPE, 0.0)).graph_node
+        end = network.resolve((_PIPE, _PIPE_LENGTH)).graph_node
+
+        assert network.to_networkx().edges[start, end]["length"] == _PIPE_LENGTH
+
+    def test_only_the_pump_has_none(self):
+        lengths = _lengths(Network.open(_EPANET_RES, companions=[]))
+
+        assert [reach for reach, length in lengths.items() if length is None] == [_PUMP]
+
+    def test_a_reach_without_a_length_has_one_breakpoint(self):
+        """Its far end has no position, so it is not given one at 0.0 as well.
+
+        Two breakpoints at 0.0 would share one key: the graph would get a
+        zero-length self-loop, one edge more than the count
+        test_network_breakpoints.py checks.
+        """
+        network = Network.open(_EPANET_RES, companions=[])
+
+        assert network.addresses(reach=_PUMP) == [(_PUMP, 0.0)]
 
 
 class TestCompanionErrors:
@@ -168,34 +200,34 @@ class TestCompanionErrors:
         with pytest.raises(ValueError, match="not a companion"):
             Network.open(_EPANET_RES, companions=[_RES1D])
 
-    @pytest.mark.parametrize("suffix", [".inp", ".resx"])
-    def test_two_of_a_kind_are_refused(self, suffix):
-        companion = str(_TESTDATA / f"epanet{suffix}")
+    def test_an_inp_is_refused(self):
+        """It used to supply reach lengths, which the '.res' now does."""
+        with pytest.raises(ValueError, match="no longer a companion") as excinfo:
+            Network.open(_EPANET_RES, companions=[str(_TESTDATA / "epanet.inp")])
 
-        with pytest.raises(ValueError, match=f"Two '{suffix}' companions"):
-            Network.open(_EPANET_RES, companions=[companion, companion])
+        assert "companions=[]" not in str(excinfo.value)
+
+    def test_two_resx_are_refused(self):
+        with pytest.raises(ValueError, match="Two '.resx' companions"):
+            Network.open(_EPANET_RES, companions=[_EPANET_RESX, _EPANET_RESX])
 
     def test_an_opened_result_that_is_not_a_companion_is_refused(self):
         with pytest.raises(ValueError, match="not a companion"):
             Network.open(_EPANET_RES, companions=[Res1D(_EPANET_RES)])
 
-    def test_a_found_companion_is_named_when_it_fails(self, tmp_path):
-        res = _copy(tmp_path, "epanet", ".res")
-        (tmp_path / "model.inp").write_text("[JUNCTIONS]\n", encoding="utf-8")
+    def test_a_found_companion_is_named_when_it_fails(self, tmp_path, monkeypatch):
+        """Stubbed: the one '.resx' fixture belongs to the one '.res'."""
 
-        with pytest.raises(ValueError, match="model.inp") as excinfo:
+        def refuse(res, resx):
+            raise ValueError("not from the same run")
+
+        monkeypatch.setattr(_companions, "_open_companion_result", refuse)
+        res = _copy(tmp_path, "epanet", ".res", ".resx")
+
+        with pytest.raises(ValueError, match="model.resx") as excinfo:
             Network.open(res)
 
         assert "companions=[]" in str(excinfo.value)
-
-    def test_a_named_companion_is_left_to_speak_for_itself(self, tmp_path):
-        """Nothing to explain when the caller chose the file."""
-        res = _copy(tmp_path, "epanet", ".res")
-        bad = tmp_path / "elsewhere.inp"
-        bad.write_text("[JUNCTIONS]\n", encoding="utf-8")
-
-        with pytest.raises(ValueError, match="no .PIPES. section"):
-            Network.open(res, companions=[bad])
 
 
 class TestExtensionPolicy:
@@ -218,7 +250,7 @@ class TestExtensionPolicy:
             Network.open(str(_TESTDATA / "epanet.resx"))
 
     def test_a_format_without_topology_keeps_its_reason(self):
-        with pytest.raises(NotImplementedError, match="companion '.inp' input file"):
+        with pytest.raises(NotImplementedError, match="sibling '.inp' input file"):
             Network.open(str(_TESTDATA / "swmm.out"))
 
     def test_a_format_res1d_cannot_read_is_refused(self):
@@ -278,48 +310,6 @@ class TestQuantityIdsThatAreNoIdentifiers:
         assert got == pytest.approx(expected)
 
 
-def test_pumps_keep_an_unknown_length_even_with_the_inp(tmp_path):
-    """[PIPES] is the only section carrying lengths."""
-    res = _copy(tmp_path, "epanet", ".res", ".inp")
-
-    lengths = _lengths(Network.open(res))
-
-    assert lengths[_PUMP] is None
-    assert sum(length is None for length in lengths.values()) == 1
-
-
-def test_a_pipe_the_inp_gives_no_length_for_has_one_breakpoint(tmp_path):
-    """A zero in [PIPES] says the length is unknown, not that the pipe has none.
-
-    Taken as a real length it would place the reach's second breakpoint at
-    position 0.0, on top of the first, and the two would share one key: the
-    graph would get a zero-length self-loop, one edge more than the count
-    test_network_breakpoints.py checks.
-    """
-    res = _copy(tmp_path, "epanet", ".res", ".inp")
-    inp = tmp_path / "model.inp"
-    inp.write_text(
-        inp.read_text(encoding="latin-1").replace("3209.544", "0.000"), encoding="latin-1"
-    )
-
-    network = Network.open(res)
-    addresses = [address for _, address in network.to_networkx().nodes(data="address")]
-
-    assert _lengths(network)[_PIPE] is None
-    assert [
-        address for address in addresses if isinstance(address, tuple) and address[0] == _PIPE
-    ] == [
-        (_PIPE, 0.0),
-    ]
-
-
-_NON_ASCII_INP = """
-[PIPES]
-rør1 1 2 250 300 100
-"""
-"""One pipe, named outside ASCII. Fields are whitespace-delimited either way."""
-
-
 @pytest.fixture(scope="module")
 def epanet_res():
     """The EPANET result a stub companion is checked against."""
@@ -349,27 +339,14 @@ class TestWhatNoFixtureCanReach:
     here that a fixture already can.
     """
 
-    def test_an_inp_in_the_codepage_epanet_writes_is_read_as_itself(self, tmp_path):
-        """A non-ASCII reach id survives the '.inp'.
-
-        EPANET writes its input file in the Windows ANSI codepage, while mikeio1d
-        hands back '.res' names decoded as UTF-8, so one model can spell one reach
-        two ways. Every fixture is pure ASCII, where the two spellings coincide.
+    def test_a_resx_name_decoded_with_the_codepage_is_rekeyed(self):
+        """mikeio1d decodes '.res' names as UTF-8 and '.resx' names with the Windows
+        ANSI codepage, so one model can spell one reach two ways. Every fixture is
+        pure ASCII, where the two spellings coincide.
         """
-        inp = tmp_path / "model.inp"
-        inp.write_bytes(_NON_ASCII_INP.encode("cp1252"))
+        mis_decoded = "rør1".encode("utf-8").decode("cp1252")
 
-        assert read_pipe_lengths(inp) == {"rør1": 250.0}
-
-    def test_a_utf8_inp_is_reconciled_against_the_result(self, tmp_path):
-        """Read one byte at a time, UTF-8 arrives mis-spelled - and repairable."""
-        inp = tmp_path / "model.inp"
-        inp.write_bytes(_NON_ASCII_INP.encode("utf-8"))
-
-        lengths = read_pipe_lengths(inp)
-
-        assert lengths != {"rør1": 250.0}
-        assert _rekey_by_main_file(lengths, {"rør1"}) == {"rør1": 250.0}
+        assert _rekey_by_main_file({mis_decoded: "x"}, {"rør1"}) == {"rør1": "x"}
 
     def test_a_companion_clash_names_the_node_and_the_quantity(self):
         """No pair of fixtures collides: epanet.res and epanet.resx are disjoint.
