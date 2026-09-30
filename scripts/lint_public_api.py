@@ -1,17 +1,22 @@
 """Check that the public API, as declared by ``__all__``, agrees with the docs.
 
-The public API is the names listed in ``__all__``, plus every non-underscore
-member of an exported class. This script reads the source and the docs with the
-standard library only -- nothing is imported, so .NET is never loaded and the
-whole run takes well under a second.
+The public API is the names listed in ``__all__`` of public modules, plus every
+non-underscore member of an exported class. A module or package whose name starts
+with a single underscore (``_graph.py``, ``_internal/``) is private, and so is
+everything inside it; dunder names such as ``__init__`` are not.
+
+This script reads the source and the docs with the standard library only --
+nothing is imported, so .NET is never loaded and the whole run takes well under
+a second. Checks that ruff already covers are left to ruff: F822 (undefined
+export), PLE0604/PLE0605 (malformed ``__all__``), RUF022 (unsorted) and RUF068
+(duplicates).
 
 Checks
 ------
-missing-all          a package under src/mikeio1d has no ``__all__``
+missing-all          a public package under src/mikeio1d has no ``__all__``
 misspelled-all       a module assigns something like ``__all___`` or ``__ALL__``
-malformed-all        ``__all__`` is not a literal list or tuple of strings
-unbound-export       an ``__all__`` entry is not defined or imported in the module
-docs-import          docs or notebooks import a name the module does not export
+docs-import          docs or notebooks import a name the module does not export,
+                     or import from a private module
 undocumented-export  an exported name is never mentioned in the docs
 leaked-type          a public signature mentions a .NET type or a private name
 
@@ -66,6 +71,7 @@ class Module:
     name: str
     path: Path
     tree: ast.Module
+    declares_all: bool
     exports: list[str] | None
     exports_line: int
 
@@ -73,6 +79,16 @@ class Module:
     def is_package(self) -> bool:
         """Whether the module is a package ``__init__``."""
         return self.path.name == "__init__.py"
+
+    @property
+    def is_private(self) -> bool:
+        """Whether this module, or a package containing it, has a private name."""
+        return any(is_private_name(part) for part in self.name.split("."))
+
+
+def is_private_name(name: str) -> bool:
+    """Whether a module name is private: a single leading underscore, not a dunder."""
+    return name.startswith("_") and not (name.startswith("__") and name.endswith("__"))
 
 
 # --- Loading source -----------------------------------------------------------------
@@ -92,12 +108,14 @@ def load_modules() -> dict[str, Module]:
     for path in sorted((SRC / PACKAGE).rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         name = module_name(path)
-        exports, line = None, 0
+        declares_all, exports, line = False, None, 0
         for node in tree.body:
             target = assigned_name(node)
             if target == "__all__" and node.value is not None:
+                # A non-literal __all__ gives None here; ruff's PLE0604/PLE0605 report it.
+                declares_all = True
                 exports, line = literal_strings(node.value), node.lineno
-        modules[name] = Module(name, path, tree, exports, line)
+        modules[name] = Module(name, path, tree, declares_all, exports, line)
     return modules
 
 
@@ -209,7 +227,7 @@ def public_members(
 
 
 def check_declarations(modules: dict[str, Module]) -> list[Finding]:
-    """Check that ``__all__`` is present, spelled right, literal and bound."""
+    """Check that ``__all__`` is spelled right and that every public package has one."""
     findings = []
     for module in modules.values():
         top_dir = module.path.relative_to(SRC / PACKAGE).parts[0]
@@ -221,39 +239,22 @@ def check_declarations(modules: dict[str, Module]) -> list[Finding]:
                         module.path, node.lineno, "misspelled-all", f"'{name}' is not '__all__'"
                     )
                 )
-        if module.is_package and module.exports is None and top_dir not in NON_PYTHON_DIRS:
-            has_all = any(assigned_name(n) == "__all__" for n in module.tree.body)
-            if has_all:
-                findings.append(
-                    Finding(
-                        module.path,
-                        module.exports_line or 1,
-                        "malformed-all",
-                        "__all__ must be a literal list or tuple of strings",
-                    )
+        if (
+            module.is_package
+            and not module.is_private
+            and not module.declares_all
+            and top_dir not in NON_PYTHON_DIRS
+        ):
+            findings.append(
+                Finding(
+                    module.path,
+                    1,
+                    "missing-all",
+                    f"package {module.name} has no __all__ "
+                    "(use __all__ = [] if nothing in it is public, or rename it with a "
+                    "leading underscore)",
                 )
-            else:
-                findings.append(
-                    Finding(
-                        module.path,
-                        1,
-                        "missing-all",
-                        f"package {module.name} has no __all__ "
-                        "(use __all__ = [] if nothing in it is public)",
-                    )
-                )
-        if module.exports:
-            bound = bindings(module)
-            for name in module.exports:
-                if name not in bound and f"{module.name}.{name}" not in modules:
-                    findings.append(
-                        Finding(
-                            module.path,
-                            module.exports_line,
-                            "unbound-export",
-                            f"'{name}' is in __all__ but not defined or imported",
-                        )
-                    )
+            )
     return findings
 
 
@@ -303,11 +304,16 @@ def signature_annotations(function: ast.FunctionDef | ast.AsyncFunctionDef):
         yield function.returns
 
 
+def public_modules(modules: dict[str, Module]) -> list[Module]:
+    """Return the modules whose ``__all__`` is part of the public API."""
+    return [module for module in modules.values() if not module.is_private]
+
+
 def check_signatures(modules: dict[str, Module]) -> list[Finding]:
     """Check that public signatures only mention types a caller can use."""
     findings = []
     seen = set()
-    for module in modules.values():
+    for module in public_modules(modules):
         for name in module.exports or []:
             found = resolve(modules, module.name, name)
             if found is None:
@@ -387,13 +393,27 @@ def check_doc_imports(modules: dict[str, Module], docs: dict[Path, str]) -> list
     """Check that docs only import names the package exports."""
     findings = []
 
-    def check(path: Path, line: int, module_name: str, name: str) -> None:
-        if f"{module_name}.{name}" in modules:
-            return  # importing a submodule; the submodule's own exports are checked
+    def check_module(path: Path, line: int, module_name: str) -> bool:
+        """Report a missing or private module; return whether it is usable."""
         module = modules.get(module_name)
         if module is None:
             message = f"'{module_name}' is not a module of the package"
-        elif module.exports is None:
+        elif module.is_private:
+            message = f"imports from {module_name}, which is private"
+        else:
+            return True
+        findings.append(Finding(path, line, "docs-import", message))
+        return False
+
+    def check(path: Path, line: int, module_name: str, name: str) -> None:
+        if f"{module_name}.{name}" in modules:
+            # Importing a submodule; its own exports are checked where it is used.
+            check_module(path, line, f"{module_name}.{name}")
+            return
+        if not check_module(path, line, module_name):
+            return
+        module = modules[module_name]
+        if module.exports is None:
             message = f"imports '{name}' from {module_name}, which declares no __all__"
         elif name in module.exports:
             return
@@ -422,15 +442,7 @@ def check_doc_imports(modules: dict[str, Module], docs: dict[Path, str]) -> list
                 elif isinstance(node, ast.Import):
                     for alias in node.names:
                         if alias.name.split(".")[0] == PACKAGE:
-                            if alias.name not in modules:
-                                findings.append(
-                                    Finding(
-                                        path,
-                                        first_line + node.lineno - 1,
-                                        "docs-import",
-                                        f"'{alias.name}' is not a module of the package",
-                                    )
-                                )
+                            check_module(path, first_line + node.lineno - 1, alias.name)
                             if alias.asname:
                                 aliases[alias.asname] = alias.name
                             elif alias.name == PACKAGE:
@@ -451,7 +463,7 @@ def check_documented(modules: dict[str, Module], docs: dict[Path, str]) -> list[
     words = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", corpus))
     findings = []
     reported = set()
-    for module in modules.values():
+    for module in public_modules(modules):
         for name in module.exports or []:
             if name not in words and name not in reported:
                 reported.add(name)

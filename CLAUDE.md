@@ -48,7 +48,9 @@ The local `.pytest.ini` excludes slow tests and experimental tests by default. C
 ### Public API
 
 The public API is the names in each package's `__all__`, plus every non-underscore member of
-an exported class. `just api` checks that declaration against the source and the docs: every
+an exported class. A module or package whose name starts with a single underscore
+(`network/_graph.py`) is private, along with everything inside it; dunders like `__init__` are
+not. Public packages re-export what callers need from private modules. `just api` checks that declaration against the source and the docs: every
 package has an `__all__`, docs and notebooks import only exported names, every export is
 mentioned in the docs, and public signatures don't expose .NET or private types. It reads files
 without importing anything, so it takes well under a second.
