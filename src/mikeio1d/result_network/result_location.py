@@ -271,7 +271,8 @@ class ResultLocation(ABC):
         Returns
         -------
         list[ResultQuantity]
-            The ResultQuantity objects, in the order the quantity ids were given.
+            The ResultQuantity objects, in the order the quantity ids were given. A quantity id
+            given more than once is only included once.
 
         Raises
         ------
@@ -282,12 +283,16 @@ class ResultLocation(ABC):
         """
         result_quantity_map = self._creator.result_quantity_map
         if quantities is None:
+            if len(result_quantity_map) == 0:
+                raise ValueError(f"{self!r} has no quantities.")
             quantities = list(result_quantity_map)
         elif isinstance(quantities, str):
             quantities = [quantities]
 
         if len(quantities) == 0:
             raise ValueError("At least one quantity must be given.")
+
+        quantities = list(dict.fromkeys(quantities))
 
         unknown = [q for q in quantities if q not in result_quantity_map]
         if unknown:

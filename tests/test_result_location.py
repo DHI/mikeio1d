@@ -84,6 +84,10 @@ class TestRead:
         df = reach.read(column_mode="timeseries", quantities="Discharge")
         assert [tsid.quantity for tsid in df.columns] == ["Discharge"]
 
+    def test_a_repeated_quantity_is_read_once(self, reach):
+        df = reach.read(quantities=["WaterLevel", "WaterLevel"])
+        assert_frame_equal(df, reach.WaterLevel.read())
+
     def test_to_dataframe_is_an_alias(self, reach):
         expected = reach.read("all", quantities="WaterLevel")
         assert_frame_equal(reach.to_dataframe("all", quantities="WaterLevel"), expected)
@@ -124,6 +128,13 @@ class TestUnknownQuantities:
     def test_an_empty_list_is_refused(self, reach):
         with pytest.raises(ValueError, match="At least one quantity"):
             reach.read(quantities=[])
+
+    def test_a_location_without_quantities_says_so(self):
+        res = Res1D(testdata.network_res1d, quantities=["WaterLevel"])
+        structure = res.structures["119w1"]
+        assert structure.quantities == []
+        with pytest.raises(ValueError, match="has no quantities"):
+            structure.read()
 
 
 class TestAdd:
