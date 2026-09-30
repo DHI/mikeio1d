@@ -99,12 +99,14 @@ class _Results:
 
         series = [self.series[address][quantity] for address, quantity in items]
 
-        # Grouped by file and de-duplicated within it.
         by_file: dict[Path, list[TimeSeriesId]] = {}
+        seen_by_file: dict[Path, set[TimeSeriesId]] = {}
         for item in series:
             tsids = by_file.setdefault(item.path, [])
-            if item.tsid not in tsids:
+            seen = seen_by_file.setdefault(item.path, set())
+            if item.tsid not in seen:
                 tsids.append(item.tsid)
+                seen.add(item.tsid)
 
         columns: dict[tuple[Path, TimeSeriesId], pd.Series] = {}
         index = None
