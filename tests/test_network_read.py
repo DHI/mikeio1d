@@ -199,6 +199,12 @@ class TestResolvingAnAddress:
         with pytest.raises(ValueError, match="finite, non-negative"):
             network.resolve(address, position_tol=-1.0)
 
+    @pytest.mark.parametrize("position", [float("nan"), float("inf"), float("-inf")])
+    def test_a_position_that_is_not_finite_is_refused(self, network, position):
+        """NaN compares false with any window, so it would otherwise snap to a breakpoint."""
+        with pytest.raises(ValueError, match="breakpoint position must be finite"):
+            network.resolve(("100l1", position), position_tol=30.0)
+
     def test_an_exact_hit_gives_the_position_the_file_stores(self, network):
         """("100l1", 0) and ("100l1", 0.0) are the same key, but only one is the file's."""
         resolved = network.resolve(("100l1", 0))
@@ -383,6 +389,11 @@ class TestReadingSeries:
     def test_a_tolerance_that_is_not_a_distance_is_refused(self, network):
         with pytest.raises(ValueError, match="finite, non-negative"):
             network.read([(("100l1", 23.8), "Discharge")], position_tol=-1.0)
+
+    @pytest.mark.parametrize("position", [float("nan"), float("inf")])
+    def test_a_position_that_is_not_finite_is_refused(self, network, position):
+        with pytest.raises(ValueError, match="breakpoint position must be finite"):
+            network.read([(("100l1", position), "Discharge")])
 
     @pytest.mark.parametrize("items", [[("101", "WaterLevel")], []], ids=["exact hit", "no items"])
     def test_the_tolerance_is_checked_whatever_the_items(self, network, items):
