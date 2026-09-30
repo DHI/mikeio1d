@@ -1,7 +1,7 @@
 {
  "counts": {
-  "graph_edges": 39,
-  "graph_nodes": 37,
+  "graph_edges": 38,
+  "graph_nodes": 36,
   "reaches": 13
  },
  "dataframe": {
@@ -1770,78 +1770,6 @@
     "n_nan": 0,
     "sum": 0.0
    },
-   "36|AvgWaterQuality": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|Flow": {
-    "first": 117.737534,
-    "last": 119.382088,
-    "max": 120.466057,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 1725.927383
-   },
-   "36|FrictionFactor": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|HeadlossPer1000Unit": {
-    "first": -62.285,
-    "last": -61.17902,
-    "max": 0.0,
-    "min": -66.749077,
-    "n": 25,
-    "n_nan": 0,
-    "sum": -960.498978
-   },
-   "36|ReactorRate": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
-   "36|Setting": {
-    "first": 1.0,
-    "last": 1.0,
-    "max": 1.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 15.0
-   },
-   "36|StatusCode": {
-    "first": 3.0,
-    "last": 3.0,
-    "max": 3.0,
-    "min": 2.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 65.0
-   },
-   "36|Velocity": {
-    "first": 0.0,
-    "last": 0.0,
-    "max": 0.0,
-    "min": 0.0,
-    "n": 25,
-    "n_nan": 0,
-    "sum": 0.0
-   },
    "3|AvgWaterQuality": {
     "first": 0.0,
     "last": 0.0,
@@ -2277,7 +2205,7 @@
   },
   "shape": [
    25,
-   252
+   244
   ],
   "time": {
    "first": "2022-10-13 00:00:00",
@@ -2286,33 +2214,32 @@
   }
  },
  "graph": {
-  "alias_map": {
+  "address_map": {
    "bp:10@0.0": 2,
-   "bp:10@None": 3,
+   "bp:10@3209.544": 3,
    "bp:110@0.0": 8,
-   "bp:110@None": 9,
+   "bp:110@60.96": 9,
    "bp:111@0.0": 11,
-   "bp:111@None": 12,
+   "bp:111@1609.344": 12,
    "bp:112@0.0": 14,
-   "bp:112@None": 15,
+   "bp:112@1609.344": 15,
    "bp:113@0.0": 18,
-   "bp:113@None": 19,
+   "bp:113@1609.344": 19,
    "bp:11@0.0": 5,
-   "bp:11@None": 6,
+   "bp:11@1609.344": 6,
    "bp:121@0.0": 23,
-   "bp:121@None": 24,
+   "bp:121@1609.344": 24,
    "bp:122@0.0": 26,
-   "bp:122@None": 27,
+   "bp:122@1609.344": 27,
    "bp:12@0.0": 20,
-   "bp:12@None": 21,
+   "bp:12@1609.344": 21,
    "bp:21@0.0": 28,
-   "bp:21@None": 29,
+   "bp:21@1609.344": 29,
    "bp:22@0.0": 30,
-   "bp:22@None": 31,
+   "bp:22@1609.344": 31,
    "bp:31@0.0": 32,
-   "bp:31@None": 33,
+   "bp:31@1609.344": 33,
    "bp:9@0.0": 35,
-   "bp:9@None": 36,
    "node:10": 0,
    "node:11": 1,
    "node:12": 4,
@@ -2328,8 +2255,8 @@
   "edges": [
    [
     "bp:10@0.0",
-    "bp:10@None",
-    null,
+    "bp:10@3209.544",
+    3209.544,
     false
    ],
    [
@@ -2339,15 +2266,15 @@
     true
    ],
    [
-    "bp:10@None",
+    "bp:10@3209.544",
     "node:11",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:110@0.0",
-    "bp:110@None",
-    null,
+    "bp:110@60.96",
+    60.96,
     false
    ],
    [
@@ -2357,15 +2284,15 @@
     true
    ],
    [
-    "bp:110@None",
+    "bp:110@60.96",
     "node:12",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:111@0.0",
-    "bp:111@None",
-    null,
+    "bp:111@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2375,15 +2302,15 @@
     true
    ],
    [
-    "bp:111@None",
+    "bp:111@1609.344",
     "node:21",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:112@0.0",
-    "bp:112@None",
-    null,
+    "bp:112@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2393,15 +2320,15 @@
     true
    ],
    [
-    "bp:112@None",
+    "bp:112@1609.344",
     "node:22",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:113@0.0",
-    "bp:113@None",
-    null,
+    "bp:113@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2411,15 +2338,15 @@
     true
    ],
    [
-    "bp:113@None",
+    "bp:113@1609.344",
     "node:23",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:11@0.0",
-    "bp:11@None",
-    null,
+    "bp:11@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2429,15 +2356,15 @@
     true
    ],
    [
-    "bp:11@None",
+    "bp:11@1609.344",
     "node:12",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:121@0.0",
-    "bp:121@None",
-    null,
+    "bp:121@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2447,15 +2374,15 @@
     true
    ],
    [
-    "bp:121@None",
+    "bp:121@1609.344",
     "node:31",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:122@0.0",
-    "bp:122@None",
-    null,
+    "bp:122@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2465,15 +2392,15 @@
     true
    ],
    [
-    "bp:122@None",
+    "bp:122@1609.344",
     "node:32",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:12@0.0",
-    "bp:12@None",
-    null,
+    "bp:12@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2483,15 +2410,15 @@
     true
    ],
    [
-    "bp:12@None",
+    "bp:12@1609.344",
     "node:13",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:21@0.0",
-    "bp:21@None",
-    null,
+    "bp:21@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2501,15 +2428,15 @@
     true
    ],
    [
-    "bp:21@None",
+    "bp:21@1609.344",
     "node:22",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:22@0.0",
-    "bp:22@None",
-    null,
+    "bp:22@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2519,15 +2446,15 @@
     true
    ],
    [
-    "bp:22@None",
+    "bp:22@1609.344",
     "node:23",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:31@0.0",
-    "bp:31@None",
-    null,
+    "bp:31@1609.344",
+    1609.344,
     false
    ],
    [
@@ -2537,14 +2464,14 @@
     true
    ],
    [
-    "bp:31@None",
+    "bp:31@1609.344",
     "node:32",
-    null,
-    false
+    0.0,
+    true
    ],
    [
     "bp:9@0.0",
-    "bp:9@None",
+    "node:10",
     null,
     false
    ],
@@ -2553,12 +2480,6 @@
     "node:9",
     0.0,
     true
-   ],
-   [
-    "bp:9@None",
-    "node:10",
-    null,
-    false
    ]
   ],
   "nodes": {
@@ -2572,7 +2493,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:10@None": [
+   "bp:10@3209.544": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2592,7 +2513,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:110@None": [
+   "bp:110@60.96": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2612,7 +2533,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:111@None": [
+   "bp:111@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2632,7 +2553,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:112@None": [
+   "bp:112@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2652,7 +2573,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:113@None": [
+   "bp:113@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2672,7 +2593,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:11@None": [
+   "bp:11@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2692,7 +2613,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:121@None": [
+   "bp:121@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2712,7 +2633,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:122@None": [
+   "bp:122@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2732,7 +2653,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:12@None": [
+   "bp:12@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2752,7 +2673,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:21@None": [
+   "bp:21@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2772,7 +2693,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:22@None": [
+   "bp:22@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2792,7 +2713,7 @@
     "StatusCode",
     "Velocity"
    ],
-   "bp:31@None": [
+   "bp:31@1609.344": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2803,16 +2724,6 @@
     "Velocity"
    ],
    "bp:9@0.0": [
-    "AvgWaterQuality",
-    "Flow",
-    "FrictionFactor",
-    "HeadlossPer1000Unit",
-    "ReactorRate",
-    "Setting",
-    "StatusCode",
-    "Velocity"
-   ],
-   "bp:9@None": [
     "AvgWaterQuality",
     "Flow",
     "FrictionFactor",
@@ -2921,17 +2832,29 @@
   },
   "find": {
    "bp:10@0.0": 2,
+   "bp:10@3209.544": 3,
    "bp:110@0.0": 8,
+   "bp:110@60.96": 9,
    "bp:111@0.0": 11,
+   "bp:111@1609.344": 12,
    "bp:112@0.0": 14,
+   "bp:112@1609.344": 15,
    "bp:113@0.0": 18,
+   "bp:113@1609.344": 19,
    "bp:11@0.0": 5,
+   "bp:11@1609.344": 6,
    "bp:121@0.0": 23,
+   "bp:121@1609.344": 24,
    "bp:122@0.0": 26,
+   "bp:122@1609.344": 27,
    "bp:12@0.0": 20,
+   "bp:12@1609.344": 21,
    "bp:21@0.0": 28,
+   "bp:21@1609.344": 29,
    "bp:22@0.0": 30,
+   "bp:22@1609.344": 31,
    "bp:31@0.0": 32,
+   "bp:31@1609.344": 33,
    "bp:9@0.0": 35,
    "node:10": 0,
    "node:11": 1,
@@ -2956,22 +2879,22 @@
     "node": "21"
    },
    "11": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "111"
    },
    "12": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "111"
    },
    "13": {
     "node": "22"
    },
    "14": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "112"
    },
    "15": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "112"
    },
    "16": {
@@ -2981,106 +2904,102 @@
     "node": "23"
    },
    "18": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "113"
    },
    "19": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "113"
    },
    "2": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "10"
    },
    "20": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "12"
    },
    "21": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "12"
    },
    "22": {
     "node": "31"
    },
    "23": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "121"
    },
    "24": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "121"
    },
    "25": {
     "node": "32"
    },
    "26": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "122"
    },
    "27": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "122"
    },
    "28": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "21"
    },
    "29": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "21"
    },
    "3": {
-    "distance": null,
+    "position": 3209.544,
     "reach": "10"
    },
    "30": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "22"
    },
    "31": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "22"
    },
    "32": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "31"
    },
    "33": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "31"
    },
    "34": {
     "node": "9"
    },
    "35": {
-    "distance": 0.0,
-    "reach": "9"
-   },
-   "36": {
-    "distance": null,
+    "position": 0.0,
     "reach": "9"
    },
    "4": {
     "node": "12"
    },
    "5": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "11"
    },
    "6": {
-    "distance": null,
+    "position": 1609.344,
     "reach": "11"
    },
    "7": {
     "node": "2"
    },
    "8": {
-    "distance": 0.0,
+    "position": 0.0,
     "reach": "110"
    },
    "9": {
-    "distance": null,
+    "position": 60.96,
     "reach": "110"
    }
   }
@@ -3103,8 +3022,8 @@
   "10": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:10@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3117,8 +3036,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:10@None",
+     "id": "bp:10@3209.544",
+     "position": 3209.544,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3132,15 +3051,15 @@
     }
    ],
    "end": "11",
-   "length": null,
+   "length": 3209.544,
    "n_breakpoints": 2,
    "start": "10"
   },
   "11": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:11@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3153,8 +3072,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:11@None",
+     "id": "bp:11@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3168,15 +3087,15 @@
     }
    ],
    "end": "12",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "11"
   },
   "110": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:110@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3189,8 +3108,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:110@None",
+     "id": "bp:110@60.96",
+     "position": 60.96,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3204,15 +3123,15 @@
     }
    ],
    "end": "12",
-   "length": null,
+   "length": 60.96,
    "n_breakpoints": 2,
    "start": "2"
   },
   "111": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:111@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3225,8 +3144,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:111@None",
+     "id": "bp:111@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3240,15 +3159,15 @@
     }
    ],
    "end": "21",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "11"
   },
   "112": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:112@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3261,8 +3180,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:112@None",
+     "id": "bp:112@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3276,15 +3195,15 @@
     }
    ],
    "end": "22",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "12"
   },
   "113": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:113@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3297,8 +3216,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:113@None",
+     "id": "bp:113@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3312,15 +3231,15 @@
     }
    ],
    "end": "23",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "13"
   },
   "12": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:12@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3333,8 +3252,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:12@None",
+     "id": "bp:12@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3348,15 +3267,15 @@
     }
    ],
    "end": "13",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "12"
   },
   "121": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:121@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3369,8 +3288,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:121@None",
+     "id": "bp:121@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3384,15 +3303,15 @@
     }
    ],
    "end": "31",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "21"
   },
   "122": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:122@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3405,8 +3324,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:122@None",
+     "id": "bp:122@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3420,15 +3339,15 @@
     }
    ],
    "end": "32",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "22"
   },
   "21": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:21@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3441,8 +3360,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:21@None",
+     "id": "bp:21@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3456,15 +3375,15 @@
     }
    ],
    "end": "22",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "21"
   },
   "22": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:22@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3477,8 +3396,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:22@None",
+     "id": "bp:22@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3492,15 +3411,15 @@
     }
    ],
    "end": "23",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "22"
   },
   "31": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:31@0.0",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3513,8 +3432,8 @@
      ]
     },
     {
-     "distance": null,
-     "id": "bp:31@None",
+     "id": "bp:31@1609.344",
+     "position": 1609.344,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3528,29 +3447,15 @@
     }
    ],
    "end": "32",
-   "length": null,
+   "length": 1609.344,
    "n_breakpoints": 2,
    "start": "31"
   },
   "9": {
    "breakpoints": [
     {
-     "distance": 0.0,
      "id": "bp:9@0.0",
-     "quantities": [
-      "AvgWaterQuality",
-      "Flow",
-      "FrictionFactor",
-      "HeadlossPer1000Unit",
-      "ReactorRate",
-      "Setting",
-      "StatusCode",
-      "Velocity"
-     ]
-    },
-    {
-     "distance": null,
-     "id": "bp:9@None",
+     "position": 0.0,
      "quantities": [
       "AvgWaterQuality",
       "Flow",
@@ -3565,7 +3470,7 @@
    ],
    "end": "10",
    "length": null,
-   "n_breakpoints": 2,
+   "n_breakpoints": 1,
    "start": "9"
   }
  }

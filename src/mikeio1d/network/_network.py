@@ -1,84 +1,94 @@
 """A network of nodes and reaches, addressable by the names it came with.
 
 Reading a result file gives locations named the way the model named them: a node
-id, or a reach and a distance along it. A graph needs one flat set of integers.
-:class:`Network` holds both, and :meth:`Network.find` and :meth:`Network.recall`
-translate between them.
+id, or a reach and a position along it. :class:`Network` is addressed by those
+names throughout; the integers its graph is labelled with stay the graph's own.
 """
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterable
+    from datetime import datetime
+
+    from pathlib import Path
+
+    from ..res1d import Res1D
+    from ._naming import Address
+    from ._results import _Results
+
 from collections.abc import Mapping
 from collections.abc import Sequence
-from copy import deepcopy
-from pathlib import Path
 from types import MappingProxyType
-from typing import Any, overload
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 import xarray as xr
 
-from ..res1d import Res1D
-from ._companions import _companion_paths, _read_companions, _CompanionConflict
-from ._graph import _build_dataframe, _generate_graph
-from ._naming import _Naming, _is_break_point
-from ._policy import _validate_extension
-from ._res1d import _load_res1d_network
+from ._graph import _generate_graph
+from ._loader import _load_network
+from ._naming import _Naming
+from ._naming import _is_breakpoint
+from ._naming import _window
+from ._types import NetworkLocation
 from ._types import NetworkReach
-
-
-def _blame_the_companions(res: Res1D, found: Sequence[Any], err: Exception) -> ValueError:
-    """Name the companions in an error about them, for a caller who asked for none.
-
-    A companion found beside the result file has to be named when it turns out
-    to be the problem, or the error points at files the caller did not know were
-    being read.
-    """
-    names = ", ".join(f"'{Path(str(companion)).name}'" for companion in found)
-    return ValueError(
-        f"Failed to build a network from '{Path(str(res.file_path)).name}': {err}\n"
-        f"Companion files read alongside it, because they share its folder: "
-        f"{names}. Pass companions=[] to read the result file on its own, or "
-        "name the companions you want."
-    )
 
 
 class Network:
     """A network of nodes and reaches, addressable by the names it came with.
 
     A result file names a location the way the model did: a node id, or a reach
-    and a distance along it. A graph needs one flat set of integers. A Network
-    holds both - :attr:`graph` is the integer-labelled graph carrying the
-    timeseries each location holds, and :meth:`find` and :meth:`recall`
-    translate between the two namings.
+    and a position along it, and every member here takes and gives those names.
+    :meth:`to_networkx` is labelled with integers instead, each node carrying its name
+    as the ``address`` attribute, and :meth:`resolve` gives the integer for a
+    name - see :attr:`NetworkLocation.graph_node`.
 
-    Build one with :meth:`open`, which reads a result file, or by handing the
-    constructor a sequence of :class:`~mikeio1d.network.NetworkReach`.
+    Build one with :meth:`open`, which reads no timeseries. They stay in the
+    file until :meth:`read` asks for them. The constructor is internal: it
+    takes what a loader produces, not a file.
+
+    Notes
+    -----
+    Which locations carry series depends on the format:
+
+    * MIKE 1D (``.res1d``): nodes and reach gridpoints both carry them.
+    * MIKE 11 (``.res11``): only gridpoints do. A node carries nothing, so an
+      observation at a node is read at a gridpoint beside it, which
+      ``addresses(reach=...)`` lists.
+    * EPANET (``.res``): a node carries its own. A pipe's are read at its start,
+      ``(pipe_id, 0.0)``, and at its end, ``(pipe_id, length)``; the two give
+      the same series. A pump or valve has no length, so only its start.
+
+    Examples
+    --------
+    >>> from mikeio1d.network import Network
+    >>> network = Network.open("tests/testdata/network.res1d")
+    >>> print(network)
+    <Network>
+    Reaches: 118
+    Nodes: 495
+    Quantities: ['WaterLevel', 'Discharge']
+    Time: 1994-08-07 16:35:00 - 1994-08-07 18:35:00
     """
 
-    def __init__(self, reaches: Sequence[NetworkReach]):
-        # Ids first: two reaches sharing one would interleave their break points
-        # into a single chain, and the graph error would describe the wreckage
-        # rather than the cause.
+    def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
+        self._results = results
+        # Before the graph, whose error for a duplicate id would not name it.
         self._reaches = self._generate_reaches_dict(reaches)
-        self._initialize_network_attributes(_generate_graph(reaches))
-
-    def _initialize_network_attributes(self, graph: nx.Graph):
-        self._df = _build_dataframe(graph)
-        self._graph = graph.copy()
-        self._naming = _Naming(self._graph, self._reaches)
+        self._graph = _generate_graph(reaches)
+        self._naming = _Naming(self._graph, self._reaches, results.quantities_at)
 
     def __repr__(self) -> str:
-        time = self._df.index
-        time_window = "N/A - N/A" if len(time) == 0 else f"{time[0]} - {time[-1]}"
         out = [
             "<Network>",
             f"Reaches: {len(self._reaches)}",
             f"Nodes: {self._graph.number_of_nodes()}",
-            f"Quantities: {self.quantities}",
-            f"Time: {time_window}",
         ]
+        start, end = self.period
+        out += [f"Quantities: {list(self.quantities)}", f"Time: {start} - {end}"]
         return "\n".join(out)
 
     @classmethod
@@ -87,65 +97,36 @@ class Network:
         res: str | Path | Res1D,
         *,
         companions: Sequence[str | Path | Res1D] | None = None,
-        nodes: str | list[str] | None = None,
-        reaches: str | list[str] | None = None,
-        quantities: str | list[str] | None = None,
     ) -> Network:
         """Read a network from a result file.
+
+        Opening reads no timeseries. :meth:`read`, :meth:`to_dataframe` and
+        :meth:`to_dataset` read them when asked.
 
         Parameters
         ----------
         res : str, Path or Res1D
             Path to a ``.res1d``, ``.res11`` or ``.res`` result file, or an
-            already-opened :class:`~mikeio1d.Res1D`.
+            already-opened :class:`~mikeio1d.Res1D`. Series are read from the
+            file on disk, so edits made to a ``Res1D`` in memory with
+            ``modify()`` are not seen. A ``Res1D`` opened with ``nodes=``,
+            ``reaches=`` or ``quantities=`` still gives the whole network, but
+            only the series its filter lets through: a location it leaves out
+            is there, carrying nothing. One opened with ``time=`` or
+            ``step_every=`` is not supported yet.
         companions : sequence of str, Path or Res1D, or None, optional
-            Files read alongside the result and recognised by their extension:
+            Files read alongside the result. The one kind is ``.resx``: extra
+            EPANET results for the same network. Its node quantities (tank
+            ``Volume`` and ``Volume Percentage``) are merged onto the matching
+            nodes, and its reach quantities (pump ``efficiency``, ``energy``
+            and ``energy costs``) onto the matching reach's breakpoints.
 
-            * ``.resx`` -- extra EPANET results for the same network. Its node
-              quantities (tank ``Volume`` and ``Volume Percentage``) are merged
-              onto the matching nodes, and its reach quantities (pump
-              ``efficiency``, ``energy`` and ``energy costs``) onto the matching
-              reach's breakpoints.
-            * ``.inp`` -- the EPANET input file, read for its ``[PIPES]``
-              lengths. No result file carries a reach length, so without this one
-              no reach has one.
-
-            ``None`` *(default)* looks for them beside the result file, matching
+            ``None`` *(default)* looks for one beside the result file, matching
             its folder and stem; ``[]`` reads none; a list reads exactly those.
-            Only EPANET results are looked beside.
-        nodes : str, list of str, or None, optional
-            Controls which nodes have their timeseries data loaded into memory.
-
-            * ``None`` *(default)* -- data is loaded for every node.
-            * A single node ID or a list of node IDs -- only those nodes get
-              data; others are topology-only.
-            * ``[]`` (empty list) -- no node data is loaded at all.
-
-            The full network topology is always constructed regardless of this
-            setting, so ``find()`` and ``recall()`` still work on all nodes.
-        reaches : str, list of str, or None, optional
-            Controls which reaches have their intermediate gridpoint data
-            populated.
-
-            * ``None`` *(default)* -- gridpoints are populated for every reach.
-            * A single reach name or a list of reach names -- only those reaches
-              get gridpoint data; others are topology-only.
-            * ``[]`` (empty list) -- no gridpoint data is loaded at all.
-
-            EPANET reaches have at most one gridpoint (see Notes), but this
-            argument still governs whether its data, and any matching ``.resx``
-            reach quantities, are populated.
-        quantities : str, list of str, or None, optional
-            Controls which quantities are read at each selected location.
-
-            * ``None`` *(default)* -- every quantity is read.
-            * A single quantity name or a list of names -- only those are read.
-            * ``[]`` (empty list) -- no data is read at all.
-
-            A location that does not carry a requested quantity becomes
-            topology-only rather than an error, so this composes with ``nodes``
-            and ``reaches`` on files where nodes and reaches hold different
-            quantities.
+            Only EPANET results are looked beside. A companion passed as a
+            ``Res1D`` follows the same rules for filters as ``res``. The
+            EPANET ``.inp`` input file is not a companion: reach lengths come
+            from the ``.res`` itself.
 
         Returns
         -------
@@ -154,124 +135,68 @@ class Network:
         Raises
         ------
         NotImplementedError
-            If no network can be built from the file's extension.
+            If no network can be built from the file's extension, if the file
+            holds catchments and no reaches, or if the result or a companion is
+            a ``Res1D`` opened with ``time=`` or ``step_every=``.
         ValueError
-            If a companion has an extension this reader does not know, if two
-            companions of the same kind are given, or if a ``.resx`` does not
-            come from the same run as the result file.
+            If a companion has an extension this reader does not know or is an
+            ``.inp``, if two ``.resx`` are given, if a ``.resx`` covers a
+            different period from the result file, or if the two carry the same
+            quantity at one location.
+
+        Notes
+        -----
+        A ``UserWarning`` is raised if the file holds catchments beside its
+        reaches, which the network leaves out with their quantities, or nodes
+        that end no reach, which it leaves out too.
 
         Examples
         --------
         >>> from mikeio1d.network import Network
-        >>> network = Network.open("model.res1d")  # doctest: +SKIP
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.reaches["100l1"].start
+        '100'
 
-        Load data only for the two nodes where observations exist, and skip all
-        intermediate gridpoint data to keep memory usage low:
+        Name the companions rather than letting them be found, or pass ``[]`` to
+        read the result file on its own:
 
-        >>> network = Network.open(  # doctest: +SKIP
-        ...     "model.res1d",
-        ...     nodes=["node_a", "node_b"],
-        ...     reaches=[],
+        >>> epanet = Network.open(
+        ...     "tests/testdata/epanet.res",
+        ...     companions=["tests/testdata/epanet.resx"],
         ... )
+        >>> "Volume" in epanet.quantities
+        True
+        >>> alone = Network.open("tests/testdata/epanet.res", companions=[])
+        >>> "Volume" in alone.quantities
+        False
 
-        Read a single quantity, for a calibration loop that only scores
-        discharge:
+        An EPANET reach's length comes from the ``.res`` itself. A pump or valve
+        has none:
 
-        >>> network = Network.open("model.res1d", quantities="Discharge")  # doctest: +SKIP
+        >>> alone.reaches["10"].length
+        3209.544
+        >>> alone.reaches["9"].length is None
+        True
 
-        Name the companions rather than letting them be found:
+        A filtered ``Res1D`` gives the whole network, carrying only what its
+        filter lets through:
 
-        >>> network = Network.open(  # doctest: +SKIP
-        ...     "model.res",
-        ...     companions=["other.resx", "other.inp"],
-        ... )
+        >>> from mikeio1d import Res1D
+        >>> res = Res1D("tests/testdata/network.res1d", nodes=["1"], reaches=["100l1"])
+        >>> filtered = Network.open(res)
+        >>> filtered.resolve("1").quantities, filtered.resolve("101").quantities
+        (('WaterLevel',), ())
 
         Notes
         -----
-        MIKE 11 keeps its timeseries on reach gridpoints rather than on nodes,
-        so the nodes of a ``.res11`` network carry no data of their own. Pass
-        ``reaches`` rather than ``nodes`` to control what gets loaded.
+        Which locations carry series depends on the format; see
+        :class:`Network`.
 
-        An EPANET reach carries one synthetic gridpoint, which mikeio1d gives a
-        breakpoint at each end so that the reach's own quantities (``Flow``,
-        ``Velocity``, ...) are reachable the way a MIKE reach's end data is. As
-        a result:
-
-        * without the ``.inp``, a reach's length is unknown, so only its first
-          breakpoint (``distance=0.0``) is real; the second is not addressable
-          by distance at all -- ``find(reach=..., distance=...)`` resolves it
-          only via ``distance="start"``/``"end"`` (which return the node, not
-          the breakpoint), or not at all by a number. The corresponding edges of
-          :attr:`graph` are ``length=None``
-        * with the ``.inp``, a pipe's second breakpoint sits at its full length
-          -- both breakpoints are then addressable by distance, and the edge
-          between them carries the pipe's real length. Pumps and valves keep an
-          unaddressable second breakpoint even so, since ``[PIPES]`` is the only
-          section carrying lengths
-
-        Node timeseries, :meth:`to_dataframe`, :meth:`to_dataset`,
-        ``find(node=...)`` and :meth:`recall` are unaffected.
+        A ``.resx`` and its result file are compared on their periods here, but
+        on their time steps only when a :meth:`read` uses both: neither header
+        gives the steps, and reading them would read the timeseries.
         """
-        if isinstance(res, (str, Path)):
-            path = Path(res)
-            _validate_extension(path.suffix)
-            res = Res1D(str(path))
-        elif isinstance(res, Res1D):
-            _validate_extension(Path(res.file_path).suffix)
-        else:
-            raise TypeError(f"Expected a str, Path or Res1D object, got {type(res).__name__!r}")
-
-        if nodes is None:
-            nodes_list: list[str] = list(res.nodes.keys())
-        elif isinstance(nodes, str):
-            nodes_list = [nodes]
-        else:
-            nodes_list = list(nodes)
-
-        if reaches is None:
-            reaches_list: list[str] = list(res.reaches.keys())
-        elif isinstance(reaches, str):
-            reaches_list = [reaches]
-        else:
-            reaches_list = list(reaches)
-
-        # None is threaded through as "read everything" rather than expanded to
-        # res.quantities, which would only cost a lookup for the same result.
-        if quantities is None:
-            quantities_set: set[str] | None = None
-        elif isinstance(quantities, str):
-            quantities_set = {quantities}
-        else:
-            quantities_set = set(quantities)
-
-        found, discovered = _companion_paths(res, companions)
-
-        # Each failure that a companion caused is caught where it is raised, so
-        # a fault in the result file itself keeps its own message: advice to
-        # drop the companions cannot help with a topology the result file does
-        # not have.
-        try:
-            extra, lengths = _read_companions(res, found)
-        except ValueError as err:
-            if not discovered:
-                raise
-            raise _blame_the_companions(res, found, err) from err
-
-        try:
-            list_of_reaches = _load_res1d_network(
-                res,
-                nodes_list,
-                reaches_list,
-                extra=extra,
-                lengths=lengths,
-                quantities=quantities_set,
-            )
-        except _CompanionConflict as err:
-            if not discovered:
-                raise
-            raise _blame_the_companions(res, found, err) from err
-
-        return cls(list_of_reaches)
+        return cls(*_load_network(res, companions))
 
     @staticmethod
     def _generate_reaches_dict(
@@ -282,80 +207,199 @@ class Network:
             if reach.id in by_id:
                 raise ValueError(
                     f"Two reaches share the id {reach.id!r}. A reach is addressed by its "
-                    "id, and its break points are keyed by it, so keeping both would drop "
+                    "id, and its breakpoints are keyed by it, so keeping both would drop "
                     "one of them and interleave their edges."
                 )
             by_id[reach.id] = reach
         return by_id
 
-    def to_dataframe(self, sel: str | None = None) -> pd.DataFrame:
-        """Dataframe using node ids as column names.
+    def to_dataframe(self) -> pd.DataFrame:
+        """Read every series in the network, labelled the way :meth:`read` labels them.
 
-        It will be multiindex unless 'sel' is passed.
+        Meant for small networks: it holds every series in memory at once, and
+        each call reads the file again. To read only some locations, or one
+        quantity, use :meth:`read`::
 
-        Parameters
-        ----------
-        sel : Optional[str], optional
-            Quantity to select, by default None
+            network.read(quantity="Discharge")
 
         Returns
         -------
         pd.DataFrame
-            Timeseries contained in graph nodes
+            Time-indexed. Columns are ``(address, quantity)`` pairs, as
+            :meth:`read` gives them.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> df = network.to_dataframe()
+        >>> df.shape
+        (110, 495)
+        >>> df.columns[:2].tolist()
+        [('100', 'WaterLevel'), ('99', 'WaterLevel')]
         """
-        df = self._df.copy()
-        if sel is None:
-            return df
-        else:
-            df.attrs["quantity"] = sel
-            return df.reorder_levels(["quantity", "node"], axis=1).loc[:, sel]
+        items = [
+            (address, quantity)
+            for address in self._naming.graph_nodes
+            for quantity in self._results.quantities_at(address)
+        ]
+        df = self._results.read(items).rename_axis(index="time")
+        df.columns = pd.Index(items, tupleize_cols=False, name="item")
+        return df
 
     def to_dataset(self) -> xr.Dataset:
-        """Dataset of the timeseries, with each node's original identity alongside.
+        """Dataset of the timeseries, with each location's address alongside.
+
+        Meant for small networks: it reads every series, as :meth:`to_dataframe`
+        does.
 
         Returns
         -------
         xr.Dataset
-            One variable per quantity over ``(time, node)``. ``node`` is the
-            integer index the graph uses, and the ``name``, ``reach`` and
-            ``distance`` coordinates carry the names the model gave the same
-            locations, so a consumer never has to hold on to the network to know
-            what a column is::
+            One variable per quantity over ``(time, graph_node)``. All of them
+            share one ``graph_node`` axis, holding every location that carries
+            any quantity; a variable is NaN where its location does not carry
+            it. ``graph_node`` is the graph's integer, as
+            :attr:`NetworkLocation.graph_node` gives it, and the ``node_id``,
+            ``reach`` and ``position`` coordinates carry the address, so a consumer never
+            has to hold on to the network to know what a column is. A node fills in ``node_id``, a
+            breakpoint ``reach`` and ``position``, and the empty half says
+            which it is::
 
                 Coordinates:
-                  * time      datetime64
-                  * node      int64     0 1 2 3 ...
-                    name      <U16      'J1' 'J2' '' ''
-                    reach     <U16      '' '' 'r1' 'r1'
-                    distance  float64   nan nan 0.0 24.5
+                  * time        datetime64
+                  * graph_node  int64       0 1 2 3 ...
+                    node_id     <U16        'J1' 'J2' '' ''
+                    reach       <U16        '' '' 'r1' 'r1'
+                    position    float64     nan nan 0.0 24.5
 
             Empty when no location carries data.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> ds = network.to_dataset()
+        >>> list(ds.data_vars), dict(ds.sizes)
+        (['WaterLevel', 'Discharge'], {'time': 110, 'graph_node': 495})
+
+        A column's address, from its coordinates:
+
+        >>> graph_node = network.resolve(("100l1", 23.8), position_tol=0.1).graph_node
+        >>> column = ds.sel(graph_node=graph_node)
+        >>> column.node_id.item(), column.reach.item(), column.position.item()
+        ('', '100l1', 23.8413574216414)
         """
-        df_raw = self.to_dataframe()
-        if len(df_raw.columns) == 0:
+        df = self.to_dataframe()
+        if len(df.columns) == 0:
             return xr.Dataset()
-        df = df_raw.reorder_levels(["quantity", "node"], axis=1)
-        quantities = df.columns.get_level_values("quantity").unique()
+        columns_by_quantity: dict[str, list[int]] = {}
+        for i, (_, quantity) in enumerate(df.columns):
+            columns_by_quantity.setdefault(quantity, []).append(i)
+        graph_nodes = self._naming.graph_nodes
         ds = xr.Dataset(
             {
-                q: xr.DataArray(df[q], dims=["time", "node"], attrs={"long_name": str(q)})
-                for q in quantities
+                quantity: xr.DataArray(
+                    df.iloc[:, cols].to_numpy(),
+                    coords={
+                        "time": df.index,
+                        "graph_node": [graph_nodes[df.columns[i][0]] for i in cols],
+                    },
+                    dims=["time", "graph_node"],
+                    attrs={"long_name": str(quantity)},
+                )
+                for quantity, cols in columns_by_quantity.items()
             }
         )
-        return ds.assign_coords(self._naming.identity_coords(ds.node.values))
 
-    @property
-    def graph(self) -> nx.Graph:
-        """Graph of the network."""
-        return self._graph
+        node_ids, reaches, positions = [], [], []
+        for graph_node in ds.graph_node.to_numpy():
+            address = self._graph.nodes[int(graph_node)]["address"]
+            if _is_breakpoint(address):
+                reach, position = address
+                node_ids.append("")
+                reaches.append(reach)
+                positions.append(position)
+            else:
+                node_ids.append(address)
+                reaches.append("")
+                positions.append(np.nan)
+        return ds.assign_coords(
+            node_id=("graph_node", np.array(node_ids, dtype=str)),
+            reach=("graph_node", np.array(reaches, dtype=str)),
+            position=("graph_node", np.array(positions, dtype=float)),
+        )
+
+    def to_networkx(self) -> nx.Graph:
+        """Build the network as an undirected networkx graph.
+
+        Each call builds a new graph, which the caller is free to edit. Hold on
+        to it rather than calling this again.
+
+        A reach becomes a chain of edges: its start node, its breakpoints in
+        order, its end node. The graph is undirected; which way a reach runs is
+        in ``reaches[reach_id].start`` and ``.end``.
+
+        Returns
+        -------
+        nx.Graph
+            Nodes are graph nodes, the integers :attr:`NetworkLocation.graph_node`
+            gives. Nodes and edges carry at least these attributes:
+
+            * node ``address`` -- the location's address: a model node's id,
+              or a ``(reach_id, position)`` breakpoint.
+            * edge ``length`` -- the distance between the edge's two ends, in
+              the reach's own units. ``None`` where the reach's length is not
+              known, which is only on the edge into its end node: an EPANET
+              pump or valve has no length. networkx treats an
+              edge whose weight is ``None`` as absent, so a route weighted by
+              ``length`` goes around it.
+            * edge ``boundary`` -- ``True`` where both ends are the same place,
+              a breakpoint sitting on its reach's end node. Its length is
+              ``0.0``.
+
+        Examples
+        --------
+        >>> import networkx as nx
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> graph = network.to_networkx()
+
+        From a graph node back to its address:
+
+        >>> graph.nodes[network.resolve("101").graph_node]["address"]
+        '101'
+
+        The shortest route between two nodes by length:
+
+        >>> start = network.resolve("100").graph_node
+        >>> end = network.resolve("99").graph_node
+        >>> route = nx.shortest_path(graph, start, end, weight="length")
+        >>> [graph.nodes[n]["address"] for n in route]
+        ['100', ('100l1', 0.0), ('100l1', 23.8413574216414), ('100l1', 47.6827148432828), '99']
+
+        Its first edge is a boundary edge, since the reach's first breakpoint
+        sits on its start node:
+
+        >>> graph.edges[route[0], route[1]]
+        {'length': 0.0, 'boundary': True}
+
+        A route by length skips an edge whose length is ``None``, as for an
+        EPANET pump, and finds none where that edge was the only way:
+
+        >>> epanet = Network.open("tests/testdata/epanet.res")
+        >>> pump = epanet.reaches["9"]
+        >>> start, end = epanet.resolve(pump.start).graph_node, epanet.resolve(pump.end).graph_node
+        >>> nx.shortest_path(epanet.to_networkx(), start, end, weight="length")
+        Traceback (most recent call last):
+        ...
+        networkx.exception.NetworkXNoPath: No path between 34 and 0.
+        """
+        return self._graph.copy()
 
     @property
     def reaches(self) -> Mapping[str, NetworkReach]:
         """The network's reaches, by the id the model gave them.
 
-        Read-only. A reach answers for its own length, endpoints and break
-        points, which is how a caller asks about a location without holding the
-        result file open.
+        Read-only. A mapping rather than a dict, so a reach's record may be
+        built when it is looked up rather than when the network is opened.
 
         Returns
         -------
@@ -364,209 +408,378 @@ class Network:
 
         Examples
         --------
-        >>> network.reaches["10"].length  # doctest: +SKIP
-        304.8
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> reach = network.reaches["100l1"]
+        >>> reach.start, reach.end, reach.length
+        ('100', '99', 47.6827148432828)
         """
         return MappingProxyType(self._reaches)
 
     @property
-    def quantities(self) -> list[str]:
-        """Quantities present in data.
+    def period(self) -> tuple[datetime, datetime]:
+        """First and last timestep of the series this network reads.
+
+        Every frame :meth:`read` returns spans it. Read from the file header, so
+        no timeseries is loaded.
 
         Returns
         -------
-        List[str]
-            List of quantities
+        tuple[datetime, datetime]
+            Start and end of the network's time axis.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.period
+        (datetime.datetime(1994, 8, 7, 16, 35), datetime.datetime(1994, 8, 7, 18, 35))
         """
-        # Read off _df rather than to_dataframe(), whose copy would duplicate
-        # the whole dataset for the sake of its column labels.
-        return list(self._df.columns.get_level_values("quantity").unique())
+        return self._results.period
 
-    @overload
-    def find(
+    @property
+    def quantities(self) -> Mapping[str, str | None]:
+        """Quantities readable somewhere in this network, by their units.
+
+        The union over every location the network has, so everything named here
+        can be read at some address - see :meth:`addresses`. A result file's
+        header may declare more than this: a MIKE river result carries structure
+        and sensor quantities that sit on neither a node nor a gridpoint, and a
+        result may carry catchment quantities. Nothing in a network can address
+        them.
+
+        Read-only, and read from the file header.
+
+        Returns
+        -------
+        Mapping[str, str | None]
+            Quantity ID to unit abbreviation. The unit is ``None`` where the
+            file gave none.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> dict(network.quantities)
+        {'WaterLevel': 'm', 'Discharge': 'm^3/s'}
+        """
+        results = self._results
+        units = results.units
+        readable = {
+            quantity
+            for address in self._naming.graph_nodes
+            for quantity in results.quantities_at(address)
+        }
+        # In the header's order, so the listing does not depend on the topology.
+        ordered = [q for q in units if q in readable]
+        ordered += sorted(readable.difference(units))
+        return MappingProxyType({q: units.get(q) for q in ordered})
+
+    def _blame_unreadable(
         self,
+        items: Sequence[tuple[Address, str]],
+        position_tol: float | None,
+    ) -> KeyError:
+        """Say which of the requested items cannot be read, and why each cannot.
+
+        One error for all of them: how many fail, and the first ones by name.
+        Kept to one line, since a KeyError renders its message through repr
+        and would show newlines raw.
+        """
+        faults = []
+        for address, quantity in items:
+            found = self._naming.canonical(address, position_tol=position_tol, quantity=quantity)
+            if found is not None:
+                continue
+            described = self._naming.describe_miss(
+                address, position_tol=position_tol, quantity=quantity
+            )
+            # A location that is here is described by what it carries; one
+            # that is not, by what is near it.
+            joint = " " if self._naming.named(address) is not None else " - "
+            faults.append(f"{address!r}{joint}{described}")
+        shown = "; ".join(faults[:10])
+        if len(faults) > 10:
+            shown += f"; ... and {len(faults) - 10} more"
+        return KeyError(
+            f"read() cannot read {len(faults)} of the {len(items)} items asked for: {shown}. "
+            "resolve() says what one location carries, and addresses(quantity=...) says where "
+            "a quantity is, both without reading anything."
+        )
+
+    def read(
+        self,
+        items: Sequence[tuple[Address, str]] | None = None,
         *,
-        node: str,
-        reach: None = None,
-        distance: None = None,
-    ) -> int:
-        pass
+        quantity: str | None = None,
+        position_tol: float | None = None,
+    ) -> pd.DataFrame:
+        """Read the series named by ``(address, quantity)`` pairs, or one quantity everywhere.
 
-    @overload
-    def find(
-        self,
-        *,
-        node: list[str],
-        reach: None = None,
-        distance: None = None,
-    ) -> list[int]:
-        pass
+        Pass either ``items`` or ``quantity``, not both.
 
-    @overload
-    def find(
-        self,
-        *,
-        node: None = None,
-        reach: str | list[str],
-        distance: str | float,
-    ) -> int:
-        pass
-
-    @overload
-    def find(
-        self,
-        *,
-        node: None = None,
-        reach: str | list[str],
-        distance: list[str | float],
-    ) -> list[int]:
-        pass
-
-    def find(
-        self,
-        node: str | list[str] | None = None,
-        reach: str | list[str] | None = None,
-        distance: str | float | list[str | float] | None = None,
-    ) -> int | list[int]:
-        """Find node or breakpoint id in the Network object based on former coordinates.
+        Each call opens the file once, however many items it asks for. So one
+        call with many items is faster than many calls with one item each.
 
         Parameters
         ----------
-        node : str | List[str], optional
-            Node id(s) in the original network, by default None
-        reach : str | List[str], optional
-            Reach id(s) for breakpoint lookup or reach endpoint lookup, by default None
-        distance : str | float | List[str | float], optional
-            Distance(s) along reach for breakpoint lookup, or "start"/"end"
-            for reach endpoints, by default None
+        items : sequence of (address, quantity)
+            What to read. An address is a node ID, or a reach ID and a position
+            along it, as :meth:`addresses` gives and :meth:`resolve` confirms.
+            An empty sequence reads nothing at all, and returns an empty frame
+            rather than the whole file.
+        quantity : str, optional
+            A quantity to read at every location that carries it, in place of
+            ``items``. The same as passing
+            ``[(a, quantity) for a in addresses(quantity=quantity)]``.
+        position_tol : float, optional
+            How far a position may be from a breakpoint's own and still mean
+            it. Defaults to 1e-3, enough to absorb a rounded float, and never
+            narrows below it: a position that close to a breakpoint names it,
+            and is read there or refused. Widen it to snap a measured chainage
+            onto the model's; the nearest breakpoint inside the window carrying
+            the item's quantity wins. Checked for a node ID too, but not used.
+            Only with ``items``.
 
         Returns
         -------
-        int | List[int]
-            Node or breakpoint id(s) in the generic network. A list argument is
-            answered with a list, even a one-element one; a scalar argument with
-            a scalar.
+        pd.DataFrame
+            Time-indexed over :attr:`period`, one column per element
+            of ``items``, in that order and keeping duplicates. The columns are
+            the items themselves, as asked for rather than as snapped, so
+            ``df[items[i]]`` selects the series asked for.
+
+        Raises
+        ------
+        KeyError
+            If any item names a location the network does not have, or a
+            quantity that location does not carry. The message says how many
+            items fail and names the first ones. For ``quantity``, if no
+            location in the network carries it.
+        TypeError
+            If neither or both of ``items`` and ``quantity`` are given, or
+            ``position_tol`` is given with ``quantity``.
+        ValueError
+            If ``position_tol`` is negative or not finite, or if the items span
+            the result file and its ``.resx`` companion and the two turn out to
+            have different time axes.
+
+        Notes
+        -----
+        A node of a MIKE 11 result carries nothing; see :class:`Network` for
+        which locations carry series in each format.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> df = network.read([("101", "WaterLevel")])
+        >>> df.shape
+        (110, 1)
+        >>> df.columns.tolist()
+        [('101', 'WaterLevel')]
+
+        One quantity at every location that carries it:
+
+        >>> network.read(quantity="Discharge").shape
+        (110, 129)
+
+        A measured chainage, snapped onto the model's nearest breakpoint. The
+        column keeps the address asked for:
+
+        >>> df = network.read([(("100l1", 23.8), "Discharge")], position_tol=0.1)
+        >>> df.columns.tolist()
+        [(('100l1', 23.8), 'Discharge')]
+
+        A reach observation, whose breakpoints have to agree before one of them
+        can stand for the reach:
+
+        >>> points = network.addresses(reach="100l1", quantity="Discharge")
+        >>> network.read([(point, "Discharge") for point in points]).columns.tolist()
+        [(('100l1', 23.8413574216414), 'Discharge')]
+        """
+        if (items is None) == (quantity is None):
+            raise TypeError("read() takes either items or quantity, not both and not neither.")
+        if quantity is not None:
+            return self._read_quantity(quantity, position_tol)
+
+        _window(position_tol)
+        # Every item is checked before anything is read.
+        resolved: list[tuple[Address, str]] = []
+        for address, item_quantity in items:
+            found = self._naming.canonical(
+                address, position_tol=position_tol, quantity=item_quantity
+            )
+            if found is None:
+                raise self._blame_unreadable(items, position_tol)
+            resolved.append((found, item_quantity))
+
+        df = self._results.read(resolved)
+        # A flat index: an address can itself be a tuple, which a MultiIndex
+        # would split.
+        df.columns = pd.Index(list(items), tupleize_cols=False, name="item")
+        return df
+
+    def _read_quantity(self, quantity: str, position_tol: float | None) -> pd.DataFrame:
+        if position_tol is not None:
+            raise TypeError(
+                "read() takes position_tol only with items: a quantity is read at the "
+                "addresses the network already has, so there is no position to snap."
+            )
+        items = [(address, quantity) for address in self.addresses(quantity=quantity)]
+        if not items:
+            raise KeyError(
+                f"read() found no location carrying {quantity!r}. The network carries "
+                f"{list(self.quantities)}."
+            )
+        # The addresses come from the network, so they need no resolving.
+        df = self._results.read(items)
+        df.columns = pd.Index(items, tupleize_cols=False, name="item")
+        return df
+
+    def addresses(
+        self, *, reach: str | None = None, quantity: str | None = None
+    ) -> Sequence[Address]:
+        """List the addresses this network can be read at.
+
+        Where :meth:`resolve` goes from an address to what the network knows
+        about the location, this gives the addresses themselves: the names
+        :meth:`read` takes.
+
+        Parameters
+        ----------
+        reach : str, optional
+            Only the breakpoints along this reach, in the order they sit. The
+            reach's own end nodes are not among them - they are nodes, and a
+            node is named by its own ID. A structure's reach keeps the type
+            prefix the file gives it: ``"Weir:119w1"``, where
+            ``Res1D.structures`` says ``"119w1"``. ``None`` *(default)* lists
+            everything.
+        quantity : str, optional
+            Only locations carrying this quantity. ``None`` *(default)* does not
+            filter.
+
+        Returns
+        -------
+        Sequence[str | tuple[str, float]]
+            Addresses, each of which :meth:`resolve` answers for and
+            :meth:`read` takes. A sequence: it has a length, can be indexed and
+            can be iterated more than once. Pass it to ``list()`` for a list.
+
+        Raises
+        ------
+        KeyError
+            If ``reach`` is not a reach of this network. The message suggests
+            the reach meant, such as the prefixed id of a structure's reach.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.addresses(reach="100l1")
+        [('100l1', 0.0), ('100l1', 23.8413574216414), ('100l1', 47.6827148432828)]
+
+        Every breakpoint of a reach that carries discharge, which is the batch
+        a reach observation has to be scored against:
+
+        >>> network.addresses(reach="100l1", quantity="Discharge")
+        [('100l1', 23.8413574216414)]
+        """
+        results = self._results
+        if reach is None:
+            addresses: Iterable[Address] = self._naming.graph_nodes
+        elif reach in self._reaches:
+            addresses = self._reaches[reach].breakpoints
+        else:
+            raise KeyError(f"addresses() found {self._naming.describe_miss((reach, 0.0))}")
+
+        if quantity is None:
+            return list(addresses)
+        return [address for address in addresses if quantity in results.quantities_at(address)]
+
+    def resolve(
+        self,
+        address: Address,
+        *,
+        position_tol: float | None = None,
+        quantity: str | None = None,
+    ) -> NetworkLocation | None:
+        """Say whether a location is in this network, what it carries, and where.
+
+        An address that is not here gives ``None`` rather than an exception.
+
+        Parameters
+        ----------
+        address : str or tuple[str, float]
+            A node ID, or a reach ID and a position along it. A reach's own end
+            nodes are named by their IDs, which ``reaches[reach_id].start``
+            and ``.end`` give. A structure's reach ID keeps the type prefix the
+            file gives it, as in ``("Weir:119w1", 0.5)``.
+        position_tol : float, optional
+            How far a position may be from a breakpoint's own and still mean
+            it. Defaults to 1e-3, enough to absorb a rounded float, and never
+            narrows below it: a position that close to a breakpoint names it.
+            Widen it to snap a measured chainage onto the model's; the nearest
+            breakpoint inside the window wins. Checked for a node ID too, but
+            not used.
+        quantity : str, optional
+            Only a location carrying this quantity. A position snaps onto the
+            nearest breakpoint that carries it, so a caller need not know
+            which quantities sit where on a staggered grid. A position naming a
+            breakpoint that lacks it, or a node lacking it, gives ``None``
+            rather than a neighbour. ``None`` *(default)* snaps onto any
+            breakpoint.
+
+        Returns
+        -------
+        NetworkLocation or None
+            ``None`` if there is no such location, or none carrying
+            ``quantity``: exactly when :meth:`read` would refuse the address
+            with that quantity. Otherwise its address as the network spells it,
+            every quantity readable there, and its graph node.
 
         Raises
         ------
         ValueError
-            If invalid combination of parameters is provided
-        KeyError
-            If requested node/breakpoint is not found in the network
+            If ``position_tol`` is negative or not finite.
+
+        Notes
+        -----
+        A node of a MIKE 11 result carries nothing, so it resolves with empty
+        ``quantities``; see :class:`Network` for which locations carry series in
+        each format.
+
+        Examples
+        --------
+        >>> network = Network.open("tests/testdata/network.res1d")
+        >>> network.resolve("101")
+        NetworkLocation(address='101', quantities=('WaterLevel',), graph_node=5)
+
+        A measured chainage, snapped onto the breakpoint the file stores:
+
+        >>> network.resolve(("100l1", 23.8), position_tol=0.1)
+        NetworkLocation(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)
+
+        With a quantity, a position snaps only onto a breakpoint carrying it.
+        On this staggered grid 5.0 is nearest the water level point at 0.0, but
+        discharge sits at 23.84:
+
+        >>> network.resolve(("100l1", 5.0), position_tol=30, quantity="Discharge").address
+        ('100l1', 23.8413574216414)
+
+        A position naming a breakpoint is not snapped away from it:
+
+        >>> network.resolve(("100l1", 0.0), position_tol=30, quantity="Discharge") is None
+        True
+
+        >>> network.resolve("no_such_node") is None
+        True
+
+        A node of a MIKE 11 result is in the network, carrying nothing:
+
+        >>> Network.open("tests/testdata/network_cali.res11").resolve("0 CALI")
+        NetworkLocation(address='0 CALI', quantities=(), graph_node=0)
         """
-        by_node = node is not None
-        by_breakpoint = reach is not None or distance is not None
-
-        if by_node and by_breakpoint:
-            raise ValueError(
-                "Cannot specify both 'node' and 'reach'/'distance' parameters simultaneously"
-            )
-
-        if not by_node and not by_breakpoint:
-            raise ValueError("Must specify either 'node' or both 'reach' and 'distance' parameters")
-
-        # The answer keeps the shape of the argument it came from: a caller who
-        # passed a list gets a list back, even a one-element one, so building the
-        # selection programmatically does not change the type of the result.
-        one_answer = not isinstance(node if by_node else distance, list)
-
-        ids: list[str | tuple[str, float]]
-
-        if by_node:
-            assert node is not None
-            if not isinstance(node, list):
-                node = [node]
-            ids = list(node)
-
-        else:
-            if reach is None or distance is None:
-                raise ValueError(
-                    "Both 'reach' and 'distance' parameters are required for breakpoint/endpoint lookup"
-                )
-
-            if not isinstance(reach, list):
-                reach = [reach]
-
-            if not isinstance(distance, list):
-                distance = [distance]
-
-            if len(reach) == 1:
-                reach = reach * len(distance)
-
-            if len(reach) != len(distance):
-                raise ValueError(
-                    "Incompatible lengths of 'reach' and 'distance' arguments. One 'reach' admits multiple distances, otherwise they must be the same length."
-                )
-
-            ids = []
-            for reach_i, distance_i in zip(reach, distance):
-                if distance_i in ["start", "end"]:
-                    ids.append(self._naming.endpoint(reach_i, distance_i))
-                else:
-                    if not isinstance(distance_i, (int, float)):
-                        raise ValueError(
-                            "Invalid 'distance' value for breakpoint lookup: "
-                            f"{distance_i!r}. Expected a numeric value or 'start'/'end'."
-                        )
-                    ids.append((reach_i, distance_i))
-
-        resolved = [self._naming.id_of(id) for id in ids]
-        missing_ids = [ids[i] for i, v in enumerate(resolved) if v is None]
-        if missing_ids:
-            details = "; ".join(f"{id!r} - {self._naming.describe_miss(id)}" for id in missing_ids)
-            raise KeyError(f"Not found in the network: {details}")
-        return resolved[0] if one_answer else resolved
-
-    @overload
-    def recall(self, id: int) -> dict[str, Any]:
-        pass
-
-    @overload
-    def recall(self, id: list[int]) -> list[dict[str, Any]]:
-        pass
-
-    def recall(self, id: int | list[int]) -> dict[str, Any] | list[dict[str, Any]]:
-        """Recover the original coordinates of an element given the node id(s) in the Network object.
-
-        Parameters
-        ----------
-        id : int | List[int]
-            Node id(s) in the generic network
-
-        Returns
-        -------
-        Dict[str, Any] | List[Dict[str, Any]]
-            Original coordinates: a dict for a single id, a list of dicts for a
-            list of ids, even a one-element one.
-            Dict contains coordinates:
-            - For nodes: 'node' key with node id
-            - For breakpoints: 'reach' and 'distance' keys with reach id and distance
-
-        Raises
-        ------
-        KeyError
-            If node id is not found in the network
-        """
-        one_answer = not isinstance(id, list)
-        if one_answer:
-            id = [id]
-
-        results: list[dict[str, Any]] = []
-        for node_id in id:
-            alias = self._naming.alias_of(node_id)
-            if _is_break_point(alias):
-                results.append({"reach": alias[0], "distance": alias[1]})
-            else:
-                results.append({"node": alias})
-
-        return results[0] if one_answer else results
-
-    def copy(self) -> Network:
-        """Create a deep copy of the Network.
-
-        Returns
-        -------
-        Network
-            Deep copy of the Network object
-        """
-        return deepcopy(self)
+        found = self._naming.canonical(address, position_tol=position_tol, quantity=quantity)
+        if found is None:
+            return None
+        return NetworkLocation(
+            address=found,
+            quantities=self._results.quantities_at(found),
+            graph_node=self._naming.graph_nodes[found],
+        )
