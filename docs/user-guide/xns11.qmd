@@ -145,7 +145,7 @@ gdf.head()
 ```
 
 ```{python}
-gdf.plot(column='location_id', cmap='tab20', legend=True)
+gdf.plot()
 ```
 It is also possible to extract cross section markers as GeoDataFrames.
 
