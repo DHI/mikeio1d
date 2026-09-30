@@ -10,7 +10,6 @@ if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
     from .query import QueryData
-    from .result_reader_writer.result_reader import ColumnMode
 
     from DHI.Mike1D.ResultDataAccess import ResultData
     from DHI.Mike1D.ResultDataAccess import ResultDataSearcher
@@ -221,7 +220,7 @@ class Res1D:
     def read(
         self,
         queries: list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData | None = None,
-        column_mode: str | ColumnMode | None = None,
+        column_mode: str | None = None,
     ) -> pd.DataFrame:
         """Read result data into a pandas DataFrame.
 
@@ -262,7 +261,7 @@ class Res1D:
     def to_dataframe(
         self,
         queries: list[TimeSeriesId] | TimeSeriesId | list[QueryData] | QueryData | None = None,
-        column_mode: str | ColumnMode | None = None,
+        column_mode: str | None = None,
     ) -> pd.DataFrame:
         """Read result data into a pandas DataFrame.
 

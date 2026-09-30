@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
     from ..result_network import ResultLocation
-    from ..result_reader_writer.result_reader import ColumnMode
     from ..result_query import QueryData
 
     import pandas as pd
@@ -128,12 +127,12 @@ class ResultQuantity:
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
         self.res1d.network.queue.append(self.timeseries_id)
 
-    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
+    def read(self, column_mode: str | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.

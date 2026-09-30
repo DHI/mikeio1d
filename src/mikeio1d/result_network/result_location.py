@@ -8,7 +8,6 @@ if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
     from ..res1d import Res1D
-    from ..result_reader_writer.result_reader import ColumnMode
     from ..query import QueryData
 
     from DHI.Mike1D.ResultDataAccess import IRes1DDataSet
@@ -99,12 +98,12 @@ class ResultLocation(ABC):
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
 
-    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
+    def read(self, column_mode: str | None = None) -> pd.DataFrame:
         """Read the time series data for all quantities at this location into a DataFrame.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
@@ -123,14 +122,14 @@ class ResultLocation(ABC):
         df = reader.read(timesries_ids, column_mode=column_mode)
         return df
 
-    def to_dataframe(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
+    def to_dataframe(self, column_mode: str | None = None) -> pd.DataFrame:
         """Read the time series data for all quantities at this location into a DataFrame.
 
         Alias for read() method.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
