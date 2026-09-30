@@ -1,0 +1,103 @@
+"""Build the graph a network is made of.
+
+One reach becomes a chain of edges: start node, its breakpoints in order, end
+node. An edge carries the distance between its ends where that is known, and a
+``boundary`` flag where the two ends are the same place - a gridpoint promoted to
+a breakpoint sits exactly at the reach end it belongs to.
+
+Every edge length is a difference between two positions in one reach's own
+frame, so an offset frame - a MIKE river reach reporting chainages along the
+whole branch - cancels out.
+
+Two reaches between the same pair of nodes - parallel pumps, a battery of
+orifices - stay apart because each one's breakpoints are keyed by its own id,
+so each gets its own chain of graph nodes. A reach with no breakpoints has only
+the one start-to-end edge, which is why :func:`_generate_graph` refuses two of
+those between the same nodes rather than collapsing them into one.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Sequence
+
+import networkx as nx
+
+from ._naming import _POSITION_TOLERANCE
+from ._types import NetworkReach
+
+
+def _generate_graph(reaches: Sequence[NetworkReach]) -> nx.Graph:
+    g0 = nx.Graph()
+    # Which reach claimed each node pair with a bare start-to-end edge. Every
+    # other edge this builds has a breakpoint key - a (reach_id, position)
+    # tuple - at one end at least, so no two reaches can land on it.
+    lone_reach_by_pair: dict[frozenset[str], str] = {}
+    for reach in reaches:
+        # 1) Add start and end nodes
+        for node_key in (reach.start, reach.end):
+            if node_key not in g0.nodes:
+                g0.add_node(node_key)
+
+        # 2) Add edges connecting start/end nodes to their adjacent breakpoints
+        start_key = reach.start
+        end_key = reach.end
+        if reach.n_breakpoints == 0:
+            pair = frozenset((start_key, end_key))
+            claimed_by = lone_reach_by_pair.get(pair)
+            if claimed_by is not None:
+                raise ValueError(
+                    f"Reaches {claimed_by!r} and {reach.id!r} both run between nodes "
+                    f"{start_key!r} and {end_key!r}, and neither has breakpoints, so the "
+                    "graph cannot keep them apart. Give each of them at least one break "
+                    "point: a reach with breakpoints gets its own chain of graph nodes, "
+                    "which is how a result file's parallel pumps and orifices stay distinct."
+                )
+            lone_reach_by_pair[pair] = reach.id
+            g0.add_edge(start_key, end_key, length=reach.length, boundary=False)
+        else:
+            bp_keys = list(reach.breakpoints)
+            g0.add_nodes_from(bp_keys)
+
+            # A breakpoint at the reach's own end is the same place as the end
+            # node: tag the edge as a boundary and clamp it to 0.0, since the two
+            # positions come from different sources and float noise would leave
+            # a tiny non-zero length.
+            leading_diff = reach.breakpoints[0][1] - reach.start_position
+            leading_is_boundary = abs(leading_diff) <= _POSITION_TOLERANCE
+            leading_length = 0.0 if leading_is_boundary else leading_diff
+            g0.add_edge(
+                start_key,
+                bp_keys[0],
+                length=leading_length,
+                boundary=leading_is_boundary,
+            )
+
+            # Only this edge needs the reach's length, which can be unknown;
+            # the others are known from breakpoint positions alone.
+            end_position = reach.end_position
+            if end_position is None:
+                tail_length = None
+                tail_is_boundary = False
+            else:
+                tail_diff = end_position - reach.breakpoints[-1][1]
+                tail_is_boundary = abs(tail_diff) <= _POSITION_TOLERANCE
+                tail_length = 0.0 if tail_is_boundary else tail_diff
+            g0.add_edge(
+                bp_keys[-1],
+                end_key,
+                length=tail_length,
+                boundary=tail_is_boundary,
+            )
+
+        # 3) Connect consecutive intermediate breakpoints
+        for i in range(reach.n_breakpoints - 1):
+            current_ = reach.breakpoints[i]
+            next_ = reach.breakpoints[i + 1]
+            g0.add_edge(
+                current_,
+                next_,
+                length=next_[1] - current_[1],
+                boundary=False,
+            )
+
+    return nx.convert_node_labels_to_integers(g0, label_attribute="address")

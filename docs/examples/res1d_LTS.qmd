@@ -4,13 +4,13 @@ description: Read and plot LTS results.
 jupyter: python3
 ---
 ```{python}
-from mikeio1d import Res1D
+import mikeio1d
 ```	
 
 ## Event statistics
 
 ```{python}
-res = Res1D("../data/lts_event_statistics.res1d")
+res = mikeio1d.open("../data/lts_event_statistics.res1d")
 res.info()
 ```	
 
@@ -42,7 +42,7 @@ df[
 ## Chronological statistics
 
 ```{python}
-res = Res1D("../data/lts_monthly_statistics.res1d")
+res = mikeio1d.open("../data/lts_monthly_statistics.res1d")
 df = res.read()
 df.head()
 ```

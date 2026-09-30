@@ -5,14 +5,14 @@ jupyter: python3
 ---
 
 ```{python}
-from mikeio1d import Res1D
+import mikeio1d
 ```
 
 ## Res1D
 
 ```{python}
 # Check contents
-res = Res1D("../data/network.res1d")
+res = mikeio1d.open("../data/network.res1d")
 res.info()
 ```
 
@@ -88,7 +88,7 @@ res.nodes['1']
 ### Catchments
 ```{python}
 # See info related to catchments
-res = Res1D("../data/catchments.res1d")
+res = mikeio1d.open("../data/catchments.res1d")
 res.catchments
 ```
 
@@ -107,7 +107,7 @@ df = res.catchments['20_2_2'].TotalRunOff.plot()
 ## Dynamic selections
 ```{python}
 # Dynamically select results to extract into a pandas DataFrame.
-res = Res1D("../data/network.res1d")
+res = mikeio1d.open("../data/network.res1d")
 
 res.reaches['100l1'].Discharge.add()
 res.reaches['101l1'].Discharge.add()

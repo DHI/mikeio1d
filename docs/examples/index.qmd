@@ -15,3 +15,8 @@ The files are stored on GitHub in the [MIKE IO 1D repo](https://github.com/DHI/m
 The easiest way is to the download the repo as a [zip file](https://github.com/DHI/mikeio1d/archive/main.zip) and extract the files you need.
 
 In the zip file you find the files in `tests/testdata/` folder.
+:::
+
+::: {.callout-tip title="Additional examples on GitHub" collapse="true"}
+There's [additional notebooks](https://github.com/DHI/mikeio1d/tree/main/notebooks) available on GitHub.
+:::

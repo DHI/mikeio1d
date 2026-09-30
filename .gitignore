@@ -139,15 +139,19 @@ Debug
 Release
 .vs
 
-# mikeio1d/bin folder
-mikeio1d/bin/**/*.dll
-mikeio1d/bin/**/*.pfs
-mikeio1d/bin/**/*.ubg
-mikeio1d/bin/**/*.xml
-mikeio1d/bin/**/*so.5
+# UV lock file
+uv.lock
 
-# mikeio1d/util/bin folder
-mikeio1d/bin/DHI.Mike1D.MikeIO/**/*
+# src/mikeio1d/bin folder
+src/mikeio1d/bin/**/*.dll
+src/mikeio1d/bin/**/*.pfs
+src/mikeio1d/bin/**/*.ubg
+src/mikeio1d/bin/**/*.xml
+src/mikeio1d/bin/**/*.so
+src/mikeio1d/bin/**/*so.5
+
+# src/mikeio1d/util/bin folder
+src/mikeio1d/bin/DHI.Mike1D.MikeIO/**/*
 
 # Specific files
 tests/testdata/network_river.mod.res1d
@@ -166,5 +170,12 @@ tests/testdata/catchment_merge_c.res1d
 tests/testdata/network_cali.res1d
 tests/testdata/NetworkFactorTwo.res1d
 tests/testdata/NetworkNodeWaterLevel.dfs0
-tests/testdata/mikep_cs_demo.xns11
 
+# uv
+uv.lock
+
+# Claude Code
+.claude/settings.local.json
+
+# Worktrees
+.trees

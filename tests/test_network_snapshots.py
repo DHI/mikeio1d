@@ -1,0 +1,132 @@
+"""Hold this module to what modelskill's loader did, except where it deliberately parts from it.
+
+These snapshots were recorded in modelskill before the topology layer moved here
+(ADR-013 there), over fixtures that are copies of the ones in this repository.
+They are the acceptance test for the move: the same loads must still produce
+the same graph, the same address map, the same dataframe and the same
+correspondence between names and graph integers - recorded through find and
+recall then, and through resolve and the graph's own labels now.
+
+Where the baseline differs from modelskill's recording:
+
+- A reach of unknown length has one breakpoint, at its start, not a second at
+  distance None (e7f205a). Both EPANET snapshots were re-recorded: alone, every
+  pipe lost its far breakpoint (37 graph nodes to 24); with companions, only
+  link 9, which the .inp gave no length either (37 to 36).
+- EPANET lengths come from the .res, not the .inp, which is no longer a
+  companion (f3e94c8). The snapshot with companions held still; the one alone
+  was re-recorded and now has the same graph (36 graph nodes), differing only
+  in the .resx quantities.
+- The loads filtered by node or quantity are gone, with the open options they
+  used (41cb850). A filtered read is Network.read's to test.
+- Names changed, values did not: alias became address, the graph integer
+  graph_node, and distance position. The res1d and res11 snapshots are
+  otherwise modelskill's.
+- The river snapshot is new here. modelskill recorded none, so it holds this
+  module's own output from when it was added.
+
+Cases are named for the fixture and its load options rather than for a
+constructor, so reshaping the entry points cannot quietly rewrite the target.
+
+Regenerate with::
+
+    pytest tests/test_network_snapshots.py --update-snapshots
+"""
+
+# ruff: noqa: E402
+import json
+from pathlib import Path
+
+import pytest
+
+pytest.importorskip("networkx")
+
+from mikeio1d.network import Network
+
+from tests.network_snapshot import describe
+
+_TESTDATA = Path(__file__).parent / "testdata"
+_SNAPSHOTS = _TESTDATA / "network_snapshots"
+
+_RES1D = str(_TESTDATA / "network.res1d")
+_RIVER = str(_TESTDATA / "network_river.res1d")
+_RES11 = str(_TESTDATA / "network_cali.res11")
+_EPANET_RES = str(_TESTDATA / "epanet.res")
+_EPANET_RESX = str(_TESTDATA / "epanet.resx")
+
+# Each case is a fixture plus the options it is loaded with. The lone EPANET load
+# has to say companions=[] where modelskill said nothing at all: discovery finds
+# the .resx sitting beside the fixture, and that load is about its absence.
+LOADS = {
+    "res1d": lambda: Network.open(_RES1D),
+    "res1d_river": lambda: Network.open(_RIVER),
+    "res11": lambda: Network.open(_RES11),
+    "epanet_with_companions": lambda: Network.open(_EPANET_RES, companions=[_EPANET_RESX]),
+    "epanet_alone": lambda: Network.open(_EPANET_RES, companions=[]),
+}
+
+
+def _mismatches(actual, expected, where=""):
+    """Compare two snapshots, tolerating the last bits of a float.
+
+    Parameters
+    ----------
+    actual : object
+        What the loader produced now.
+    expected : object
+        What the stored snapshot holds.
+    where : str, optional
+        Path through the structure, used to name a mismatch.
+
+    Returns
+    -------
+    list of str
+        One line per difference, empty when the two agree. A tolerance is
+        applied to floats because these files are meant to travel between
+        machines, where a sum over thousands of values need not land on the same
+        final digit.
+    """
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        problems = []
+        for key in sorted(set(expected) | set(actual)):
+            if key not in actual:
+                problems.append(f"{where}/{key}: missing, expected {expected[key]!r}")
+            elif key not in expected:
+                problems.append(f"{where}/{key}: unexpected, got {actual[key]!r}")
+            else:
+                problems += _mismatches(actual[key], expected[key], f"{where}/{key}")
+        return problems
+
+    if isinstance(expected, list) and isinstance(actual, list):
+        if len(expected) != len(actual):
+            return [f"{where}: length {len(actual)}, expected {len(expected)}"]
+        problems = []
+        for i, (got, want) in enumerate(zip(actual, expected)):
+            problems += _mismatches(got, want, f"{where}[{i}]")
+        return problems
+
+    if isinstance(expected, float) or isinstance(actual, float):
+        if actual is None or expected is None:
+            return [] if actual == expected else [f"{where}: {actual!r} != {expected!r}"]
+        if actual == pytest.approx(expected, rel=1e-9, abs=1e-9):
+            return []
+        return [f"{where}: {actual!r} != {expected!r}"]
+
+    return [] if actual == expected else [f"{where}: {actual!r} != {expected!r}"]
+
+
+@pytest.mark.parametrize("case", sorted(LOADS))
+def test_loader_output_is_unchanged(case, update_snapshots):
+    snapshot = _SNAPSHOTS / f"{case}.json"
+    actual = describe(LOADS[case]())
+
+    if update_snapshots:
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        snapshot.write_text(json.dumps(actual, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        return
+
+    assert snapshot.exists(), f"No snapshot for '{case}'. Run --update-snapshots."
+    expected = json.loads(snapshot.read_text(encoding="utf-8"))
+
+    problems = _mismatches(actual, expected)
+    assert not problems, "\n".join([f"'{case}' has changed:", *problems[:40]])

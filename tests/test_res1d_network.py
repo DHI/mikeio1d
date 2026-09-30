@@ -151,27 +151,6 @@ def test_time_index_microseconds(test_file):
     assert df.index.microsecond.unique().size > 1
 
 
-def test_get_node_values(test_file):
-    values = test_file.get_node_values("1", "WaterLevel")
-    assert len(values) == 110
-
-
-def test_get_reach_values(test_file):
-    values = test_file.get_reach_values("9l1", 5, "WaterLevel")
-    time_series = pd.Series(values, index=test_file.time_index)
-    assert len(values) == 110
-    assert len(time_series.index) == 110
-    # Just try to call the methods
-    test_file.get_reach_end_values("9l1", "WaterLevel")
-    test_file.get_reach_start_values("9l1", "WaterLevel")
-    test_file.get_reach_sum_values("9l1", "WaterLevel")
-
-
-def test_get_reach_value(test_file):
-    value = test_file.get_reach_value("9l1", 5, "WaterLevel", test_file.start_time)
-    assert value > 0
-
-
 def test_dotnet_methods(test_file):
     res1d = test_file
     # Just try to access the properties and methods in .net
@@ -191,7 +170,7 @@ def test_dotnet_methods(test_file):
 
 def test_res1d_filter(test_file_path, helpers):
     nodes = ["1", "2"]
-    reaches = ["9l1"]
+    reaches = "9l1"
     res1d = Res1D(test_file_path, nodes=nodes, reaches=reaches)
     res1d.reader.column_mode = ColumnMode.ALL
 
@@ -245,7 +224,12 @@ def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
 @pytest.mark.parametrize(
     "time, expected_len, expected_start, expected_end",
     [
-        (None, 110, "1994-08-07 16:35:00.000", "1994-08-07 18:35:00.000"),
+        (
+            None,
+            110,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 18:35:00.000",
+        ),
         (
             slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
             3,
@@ -282,6 +266,36 @@ def test_res1d_filter_using_flow_split(flow_split_file_path, helpers):
             "1994-08-07 18:32:07.967000",
             "1994-08-07 18:35:00.000",
         ),
+        (
+            [
+                slice("1994-08-07 16:35:00.000", "1994-08-07 16:38:00.000000"),
+                slice("1994-08-07 16:38:00.000", "1994-08-07 16:48:00.000000"),
+                slice("1994-08-07 16:48:00.000", "1994-08-07 16:58:12.888000"),
+            ],
+            21,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:58:12.888000",
+        ),
+        (
+            [
+                slice("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+                slice("1994-08-07 16:45:00.000", "1994-08-07 16:48:00.000000"),
+                slice("1994-08-07 16:55:00.000", "1994-08-07 16:58:12.888000"),
+            ],
+            9,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:58:12.888000",
+        ),
+        (
+            [
+                ("1994-08-07 16:35:00.000", "1994-08-07 16:37:07.560000"),
+                ("1994-08-07 16:45:00.000", "1994-08-07 16:48:00.000000"),
+                ("1994-08-07 16:55:00.000", "1994-08-07 16:58:12.888000"),
+            ],
+            9,
+            "1994-08-07 16:35:00.000",
+            "1994-08-07 16:58:12.888000",
+        ),
     ],
 )
 def test_res1d_filter_time(test_file_path, time, expected_len, expected_start, expected_end):
@@ -313,11 +327,11 @@ def test_res1d_filter_quantity_invalid_id(test_file_path):
         Res1D(test_file_path, quantities=["InvalidQuantity"])
 
 
-@pytest.mark.parametrize("quantities", [["WaterLevel"], ["WaterLevel", "Discharge"]])
+@pytest.mark.parametrize("quantities", [["WaterLevel"], ["WaterLevel", "Discharge"], "WaterLevel"])
 def test_res1d_filter_quantity(test_file_path, quantities):
     res = Res1D(test_file_path, quantities=quantities)
 
-    quantities = set(quantities)
+    quantities = set([quantities] if isinstance(quantities, str) else quantities)
     assert quantities.issuperset(set(res.nodes.quantities))
     assert quantities.issuperset(set(res.catchments.quantities))
     assert quantities.issuperset(set(res.structures.quantities))
@@ -430,31 +444,73 @@ def test_structure_reach_static_attributes(res1d_network):
     assert structures.s_115p1.chainage == pytest.approx(41.21402714094492)
 
 
-def test_structure_reach_maintains_backweards_compatibility(res1d_network):
-    structures = res1d_network.structures
+@pytest.mark.parametrize(
+    "str_chainage,float_chainage",
+    [
+        ("0.000", 0.0),  # Exact match
+        ("23.841", 23.841),  # Exact match
+        ("23.841", 23.84),  # Fewer decimal places
+        ("23.841", 23.8),  # Fewer decimal places
+        ("47.683", 47.683),  # Exact match for last chainage
+        ("47.683", 47.68),  # Fewer decimal places
+        ("47.683", 47.6),  # Fewer decimal places
+    ],
+)
+def test_reach_float_chainage_indexing(test_file, str_chainage, float_chainage):
+    """Test that ResultReach can be indexed with a float chainage value.
 
-    with pytest.warns(UserWarning):
-        assert structures.s_119w1.structure_id == structures.s_119w1.id
+    Uses reach 100l1 with chainages ['0.000', '23.841', '47.683']
+    """
+    res1d = test_file
+    reaches = res1d.reaches
+    reach = reaches.r_100l1
+
+    # Get grid points using both string and float representations
+    grid_point_from_str = reach[str_chainage]
+    grid_point_from_float = reach[float_chainage]
+
+    # Assert they are the same grid point
+    assert grid_point_from_float is grid_point_from_str
 
 
-def test_nodes_dict_access_maintains_backwards_compatibility(res1d_network):
-    with pytest.warns(UserWarning):
-        node = res1d_network.nodes["1"]
-        assert node.GroundLevel == pytest.approx(197.07000732421875)
-        assert node.BottomLevel == pytest.approx(195.0500030517578)
-        assert node.XCoordinate == pytest.approx(-687934.6000976562)
+def test_reach_float_chainage_indexing_keyerror(test_file):
+    """Test that trying to access a non-existent chainage raises KeyError."""
+    res1d = test_file
+    reaches = res1d.reaches
+    reach = reaches.r_100l1
+
+    # Test that trying to access a non-existent chainage raises KeyError
+    with pytest.raises(KeyError):
+        reach[999.999]
 
 
-def test_node_node_property_maintains_backwards_compatibility(res1d_network):
-    node = res1d_network.nodes.n_1
-    assert node.node.GroundLevel == pytest.approx(197.07000732421875)
-    assert node.node.BottomLevel == pytest.approx(195.0500030517578)
-    assert node.node.XCoordinate == pytest.approx(-687934.6000976562)
+def test_to_dataframe_aliases(res1d_network):
+    """Test that to_dataframe() alias exists and returns a DataFrame in all relevant classes."""
+    # Test Res1D class
+    df = res1d_network.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
 
+    # Test ResultLocation class (node)
+    node = res1d_network.nodes["1"]
+    df = node.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
 
-def test_reaches_dict_access_maintains_backwards_compatibility(res1d_network, res1d_river_network):
-    with pytest.warns(UserWarning):
-        # Indexing reaches could return a single dotnet reach
-        reach = res1d_network.reaches["100l1"]
-        assert reach.Name == "100l1"
-        assert reach.Length == pytest.approx(47.6827148432828)
+    # Test ResultLocations class (nodes)
+    df = res1d_network.nodes.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+
+    # Test ResultQuantityCollection class
+    quantity_collection = res1d_network.nodes.quantities["WaterLevel"]
+    df = quantity_collection.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+
+    # Test ResultQuantity class (base class for all quantities)
+    quantity = res1d_network.nodes["1"].WaterLevel
+    df = quantity.to_dataframe()
+    assert isinstance(df, pd.DataFrame)
+
+    # Test ResultQuantityDerived class if available
+    if hasattr(res1d_network.nodes, "WaterLevelPlusOne"):
+        derived_quantity = res1d_network.nodes.WaterLevelPlusOne
+        df = derived_quantity.to_dataframe()
+        assert isinstance(df, pd.DataFrame)

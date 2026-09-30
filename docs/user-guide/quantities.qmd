@@ -9,11 +9,11 @@ res_catchments = Res1D('../data/catchments.res1d')
 ```
 :::
 
-Quantities are the actual model results, which can be read into a pandas DataFrame or plotted directly.
+[Quantities](`mikeio1d.result_network.ResultQuantity`) are the actual model results, which can be read into a pandas DataFrame or plotted directly.
 
 ## Data structures
 
-Two main quantity structures exist: quantities and quantity collections.
+Two main quantity structures exist: [quantities](`mikeio1d.result_network.ResultQuantity`) and [quantity collections](`mikeio1d.result_network.ResultQuantityCollection`).
 
 ### Quantity
 A quantity is a single quantity at a specific location. Quantities are accessed from a location object.

@@ -2,7 +2,7 @@
 title: Locations
 ---
 
-Locations are where model results exist in the [Network](network.qmd). The main location types are nodes, reaches, gridpoints, and catchments. 
+Locations are where model results exist in the [Network](network.qmd). The main location types are [nodes](`mikeio1d.result_network.ResultNodes`), [reaches](`mikeio1d.result_network.ResultReaches`), and [catchments](`mikeio1d.result_network.ResultCatchments`)
 
 ::: {.hidden}
 ```{python}
@@ -13,7 +13,7 @@ res_catchments = Res1D('../data/catchments.res1d')
 :::
 
 ## Data structures
-There are two main data structures for locations: location collections and single locations.
+There are two main data structures for locations: location collections ([](`~mikeio1d.result_network.ResultLocations`)) and single locations ([](`~mikeio1d.result_network.ResultLocation`)).
 
 ### Location collections
 Access location collections from a [Res1D](res1d.qmd) object. Each collection shows available quantities and location IDs.

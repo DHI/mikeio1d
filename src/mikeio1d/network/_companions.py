@@ -1,0 +1,326 @@
+"""Files read alongside a result file, and the names they use.
+
+An EPANET run writes two result files: the ``.res`` holding the network, its
+reach lengths and its main results, and a ``.resx`` holding extra results for
+the same network. A companion is found by sharing the result file's folder and
+stem. The ``.inp`` input file beside them is not read: everything a network
+needs from it is in the ``.res`` too.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from ._res1d import _SeriesKey
+    from ._results import _Series
+
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from ..res1d import Res1D
+from ._res1d import _as_res1d
+from ._res1d import _suffix_of
+from ._res1d import _series_by_key
+from ._res1d import _units_of
+
+_COMPANION_SEARCH_EXTENSIONS = frozenset({".res"})
+"""Result extensions whose companions can be found by folder and stem.
+
+Only EPANET's ``.res``, because no other product this reader knows writes
+companions worth looking for. Found companions are read without the caller
+asking, so the search has to be narrow enough that finding one is good evidence
+it belongs.
+"""
+
+# The encodings a companion file's text is worth re-reading as. mikeio1d hands
+# back '.res' names decoded as UTF-8 but '.resx' names decoded with the Windows
+# ANSI codepage, so a name holding a non-ASCII character arrives spelled two
+# ways from one model. cp1252 is that codepage on a Western-European Windows.
+_COMPANION_ENCODINGS = ("cp1252", "latin-1")
+
+
+def _repair_mis_decoded(name: str) -> list[str]:
+    """Re-read a name as UTF-8, undoing a single-byte decoding of those bytes.
+
+    Parameters
+    ----------
+    name : str
+        A location name as the companion file reported it.
+
+    Returns
+    -------
+    list of str
+        The candidate spellings, which is empty when no encoding round-trips.
+        A caller must check a candidate against the main file before using it:
+        the encoding that produced the name is a guess.
+    """
+    candidates = []
+    for encoding in _COMPANION_ENCODINGS:
+        try:
+            repaired = name.encode(encoding).decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            continue
+        if repaired != name and repaired not in candidates:
+            candidates.append(repaired)
+    return candidates
+
+
+def _rekey_by_main_file(locations: Any, known: Any) -> dict[str, Any]:
+    """Key a companion file's locations by their names in the main result file.
+
+    A name that already matches, or that no re-reading reconciles, keeps the
+    spelling it came with — so a companion from a genuinely different model
+    still holds names the main file does not, and validation still catches it.
+
+    Parameters
+    ----------
+    locations : mapping of str to value
+        What the companion file said, keyed by its own spelling of each name:
+        the node or reach names of a companion result.
+    known : container of str
+        The main file's names for the same kind of location.
+
+    Returns
+    -------
+    dict of str to value
+    """
+    rekeyed = {}
+    for name in locations:
+        key = name
+        if name not in known:
+            key = next(
+                (c for c in _repair_mis_decoded(name) if c in known),
+                name,
+            )
+        rekeyed[key] = locations[name]
+    return rekeyed
+
+
+@dataclass(frozen=True)
+class _Companion:
+    """A companion result file's series, keyed by the main file's location names.
+
+    Keyed as the main file's series are (see ``_res1d._SeriesKey``), so the two
+    merge by key.
+    """
+
+    series_by_key: dict[_SeriesKey, dict[str, _Series]]
+    units: Mapping[str, str]
+
+
+def _open_companion_result(res: Res1D, resx: str | Path | Res1D) -> _Companion:
+    """Open and validate a companion ``.resx`` result file.
+
+    Returns
+    -------
+    _Companion
+        The companion's locations, keyed by their names in ``res``.
+
+    Raises
+    ------
+    ValueError
+        If the file does not come from the same run as ``res``.
+    """
+    extra = _as_res1d(resx)
+
+    # Merging two different runs would line up silently and produce a network
+    # that is wrong in a way no later error would reveal. Only the period is
+    # compared here: the full time axis is not in a '.resx' header, and reading
+    # it would load both files' dynamic data. _Results.read checks the axes
+    # once a read brings the two together.
+    if (res.start_time, res.end_time) != (extra.start_time, extra.end_time):
+        raise ValueError(
+            "The '.resx' companion does not cover the same period as the "
+            "'.res' file, so the two are not from the same run. Got "
+            f"{extra.start_time} - {extra.end_time} against "
+            f"{res.start_time} - {res.end_time}."
+        )
+
+    # Each of the companion's names, under its spelling in the main file.
+    nodes = _rekey_by_main_file({name: name for name in extra.nodes}, res.nodes)
+    reaches = _rekey_by_main_file({name: name for name in extra.reaches}, res.reaches)
+
+    unknown_nodes = set(nodes) - set(res.nodes)
+    if unknown_nodes:
+        raise ValueError(
+            f"The '.resx' companion holds nodes {sorted(unknown_nodes)} that are "
+            "absent from the '.res' network, so the two files do not describe "
+            "the same model."
+        )
+
+    unknown_reaches = set(reaches) - set(res.reaches)
+    if unknown_reaches:
+        raise ValueError(
+            f"The '.resx' companion holds reaches {sorted(unknown_reaches)} that are "
+            "absent from the '.res' network, so the two files do not describe "
+            "the same model."
+        )
+
+    main_node = {own_name: main for main, own_name in nodes.items()}
+    main_reach = {own_name: main for main, own_name in reaches.items()}
+    series_by_key: dict[_SeriesKey, dict[str, _Series]] = {}
+    for key, carried in _series_by_key(extra).items():
+        if isinstance(key, tuple):
+            key = (main_reach[key[0]], key[1])
+        else:
+            key = main_node[key]
+        series_by_key[key] = carried
+
+    return _Companion(series_by_key=series_by_key, units=_units_of(extra))
+
+
+def _merge_companion(
+    own: Mapping[_SeriesKey, dict[str, _Series]],
+    units: Mapping[str, str],
+    extra: _Companion,
+) -> tuple[dict[_SeriesKey, dict[str, _Series]], dict[str, str]]:
+    """Add a companion's series and units to the main file's.
+
+    Onto the main file's locations only. A quantity both files carry at one
+    location is refused rather than merged, since whichever came last would
+    silently win. Where both declare a unit for a quantity, the main file's wins.
+
+    Raises
+    ------
+    ValueError
+        If the two files carry the same quantity at one location.
+    """
+    _refuse_clashes(own, extra.series_by_key)
+    series_by_key = {
+        key: {**carried, **extra.series_by_key.get(key, {})} for key, carried in own.items()
+    }
+    return series_by_key, {**extra.units, **units}
+
+
+def _refuse_clashes(
+    own: Mapping[_SeriesKey, Mapping[str, object]],
+    other: Mapping[_SeriesKey, Mapping[str, object]],
+) -> None:
+    """Refuse a companion carrying a quantity the result file has at the same place.
+
+    Otherwise whichever file was merged last would silently win.
+
+    Parameters
+    ----------
+    own, other : mapping of _SeriesKey to (mapping of quantity ID to anything)
+        What each location carries, in the main file and in the companion.
+
+    Raises
+    ------
+    ValueError
+        Naming the first location where the two overlap, and what they share.
+    """
+    for key, carried in other.items():
+        overlapping = set(own.get(key, ())) & set(carried)
+        if overlapping:
+            where = f"Reach {key[0]!r}" if isinstance(key, tuple) else f"Node {key!r}"
+            raise ValueError(
+                f"{where} already has {sorted(overlapping)} in the main result file, "
+                "so the companion file's copy cannot be merged in."
+            )
+
+
+def _find_epanet_companion(res: Path) -> Path | None:
+    """Find the ``.resx`` sitting beside an EPANET ``.res``.
+
+    A companion is recognised by sharing the result file's directory and stem.
+
+    Parameters
+    ----------
+    res : Path
+        Path to an EPANET ``.res`` result file.
+
+    Returns
+    -------
+    Path or None
+        The ``.resx`` companion, or None if there is none.
+    """
+    for candidate in sorted(res.parent.iterdir()):
+        if (
+            candidate.is_file()
+            and candidate.stem == res.stem
+            and candidate.suffix.lower() == ".resx"
+        ):
+            return candidate
+    return None
+
+
+def _companion_paths(
+    res: Res1D, companions: Sequence[str | Path | Res1D] | None
+) -> tuple[list[str | Path | Res1D], bool]:
+    """Decide which companions to read: the ones asked for, or the ones found.
+
+    Parameters
+    ----------
+    res : Res1D
+        The result file the companions belong to.
+    companions : sequence of str, Path or Res1D, or None
+        What the caller asked for. ``None`` means look beside the result file,
+        an empty sequence means read none.
+
+    Returns
+    -------
+    tuple of (list, bool)
+        The companions to read, and whether they were found rather than named,
+        so an error can name a file the caller never mentioned.
+    """
+    if companions is not None:
+        return list(companions), False
+
+    file_path = res.file_path
+    if file_path is None or _suffix_of(file_path) not in _COMPANION_SEARCH_EXTENSIONS:
+        return [], False
+
+    found = _find_epanet_companion(Path(file_path))
+    return ([found], True) if found is not None else ([], False)
+
+
+def _read_companions(
+    res: Res1D,
+    companions: Sequence[str | Path | Res1D],
+) -> _Companion | None:
+    """Read the companions.
+
+    Parameters
+    ----------
+    res : Res1D
+        The result file the companions belong to.
+    companions : sequence of str, Path or Res1D
+        The companions to read.
+
+    Returns
+    -------
+    _Companion or None
+        The extra results, or None when no companion was given.
+
+    Raises
+    ------
+    ValueError
+        If an extension is not one a companion can have, or if two ``.resx``
+        companions are given.
+    """
+    extra: _Companion | None = None
+
+    for companion in companions:
+        suffix = _suffix_of(companion)
+        if suffix == ".resx":
+            if extra is not None:
+                raise ValueError("Two '.resx' companions were given; a network can read one.")
+            extra = _open_companion_result(res, companion)
+        elif suffix == ".inp":
+            raise ValueError(
+                "An '.inp' is no longer a companion: the '.res' stores every reach length "
+                "itself, so the input file adds nothing. Leave it out of companions."
+            )
+        else:
+            raise ValueError(
+                f"'{suffix}' is not a companion a network can read. Expected '.resx' for "
+                "extra results."
+            )
+
+    return extra

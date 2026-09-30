@@ -11,7 +11,7 @@ MIKE IO 1D treats EPANET (.res/.resx) and Res1D results in the same way, so you 
 :::
 
 ```{python}	
-from mikeio1d import Res1D
+import mikeio1d
 ```
 
 ::: callout-caution
@@ -19,7 +19,7 @@ Reading '.res' files requires the accompanying '.inp' file having the same name.
 :::
 
 ```{python}	
-res = Res1D("../data/epanet.res")
+res = mikeio1d.open("../data/epanet.res")
 res.info()
 ```
 

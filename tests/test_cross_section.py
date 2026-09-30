@@ -44,14 +44,47 @@ def cs_dummy(xz_data) -> CrossSection:
 
 @pytest.fixture
 def cs_basic(xns_basic) -> CrossSection:
-    return list(xns_basic.xsections.values())[0]
+    return list(xns_basic.values())[0]
 
 
 @pytest.fixture
 def cs_sample(xns_basic) -> List[CrossSection]:
-    x = list(xns_basic.xsections.values())
+    x = list(xns_basic.values())
     x = x[::2]
     return x
+
+
+# Closed-form conveyance factor per resistance type, expressed from the processed
+# resistance (r), flow area (A) and hydraulic radius (R). These mirror the formula
+# used by the MIKE+ cross section editor's processed-data table (issue #229) and are
+# written out explicitly here so the test does not depend on the implementation.
+CONVEYANCE_FORMULAS = {
+    ResistanceType.RELATIVE: lambda r, A, R: A * R ** (2.0 / 3) * r,
+    ResistanceType.MANNINGS_M: lambda r, A, R: A * R ** (2.0 / 3) * r,
+    ResistanceType.MANNINGS_N: lambda r, A, R: A * R ** (2.0 / 3) / r,
+    ResistanceType.CHEZY: lambda r, A, R: A * R**0.5 * r,
+    ResistanceType.DARCY_WEISBACH: lambda r, A, R: A * R**0.5 * r,
+}
+
+# Resistance types handled directly by the MIKE 1D engine's CalculateSpecificConveyance
+# (the engine-first path); the rest fall back to the Python implementation.
+RESISTANCE_TYPES_VIA_ENGINE = [ResistanceType.MANNINGS_M, ResistanceType.CHEZY]
+RESISTANCE_TYPES_VIA_FALLBACK = [
+    ResistanceType.RELATIVE,
+    ResistanceType.MANNINGS_N,
+    ResistanceType.DARCY_WEISBACH,
+]
+
+
+def make_cs_with_resistance(xz_data, resistance_type, value) -> CrossSection:
+    """Create an open cross section with a uniform resistance of the given type and value."""
+    x, z = xz_data
+    cs = CrossSection.from_xz(x=x, z=z, location_id="loc", chainage=100, topo_id="topo")
+    cs.resistance_type = resistance_type
+    df = cs.raw
+    df["resistance"] = value
+    cs.raw = df  # uniform distribution -> triggers recompute
+    return cs
 
 
 class TestCrossSectionUnits:
@@ -98,6 +131,55 @@ class TestCrossSectionUnits:
 
     def test_zmin(self, cs_dummy):
         assert cs_dummy.zmin == 10
+
+    def test_datum_get(self, cs_dummy):
+        assert cs_dummy.datum == 0.0
+
+    def test_datum_set(self, cs_dummy):
+        raw_z = cs_dummy.raw.z.copy()
+        zmin, zmax = cs_dummy.zmin, cs_dummy.zmax
+
+        cs_dummy.datum = 5.0
+        assert cs_dummy.datum == 5.0
+
+        # zmin/zmax and processed levels are absolute, so they shift with the datum.
+        np.testing.assert_allclose(cs_dummy.zmin, zmin + 5.0)
+        np.testing.assert_allclose(cs_dummy.zmax, zmax + 5.0)
+        assert min(cs_dummy.processing_levels) == cs_dummy.zmin
+        assert max(cs_dummy.processing_levels) == cs_dummy.zmax
+
+        # Raw data is stored relative to the datum and must be unaffected.
+        np.testing.assert_array_equal(cs_dummy.raw.z, raw_z)
+
+    def test_processed_levels_are_absolute(self, cs_sample):
+        """Processed levels include the datum and agree with the datum-aware .NET getters.
+
+        The located cross section's getters take an absolute water level. The processed
+        table must agree with them at every level for every quantity, otherwise the
+        levels are in the wrong reference frame.
+        """
+        for cs in cs_sample:
+            proc = cs.processed
+            m1d = cs._m1d_cross_section
+
+            assert proc.level.min() == cs.zmin, cs
+            assert proc.level.max() == cs.zmax, cs
+
+            for level, flow_area, radius, storage_width in zip(
+                proc.level, proc.flow_area, proc.radius, proc.storage_width
+            ):
+                np.testing.assert_allclose(m1d.GetFlowArea(level), flow_area, rtol=1e-4, atol=1e-4)
+                np.testing.assert_allclose(
+                    m1d.GetHydraulicRadius(level), radius, rtol=1e-4, atol=1e-4
+                )
+                np.testing.assert_allclose(
+                    m1d.GetStorageWidth(level), storage_width, rtol=1e-4, atol=1e-4
+                )
+
+            water_level = cs.zmin + 0.3 * (cs.zmax - cs.zmin)
+            interpolated_area = np.interp(water_level, proc.level.values, proc.flow_area.values)
+            np.testing.assert_allclose(interpolated_area, m1d.GetFlowArea(water_level), rtol=1e-3)
+            assert interpolated_area > 0, cs
 
     def test_coords_get(self, cs_basic):
         coords = cs_basic.coords
@@ -234,6 +316,118 @@ class TestCrossSectionUnits:
         )
         np.testing.assert_array_equal(conveyances, df.conveyance_factor)
 
+    def test_conveyance_factor_respects_resistance_type(self, xz_data):
+        """Conveyance factor must account for the resistance formulation (issue #229).
+
+        Manning's n = 0.02 and Manning's M = 50 are hydraulically equivalent
+        (M = 1/n), so they must yield identical processed conveyance factors.
+        Conversely, Manning's n = 50 and Manning's M = 50 are NOT equivalent and
+        must yield different conveyance factors. The bug is that the conveyance
+        factor is computed directly from the raw resistance number as if it were
+        always Manning's M, ignoring the actual formulation.
+        """
+        x, z = xz_data
+
+        def conveyance_for(resistance_type, value):
+            cs = CrossSection.from_xz(x=x, z=z, location_id="loc", chainage=100, topo_id="topo")
+            cs.resistance_type = resistance_type
+            df = cs.raw
+            df["resistance"] = value
+            cs.raw = df  # uniform distribution, triggers recompute
+            return cs.processed.conveyance_factor
+
+        mannings_n_002 = conveyance_for(ResistanceType.MANNINGS_N, 0.02)
+        mannings_m_50 = conveyance_for(ResistanceType.MANNINGS_M, 50.0)
+        mannings_n_50 = conveyance_for(ResistanceType.MANNINGS_N, 50.0)
+
+        # Equivalent resistances -> equal conveyance.
+        np.testing.assert_allclose(mannings_n_002, mannings_m_50, rtol=1e-9)
+
+        # Non-equivalent resistances -> different conveyance.
+        assert not np.allclose(mannings_n_50, mannings_m_50)
+
+    @pytest.mark.parametrize(
+        "resistance_type, value",
+        [
+            (ResistanceType.RELATIVE, 1.5),
+            (ResistanceType.MANNINGS_N, 0.03),
+            (ResistanceType.MANNINGS_M, 40.0),
+            (ResistanceType.CHEZY, 45.0),
+            (ResistanceType.DARCY_WEISBACH, 0.05),
+        ],
+    )
+    def test_conveyance_factor_formula_per_resistance_type(self, xz_data, resistance_type, value):
+        """The processed conveyance factor uses the correct formula for each resistance type.
+
+        Each formulation has its own conveyance formula (issue #229); using the wrong one
+        was the original bug. The expected values are computed from an explicit closed form
+        (CONVEYANCE_FORMULAS) rather than the implementation, so this is not circular. For
+        Darcy-Weisbach the processed resistance is stored as a Chezy number, which the
+        formula reads directly.
+        """
+        cs = make_cs_with_resistance(xz_data, resistance_type, value)
+        df = cs.processed
+        expected = CONVEYANCE_FORMULAS[resistance_type](
+            df.resistance.values, df.flow_area.values, df.radius.values
+        )
+        np.testing.assert_allclose(df.conveyance_factor, expected, rtol=1e-9, atol=1e-12)
+
+        # Conveyance must be positive wherever there is flow area.
+        flowing = df.flow_area.values > 0
+        assert (np.asarray(df.conveyance_factor)[flowing] > 0).all()
+
+    def test_conveyance_factor_distinguishes_resistance_types(self, xz_data):
+        """Resistance types must not collapse to the same conveyance (issue #229).
+
+        The original bug computed every formulation as if it were Manning's M, so Manning's n,
+        Manning's M and Chezy all produced identical conveyance for the same number. Here:
+        - Manning's n = 0.02 is hydraulically equivalent to Manning's M = 50 (M = 1/n) -> equal.
+        - The same number 50 under Manning's n, Chezy and Manning's M -> all different.
+        """
+        n_002 = make_cs_with_resistance(
+            xz_data, ResistanceType.MANNINGS_N, 0.02
+        ).processed.conveyance_factor
+        m_50 = make_cs_with_resistance(
+            xz_data, ResistanceType.MANNINGS_M, 50.0
+        ).processed.conveyance_factor
+        n_50 = make_cs_with_resistance(
+            xz_data, ResistanceType.MANNINGS_N, 50.0
+        ).processed.conveyance_factor
+        chezy_50 = make_cs_with_resistance(
+            xz_data, ResistanceType.CHEZY, 50.0
+        ).processed.conveyance_factor
+
+        # Manning's n = 0.02 is equivalent to Manning's M = 50 (M = 1/n).
+        np.testing.assert_allclose(n_002, m_50, rtol=1e-9)
+
+        # Same number, different formula -> different conveyance.
+        assert not np.allclose(n_50, m_50)
+        # Chezy uses sqrt(R) instead of R**(2/3) (the #229 "Type 3 shows no change" bug).
+        assert not np.allclose(chezy_50, m_50)
+        assert not np.allclose(chezy_50, n_50)
+
+    @pytest.mark.parametrize("resistance_type", RESISTANCE_TYPES_VIA_ENGINE)
+    def test_conveyance_factor_engine_matches_python(self, xz_data, resistance_type):
+        """For formulations the MIKE 1D engine supports, the engine result and the Python
+        fallback must agree, guarding against future divergence (issue #229)."""
+        cs = make_cs_with_resistance(xz_data, resistance_type, 45.0)
+        df = cs.processed
+        args = (df.resistance, df.flow_area, df.radius)
+        engine = cs._calculate_conveyance_factor_dotnet(*args)
+        assert engine is not None, "engine should support this formulation"
+        python = cs._calculate_conveyance_factor_python(*args)
+        np.testing.assert_allclose(engine, python, rtol=1e-9, atol=1e-12)
+
+    @pytest.mark.parametrize("resistance_type", RESISTANCE_TYPES_VIA_FALLBACK)
+    def test_conveyance_factor_uses_python_fallback(self, xz_data, resistance_type):
+        """Formulations the engine does not handle must fall back to the Python implementation
+        (the engine helper returns None), so the conveyance is still computed (issue #229)."""
+        value = 0.03 if resistance_type == ResistanceType.MANNINGS_N else 1.0
+        cs = make_cs_with_resistance(xz_data, resistance_type, value)
+        df = cs.processed
+        engine = cs._calculate_conveyance_factor_dotnet(df.resistance, df.flow_area, df.radius)
+        assert engine is None
+
     def test_processed_get(self, cs_sample):
         for cs in cs_sample:
             df = cs.processed
@@ -251,7 +445,8 @@ class TestCrossSectionUnits:
             set(df.columns) == expected_columns
             base_xs = cs._m1d_cross_section.BaseCrossSection
             expected_vs_actual = [
-                (np.array(base_xs.ProcessedLevels), df.level),
+                # Base levels are relative to the datum; mikeio1d exposes them as absolute.
+                (np.array(base_xs.ProcessedLevels) + cs.datum, df.level),
                 (np.array(base_xs.ProcessedFlowAreas), df.flow_area),
                 (np.array(base_xs.ProcessedRadii), df.radius),
                 (np.array(base_xs.ProcessedStorageWidths), df.storage_width),
@@ -355,6 +550,82 @@ class TestCrossSectionUnits:
         cs_dummy.raw = df
         assert cs_dummy.raw.markers.iloc[0] == ""
         assert cs_dummy.raw.markers.iloc[1] == str(Marker.LEFT_LEVEE_BANK.value)
+
+    def test_raw_set_resistance_uniform_cast(self, cs_dummy):
+        """Test that setting uniform resistance via raw setter casts to UNIFORM."""
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+        df = cs_dummy.raw
+        df.resistance = 50.0
+        cs_dummy.raw = df
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+
+    def test_raw_set_resistance_warns_zones_to_distributed(self, xns_basic):
+        """Test that modifying resistance on ZONES cross section warns and casts to DISTRIBUTED."""
+        zones_css = [
+            cs
+            for cs in xns_basic.values()
+            if cs.resistance_distribution == ResistanceDistribution.ZONES
+        ]
+        assert len(zones_css) > 0, "No ZONES cross sections found in testdata"
+        cs = zones_css[0]
+        df = cs.raw
+        df.resistance = np.arange(1, len(df) + 1, dtype=float)
+        with pytest.warns(match="Resistance distribution changed from ZONES to DISTRIBUTED"):
+            cs.raw = df
+        assert cs.resistance_distribution == ResistanceDistribution.DISTRIBUTED
+
+    def test_raw_set_resistance_uniform_value_persists(self, cs_dummy):
+        """Test that setting uniform resistance via raw setter persists the value."""
+        df = cs_dummy.raw
+        df.resistance = 42.0
+        cs_dummy.raw = df
+        result = cs_dummy.raw
+        np.testing.assert_allclose(result.resistance.values, 42.0)
+
+    def test_raw_set_resistance_unchanged_uniform(self, cs_dummy):
+        """Test that setting raw with unchanged resistance preserves UNIFORM distribution."""
+        df = cs_dummy.raw
+        original_resistance = df.resistance.copy()
+        df.z += 100
+        cs_dummy.raw = df
+        result = cs_dummy.raw
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+        np.testing.assert_allclose(result.resistance.values, original_resistance.values)
+        np.testing.assert_allclose(result.z.values, df.z.values)
+
+    def test_raw_set_resistance_distributed(self, xz_data):
+        """Test that modifying distributed resistance via raw setter persists correctly."""
+        x, z = xz_data
+        cs = CrossSection.from_xz(x=x, z=z, location_id="loc1", chainage=100, topo_id="topo1")
+        cs.resistance_distribution = ResistanceDistribution.DISTRIBUTED
+        df = cs.raw
+        df.resistance = np.arange(1, len(df) + 1, dtype=float)
+        cs.raw = df
+        result = cs.raw
+        np.testing.assert_array_almost_equal(result.resistance.values, df.resistance.values)
+
+    def test_raw_set_preserves_distribution_type(self, cs_dummy):
+        """Test that the raw setter preserves the resistance distribution type when unchanged."""
+        cs_dummy.resistance_distribution = ResistanceDistribution.UNIFORM
+        df = cs_dummy.raw
+        cs_dummy.raw = df
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+
+    def test_raw_set_warns_uniform_to_distributed(self, cs_dummy):
+        """Test that non-uniform resistance on a UNIFORM cross section warns and casts."""
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+        df = cs_dummy.raw
+        df.resistance = np.arange(1, len(df) + 1, dtype=float)
+        with pytest.warns(match="Resistance distribution changed from UNIFORM to DISTRIBUTED"):
+            cs_dummy.raw = df
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.DISTRIBUTED
+
+    def test_raw_set_geometry_change_allows_resistance_column(self, cs_dummy):
+        """Test that adding/removing points doesn't error on resistance even for UNIFORM."""
+        assert cs_dummy.resistance_distribution == ResistanceDistribution.UNIFORM
+        df = cs_dummy.raw
+        df = df.iloc[2:-2].reset_index(drop=True)
+        cs_dummy.raw = df
 
     def test_markers_get(self, cs_dummy):
         markers = cs_dummy.markers

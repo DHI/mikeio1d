@@ -14,7 +14,7 @@ Most users of MIKE IO 1D will also find [MIKE+Py](https://github.com/DHI/mikeplu
 
 ## Requirements
 * Windows, Linux (experimental)
-* Python x64 3.9 - 3.13
+* Python x64 3.12 - 3.14
 * (Windows) [VC++ redistributables](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) (already installed if you have MIKE)
 * (Linux) [.NET Runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) (not installed by default)
 
@@ -45,7 +45,7 @@ Check out the [official documentation for MIKE IO 1D](https://dhi.github.io/mike
 ### Read network results into a DataFrame
 ```python
 >>>  import mikeio1d
->>>  res = mikeio1d.read('my_results.res1d')
+>>>  res = mikeio1d.open('my_results.res1d')
 >>>  df = res.read()
 
 >>>  df_reach = res.reaches['my_reach'].Discharge.read()
@@ -57,7 +57,7 @@ Check out the [official documentation for MIKE IO 1D](https://dhi.github.io/mike
 >>>  import mikeio1d
 
 # Plot section with location id 'basin_right', chainage '238.800', and topo id '1'.
->>>  xns = mikeio1d.read("mikep_cs_demo.xns11")
+>>>  xns = mikeio1d.open("mikep_cs_demo.xns11")
 >>>  xns['basin_right', '238.800', '1'].plot()
 ```
 ![Geometry](https://raw.githubusercontent.com/DHI/mikeio1d/main/images/xns11_geometry.png)

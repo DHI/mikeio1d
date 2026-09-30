@@ -130,29 +130,6 @@ def test_start_time(test_file):
     assert date == test_file.time_index.min()
 
 
-def test_get_node_values(test_file):
-    values = test_file.get_node_values("B4.1200", "SurchargeIntegratedMonthly")
-    assert len(values) == 73
-
-
-def test_get_reach_values(test_file):
-    values = test_file.get_reach_values("B4.1491l1", 144, "DischargeIntegratedMonthlyCount")
-    time_series = pd.Series(values, index=test_file.time_index)
-    assert len(values) == 73
-    assert len(time_series.index) == 73
-    # Just try to call the methods
-    test_file.get_reach_end_values("B4.1491l1", "DischargeIntegratedMonthlyCount")
-    test_file.get_reach_start_values("B4.1491l1", "DischargeIntegratedMonthlyCount")
-    test_file.get_reach_sum_values("B4.1491l1", "DischargeIntegratedMonthlyCount")
-
-
-def test_get_reach_value(test_file):
-    value = test_file.get_reach_value(
-        "B4.1491l1", 144, "DischargeIntegratedMonthlyCount", test_file.start_time
-    )
-    assert value == 0
-
-
 def test_res1d_filter(test_file_path, helpers):
     nodes = ["B4.1320", "A0.0327"]
     reaches = ["B4.1491l1"]

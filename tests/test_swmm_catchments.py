@@ -28,7 +28,7 @@ def test_read(test_file):
 
 def test_quantities(test_file):
     quantities = test_file.quantities
-    assert len(quantities) == 36
+    assert len(quantities) == 37
 
 
 @pytest.mark.parametrize(
@@ -84,11 +84,6 @@ def test_time_index(test_file):
 
 def test_start_time(test_file):
     assert test_file.start_time == test_file.time_index.min()
-
-
-def test_get_catchment_values(test_file):
-    values = test_file.get_catchment_values("5", "SWMM_SUBCATCH_RUNOFF")
-    assert len(values) == 36
 
 
 def test_dotnet_methods(test_file):

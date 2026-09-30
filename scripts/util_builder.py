@@ -20,7 +20,7 @@ class UtilBuilder:
     build_dir_name = os.path.join("bin", "Release", "netstandard2.0")
 
     # Directory where libraries will be installed
-    bin_dir_name = os.path.join("mikeio1d", "bin", "DHI.Mike1D.MikeIO")
+    bin_dir_name = os.path.join("src", "mikeio1d", "bin", "DHI.Mike1D.MikeIO")
 
     # Utility libraries to build and install
     library_names = ["DHI.Mike1D.MikeIO"]
@@ -79,7 +79,7 @@ class UtilBuilder:
 
     @staticmethod
     def build_and_install():
-        """Builds and installs MIKE IO 1D utilities into mikeio1d/bin folder"""
+        """Builds and installs MIKE IO 1D utilities into src/mikeio1d/bin folder"""
         cwd = os.getcwd()
         path, _ = os.path.split(os.path.join(cwd, __file__))
         path = os.path.normpath(os.path.join(path, ".."))

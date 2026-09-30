@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 880" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1680" height="880" fill="#f7f8fc"/>
+
+  <!-- ============ Titles ============ -->
+  <text x="430" y="50" font-size="32" font-weight="700" fill="#1e2432" text-anchor="middle">Res1D</text>
+  <text x="1330" y="50" font-size="32" font-weight="700" fill="#1e2432" text-anchor="middle">Network</text>
+
+  <!-- ============ Row background bands (left panel) ============ -->
+  <rect x="20" y="195" width="800" height="60" rx="10" fill="#fdf1e0"/>
+  <rect x="20" y="375" width="800" height="60" rx="10" fill="#e3f5ef"/>
+  <rect x="20" y="555" width="800" height="60" rx="10" fill="#e9e6fb"/>
+
+  <!-- ============ Vertical column guides ============ -->
+  <g stroke="#cfd2e0" stroke-width="1.5" stroke-dasharray="4,5">
+    <line x1="215" y1="190" x2="215" y2="800"/>
+    <line x1="345" y1="190" x2="345" y2="800"/>
+    <line x1="475" y1="190" x2="475" y2="800"/>
+    <line x1="605" y1="190" x2="605" y2="800"/>
+    <line x1="735" y1="190" x2="735" y2="800"/>
+  </g>
+
+  <!-- ============ Row labels ============ -->
+  <text x="36" y="230" font-size="18" font-weight="600" fill="#9a5a12">gridpoints</text>
+  <text x="36" y="410" font-size="18" font-weight="600" fill="#0f7d6f">reaches</text>
+  <text x="36" y="590" font-size="18" font-weight="600" fill="#3730a3">nodes</text>
+  <text x="36" y="770" font-size="18" font-weight="600" fill="#1e2432">combined</text>
+
+  <!-- ============ gridpoints row ============ -->
+  <g fill="#ffffff" stroke="#c9761f" stroke-width="3">
+    <circle cx="215" cy="225" r="14"/>
+    <circle cx="345" cy="225" r="14"/>
+    <circle cx="460" cy="225" r="14"/>
+    <circle cx="490" cy="225" r="14"/>
+    <circle cx="605" cy="225" r="14"/>
+    <circle cx="735" cy="225" r="14"/>
+  </g>
+
+  <!-- ============ reaches row ============ -->
+  <line x1="215" y1="405" x2="460" y2="405" stroke="#0f9e8a" stroke-width="5"/>
+  <line x1="490" y1="405" x2="735" y2="405" stroke="#0f9e8a" stroke-width="5"/>
+  <text x="338" y="382" font-size="18" font-weight="700" fill="#0f7d6f" text-anchor="middle">r1</text>
+  <text x="613" y="382" font-size="18" font-weight="700" fill="#0f7d6f" text-anchor="middle">r2</text>
+
+  <!-- ============ nodes row ============ -->
+  <g>
+    <circle cx="215" cy="585" r="22" fill="#5b4bd6" stroke="#2f2380" stroke-width="2"/>
+    <text x="215" y="591" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">A</text>
+    <circle cx="475" cy="585" r="22" fill="#5b4bd6" stroke="#2f2380" stroke-width="2"/>
+    <text x="475" y="591" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">B</text>
+    <circle cx="735" cy="585" r="22" fill="#5b4bd6" stroke="#2f2380" stroke-width="2"/>
+    <text x="735" y="591" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">C</text>
+  </g>
+
+  <!-- ============ combined row ============ -->
+  <!-- reach segments drawn first so the coincident markers layer on top of them -->
+  <line x1="215" y1="765" x2="475" y2="765" stroke="#0f9e8a" stroke-width="4"/>
+  <line x1="475" y1="765" x2="735" y2="765" stroke="#0f9e8a" stroke-width="4"/>
+
+  <!-- col2 / col4: a lone gridpoint, nothing else at that spot -->
+  <circle cx="345" cy="765" r="11" fill="#ffffff" stroke="#c9761f" stroke-width="3"/>
+  <circle cx="605" cy="765" r="11" fill="#ffffff" stroke="#c9761f" stroke-width="3"/>
+
+  <!-- col1: node A and r1's own gridpoint at distance 0 sit at the same spot,
+       drawn as concentric markers rather than side by side -->
+  <g>
+    <circle cx="215" cy="765" r="18" fill="#5b4bd6" stroke="#2f2380" stroke-width="2"/>
+    <circle cx="215" cy="765" r="11" fill="none" stroke="#c9761f" stroke-width="3"/>
+    <text x="215" y="770" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">A</text>
+  </g>
+
+  <!-- col3: node B plus r1's last gridpoint AND r2's first gridpoint, all three coincident -->
+  <g>
+    <circle cx="475" cy="765" r="20" fill="#5b4bd6" stroke="#2f2380" stroke-width="2"/>
+    <circle cx="475" cy="765" r="13" fill="none" stroke="#c9761f" stroke-width="3"/>
+    <circle cx="475" cy="765" r="7" fill="none" stroke="#c9761f" stroke-width="3"/>
+    <text x="475" y="770" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">B</text>
+  </g>
+
+  <!-- col5: node C and r2's own gridpoint at its length sit at the same spot -->
+  <g>
+    <circle cx="735" cy="765" r="18" fill="#5b4bd6" stroke="#2f2380" stroke-width="2"/>
+    <circle cx="735" cy="765" r="11" fill="none" stroke="#c9761f" stroke-width="3"/>
+    <text x="735" y="770" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">C</text>
+  </g>
+
+  <g font-size="11.5" font-style="italic" fill="#6b7280" text-anchor="middle">
+    <text x="215" y="802">(same location)</text>
+    <text x="475" y="802">(same location, ×3)</text>
+    <text x="735" y="802">(same location)</text>
+  </g>
+
+  <!-- ============ Arrow ============ -->
+  <line x1="800" y1="585" x2="972" y2="585" stroke="#1e2432" stroke-width="4"/>
+  <polygon points="972,585 954,575 954,595" fill="#1e2432"/>
+  <text x="886" y="558" font-size="20" font-weight="700" fill="#1e2432" text-anchor="middle" font-family="Consolas, monospace">Network.open()</text>
+
+  <!-- ============ Network row ============ -->
+  <!-- boundary edges (zero-length) -->
+  <g stroke="#d97b1f" stroke-width="3" stroke-dasharray="7,6">
+    <line x1="1060" y1="585" x2="1090" y2="585"/>
+    <line x1="1270" y1="585" x2="1300" y2="585"/>
+    <line x1="1340" y1="585" x2="1370" y2="585"/>
+    <line x1="1550" y1="585" x2="1580" y2="585"/>
+  </g>
+  <!-- ordinary reach-segment edges -->
+  <g stroke="#0f9e8a" stroke-width="4">
+    <line x1="1130" y1="585" x2="1160" y2="585"/>
+    <line x1="1200" y1="585" x2="1230" y2="585"/>
+    <line x1="1410" y1="585" x2="1440" y2="585"/>
+    <line x1="1480" y1="585" x2="1510" y2="585"/>
+  </g>
+  <g font-size="11" fill="#b5651d" text-anchor="middle">
+    <text x="1075" y="572">0.0</text>
+    <text x="1285" y="572">0.0</text>
+    <text x="1355" y="572">0.0</text>
+    <text x="1565" y="572">0.0</text>
+  </g>
+  <g fill="#5b4bd6" stroke="#2f2380" stroke-width="2">
+    <circle cx="1040" cy="585" r="20"/>
+    <circle cx="1110" cy="585" r="20"/>
+    <circle cx="1180" cy="585" r="20"/>
+    <circle cx="1250" cy="585" r="20"/>
+    <circle cx="1320" cy="585" r="20"/>
+    <circle cx="1390" cy="585" r="20"/>
+    <circle cx="1460" cy="585" r="20"/>
+    <circle cx="1530" cy="585" r="20"/>
+    <circle cx="1600" cy="585" r="20"/>
+  </g>
+  <g font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <text x="1040" y="591">1</text>
+    <text x="1110" y="591">2</text>
+    <text x="1180" y="591">3</text>
+    <text x="1250" y="591">4</text>
+    <text x="1320" y="591">5</text>
+    <text x="1390" y="591">6</text>
+    <text x="1460" y="591">7</text>
+    <text x="1530" y="591">8</text>
+    <text x="1600" y="591">9</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="14" fill="#333333">
+    <line x1="1040" y1="650" x2="1075" y2="650" stroke="#0f9e8a" stroke-width="4"/>
+    <text x="1085" y="655">reach segment (length &gt; 0)</text>
+    <line x1="1040" y1="676" x2="1075" y2="676" stroke="#d97b1f" stroke-width="3" stroke-dasharray="7,6"/>
+    <text x="1085" y="681">boundary edge (length = 0.0)</text>
+  </g>
+
+  <!-- ============ Zoomed callout ============ -->
+  <rect x="1000" y="90" width="420" height="382" rx="16" fill="#ffffff" stroke="#3d2f9e" stroke-width="2"/>
+  <text x="1210" y="126" font-size="19" font-weight="700" fill="#3d2f9e" text-anchor="middle">Boundary edge (zoomed)</text>
+  <line x1="1016" y1="140" x2="1404" y2="140" stroke="#e5e5f0" stroke-width="1.5"/>
+
+  <line x1="1114" y1="190" x2="1226" y2="190" stroke="#d97b1f" stroke-width="3" stroke-dasharray="7,6"/>
+  <text x="1170" y="174" font-size="12.5" fill="#b5651d" text-anchor="middle">length: 0.0</text>
+  <text x="1170" y="225" font-size="12.5" fill="#b5651d" text-anchor="middle">boundary: True</text>
+  <g fill="#5b4bd6" stroke="#2f2380" stroke-width="2">
+    <circle cx="1090" cy="190" r="24"/>
+    <circle cx="1250" cy="190" r="24"/>
+  </g>
+  <g font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <text x="1090" y="196">1</text>
+    <text x="1250" y="196">2</text>
+  </g>
+
+  <g font-size="14" fill="#222222">
+    <text x="1025" y="253" font-weight="700">Node 1 — old id: "A"</text>
+    <text x="1025" y="273" fill="#555555">ordinary node — no boundary flag on it</text>
+    <text x="1025" y="303" font-weight="700">Node 2 — old id: reach "r1" @ 0.0</text>
+    <text x="1025" y="323" fill="#555555">r1's own first gridpoint, promoted to a</text>
+    <text x="1025" y="341" fill="#555555">breakpoint since it sits where node 1 does</text>
+  </g>
+
+  <rect x="1015" y="356" width="390" height="98" rx="8" fill="#1e2140"/>
+  <g font-size="13" font-family="Consolas, monospace">
+    <text x="1030" y="380" fill="#8fd9c9">recall(1) → {"node": "A"}</text>
+    <text x="1030" y="402" fill="#8fd9c9">recall(2) → {"reach": "r1", "distance": 0.0}</text>
+    <text x="1030" y="424" fill="#f4d58d">find(node="A") → 1</text>
+  </g>
+
+  <line x1="1210" y1="472" x2="1075" y2="563" stroke="#9a93c9" stroke-width="1.5" stroke-dasharray="4,4"/>
+</svg>

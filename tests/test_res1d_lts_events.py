@@ -118,6 +118,18 @@ def test_read_node(test_file, quantity, node_id, expected_max):
     assert pytest.approx(actual_max) == expected_max
 
 
+def test_update_time_quantities_with_nonzero_times(test_file):
+    # Regression for #232: LTS event-time columns hold seconds-since-start as float32.
+    # The fixture's times are all 0, so feed realistic non-zero values to ensure the
+    # datetime conversion replaces the float column instead of an in-place (lossy) set.
+    df = pd.DataFrame(
+        np.array([[3.15e9], [1.94e9]], dtype="float32"),
+        columns=["WaterLevelMaximumTime:B858"],
+    )
+    test_file.reader.update_time_quantities(df)
+    assert df["WaterLevelMaximumTime:B858"].dtype == "datetime64[ns]"
+
+
 def test_time_index(test_file):
     assert len(test_file.time_index) == 10
 
@@ -125,27 +137,6 @@ def test_time_index(test_file):
 def test_lts_event_index(test_file):
     for i in range(len(test_file.time_index)):
         assert test_file.time_index[i] == i
-
-
-def test_get_node_values(test_file):
-    values = test_file.get_node_values("B4.1320", "WaterLevelMaximumTime")
-    assert len(values) == 10
-
-
-def test_get_reach_values(test_file):
-    values = test_file.get_reach_values("B4.1491l1", 144, "WaterLevelMaximumTime")
-    time_series = pd.Series(values, index=test_file.time_index)
-    assert len(values) == 10
-    assert len(time_series.index) == 10
-    # Just try to call the methods
-    test_file.get_reach_end_values("B4.1491l1", "WaterLevelMaximumTime")
-    test_file.get_reach_start_values("B4.1491l1", "WaterLevelMaximumTime")
-    test_file.get_reach_sum_values("B4.1491l1", "WaterLevelMaximumTime")
-
-
-def test_get_reach_value(test_file):
-    with pytest.raises(NotImplementedError):
-        assert test_file.get_reach_value("B4.1491l1", 144, "WaterLevel", 1)
 
 
 def test_res1d_filter(test_file_path, helpers):
@@ -220,7 +211,7 @@ def test_res1d_merging_same_file(test_file_path):
     assert (b4_1491l1_time1 == b4_1491l1_time2).values[0]
 
     # Validate all merged events. Every event now needs to appear twice.
-    df = res1d.read_all()
+    df = res1d.read()
     # TODO: Maybe it is possible to vectorize this check.
     for col in df:
         for i in range(0, len(df[col]), 2):
