@@ -168,7 +168,7 @@ def _series_at(location: ResultNode | ResultGridPoint) -> dict[str, _Series]:
     series = {}
     for quantity_id in location.quantities:
         quantity = _quantity_at(location, quantity_id)
-        path = Path(str(quantity.res1d.file_path))
+        path = Path(str(quantity.res1d.file_path)).resolve()
         series[quantity_id] = _Series(path, quantity.timeseries_id)
     return series
 
