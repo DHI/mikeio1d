@@ -82,7 +82,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-39fa877ca9a50db22a6d21c6fddd0724.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d779191fb58665fba6013d76b5d4c7b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -306,6 +306,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#nodes" id="toc-nodes" class="nav-link" data-scroll-target="#nodes">Nodes</a></li>
   <li><a href="#catchments" id="toc-catchments" class="nav-link" data-scroll-target="#catchments">Catchments</a></li>
   <li><a href="#reading-a-network-as-a-graph" id="toc-reading-a-network-as-a-graph" class="nav-link" data-scroll-target="#reading-a-network-as-a-graph">Reading a network as a graph</a></li>
+  <li><a href="#reading-only-what-you-need" id="toc-reading-only-what-you-need" class="nav-link" data-scroll-target="#reading-only-what-you-need">Reading only what you need</a></li>
+  <li><a href="#not-every-location-carries-data" id="toc-not-every-location-carries-data" class="nav-link" data-scroll-target="#not-every-location-carries-data">Not every location carries data</a></li>
   <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional resources</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/DHI/mikeio1d/edit/main/docs/user-guide/network.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.ipynb" download="network.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
@@ -370,7 +372,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="reading-a-network-as-a-graph" class="level2">
 <h2 class="anchored" data-anchor-id="reading-a-network-as-a-graph">Reading a network as a graph</h2>
-<p>The <code>mikeio1d.network</code> module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its break points in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a distance along it, and <code>find()</code> and <code>recall()</code> translate between those names and the integers the graph uses.</p>
+<p>The <code>mikeio1d.network</code> module reads a result file into a graph of these elements. Each reach becomes a chain — its start node, its breakpoints in order, its end node — and every edge carries the distance between its two ends, where that is known. A location keeps the name the model gave it, a node id or a reach and a position along it, and the network is addressed by those names throughout. <code>to_networkx()</code> gives the graph, labelled with integers, each node carrying its name as the <code>address</code> attribute; <code>resolve()</code> gives the integer for a name, as <code>NetworkLocation.graph_node</code>. A graph node is not a model node: every location has one, a breakpoint too, and a model node is always named by its id. The graph is undirected, and each call builds a new one, which the caller is free to edit.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="../images/docs/res1d_network_mapping.svg" class="img-fluid figure-img"></p>
@@ -393,11 +395,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The module needs the <code>network</code> extra:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install mikeio1d<span class="pp">[</span><span class="ss">network</span><span class="pp">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
+<section id="reading-only-what-you-need" class="level2">
+<h2 class="anchored" data-anchor-id="reading-only-what-you-need">Reading only what you need</h2>
+<p><code>Network.open</code> reads the header and the topology, and no timeseries:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"model.res1d"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The network then answers from the file header and its own breakpoints, still without reading any:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>network.period                                     <span class="co"># (start, end)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>network.quantities                                 <span class="co"># {'WaterLevel': 'm', 'Discharge': 'm^3/s'}</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>network.resolve(<span class="st">"manhole_12"</span>)                      <span class="co"># NetworkLocation(address=..., quantities=(...), graph_node=...)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>network.addresses(reach<span class="op">=</span><span class="st">"100l1"</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>resolve()</code> returns <code>None</code> for a location the network does not have, rather than raising, so a caller can ask before committing to a read. Give it a <code>position_tol</code> to snap a measured chainage onto the model’s:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>network.resolve((<span class="st">"100l1"</span>, <span class="fl">23.8</span>), position_tol<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># NetworkLocation(address=('100l1', 23.8413574216414), quantities=('Discharge',), graph_node=3)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A result’s grid is often staggered: on <code>100l1</code> the water level sits at 0.0 and 47.68 and the discharge at 23.84 between them. Give <code>resolve()</code> the quantity too, and a position snaps only onto a breakpoint that carries it. A position within 1e-3 of a breakpoint names that breakpoint, and is never snapped away from it, however wide the window:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>network.resolve((<span class="st">"100l1"</span>, <span class="fl">5.0</span>), position_tol<span class="op">=</span><span class="dv">30</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>)  <span class="co"># ('100l1', 23.84...)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>network.resolve((<span class="st">"100l1"</span>, <span class="fl">0.0</span>), position_tol<span class="op">=</span><span class="dv">30</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>)  <span class="co"># None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>read()</code> is what touches data. It takes <code>(address, quantity)</code> pairs, so the cross product is never formed. Each call opens the file once, however many pairs it asks for, so one call with many pairs is faster than many calls with one each:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>points <span class="op">=</span> network.addresses(reach<span class="op">=</span><span class="st">"100l1"</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>network.read([(point, <span class="st">"Discharge"</span>) <span class="cf">for</span> point <span class="kw">in</span> points])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A location that does not carry the quantity asked for is a <code>KeyError</code> naming what it does carry, not a column of <code>NaN</code>. <code>read()</code> also takes a <code>position_tol</code>, and snaps each item onto a breakpoint carrying its quantity, so a measured chainage can be read without resolving it first.</p>
+<p>To read one quantity at every location that carries it, pass it on its own: <code>network.read(quantity="Discharge")</code>.</p>
+<p><code>to_dataframe()</code> and <code>to_dataset()</code> read every location in the same way, for a caller that does want the whole network. <code>to_dataframe()</code> labels its columns <code>(address, quantity)</code>, as <code>read()</code> does; <code>to_dataset()</code> indexes locations by their graph integer and carries each one’s name alongside.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Each read goes to the file
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A network keeps the topology and where each variable is, not the file. Each <code>read()</code> opens the result file for just the nodes, reaches and quantities it asks for, loads them and lets go, so a handful of locations costs a handful of series, however large the file. A reach is loaded with all of its gridpoints.</p>
+<p>A network opened from a <code>Res1D</code> reads from that <code>Res1D</code>’s file on disk, so edits made to it in memory with <code>modify()</code> are not seen.</p>
+</div>
+</div>
+</section>
+<section id="not-every-location-carries-data" class="level2">
+<h2 class="anchored" data-anchor-id="not-every-location-carries-data">Not every location carries data</h2>
+<p>Every address in a network is a location you can read from, but some formats leave some of them empty. <code>resolve()</code> still finds such a location, with an empty <code>quantities</code>, and <code>read()</code> refuses it with a <code>KeyError</code>. Check <code>quantities</code> when matching a sensor to a location.</p>
+<ul>
+<li><strong>MIKE 1D (<code>.res1d</code>)</strong>: nodes and reach grid points both carry data.</li>
+<li><strong>MIKE 11 (<code>.res11</code>)</strong>: only reach grid points carry data; nodes are empty. To compare a sensor at a node, read a grid point next to it, which <code>addresses(reach=...)</code> lists.</li>
+<li><strong>EPANET (<code>.res</code>)</strong>: a pipe’s flow is read at the pipe’s start, <code>(pipe_id, 0.0)</code>, and at its end, <code>(pipe_id, length)</code>; the two give the same series. The length comes from the <code>.res</code> itself. A pump or valve has none, so it is read at its start only. A <code>.resx</code> beside the <code>.res</code> (same folder and stem) adds tank volumes and pump energy. Pass <code>companions=[]</code> to read the <code>.res</code> alone.</li>
+</ul>
+</section>
 <section id="additional-resources" class="level2">
 <h2 class="anchored" data-anchor-id="additional-resources">Additional resources</h2>
 <ul>
 <li><a href="https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/">MIKE 1D API</a></li>
 <li><a href="../api/index.html"><code>Network</code> API reference</a></li>
+<li><a href="https://github.com/DHI/mikeio1d/blob/main/CONTEXT.md">Glossary of the network module’s terms</a></li>
 <li><a href="https://nbviewer.jupyter.org/github/DHI/mikeio1d/blob/main/notebooks/network.ipynb">Network notebook</a></li>
 </ul>
 

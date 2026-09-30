@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>network.reachbreakpoint – MIKE IO 1D</title>
+<title>network.networklocation – MIKE IO 1D</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-39fa877ca9a50db22a6d21c6fddd0724.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d779191fb58665fba6013d76b5d4c7b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -298,14 +298,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mikeio1d.network.ReachBreakPoint" id="toc-mikeio1d.network.ReachBreakPoint" class="nav-link active" data-scroll-target="#mikeio1d.network.ReachBreakPoint">network.ReachBreakPoint</a>
+  <li><a href="#mikeio1d.network.NetworkLocation" id="toc-mikeio1d.network.NetworkLocation" class="nav-link active" data-scroll-target="#mikeio1d.network.NetworkLocation">network.NetworkLocation</a>
   <ul class="collapse">
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.ReachBreakPoint.ipynb" download="network.ReachBreakPoint.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.NetworkLocation.ipynb" download="network.NetworkLocation.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -313,61 +312,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="mikeio1d.network.ReachBreakPoint" class="level1">
-<h1>network.ReachBreakPoint</h1>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.ReachBreakPoint()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Abstract base class for an intermediate break point along a network reach.</p>
-<p>Break points represent locations between the start and end nodes of a reach (e.g.&nbsp;cross-section chainage points along a river reach) that carry their own time-series data.</p>
-<p>Two properties must be implemented:</p>
-<ul>
-<li>:attr:<code>id</code> - a <code>(reach_id, distance)</code> tuple that uniquely locates the break point within the network. <code>distance</code> may be <code>None</code> when the break point’s position along the reach is genuinely unknown (e.g.&nbsp;a link-node reach with no known length).</li>
-<li>:attr:<code>data</code> - a time-indexed :class:<code>pandas.DataFrame</code> whose columns are quantity names.</li>
-</ul>
-<p>The :attr:<code>distance</code> convenience property returns <code>id[1]</code> (the position along the reach in the units used by the parent network, or <code>None</code> if unknown). It need not be measured from the start node: a MIKE river reach reports its chainage, which is a coordinate along the whole branch, so the distance from the start node is <code>distance - reach.start_distance</code>. A break point with an unknown distance cannot be looked up via <code>find(reach=..., distance=&lt;number&gt;)</code>, but still has a graph node of its own, so it carries data and <code>recall()</code> names it.</p>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Minimal subclass:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">class</span> MyBreakPoint(ReachBreakPoint):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, reach_id, chainage, df):</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...         <span class="va">self</span>._id <span class="op">=</span> (reach_id, chainage)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>...         <span class="va">self</span>._data <span class="op">=</span> df</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> <span class="bu">id</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="va">self</span>._id</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> data(<span class="va">self</span>): <span class="cf">return</span> <span class="va">self</span>._data</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
-<p>NetworkReach : Owns a list of ReachBreakPoint instances. NetworkNode : Represents a start/end node of a reach. Network : Assembles reaches (and their break points) into a graph.</p>
-</section>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<section id="mikeio1d.network.NetworkLocation" class="level1">
+<h1>network.NetworkLocation</h1>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.NetworkLocation(<span class="va">self</span>, address, quantities, graph_node)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A location a network has, as :meth:<code>Network.resolve</code> answers for it.</p>
+<section id="attributes" class="level2 doc-section doc-section-attributes">
+<h2 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 11%">
+<col style="width: 84%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#mikeio1d.network.ReachBreakPoint.data">data</a></td>
-<td>Time-indexed DataFrame with one column per quantity.</td>
+<td>address</td>
+<td>str or tuple[str, float]</td>
+<td>The network’s own spelling of the location, which the rest of the network takes. A position is the one the file stores, not the one asked for.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.network.ReachBreakPoint.distance">distance</a></td>
-<td>Position along the reach, in the reach’s own frame, or None if unknown.</td>
+<td>quantities</td>
+<td>tuple of str</td>
+<td>The quantity IDs readable there. Empty is an answer: the location is in the network but carries nothing of its own.</td>
 </tr>
 <tr class="odd">
-<td><a href="#mikeio1d.network.ReachBreakPoint.id">id</a></td>
-<td><code>(reach_id, distance)</code> tuple uniquely identifying this break point.</td>
-</tr>
-<tr class="even">
-<td><a href="#mikeio1d.network.ReachBreakPoint.quantities">quantities</a></td>
-<td>List of quantity names available at this break point.</td>
+<td>graph_node</td>
+<td>int</td>
+<td>The integer :meth:<code>Network.to_networkx</code> and :meth:<code>Network.to_dataset</code> label the location with, which <code>graph.nodes[graph_node]["address"]</code> turns back into the address. Every location has one, a breakpoint too.</td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> location <span class="op">=</span> network.resolve((<span class="st">"100l1"</span>, <span class="fl">23.8</span>), position_tol<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> location.address, location.quantities</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>((<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>), (<span class="st">'Discharge'</span>,))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.to_networkx().nodes[location.graph_node][<span class="st">"address"</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>(<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>

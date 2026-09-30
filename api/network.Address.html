@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>network.basicreach – MIKE IO 1D</title>
+<title>network.address – MIKE IO 1D</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-39fa877ca9a50db22a6d21c6fddd0724.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d779191fb58665fba6013d76b5d4c7b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -298,14 +298,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mikeio1d.network.BasicReach" id="toc-mikeio1d.network.BasicReach" class="nav-link active" data-scroll-target="#mikeio1d.network.BasicReach">network.BasicReach</a>
+  <li><a href="#mikeio1d.network.Address" id="toc-mikeio1d.network.Address" class="nav-link active" data-scroll-target="#mikeio1d.network.Address">network.Address</a>
   <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   </ul></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.BasicReach.ipynb" download="network.BasicReach.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.Address.ipynb" download="network.Address.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -313,92 +311,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="mikeio1d.network.BasicReach" class="level1">
-<h1>network.BasicReach</h1>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.BasicReach(<span class="va">self</span>, <span class="bu">id</span>, start, end, length<span class="op">=</span><span class="va">None</span>, breakpoints<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Concrete :class:<code>NetworkReach</code> for programmatic network construction.</p>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 13%">
-<col style="width: 26%">
-<col style="width: 47%">
-<col style="width: 12%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>id</td>
-<td>str</td>
-<td>Unique reach identifier.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td>start</td>
-<td>NetworkNode</td>
-<td>Start node.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="odd">
-<td>end</td>
-<td>NetworkNode</td>
-<td>End node.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td>length</td>
-<td>float</td>
-<td>Reach length, by default None (undefined).</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>breakpoints</td>
-<td>list[ReachBreakPoint]</td>
-<td>Intermediate break points, by default empty.</td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-</section>
+<section id="mikeio1d.network.Address" class="level1">
+<h1>network.Address</h1>
+<p><code>network.Address</code></p>
+<p>A location under the name its model gave it.</p>
+<p>A plain <code>str</code> is a node id. A <code>(reach_id, position)</code> tuple is a breakpoint. Nothing is both, so the shape says which it is.</p>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> reach <span class="op">=</span> BasicReach(<span class="st">"reach_1"</span>, node_a, node_b, length<span class="op">=</span><span class="fl">250.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Where the domain has no reach length, leave it out:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> reach <span class="op">=</span> BasicReach(<span class="st">"pipe_1"</span>, node_a, node_b)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Two of these between the same two nodes - twin pipes, parallel pumps - need a break point each, or the graph cannot tell them apart. See :attr:<code>NetworkReach.breakpoints</code>.</p>
-</section>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#mikeio1d.network.BasicReach.end_distance">end_distance</a></td>
-<td>Position of the end node, or <code>None</code> where the length is undefined.</td>
-</tr>
-<tr class="even">
-<td><a href="#mikeio1d.network.BasicReach.n_breakpoints">n_breakpoints</a></td>
-<td>Number of break points in the reach.</td>
-</tr>
-<tr class="odd">
-<td><a href="#mikeio1d.network.BasicReach.start_distance">start_distance</a></td>
-<td>Position of the start node, in the frame :attr:<code>breakpoints</code> are placed in.</td>
-</tr>
-</tbody>
-</table>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve(<span class="st">"101"</span>).address</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">'101'</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve((<span class="st">"100l1"</span>, <span class="fl">23.8413574216414</span>)).address</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>(<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>

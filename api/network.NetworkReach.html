@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-39fa877ca9a50db22a6d21c6fddd0724.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d779191fb58665fba6013d76b5d4c7b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -300,9 +300,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#mikeio1d.network.NetworkReach" id="toc-mikeio1d.network.NetworkReach" class="nav-link active" data-scroll-target="#mikeio1d.network.NetworkReach">network.NetworkReach</a>
   <ul class="collapse">
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="network.NetworkReach.ipynb" download="network.NetworkReach.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
@@ -315,91 +314,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mikeio1d.network.NetworkReach" class="level1">
 <h1>network.NetworkReach</h1>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.NetworkReach()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Abstract base class for a reach in a network.</p>
-<p>A reach represents a directed connection between two :class:<code>NetworkNode</code> instances (e.g.&nbsp;a river reach between two junctions). It may also carry a list of :class:<code>ReachBreakPoint</code> objects for intermediate chainage locations.</p>
-<p>Subclass this to integrate your own network topology. Four properties must be implemented:</p>
-<ul>
-<li>:attr:<code>id</code> - a unique string identifier for the reach.</li>
-<li>:attr:<code>start</code> - the upstream/start :class:<code>NetworkNode</code>.</li>
-<li>:attr:<code>end</code> - the downstream/end :class:<code>NetworkNode</code>.</li>
-<li>:attr:<code>breakpoints</code> - list of :class:<code>ReachBreakPoint</code> instances ordered by increasing distance from the start node (empty list if none).</li>
-</ul>
-<p>:attr:<code>length</code> is optional and defaults to <code>None</code>. Reach length matters in some domains (rivers, sewer networks) and not in others (link-node water distribution models), so override it only where a length exists.</p>
-<p>:attr:<code>start_distance</code> and :attr:<code>end_distance</code> say where the reach’s own ends sit in the frame its break points are placed in. They default to <code>0.0</code> and the length, which is right wherever break points are measured from the start node; override them where the frame is offset.</p>
-<p>The concrete helper :class:<code>BasicReach</code> is provided for the common case where all data is already available in memory.</p>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Minimal subclass, without a length:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">class</span> MyReach(NetworkReach):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, rid, start_node, end_node):</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...         <span class="va">self</span>._id <span class="op">=</span> rid</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>...         <span class="va">self</span>._start <span class="op">=</span> start_node</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>...         <span class="va">self</span>._end <span class="op">=</span> end_node</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> <span class="bu">id</span>(<span class="va">self</span>): <span class="cf">return</span> <span class="va">self</span>._id</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> start(<span class="va">self</span>): <span class="cf">return</span> <span class="va">self</span>._start</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> end(<span class="va">self</span>): <span class="cf">return</span> <span class="va">self</span>._end</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> breakpoints(<span class="va">self</span>): <span class="cf">return</span> []</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Add a :attr:<code>length</code> property on top of that when the domain has one:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">class</span> MyMeasuredReach(MyReach):</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, rid, start_node, end_node, length):</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>...         <span class="bu">super</span>().<span class="fu">__init__</span>(rid, start_node, end_node)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>...         <span class="va">self</span>._length <span class="op">=</span> length</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>...     <span class="op">@</span>property</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>...     <span class="kw">def</span> length(<span class="va">self</span>): <span class="cf">return</span> <span class="va">self</span>._length</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
-<p>BasicReach : Ready-to-use concrete implementation. NetworkNode : Represents the start/end of this reach. ReachBreakPoint : Intermediate data points along this reach. Network : Assembles a list of NetworkReach objects into a graph.</p>
-</section>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.NetworkReach(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">id</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    start,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    end,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    length<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    start_position<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    breakpoints<span class="op">=</span>(),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A directed connection between two nodes, and the breakpoints along it.</p>
+<section id="attributes" class="level2 doc-section doc-section-attributes">
+<h2 class="doc-section doc-section-attributes anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 90%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#mikeio1d.network.NetworkReach.breakpoints">breakpoints</a></td>
-<td>Ordered list of intermediate :class:<code>ReachBreakPoint</code> objects (may be empty).</td>
+<td>id</td>
+<td>str</td>
+<td>The id the model gave the reach, unique within the network. A structure’s reach keeps the type prefix its file gives it, such as <code>"Weir:119w1"</code> or <code>"Pump:115p1"</code>, which keeps a weir and a pump that share an id apart.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.network.NetworkReach.end">end</a></td>
-<td>End (downstream) node of this reach.</td>
+<td>start, end</td>
+<td>str</td>
+<td>The ids of the start (upstream) and end (downstream) nodes.</td>
 </tr>
 <tr class="odd">
-<td><a href="#mikeio1d.network.NetworkReach.end_distance">end_distance</a></td>
-<td>Position of the end node, or <code>None</code> where the length is undefined.</td>
+<td>length</td>
+<td>float or None</td>
+<td>Total length in network units, or <code>None</code> where it is undefined. Reach length matters in some domains (rivers, sewer networks) and not in others (link-node water distribution models).</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.network.NetworkReach.id">id</a></td>
-<td>Unique string identifier for this reach.</td>
+<td>start_position</td>
+<td>float</td>
+<td>Position of the start node, in the frame :attr:<code>breakpoints</code> are placed in. Zero where they are measured from the reach’s own start; a MIKE river reach places them at their chainage, so it can begin thousands of metres in - or below zero.</td>
 </tr>
 <tr class="odd">
-<td><a href="#mikeio1d.network.NetworkReach.length">length</a></td>
-<td>Total length of this reach in network units, or <code>None</code> if undefined.</td>
-</tr>
-<tr class="even">
-<td><a href="#mikeio1d.network.NetworkReach.n_breakpoints">n_breakpoints</a></td>
-<td>Number of break points in the reach.</td>
-</tr>
-<tr class="odd">
-<td><a href="#mikeio1d.network.NetworkReach.start">start</a></td>
-<td>Start (upstream) node of this reach.</td>
-</tr>
-<tr class="even">
-<td><a href="#mikeio1d.network.NetworkReach.start_distance">start_distance</a></td>
-<td>Position of the start node, in the frame :attr:<code>breakpoints</code> are placed in.</td>
+<td>breakpoints</td>
+<td>tuple of (str, float)</td>
+<td>The addresses of the breakpoints along the reach, each a <code>(reach_id, position)</code> pair as :meth:<code>Network.read</code> takes it. Ascending by position; consecutive differences are edge lengths. A reach with breakpoints gets its own chain of graph nodes. A reach with none is a single start-to-end edge, and :class:<code>Network</code> refuses two of those between the same pair of nodes.</td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.reaches[<span class="st">"100l1"</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>NetworkReach(<span class="bu">id</span><span class="op">=</span><span class="st">'100l1'</span>, start<span class="op">=</span><span class="st">'100'</span>, end<span class="op">=</span><span class="st">'99'</span>, length<span class="op">=</span><span class="fl">47.6827148432828</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    start_position<span class="op">=</span><span class="fl">0.0</span>, breakpoints<span class="op">=</span>((<span class="st">'100l1'</span>, <span class="fl">0.0</span>), (<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'100l1'</span>, <span class="fl">47.6827148432828</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A breakpoint is an address as it stands:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.read([(network.reaches[<span class="st">"100l1"</span>].breakpoints[<span class="dv">1</span>], <span class="st">"Discharge"</span>)]).shape</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">110</span>, <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>

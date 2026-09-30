@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-39fa877ca9a50db22a6d21c6fddd0724.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d779191fb58665fba6013d76b5d4c7b3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -300,15 +300,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#mikeio1d.network.Network" id="toc-mikeio1d.network.Network" class="nav-link active" data-scroll-target="#mikeio1d.network.Network">network.Network</a>
   <ul class="collapse">
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
-  <li><a href="#mikeio1d.network.Network.copy" id="toc-mikeio1d.network.Network.copy" class="nav-link" data-scroll-target="#mikeio1d.network.Network.copy">copy</a></li>
-  <li><a href="#mikeio1d.network.Network.find" id="toc-mikeio1d.network.Network.find" class="nav-link" data-scroll-target="#mikeio1d.network.Network.find">find</a></li>
+  <li><a href="#mikeio1d.network.Network.addresses" id="toc-mikeio1d.network.Network.addresses" class="nav-link" data-scroll-target="#mikeio1d.network.Network.addresses">addresses</a></li>
   <li><a href="#mikeio1d.network.Network.open" id="toc-mikeio1d.network.Network.open" class="nav-link" data-scroll-target="#mikeio1d.network.Network.open">open</a></li>
-  <li><a href="#mikeio1d.network.Network.recall" id="toc-mikeio1d.network.Network.recall" class="nav-link" data-scroll-target="#mikeio1d.network.Network.recall">recall</a></li>
+  <li><a href="#mikeio1d.network.Network.read" id="toc-mikeio1d.network.Network.read" class="nav-link" data-scroll-target="#mikeio1d.network.Network.read">read</a></li>
+  <li><a href="#mikeio1d.network.Network.resolve" id="toc-mikeio1d.network.Network.resolve" class="nav-link" data-scroll-target="#mikeio1d.network.Network.resolve">resolve</a></li>
   <li><a href="#mikeio1d.network.Network.to_dataframe" id="toc-mikeio1d.network.Network.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.network.Network.to_dataframe">to_dataframe</a></li>
   <li><a href="#mikeio1d.network.Network.to_dataset" id="toc-mikeio1d.network.Network.to_dataset" class="nav-link" data-scroll-target="#mikeio1d.network.Network.to_dataset">to_dataset</a></li>
+  <li><a href="#mikeio1d.network.Network.to_networkx" id="toc-mikeio1d.network.Network.to_networkx" class="nav-link" data-scroll-target="#mikeio1d.network.Network.to_networkx">to_networkx</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -322,10 +325,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="mikeio1d.network.Network" class="level1">
 <h1>network.Network</h1>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.Network(<span class="va">self</span>, reaches)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>network.Network(<span class="va">self</span>, reaches, results)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>A network of nodes and reaches, addressable by the names it came with.</p>
-<p>A result file names a location the way the model did: a node id, or a reach and a distance along it. A graph needs one flat set of integers. A Network holds both - :attr:<code>graph</code> is the integer-labelled graph carrying the timeseries each location holds, and :meth:<code>find</code> and :meth:<code>recall</code> translate between the two namings.</p>
-<p>Build one with :meth:<code>open</code>, which reads a result file, or by handing the constructor a sequence of :class:<code>~mikeio1d.network.NetworkReach</code>.</p>
+<p>A result file names a location the way the model did: a node id, or a reach and a position along it, and every member here takes and gives those names. :meth:<code>to_networkx</code> is labelled with integers instead, each node carrying its name as the <code>address</code> attribute, and :meth:<code>resolve</code> gives the integer for a name - see :attr:<code>NetworkLocation.graph_node</code>.</p>
+<p>Build one with :meth:<code>open</code>, which reads no timeseries. They stay in the file until :meth:<code>read</code> asks for them. The constructor is internal: it takes what a loader produces, not a file.</p>
+<section id="notes" class="level2 doc-section doc-section-notes">
+<h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
+<p>Which locations carry series depends on the format:</p>
+<ul>
+<li>MIKE 1D (<code>.res1d</code>): nodes and reach gridpoints both carry them.</li>
+<li>MIKE 11 (<code>.res11</code>): only gridpoints do. A node carries nothing, so an observation at a node is read at a gridpoint beside it, which <code>addresses(reach=...)</code> lists.</li>
+<li>EPANET (<code>.res</code>): a node carries its own. A pipe’s are read at its start, <code>(pipe_id, 0.0)</code>, and at its end, <code>(pipe_id, length)</code>; the two give the same series. A pump or valve has no length, so only its start.</li>
+</ul>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(network)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Network<span class="op">&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>Reaches: <span class="dv">118</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>Nodes: <span class="dv">495</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>Quantities: [<span class="st">'WaterLevel'</span>, <span class="st">'Discharge'</span>]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>Time: <span class="dv">1994</span><span class="op">-</span><span class="dv">0</span><span class="er">8</span><span class="op">-</span><span class="dv">0</span><span class="er">7</span> <span class="dv">16</span>:<span class="dv">35</span>:<span class="dv">00</span> <span class="op">-</span> <span class="dv">1994</span><span class="op">-</span><span class="dv">0</span><span class="er">8</span><span class="op">-</span><span class="dv">0</span><span class="er">7</span> <span class="dv">18</span>:<span class="dv">35</span>:<span class="dv">00</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 <section id="attributes" class="level2">
 <h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
 <table class="caption-top table">
@@ -337,12 +360,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#mikeio1d.network.Network.graph">graph</a></td>
-<td>Graph of the network.</td>
+<td><a href="#mikeio1d.network.Network.period">period</a></td>
+<td>First and last timestep of the series this network reads.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.network.Network.quantities">quantities</a></td>
-<td>Quantities present in data.</td>
+<td>Quantities readable somewhere in this network, by their units.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.network.Network.reaches">reaches</a></td>
@@ -362,67 +385,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="#mikeio1d.network.Network.copy">copy</a></td>
-<td>Create a deep copy of the Network.</td>
+<td><a href="#mikeio1d.network.Network.addresses">addresses</a></td>
+<td>List the addresses this network can be read at.</td>
 </tr>
 <tr class="even">
-<td><a href="#mikeio1d.network.Network.find">find</a></td>
-<td>Find node or breakpoint id in the Network object based on former coordinates.</td>
-</tr>
-<tr class="odd">
 <td><a href="#mikeio1d.network.Network.open">open</a></td>
 <td>Read a network from a result file.</td>
 </tr>
+<tr class="odd">
+<td><a href="#mikeio1d.network.Network.read">read</a></td>
+<td>Read the series named by <code>(address, quantity)</code> pairs, or one quantity everywhere.</td>
+</tr>
 <tr class="even">
-<td><a href="#mikeio1d.network.Network.recall">recall</a></td>
-<td>Recover the original coordinates of an element given the node id(s) in the Network object.</td>
+<td><a href="#mikeio1d.network.Network.resolve">resolve</a></td>
+<td>Say whether a location is in this network, what it carries, and where.</td>
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.network.Network.to_dataframe">to_dataframe</a></td>
-<td>Dataframe using node ids as column names.</td>
+<td>Read every series in the network, labelled the way :meth:<code>read</code> labels them.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.network.Network.to_dataset">to_dataset</a></td>
-<td>Dataset of the timeseries, with each node’s original identity alongside.</td>
+<td>Dataset of the timeseries, with each location’s address alongside.</td>
 </tr>
-</tbody>
-</table>
-<section id="mikeio1d.network.Network.copy" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.copy">copy</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>network.Network.copy()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Create a deep copy of the Network.</p>
-<section id="returns" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
 <tr class="odd">
-<td></td>
-<td>Network</td>
-<td>Deep copy of the Network object</td>
+<td><a href="#mikeio1d.network.Network.to_networkx">to_networkx</a></td>
+<td>Build the network as an undirected networkx graph.</td>
 </tr>
 </tbody>
 </table>
-</section>
-</section>
-<section id="mikeio1d.network.Network.find" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.find">find</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>network.Network.find(node<span class="op">=</span><span class="va">None</span>, reach<span class="op">=</span><span class="va">None</span>, distance<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Find node or breakpoint id in the Network object based on former coordinates.</p>
+<section id="mikeio1d.network.Network.addresses" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.addresses">addresses</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>network.Network.addresses(reach<span class="op">=</span><span class="va">None</span>, quantity<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>List the addresses this network can be read at.</p>
+<p>Where :meth:<code>resolve</code> goes from an address to what the network knows about the location, this gives the addresses themselves: the names :meth:<code>read</code> takes.</p>
 <section id="parameters" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 6%">
-<col style="width: 23%">
-<col style="width: 63%">
-<col style="width: 6%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 91%">
+<col style="width: 3%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -434,33 +438,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>node</td>
-<td>str | List[str]</td>
-<td>Node id(s) in the original network, by default None</td>
+<td>reach</td>
+<td>str</td>
+<td>Only the breakpoints along this reach, in the order they sit. The reach’s own end nodes are not among them - they are nodes, and a node is named by its own ID. A structure’s reach keeps the type prefix the file gives it: <code>"Weir:119w1"</code>, where <code>Res1D.structures</code> says <code>"119w1"</code>. <code>None</code> <em>(default)</em> lists everything.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td>reach</td>
-<td>str | List[str]</td>
-<td>Reach id(s) for breakpoint lookup or reach endpoint lookup, by default None</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>distance</td>
-<td>str | float | List[str | float]</td>
-<td>Distance(s) along reach for breakpoint lookup, or “start”/“end” for reach endpoints, by default None</td>
+<td>quantity</td>
+<td>str</td>
+<td>Only locations carrying this quantity. <code>None</code> <em>(default)</em> does not filter.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 4%">
-<col style="width: 11%">
-<col style="width: 84%">
+<col style="width: 3%">
+<col style="width: 16%">
+<col style="width: 80%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -472,8 +470,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td>int | List[int]</td>
-<td>Node or breakpoint id(s) in the generic network. A list argument is answered with a list, even a one-element one; a scalar argument with a scalar.</td>
+<td>Sequence[str | tuple[str, float]]</td>
+<td>Addresses, each of which :meth:<code>resolve</code> answers for and :meth:<code>read</code> takes. A sequence: it has a length, can be indexed and can be iterated more than once. Pass it to <code>list()</code> for a list.</td>
 </tr>
 </tbody>
 </table>
@@ -482,9 +480,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 10%">
-<col style="width: 15%">
-<col style="width: 74%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 88%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -496,29 +494,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td></td>
-<td>ValueError</td>
-<td>If invalid combination of parameters is provided</td>
-</tr>
-<tr class="even">
-<td></td>
 <td>KeyError</td>
-<td>If requested node/breakpoint is not found in the network</td>
+<td>If <code>reach</code> is not a reach of this network. The message suggests the reach meant, such as the prefixed id of a structure’s reach.</td>
 </tr>
 </tbody>
 </table>
 </section>
+<section id="examples-1" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-1">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.addresses(reach<span class="op">=</span><span class="st">"100l1"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>[(<span class="st">'100l1'</span>, <span class="fl">0.0</span>), (<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>), (<span class="st">'100l1'</span>, <span class="fl">47.6827148432828</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Every breakpoint of a reach that carries discharge, which is the batch a reach observation has to be scored against:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.addresses(reach<span class="op">=</span><span class="st">"100l1"</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[(<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 </section>
 <section id="mikeio1d.network.Network.open" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.network.Network.open">open</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>network.Network.<span class="bu">open</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    res,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    companions<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    nodes<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    reaches<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    quantities<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>network.Network.<span class="bu">open</span>(res, <span class="op">*</span>, companions<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Read a network from a result file.</p>
+<p>Opening reads no timeseries. :meth:<code>read</code>, :meth:<code>to_dataframe</code> and :meth:<code>to_dataset</code> read them when asked.</p>
 <section id="parameters-1" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="caption-top table">
@@ -540,38 +536,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>res</td>
 <td>(str, Path or Res1D)</td>
-<td>Path to a <code>.res1d</code>, <code>.res11</code> or <code>.res</code> result file, or an already-opened :class:<code>~mikeio1d.Res1D</code>.</td>
+<td>Path to a <code>.res1d</code>, <code>.res11</code> or <code>.res</code> result file, or an already-opened :class:<code>~mikeio1d.Res1D</code>. Series are read from the file on disk, so edits made to a <code>Res1D</code> in memory with <code>modify()</code> are not seen. A <code>Res1D</code> opened with <code>nodes=</code>, <code>reaches=</code> or <code>quantities=</code> still gives the whole network, but only the series its filter lets through: a location it leaves out is there, carrying nothing. One opened with <code>time=</code> or <code>step_every=</code> is not supported yet.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
 <td>companions</td>
 <td>sequence of str, Path or Res1D, or None</td>
-<td>Files read alongside the result and recognised by their extension: * <code>.resx</code> – extra EPANET results for the same network. Its node quantities (tank <code>Volume</code> and <code>Volume Percentage</code>) are merged onto the matching nodes, and its reach quantities (pump <code>efficiency</code>, <code>energy</code> and <code>energy costs</code>) onto the matching reach’s breakpoints. * <code>.inp</code> – the EPANET input file, read for its <code>[PIPES]</code> lengths. No result file carries a reach length, so without this one no reach has one. <code>None</code> <em>(default)</em> looks for them beside the result file, matching its folder and stem; <code>[]</code> reads none; a list reads exactly those. Only EPANET results are looked beside.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>nodes</td>
-<td>str, list of str, or None</td>
-<td>Controls which nodes have their timeseries data loaded into memory. * <code>None</code> <em>(default)</em> – data is loaded for every node. * A single node ID or a list of node IDs – only those nodes get data; others are topology-only. * <code>[]</code> (empty list) – no node data is loaded at all. The full network topology is always constructed regardless of this setting, so <code>find()</code> and <code>recall()</code> still work on all nodes.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>reaches</td>
-<td>str, list of str, or None</td>
-<td>Controls which reaches have their intermediate gridpoint data populated. * <code>None</code> <em>(default)</em> – gridpoints are populated for every reach. * A single reach name or a list of reach names – only those reaches get gridpoint data; others are topology-only. * <code>[]</code> (empty list) – no gridpoint data is loaded at all. EPANET reaches have at most one gridpoint (see Notes), but this argument still governs whether its data, and any matching <code>.resx</code> reach quantities, are populated.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="odd">
-<td>quantities</td>
-<td>str, list of str, or None</td>
-<td>Controls which quantities are read at each selected location. * <code>None</code> <em>(default)</em> – every quantity is read. * A single quantity name or a list of names – only those are read. * <code>[]</code> (empty list) – no data is read at all. A location that does not carry a requested quantity becomes topology-only rather than an error, so this composes with <code>nodes</code> and <code>reaches</code> on files where nodes and reaches hold different quantities.</td>
+<td>Files read alongside the result. The one kind is <code>.resx</code>: extra EPANET results for the same network. Its node quantities (tank <code>Volume</code> and <code>Volume Percentage</code>) are merged onto the matching nodes, and its reach quantities (pump <code>efficiency</code>, <code>energy</code> and <code>energy costs</code>) onto the matching reach’s breakpoints. <code>None</code> <em>(default)</em> looks for one beside the result file, matching its folder and stem; <code>[]</code> reads none; a list reads exactly those. Only EPANET results are looked beside. A companion passed as a <code>Res1D</code> follows the same rules for filters as <code>res</code>. The EPANET <code>.inp</code> input file is not a companion: reach lengths come from the <code>.res</code> itself.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="returns-2" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -594,8 +572,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 3%">
-<col style="width: 10%">
-<col style="width: 85%">
+<col style="width: 8%">
+<col style="width: 88%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -608,133 +586,68 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td>NotImplementedError</td>
-<td>If no network can be built from the file’s extension.</td>
+<td>If no network can be built from the file’s extension, if the file holds catchments and no reaches, or if the result or a companion is a <code>Res1D</code> opened with <code>time=</code> or <code>step_every=</code>.</td>
 </tr>
 <tr class="even">
 <td></td>
 <td>ValueError</td>
-<td>If a companion has an extension this reader does not know, if two companions of the same kind are given, or if a <code>.resx</code> does not come from the same run as the result file.</td>
+<td>If a companion has an extension this reader does not know or is an <code>.inp</code>, if two <code>.resx</code> are given, if a <code>.resx</code> covers a different period from the result file, or if the two carry the same quantity at one location.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="examples" class="level4 doc-section doc-section-examples">
-<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"model.res1d"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Load data only for the two nodes where observations exist, and skip all intermediate gridpoint data to keep memory usage low:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>...     <span class="st">"model.res1d"</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>...     nodes<span class="op">=</span>[<span class="st">"node_a"</span>, <span class="st">"node_b"</span>],</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>...     reaches<span class="op">=</span>[],</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>... )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Read a single quantity, for a calibration loop that only scores discharge:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"model.res1d"</span>, quantities<span class="op">=</span><span class="st">"Discharge"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Name the companions rather than letting them be found:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>...     <span class="st">"model.res"</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>...     companions<span class="op">=</span>[<span class="st">"other.resx"</span>, <span class="st">"other.inp"</span>],</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>... )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="notes-1" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes-1">Notes</h4>
+<p>A <code>UserWarning</code> is raised if the file holds catchments beside its reaches, which the network leaves out with their quantities, or nodes that end no reach, which it leaves out too.</p>
 </section>
-<section id="notes" class="level4 doc-section doc-section-notes">
-<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h4>
-<p>MIKE 11 keeps its timeseries on reach gridpoints rather than on nodes, so the nodes of a <code>.res11</code> network carry no data of their own. Pass <code>reaches</code> rather than <code>nodes</code> to control what gets loaded.</p>
-<p>An EPANET reach carries one synthetic gridpoint, which mikeio1d gives a breakpoint at each end so that the reach’s own quantities (<code>Flow</code>, <code>Velocity</code>, …) are reachable the way a MIKE reach’s end data is. As a result:</p>
-<ul>
-<li>without the <code>.inp</code>, a reach’s length is unknown, so only its first breakpoint (<code>distance=0.0</code>) is real; the second is not addressable by distance at all – <code>find(reach=..., distance=...)</code> resolves it only via <code>distance="start"</code>/<code>"end"</code> (which return the node, not the breakpoint), or not at all by a number. The corresponding edges of :attr:<code>graph</code> are <code>length=None</code></li>
-<li>with the <code>.inp</code>, a pipe’s second breakpoint sits at its full length – both breakpoints are then addressable by distance, and the edge between them carries the pipe’s real length. Pumps and valves keep an unaddressable second breakpoint even so, since <code>[PIPES]</code> is the only section carrying lengths</li>
-</ul>
-<p>Node timeseries, :meth:<code>to_dataframe</code>, :meth:<code>to_dataset</code>, <code>find(node=...)</code> and :meth:<code>recall</code> are unaffected.</p>
+<section id="examples-2" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-2">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d.network <span class="im">import</span> Network</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.reaches[<span class="st">"100l1"</span>].start</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">'100'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Name the companions rather than letting them be found, or pass <code>[]</code> to read the result file on its own:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> epanet <span class="op">=</span> Network.<span class="bu">open</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>...     <span class="st">"tests/testdata/epanet.res"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>...     companions<span class="op">=</span>[<span class="st">"tests/testdata/epanet.resx"</span>],</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>... )</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">"Volume"</span> <span class="kw">in</span> epanet.quantities</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> alone <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/epanet.res"</span>, companions<span class="op">=</span>[])</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">"Volume"</span> <span class="kw">in</span> alone.quantities</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>An EPANET reach’s length comes from the <code>.res</code> itself. A pump or valve has none:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> alone.reaches[<span class="st">"10"</span>].length</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fl">3209.544</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> alone.reaches[<span class="st">"9"</span>].length <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A filtered <code>Res1D</code> gives the whole network, carrying only what its filter lets through:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> mikeio1d <span class="im">import</span> Res1D</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> res <span class="op">=</span> Res1D(<span class="st">"tests/testdata/network.res1d"</span>, nodes<span class="op">=</span>[<span class="st">"1"</span>], reaches<span class="op">=</span>[<span class="st">"100l1"</span>])</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> filtered <span class="op">=</span> Network.<span class="bu">open</span>(res)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> filtered.resolve(<span class="st">"1"</span>).quantities, filtered.resolve(<span class="st">"101"</span>).quantities</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>((<span class="st">'WaterLevel'</span>,), ())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="notes-2" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes-2">Notes</h4>
+<p>Which locations carry series depends on the format; see :class:<code>Network</code>.</p>
+<p>A <code>.resx</code> and its result file are compared on their periods here, but on their time steps only when a :meth:<code>read</code> uses both: neither header gives the steps, and reading them would read the timeseries.</p>
 </section>
 </section>
-<section id="mikeio1d.network.Network.recall" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.recall">recall</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>network.Network.recall(<span class="bu">id</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Recover the original coordinates of an element given the node id(s) in the Network object.</p>
+<section id="mikeio1d.network.Network.read" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.read">read</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>network.Network.read(items<span class="op">=</span><span class="va">None</span>, <span class="op">*</span>, quantity<span class="op">=</span><span class="va">None</span>, position_tol<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read the series named by <code>(address, quantity)</code> pairs, or one quantity everywhere.</p>
+<p>Pass either <code>items</code> or <code>quantity</code>, not both.</p>
+<p>Each call opens the file once, however many items it asks for. So one call with many items is faster than many calls with one item each.</p>
 <section id="parameters-2" class="level4 doc-section doc-section-parameters">
 <h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 10%">
-<col style="width: 26%">
-<col style="width: 46%">
-<col style="width: 16%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>id</td>
-<td>int | List[int]</td>
-<td>Node id(s) in the generic network</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="returns-3" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h4>
-<table class="caption-top table">
-<colgroup>
 <col style="width: 2%">
-<col style="width: 15%">
-<col style="width: 81%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td>Dict[str, Any] | List[Dict[str, Any]]</td>
-<td>Original coordinates: a dict for a single id, a list of dicts for a list of ids, even a one-element one. Dict contains coordinates: - For nodes: ‘node’ key with node id - For breakpoints: ‘reach’ and ‘distance’ keys with reach id and distance</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="raises-2" class="level4 doc-section doc-section-raises">
-<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-2">Raises</h4>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td>KeyError</td>
-<td>If node id is not found in the network</td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="mikeio1d.network.Network.to_dataframe" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.to_dataframe">to_dataframe</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_dataframe(sel<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Dataframe using node ids as column names.</p>
-<p>It will be multiindex unless ‘sel’ is passed.</p>
-<section id="parameters-3" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 23%">
-<col style="width: 50%">
-<col style="width: 15%">
+<col style="width: 6%">
+<col style="width: 87%">
+<col style="width: 2%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -746,17 +659,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>sel</td>
-<td>Optional[str]</td>
-<td>Quantity to select, by default None</td>
+<td>items</td>
+<td>sequence of (address, quantity)</td>
+<td>What to read. An address is a node ID, or a reach ID and a position along it, as :meth:<code>addresses</code> gives and :meth:<code>resolve</code> confirms. An empty sequence reads nothing at all, and returns an empty frame rather than the whole file.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>quantity</td>
+<td>str</td>
+<td>A quantity to read at every location that carries it, in place of <code>items</code>. The same as passing <code>[(a, quantity) for a in addresses(quantity=quantity)]</code>.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>position_tol</td>
+<td>float</td>
+<td>How far a position may be from a breakpoint’s own and still mean it. Defaults to 1e-3, enough to absorb a rounded float, and never narrows below it: a position that close to a breakpoint names it, and is read there or refused. Widen it to snap a measured chainage onto the model’s; the nearest breakpoint inside the window carrying the item’s quantity wins. Checked for a node ID too, but not used. Only with <code>items</code>.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="returns-4" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 91%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -768,23 +698,234 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td>pd.DataFrame</td>
-<td>Timeseries contained in graph nodes</td>
+<td>Time-indexed over :attr:<code>period</code>, one column per element of <code>items</code>, in that order and keeping duplicates. The columns are the items themselves, as asked for rather than as snapped, so <code>df[items[i]]</code> selects the series asked for.</td>
 </tr>
 </tbody>
 </table>
 </section>
+<section id="raises-2" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-2">Raises</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 91%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>KeyError</td>
+<td>If any item names a location the network does not have, or a quantity that location does not carry. The message says how many items fail and names the first ones. For <code>quantity</code>, if no location in the network carries it.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>TypeError</td>
+<td>If neither or both of <code>items</code> and <code>quantity</code> are given, or <code>position_tol</code> is given with <code>quantity</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ValueError</td>
+<td>If <code>position_tol</code> is negative or not finite, or if the items span the result file and its <code>.resx</code> companion and the two turn out to have different time axes.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="notes-3" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes-3">Notes</h4>
+<p>A node of a MIKE 11 result carries nothing; see :class:<code>Network</code> for which locations carry series in each format.</p>
+</section>
+<section id="examples-3" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-3">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df <span class="op">=</span> network.read([(<span class="st">"101"</span>, <span class="st">"WaterLevel"</span>)])</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df.shape</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>(<span class="dv">110</span>, <span class="dv">1</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df.columns.tolist()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>[(<span class="st">'101'</span>, <span class="st">'WaterLevel'</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>One quantity at every location that carries it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.read(quantity<span class="op">=</span><span class="st">"Discharge"</span>).shape</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>(<span class="dv">110</span>, <span class="dv">129</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A measured chainage, snapped onto the model’s nearest breakpoint. The column keeps the address asked for:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df <span class="op">=</span> network.read([((<span class="st">"100l1"</span>, <span class="fl">23.8</span>), <span class="st">"Discharge"</span>)], position_tol<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df.columns.tolist()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>[((<span class="st">'100l1'</span>, <span class="fl">23.8</span>), <span class="st">'Discharge'</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A reach observation, whose breakpoints have to agree before one of them can stand for the reach:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> points <span class="op">=</span> network.addresses(reach<span class="op">=</span><span class="st">"100l1"</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.read([(point, <span class="st">"Discharge"</span>) <span class="cf">for</span> point <span class="kw">in</span> points]).columns.tolist()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>[((<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>), <span class="st">'Discharge'</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="mikeio1d.network.Network.resolve" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.resolve">resolve</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>network.Network.resolve(address, <span class="op">*</span>, position_tol<span class="op">=</span><span class="va">None</span>, quantity<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Say whether a location is in this network, what it carries, and where.</p>
+<p>An address that is not here gives <code>None</code> rather than an exception.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 7%">
+<col style="width: 86%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>address</td>
+<td>str or tuple[str, float]</td>
+<td>A node ID, or a reach ID and a position along it. A reach’s own end nodes are named by their IDs, which <code>reaches[reach_id].start</code> and <code>.end</code> give. A structure’s reach ID keeps the type prefix the file gives it, as in <code>("Weir:119w1", 0.5)</code>.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>position_tol</td>
+<td>float</td>
+<td>How far a position may be from a breakpoint’s own and still mean it. Defaults to 1e-3, enough to absorb a rounded float, and never narrows below it: a position that close to a breakpoint names it. Widen it to snap a measured chainage onto the model’s; the nearest breakpoint inside the window wins. Checked for a node ID too, but not used.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>quantity</td>
+<td>str</td>
+<td>Only a location carrying this quantity. A position snaps onto the nearest breakpoint that carries it, so a caller need not know which quantities sit where on a staggered grid. A position naming a breakpoint that lacks it, or a node lacking it, gives <code>None</code> rather than a neighbour. <code>None</code> <em>(default)</em> snaps onto any breakpoint.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 9%">
+<col style="width: 87%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>NetworkLocation or None</td>
+<td><code>None</code> if there is no such location, or none carrying <code>quantity</code>: exactly when :meth:<code>read</code> would refuse the address with that quantity. Otherwise its address as the network spells it, every quantity readable there, and its graph node.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises-3" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises-3">Raises</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>ValueError</td>
+<td>If <code>position_tol</code> is negative or not finite.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="notes-4" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes-4">Notes</h4>
+<p>A node of a MIKE 11 result carries nothing, so it resolves with empty <code>quantities</code>; see :class:<code>Network</code> for which locations carry series in each format.</p>
+</section>
+<section id="examples-4" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-4">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve(<span class="st">"101"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>NetworkLocation(address<span class="op">=</span><span class="st">'101'</span>, quantities<span class="op">=</span>(<span class="st">'WaterLevel'</span>,), graph_node<span class="op">=</span><span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A measured chainage, snapped onto the breakpoint the file stores:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve((<span class="st">"100l1"</span>, <span class="fl">23.8</span>), position_tol<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>NetworkLocation(address<span class="op">=</span>(<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>), quantities<span class="op">=</span>(<span class="st">'Discharge'</span>,), graph_node<span class="op">=</span><span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>With a quantity, a position snaps only onto a breakpoint carrying it. On this staggered grid 5.0 is nearest the water level point at 0.0, but discharge sits at 23.84:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve((<span class="st">"100l1"</span>, <span class="fl">5.0</span>), position_tol<span class="op">=</span><span class="dv">30</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>).address</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>(<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A position naming a breakpoint is not snapped away from it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve((<span class="st">"100l1"</span>, <span class="fl">0.0</span>), position_tol<span class="op">=</span><span class="dv">30</span>, quantity<span class="op">=</span><span class="st">"Discharge"</span>) <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network.resolve(<span class="st">"no_such_node"</span>) <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A node of a MIKE 11 result is in the network, carrying nothing:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network_cali.res11"</span>).resolve(<span class="st">"0 CALI"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>NetworkLocation(address<span class="op">=</span><span class="st">'0 CALI'</span>, quantities<span class="op">=</span>(), graph_node<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="mikeio1d.network.Network.to_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.to_dataframe">to_dataframe</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_dataframe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read every series in the network, labelled the way :meth:<code>read</code> labels them.</p>
+<p>Meant for small networks: it holds every series in memory at once, and each call reads the file again. To read only some locations, or one quantity, use :meth:<code>read</code>::</p>
+<pre><code>network.read(quantity="Discharge")</code></pre>
+<section id="returns-4" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 79%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time-indexed. Columns are <code>(address, quantity)</code> pairs, as :meth:<code>read</code> gives them.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-5" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-5">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df <span class="op">=</span> network.to_dataframe()</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df.shape</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>(<span class="dv">110</span>, <span class="dv">495</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> df.columns[:<span class="dv">2</span>].tolist()</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>[(<span class="st">'100'</span>, <span class="st">'WaterLevel'</span>), (<span class="st">'99'</span>, <span class="st">'WaterLevel'</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 </section>
 <section id="mikeio1d.network.Network.to_dataset" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.network.Network.to_dataset">to_dataset</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_dataset()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Dataset of the timeseries, with each node’s original identity alongside.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_dataset()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dataset of the timeseries, with each location’s address alongside.</p>
+<p>Meant for small networks: it reads every series, as :meth:<code>to_dataframe</code> does.</p>
 <section id="returns-5" class="level4 doc-section doc-section-returns">
 <h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-5">Returns</h4>
 <table class="caption-top table">
 <colgroup>
+<col style="width: 0%">
 <col style="width: 1%">
-<col style="width: 2%">
-<col style="width: 96%">
+<col style="width: 97%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -797,10 +938,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td></td>
 <td>xr.Dataset</td>
-<td>One variable per quantity over <code>(time, node)</code>. <code>node</code> is the integer index the graph uses, and the <code>name</code>, <code>reach</code> and <code>distance</code> coordinates carry the names the model gave the same locations, so a consumer never has to hold on to the network to know what a column is:: Coordinates: * time datetime64 * node int64 0 1 2 3 … name &lt;U16 ‘J1’ ‘J2’ ’’ ’’ reach &lt;U16 ’’ ’’ ‘r1’ ‘r1’ distance float64 nan nan 0.0 24.5 Empty when no location carries data.</td>
+<td>One variable per quantity over <code>(time, graph_node)</code>. All of them share one <code>graph_node</code> axis, holding every location that carries any quantity; a variable is NaN where its location does not carry it. <code>graph_node</code> is the graph’s integer, as :attr:<code>NetworkLocation.graph_node</code> gives it, and the <code>node_id</code>, <code>reach</code> and <code>position</code> coordinates carry the address, so a consumer never has to hold on to the network to know what a column is. A node fills in <code>node_id</code>, a breakpoint <code>reach</code> and <code>position</code>, and the empty half says which it is:: Coordinates: * time datetime64 * graph_node int64 0 1 2 3 … node_id &lt;U16 ‘J1’ ‘J2’ ’’ ’’ reach &lt;U16 ’’ ’’ ‘r1’ ‘r1’ position float64 nan nan 0.0 24.5 Empty when no location carries data.</td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="examples-6" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-6">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ds <span class="op">=</span> network.to_dataset()</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">list</span>(ds.data_vars), <span class="bu">dict</span>(ds.sizes)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>([<span class="st">'WaterLevel'</span>, <span class="st">'Discharge'</span>], {<span class="st">'time'</span>: <span class="dv">110</span>, <span class="st">'graph_node'</span>: <span class="dv">495</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A column’s address, from its coordinates:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> graph_node <span class="op">=</span> network.resolve((<span class="st">"100l1"</span>, <span class="fl">23.8</span>), position_tol<span class="op">=</span><span class="fl">0.1</span>).graph_node</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> column <span class="op">=</span> ds.sel(graph_node<span class="op">=</span>graph_node)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> column.node_id.item(), column.reach.item(), column.position.item()</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>(<span class="st">''</span>, <span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="mikeio1d.network.Network.to_networkx" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.network.Network.to_networkx">to_networkx</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>network.Network.to_networkx()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Build the network as an undirected networkx graph.</p>
+<p>Each call builds a new graph, which the caller is free to edit. Hold on to it rather than calling this again.</p>
+<p>A reach becomes a chain of edges: its start node, its breakpoints in order, its end node. The graph is undirected; which way a reach runs is in <code>reaches[reach_id].start</code> and <code>.end</code>.</p>
+<section id="returns-6" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-6">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 97%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>nx.Graph</td>
+<td>Nodes are graph nodes, the integers :attr:<code>NetworkLocation.graph_node</code> gives. Nodes and edges carry at least these attributes: * node <code>address</code> – the location’s address: a model node’s id, or a <code>(reach_id, position)</code> breakpoint. * edge <code>length</code> – the distance between the edge’s two ends, in the reach’s own units. <code>None</code> where the reach’s length is not known, which is only on the edge into its end node: an EPANET pump or valve has no length. networkx treats an edge whose weight is <code>None</code> as absent, so a route weighted by <code>length</code> goes around it. * edge <code>boundary</code> – <code>True</code> where both ends are the same place, a breakpoint sitting on its reach’s end node. Its length is <code>0.0</code>.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="examples-7" class="level4 doc-section doc-section-examples">
+<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples-7">Examples</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> networkx <span class="im">as</span> nx</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> network <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/network.res1d"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> graph <span class="op">=</span> network.to_networkx()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>From a graph node back to its address:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> graph.nodes[network.resolve(<span class="st">"101"</span>).graph_node][<span class="st">"address"</span>]</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">'101'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The shortest route between two nodes by length:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> start <span class="op">=</span> network.resolve(<span class="st">"100"</span>).graph_node</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> end <span class="op">=</span> network.resolve(<span class="st">"99"</span>).graph_node</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> route <span class="op">=</span> nx.shortest_path(graph, start, end, weight<span class="op">=</span><span class="st">"length"</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> [graph.nodes[n][<span class="st">"address"</span>] <span class="cf">for</span> n <span class="kw">in</span> route]</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>[<span class="st">'100'</span>, (<span class="st">'100l1'</span>, <span class="fl">0.0</span>), (<span class="st">'100l1'</span>, <span class="fl">23.8413574216414</span>), (<span class="st">'100l1'</span>, <span class="fl">47.6827148432828</span>), <span class="st">'99'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Its first edge is a boundary edge, since the reach’s first breakpoint sits on its start node:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> graph.edges[route[<span class="dv">0</span>], route[<span class="dv">1</span>]]</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>{<span class="st">'length'</span>: <span class="fl">0.0</span>, <span class="st">'boundary'</span>: <span class="va">True</span>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A route by length skips an edge whose length is <code>None</code>, as for an EPANET pump, and finds none where that edge was the only way:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> epanet <span class="op">=</span> Network.<span class="bu">open</span>(<span class="st">"tests/testdata/epanet.res"</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> pump <span class="op">=</span> epanet.reaches[<span class="st">"9"</span>]</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> start, end <span class="op">=</span> epanet.resolve(pump.start).graph_node, epanet.resolve(pump.end).graph_node</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> nx.shortest_path(epanet.to_networkx(), start, end, weight<span class="op">=</span><span class="st">"length"</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>networkx.exception.NetworkXNoPath: No path between <span class="dv">34</span> <span class="kw">and</span> <span class="fl">0.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>
