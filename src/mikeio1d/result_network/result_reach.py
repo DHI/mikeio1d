@@ -47,7 +47,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
 
     """
 
-    def __init__(self, reaches: list[IRes1DReach], res1d: Res1D):
+    def __init__(self, reaches: list[IRes1DReach], res1d: Res1D):  # api: allow-leaked-type
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.REACH
@@ -117,7 +117,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         raise KeyError(self._format_chainage_index_error_message(key)) from None
 
     @property
-    def res1d_reaches(self) -> list[IRes1DReach]:
+    def res1d_reaches(self) -> list[IRes1DReach]:  # api: allow-leaked-type
         """List of DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result location."""
         return self._creator.reaches
 
@@ -206,7 +206,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         """Full flow discharge of the reach."""
         return self._creator._get_full_flow_discharge()
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None):
+    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None):  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultReach.
 
         A ResultReach may consist of several IRes1DDataSet objects. Therefore,
@@ -233,7 +233,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
             f"No IRes1DDataSet found on reach for specified IRes1DDataItem: {m1d_dataitem}"
         )
 
-    def get_query(self, data_item: IDataItem):
+    def get_query(self, data_item: IDataItem):  # api: allow-leaked-type
         """Get a query for a data item."""
         raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
 

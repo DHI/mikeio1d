@@ -44,7 +44,7 @@ class ResultStructure(ResultLocation):
 
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self,
         structure_id: str,
         reach: IRes1DReach,
@@ -67,7 +67,7 @@ class ResultStructure(ResultLocation):
         return f"<{self.type}: {self.id}>"
 
     @property
-    def res1d_reach(self) -> IRes1DReach:
+    def res1d_reach(self) -> IRes1DReach:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result structure."""
         return self._creator.reach
 
@@ -115,7 +115,7 @@ class ResultStructure(ResultLocation):
     # region Deprecated methods and attributes of ResultStructure.
 
     @property
-    def reach(self) -> IRes1DReach:
+    def reach(self) -> IRes1DReach:  # api: allow-leaked-type
         """IRes1DReach corresponding to this result structure."""
         return self.res1d_reach
 

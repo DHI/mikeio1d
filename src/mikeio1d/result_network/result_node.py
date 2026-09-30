@@ -48,7 +48,7 @@ class ResultNode(ResultLocation):
         return f"<{self.type}: {self.id}>"
 
     @property
-    def res1d_node(self) -> IRes1DNode:
+    def res1d_node(self) -> IRes1DNode:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DNode corresponding to this result location."""
         return self._creator.node
 
@@ -133,7 +133,9 @@ class ResultNode(ResultLocation):
             return self.res1d_node.Diameter
         return None
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DNode:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DNode:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultNode.
 
         Parameters
@@ -149,7 +151,7 @@ class ResultNode(ResultLocation):
         """
         return self.res1d_node
 
-    def get_query(self, data_item: IDataItem) -> QueryDataNode:
+    def get_query(self, data_item: IDataItem) -> QueryDataNode:  # api: allow-leaked-type
         """Get a QueryDataNode for given data item."""
         quantity_id = data_item.Quantity.Id
         node_id = self.res1d_node.ID

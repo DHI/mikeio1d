@@ -41,7 +41,7 @@ class ResultGridPoint(ResultLocation):
 
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self,
         reach: IRes1DReach,
         gridpoint: IRes1DGridPoint,
@@ -68,12 +68,12 @@ class ResultGridPoint(ResultLocation):
         return self._creator.result_reach
 
     @property
-    def res1d_reach(self) -> IRes1DReach:
+    def res1d_reach(self) -> IRes1DReach:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result location."""
         return self._creator.reach
 
     @property
-    def res1d_gridpoint(self) -> IRes1DGridPoint:
+    def res1d_gridpoint(self) -> IRes1DGridPoint:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DGridPoint corresponding to this result location."""
         return self._creator.gridpoint
 
@@ -102,7 +102,9 @@ class ResultGridPoint(ResultLocation):
         """Bottom level of the gridpoint."""
         return self.res1d_gridpoint.Z
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DGridPoint:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DGridPoint:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultGridPoint.
 
         This is the reach IRes1DDataSet object because grid points do not
@@ -121,7 +123,7 @@ class ResultGridPoint(ResultLocation):
         """
         return self.res1d_reach
 
-    def get_query(self, data_item: IDataItem) -> QueryDataReach:
+    def get_query(self, data_item: IDataItem) -> QueryDataReach:  # api: allow-leaked-type
         """Get a QueryDataReach for given data item."""
         quantity_id = data_item.Quantity.Id
         reach_name = self.reach.Name
@@ -137,7 +139,7 @@ class ResultGridPoint(ResultLocation):
         return self.reach
 
     @property
-    def gridpoint(self) -> IRes1DGridPoint:
+    def gridpoint(self) -> IRes1DGridPoint:  # api: allow-leaked-type
         """IRes1DGridPoint corresponding to this result location."""
         return self._creator.gridpoint
 

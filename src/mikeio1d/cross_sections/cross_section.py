@@ -55,7 +55,7 @@ class CrossSection:
     >>> cs = CrossSection.from_xz(x, z, location_id="loc1", chainage=100, topo_id="topo1")
     """
 
-    def __init__(self, m1d_cross_section: ICrossSection):
+    def __init__(self, m1d_cross_section: ICrossSection):  # api: allow-leaked-type
         if hasattr(m1d_cross_section, "__implementation__"):
             m1d_cross_section = m1d_cross_section.__implementation__
 
@@ -102,7 +102,7 @@ class CrossSection:
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
 
     @property
-    def m1d_cross_section(self) -> ICrossSection:
+    def m1d_cross_section(self) -> ICrossSection:  # api: allow-leaked-type
         """The DHI.Mike1D.CrossSectionModule.ICrossSection object that CrossSection wraps."""
         return self._m1d_cross_section
 
@@ -122,7 +122,7 @@ class CrossSection:
         return self._m1d_cross_section.Location.Chainage
 
     @property
-    def location(self) -> ZLocation:
+    def location(self) -> ZLocation:  # api: allow-leaked-type
         """Location of the cross section (DHI.Mike1D.Generic.ZLocation object)."""
         return self._m1d_cross_section.Location
 

@@ -36,7 +36,7 @@ class ResultGlobalData(ResultLocation):
 
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self,
         data_item: IDataItem,
         global_datas: ResultGlobalDatas,
@@ -49,7 +49,9 @@ class ResultGlobalData(ResultLocation):
         self._creator = ResultGlobalDataCreator(self, data_item, global_datas, res1d)
         self._creator.create()
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DGlobalData:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DGlobalData:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultGlobalData.
 
         Parameters
@@ -65,7 +67,7 @@ class ResultGlobalData(ResultLocation):
         """
         return self.res1d.result_data.GlobalData
 
-    def get_query(self, data_item: IDataItem) -> QueryDataGlobal:
+    def get_query(self, data_item: IDataItem) -> QueryDataGlobal:  # api: allow-leaked-type
         """Get a QueryDataGlobal for given data item."""
         quantity_id = data_item.Quantity.Id
         query = QueryDataGlobal(quantity_id)

@@ -20,6 +20,11 @@ docs-import          docs or notebooks import a name the module does not export,
 undocumented-export  an exported name is never mentioned in the docs
 leaked-type          a public signature mentions a .NET type or a private name
 
+A signature that exposes a .NET or private type on purpose -- an escape hatch to the
+underlying .NET object, or a constructor only the package itself calls -- is exempted by the
+comment ``# api: allow-leaked-type`` on a line of the signature: the ``def`` line, or the
+line that closes it once the formatter has wrapped it.
+
 Usage
 -----
     python scripts/lint_public_api.py          # run from the repository root
@@ -49,6 +54,9 @@ DOTNET_ROOTS = ("DHI", "System")
 
 DOC_SUFFIXES = {".qmd", ".md", ".ipynb", ".yml", ".yaml"}
 
+# Marks a signature that exposes a .NET or private type on purpose.
+ALLOW_LEAK = re.compile(r"#\s*api:\s*allow-leaked-type\b")
+
 
 @dataclass(frozen=True)
 class Finding:
@@ -71,6 +79,7 @@ class Module:
     name: str
     path: Path
     tree: ast.Module
+    lines: list[str]
     declares_all: bool
     exports: list[str] | None
     exports_line: int
@@ -106,7 +115,8 @@ def load_modules() -> dict[str, Module]:
     """Parse every module in the package."""
     modules = {}
     for path in sorted((SRC / PACKAGE).rglob("*.py")):
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        source = path.read_text(encoding="utf-8")
+        tree = ast.parse(source, filename=str(path))
         name = module_name(path)
         declares_all, exports, line = False, None, 0
         for node in tree.body:
@@ -115,7 +125,7 @@ def load_modules() -> dict[str, Module]:
                 # A non-literal __all__ gives None here; ruff's PLE0604/PLE0605 report it.
                 declares_all = True
                 exports, line = literal_strings(node.value), node.lineno
-        modules[name] = Module(name, path, tree, declares_all, exports, line)
+        modules[name] = Module(name, path, tree, source.splitlines(), declares_all, exports, line)
     return modules
 
 
@@ -304,6 +314,12 @@ def signature_annotations(function: ast.FunctionDef | ast.AsyncFunctionDef):
         yield function.returns
 
 
+def allows_leak(module: Module, function: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    """Whether the function's signature carries the ``# api: allow-leaked-type`` marker."""
+    signature = module.lines[function.lineno - 1 : function.body[0].lineno - 1]
+    return any(ALLOW_LEAK.search(line) for line in signature)
+
+
 def public_modules(modules: dict[str, Module]) -> list[Module]:
     """Return the modules whose ``__all__`` is part of the public API."""
     return [module for module in modules.values() if not module.is_private]
@@ -337,7 +353,7 @@ def check_signatures(modules: dict[str, Module]) -> list[Finding]:
                         for leak in annotation_leaks(annotation, dotnet)
                     }
                 )
-                if leaks:
+                if leaks and not allows_leak(defining_module, function):
                     findings.append(
                         Finding(
                             defining_module.path,

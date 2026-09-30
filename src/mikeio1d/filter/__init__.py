@@ -7,11 +7,5 @@ from .time_filter import TimeFilter
 from .step_every_filter import StepEveryFilter
 from .quantity_filter import QuantityFilter
 
-__all__ = [
-    "NameFilter",
-    "QuantityFilter",
-    "ResultFilter",
-    "ResultSubFilter",
-    "StepEveryFilter",
-    "TimeFilter",
-]
+# Internal machinery: filtering is public through the arguments of Res1D.
+__all__: list[str] = []

@@ -64,7 +64,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
     >>> csc.to_xns11("cross_sections.xns11")
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self, cross_sections: Collection[CrossSection] | CrossSectionData | Path | str = None
     ):
         self._cross_section_map: dict[tuple[LocationId, Chainage, TopoId], CrossSection] = {}
@@ -227,12 +227,12 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         return self.keys()
 
     @property
-    def cross_section_data(self) -> CrossSectionData:
+    def cross_section_data(self) -> CrossSectionData:  # api: allow-leaked-type
         """The DHI.Mike1D.CrossSectionModule.CrossSectionData object."""
         return self._cross_section_data
 
     @property
-    def data(self) -> CrossSectionData:
+    def data(self) -> CrossSectionData:  # api: allow-leaked-type
         """The DHI.Mike1D.CrossSectionModule.CrossSectionData object.
 
         Alias for 'cross_section_data' property.

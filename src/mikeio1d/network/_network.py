@@ -74,7 +74,9 @@ class Network:
     Time: 1994-08-07 16:35:00 - 1994-08-07 18:35:00
     """
 
-    def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
+    def __init__(
+        self, reaches: Sequence[NetworkReach], results: _Results
+    ):  # api: allow-leaked-type
         self._results = results
         # Before the graph, whose error for a duplicate id would not name it.
         self._reaches = self._generate_reaches_dict(reaches)

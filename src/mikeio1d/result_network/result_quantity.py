@@ -69,7 +69,9 @@ class ResultQuantity:
         return f"<Quantity: {ResultQuantity.prettify_quantity(self)}>"
 
     @staticmethod
-    def prettify_quantity(quantity: ResultQuantity | IQuantity, latex_format=False) -> str:
+    def prettify_quantity(
+        quantity: ResultQuantity | IQuantity, latex_format=False
+    ) -> str:  # api: allow-leaked-type
         """Get a pretty string representation of a ResultQuantity's type and unit.
 
         Parameters

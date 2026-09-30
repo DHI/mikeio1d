@@ -8,6 +8,9 @@ import importlib
 
 from ..derived_quantity import DerivedQuantity
 
+# Internal machinery: Res1D registers these quantities itself.
+__all__: list[str] = []
+
 
 def get_default_derived_quantity_classes() -> list[type[DerivedQuantity]]:
     """Get list of all derived quantity classes in this package."""

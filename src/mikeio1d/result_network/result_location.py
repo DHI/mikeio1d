@@ -64,7 +64,9 @@ class ResultLocation(ABC):
         return list(self._creator.result_quantity_derived_map.keys())
 
     @abstractmethod
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DDataSet:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DDataSet:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultLocation.
 
         Parameters
@@ -81,11 +83,11 @@ class ResultLocation(ABC):
         ...
 
     @abstractmethod
-    def get_query(self, data_item: IDataItem) -> QueryData:
+    def get_query(self, data_item: IDataItem) -> QueryData:  # api: allow-leaked-type
         """Create a query for given data item."""
         ...
 
-    def add_query(self, data_item: IDataItem):
+    def add_query(self, data_item: IDataItem):  # api: allow-leaked-type
         """Add a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)

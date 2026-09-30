@@ -12,9 +12,5 @@ from .geopandas_reaches_converter_segmented import GeoPandasReachesConverterSegm
 from .geopandas_nodes_converter import GeoPandasNodesConverter
 from .geopandas_catchments_converter import GeoPandasCatchmentsConverter
 
-__all__ = [
-    "GeoPandasCatchmentsConverter",
-    "GeoPandasNodesConverter",
-    "GeoPandasReachesConverter",
-    "GeoPandasReachesConverterSegmented",
-]
+# Internal machinery: conversion is public through the to_geopandas() methods.
+__all__: list[str] = []

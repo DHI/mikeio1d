@@ -580,7 +580,7 @@ class Res1D:
         return self.reader.file_path
 
     @property
-    def query(self) -> ResultDataQuery:
+    def query(self) -> ResultDataQuery:  # api: allow-leaked-type
         """.NET object ResultDataQuery to use for querying the loaded res1d data.
 
         More information about ResultDataQuery class see:
@@ -589,7 +589,7 @@ class Res1D:
         return self.reader.query
 
     @property
-    def searcher(self) -> ResultDataSearcher:
+    def searcher(self) -> ResultDataSearcher:  # api: allow-leaked-type
         """.NET object ResultDataSearcher to use for searching res1d data items on network.
 
         More information about ResultDataSearcher class see:
@@ -598,7 +598,7 @@ class Res1D:
         return self.reader.searcher
 
     @property
-    def result_data(self) -> ResultData:
+    def result_data(self) -> ResultData:  # api: allow-leaked-type
         """.NET object ResultData with the loaded res1d data.
 
         More information about ResultData class see:
@@ -607,7 +607,7 @@ class Res1D:
         return self.reader.data
 
     @property
-    def data(self) -> ResultData:
+    def data(self) -> ResultData:  # api: allow-leaked-type
         """.NET object ResultData with the loaded res1d data.
 
         Alias for 'result_data' property.

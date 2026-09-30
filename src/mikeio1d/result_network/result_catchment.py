@@ -32,7 +32,7 @@ class ResultCatchment(ResultLocation):
         Res1D object the catchment belongs to.
     """
 
-    def __init__(self, catchment: IRes1DCatchment, res1d: Res1D):
+    def __init__(self, catchment: IRes1DCatchment, res1d: Res1D):  # api: allow-leaked-type
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.CATCHMENT
@@ -46,7 +46,7 @@ class ResultCatchment(ResultLocation):
         return f"<Catchment: {self.id}>"
 
     @property
-    def res1d_catchment(self) -> IRes1DCatchment:
+    def res1d_catchment(self) -> IRes1DCatchment:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DCatchment corresponding to this result location."""
         return self._creator.catchment
 
@@ -73,7 +73,9 @@ class ResultCatchment(ResultLocation):
 
         return CatchmentGeometry.from_res1d_catchment(self.res1d_catchment)
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DCatchment:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DCatchment:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultCatchment.
 
         Parameters
@@ -89,7 +91,7 @@ class ResultCatchment(ResultLocation):
         """
         return self.res1d_catchment
 
-    def get_query(self, data_item: IDataItem) -> QueryDataCatchment:
+    def get_query(self, data_item: IDataItem) -> QueryDataCatchment:  # api: allow-leaked-type
         """Get a QueryDataCatchment for given data item."""
         quantity_id = data_item.Quantity.Id
         catchment_id = self.res1d_catchment.Id
