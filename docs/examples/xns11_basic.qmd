@@ -71,7 +71,7 @@ cross_sections.plot()
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mikeio1d.xns11 import CrossSection
+from mikeio1d.cross_sections import CrossSection
 ```
 
 ```{python}
