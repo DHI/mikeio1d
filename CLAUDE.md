@@ -24,25 +24,40 @@ uv sync --reinstall --group dev --group test --group notebooks --python 3.13
 # Install dev dependencies (use highest supported version, currently 3.14)
 # Uses --group (PEP 735 dependency-groups), not --extra
 uv sync --group dev --group test --group notebooks --python 3.13
+```
 
-# Run all tests
-uv run pytest
+Everything else goes through the [`just`](https://just.systems) command runner. Call the
+recipes rather than the tools behind them; `just` with no arguments lists them all.
 
-# Run a single test file or test
-uv run pytest tests/test_res1d.py -v
-uv run pytest tests/test_res1d.py::test_name -v
+```bash
+just lint            # ruff check + format check; fast, run it after every change
+just lint-changed    # stricter annotation/docstring rules, only on files changed vs main
+just api             # public API (__all__) vs source and docs; see below
+just fix             # apply formatting and safe lint fixes
 
-# Run optional dependency tests
-uv run pytest -m optional_dependency
+just test                                    # all tests
+just test tests/test_res1d.py::test_name -v  # extra arguments go to pytest
+just test -m optional_dependency             # optional dependency tests
+just test-ci                                 # the CI configuration
 
-# Lint
-uv run ruff check .
-
-# Format
-uv run ruff format .
+just check           # lint + test: run before opening a PR
 ```
 
 The local `.pytest.ini` excludes slow tests and experimental tests by default. CI uses `.pytest-ci.ini`.
+
+### Public API
+
+The public API is the names in each package's `__all__`, plus every non-underscore member of
+an exported class. A module or package whose name starts with a single underscore
+(`network/_graph.py`) is private, along with everything inside it; dunders like `__init__` are
+not. Public packages re-export what callers need from private modules. `just api` checks that declaration against the source and the docs: every
+package has an `__all__`, docs and notebooks import only exported names, every export is
+mentioned in the docs, and public signatures don't expose .NET or private types. It reads files
+without importing anything, so it takes well under a second.
+
+`just api` still reports existing drift and is not yet part of `just lint` or CI. Don't add
+new findings: when you add or change public API, update `__all__`, the docstring, the tests
+and any docs or notebook that shows it.
 
 ## Architecture
 

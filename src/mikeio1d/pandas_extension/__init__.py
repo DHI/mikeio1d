@@ -6,12 +6,12 @@ from .various import compact_dataframe
 from .various import groupby_level
 from .result_frame_aggregator import ResultFrameAggregator
 
-__all___ = [
+__all__ = [
     "Mikeio1dAccessor",
+    "ResultFrameAggregator",
     "TransposedGroupBy",
     "agg_chainage",
-    "groupby_chainage",
     "compact_dataframe",
+    "groupby_chainage",
     "groupby_level",
-    "ResultFrameAggregator",
 ]

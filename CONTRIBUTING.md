@@ -34,9 +34,9 @@ and the requirements listed in `README.md` and `docs/index.qmd`.
 2. **Implement your changes**
    - Write or update tests as needed
    - Make your code changes
-   - Ensure all tests pass with `uv run pytest`
+   - Ensure lint and tests pass with `just check` (install [`just`](https://just.systems/man/en/packages.html))
 
-3. **Format code** with `uv run ruff format .`
+3. **Format code** with `just fix`
 
 4. **Submit a pull request**
    - Provide a clear description of your changes

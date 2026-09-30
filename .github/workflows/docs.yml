@@ -20,8 +20,11 @@ jobs:
     - name: Install dependencies
       run: uv sync --group dev --group docs --extra network
 
+    - name: Install just
+      uses: extractions/setup-just@v2
+
     - name: Build documentation
-      run: make docs
+      run: just docs
 
     - name: Publish to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3.6.1
