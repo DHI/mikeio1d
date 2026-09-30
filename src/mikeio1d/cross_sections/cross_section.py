@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from ..geometry import CrossSectionGeometry
     from collections.abc import Iterable
 
+    from matplotlib.axes import Axes
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -98,7 +100,13 @@ class CrossSection:
         return CrossSection(m1d_cross_section)
 
     def __repr__(self) -> str:
-        """Return a string representation of the cross section."""
+        """Return a string representation of the cross section.
+
+        Returns
+        -------
+        str
+            The location ID, chainage and topo ID of the cross section.
+        """
         return f"<CrossSection: {self.location_id}, {format(self.chainage, '.3f')}, {self.topo_id}>"
 
     @property
@@ -408,7 +416,7 @@ class CrossSection:
     def processed_allow_recompute(self, value: bool):
         self._m1d_cross_section.BaseCrossSection.ProcessedDataProtected = not value
 
-    def recompute_processed(self):
+    def recompute_processed(self) -> None:
         """Recompute the processed data.
 
         Notes
@@ -434,6 +442,11 @@ class CrossSection:
         resistance formulations. It currently raises for formulations it does not handle (e.g.
         Relative, Manning's n); in that case we fall back to a Python implementation that mirrors the
         MIKE+ cross section editor's processed-data table (see issue #229).
+
+        Returns
+        -------
+        tuple[float]
+            The conveyance factor for each processed level.
         """
         conveyance = self._calculate_conveyance_factor_dotnet(resistance, flow_area, radius)
         if conveyance is not None:
@@ -453,6 +466,12 @@ class CrossSection:
 
         Returns None if the engine does not support the cross section's resistance formulation (it
         raises in that case), signalling the caller to fall back to the Python implementation.
+
+        Returns
+        -------
+        tuple[float] or None
+            The conveyance factor for each processed level, or None if the engine does not
+            support the resistance formulation.
         """
         formulation = m1d_ResistanceFormulation(int(self.resistance_type))
         try:
@@ -473,6 +492,11 @@ class CrossSection:
         The formula depends on the cross section's resistance type (see issue #229). Formulations the
         editor does not display a value for (Colebrook-White, Hazen-Williams, Manning's M relative)
         return the editor's -999 sentinel.
+
+        Returns
+        -------
+        tuple[float]
+            The conveyance factor for each processed level.
         """
         rt = self.resistance_type
         if rt in (ResistanceType.MANNINGS_M, ResistanceType.RELATIVE):
@@ -657,13 +681,25 @@ class CrossSection:
             self.resistance_distribution = ResistanceDistribution.DISTRIBUTED
 
     def _resistance_values_changed(self, df: pd.DataFrame, raw_current: pd.DataFrame) -> bool:
-        """Check whether resistance values differ between the new and current raw DataFrames."""
+        """Check whether resistance values differ between the new and current raw DataFrames.
+
+        Returns
+        -------
+        bool
+            True if the number of points or any resistance value differs.
+        """
         if len(df) != len(raw_current):
             return True
         return not np.array_equal(df.resistance.values, raw_current.resistance.values)
 
     def _update_marker(self, marker: int | Marker, point_index: int):
-        """Update the marker of the specified point_index."""
+        """Update the marker of the specified point_index.
+
+        Raises
+        ------
+        ValueError
+            If the marker is neither a default nor a user marker.
+        """
         marker = int(marker)
         base_xs = self._m1d_cross_section.BaseCrossSection
         if Marker.is_default_marker(marker):
@@ -728,7 +764,7 @@ class CrossSection:
             marker, x, z = row.marker, row.x, row.z
             self.set_marker(marker, x, z)
 
-    def set_marker(self, marker: int | Marker, x: float, z: float | None = None):
+    def set_marker(self, marker: int | Marker, x: float, z: float | None = None) -> None:
         """Set a marker at the point nearest to the specified x, z coordinates.
 
         Note: if z is not provided, the nearest point in the x direction will be found.
@@ -755,7 +791,7 @@ class CrossSection:
         point_index = self._find_nearest_point_index(x, z)
         self._update_marker(marker, point_index)
 
-    def unset_marker(self, marker: int | Marker):
+    def unset_marker(self, marker: int | Marker) -> None:
         """Remove the specified marker from the cross section.
 
         Parameters
@@ -798,7 +834,13 @@ class CrossSection:
         nearest_index = np.argmin(distances)
         return int(nearest_index)
 
-    def plot(self, ax=None, with_markers: bool = True, with_marker_labels=True, **kwargs):
+    def plot(
+        self,
+        ax: Axes | None = None,
+        with_markers: bool = True,
+        with_marker_labels: bool = True,
+        **kwargs,
+    ) -> Axes:
         """Plot the cross section.
 
         Parameters

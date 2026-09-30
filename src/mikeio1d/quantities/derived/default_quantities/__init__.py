@@ -13,7 +13,13 @@ __all__: list[str] = []
 
 
 def get_default_derived_quantity_classes() -> list[type[DerivedQuantity]]:
-    """Get list of all derived quantity classes in this package."""
+    """Get list of all derived quantity classes in this package.
+
+    Returns
+    -------
+    list[type[DerivedQuantity]]
+        Every DerivedQuantity subclass defined in the modules of this package.
+    """
     derived_quantity_classes = []
     for importer, modname, ispkg in pkgutil.iter_modules(__path__):
         module = importlib.import_module("." + modname, __name__)

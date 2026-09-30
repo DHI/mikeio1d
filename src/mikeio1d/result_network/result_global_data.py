@@ -68,7 +68,14 @@ class ResultGlobalData(ResultLocation):
         return self.res1d.result_data.GlobalData
 
     def get_query(self, data_item: IDataItem) -> QueryDataGlobal:  # api: allow-leaked-type
-        """Get a QueryDataGlobal for given data item."""
+        """Get a QueryDataGlobal for given data item.
+
+        Returns
+        -------
+        QueryDataGlobal
+            Query for the given data item at this location.
+
+        """
         quantity_id = data_item.Quantity.Id
         query = QueryDataGlobal(quantity_id)
         return query
@@ -101,11 +108,11 @@ class ResultGlobalDataCreator(ResultLocationCreator):
         self.global_datas = global_datas
         self.data_item = data_item
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultCatchment creation steps."""
         self.set_quantities()
 
-    def set_quantities(self):
+    def set_quantities(self) -> None:
         """Set quantities for ResultGlobalData.
 
         Here only a single data item is used for ResultGlobalData.
@@ -113,6 +120,8 @@ class ResultGlobalDataCreator(ResultLocationCreator):
         """
         self.set_quantity(self.global_datas, self.data_item)
 
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add global data result quantity to result quantity maps."""
         self.add_to_network_result_quantity_map(result_quantity)

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
     from .result_reach import ResultReach
+    from .result_quantity import ResultQuantity
 
     from DHI.Mike1D.ResultDataAccess import IDataItem
     from DHI.Mike1D.ResultDataAccess import IDataItems
@@ -78,33 +79,33 @@ class ResultGridPoint(ResultLocation):
         return self._creator.gridpoint
 
     @property
-    def reach_name(self):
+    def reach_name(self) -> str:
         """Name of reach the gridpoint is on."""
         return self._creator.reach.Name
 
     @property
-    def chainage(self):
+    def chainage(self) -> float:
         """Chainage of the gridpoint."""
         return self.res1d_gridpoint.Chainage
 
     @property
-    def xcoord(self):
+    def xcoord(self) -> float:
         """X coordinate of the gridpoint."""
         return self.res1d_gridpoint.X
 
     @property
-    def ycoord(self):
+    def ycoord(self) -> float:
         """Y coordinate of the gridpoint."""
         return self.res1d_gridpoint.Y
 
     @property
-    def bottom_level(self):
+    def bottom_level(self) -> float:
         """Bottom level of the gridpoint."""
         return self.res1d_gridpoint.Z
 
     def get_m1d_dataset(
         self, m1d_dataitem: IDataItem = None
-    ) -> IRes1DGridPoint:  # api: allow-leaked-type
+    ) -> IRes1DReach:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultGridPoint.
 
         This is the reach IRes1DDataSet object because grid points do not
@@ -124,7 +125,13 @@ class ResultGridPoint(ResultLocation):
         return self.res1d_reach
 
     def get_query(self, data_item: IDataItem) -> QueryDataReach:  # api: allow-leaked-type
-        """Get a QueryDataReach for given data item."""
+        """Get a QueryDataReach for given data item.
+
+        Returns
+        -------
+        QueryDataReach
+            Query for the data item at this grid point.
+        """
         quantity_id = data_item.Quantity.Id
         reach_name = self.reach.Name
         chainage = self.res1d_gridpoint.Chainage
@@ -191,11 +198,11 @@ class ResultGridPointCreator(ResultLocationCreator):
         self.structure_data_items = []
         self.element_indices = []
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultGridPoint creation steps."""
         self.set_static_attributes()
 
-    def set_static_attributes(self):
+    def set_static_attributes(self) -> None:
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("reach_name")
         self.set_static_attribute("chainage")
@@ -203,7 +210,9 @@ class ResultGridPointCreator(ResultLocationCreator):
         self.set_static_attribute("ycoord")
         self.set_static_attribute("bottom_level")
 
-    def add_to_result_quantity_maps(self, quantity_id, result_quantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add grid point result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
@@ -215,11 +224,11 @@ class ResultGridPointCreator(ResultLocationCreator):
 
         self.add_to_network_result_quantity_map(result_quantity)
 
-    def add_data_item(self, data_item, element_index):
+    def add_data_item(self, data_item: IDataItem, element_index: int) -> None:
         """Add data item to grid point data items list."""
         self.data_items.append(data_item)
         self.element_indices.append(element_index)
 
-    def add_structure_data_item(self, data_item):
+    def add_structure_data_item(self, data_item: IDataItem) -> None:
         """Add data item to structure data items list."""
         self.structure_data_items.append(data_item)
