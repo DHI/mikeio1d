@@ -194,6 +194,8 @@ class ResultLocation(ABC):
         if len({q.name for q in result_quantities}) == 1:
             ylabel = ResultQuantity.prettify_quantity(result_quantities[0], latex_format=True)
             ax.set_ylabel(ylabel)
+        else:
+            ax.set_ylabel("")
         ax.grid(True)
         return ax
 
