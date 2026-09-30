@@ -91,7 +91,7 @@ class ExtractorDfs0(Extractor):
         builder = self.builder
 
         # Create file
-        builder.CreateFile(self.out_file_name)
+        builder.CreateFile(str(self.out_file_name))
         dfsfile = builder.GetFile()
         times = list(result_data.TimesList)
 
