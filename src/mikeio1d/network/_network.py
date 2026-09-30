@@ -144,12 +144,11 @@ class Network:
             different period from the result file, or if the two carry the same
             quantity at one location.
 
-        Warns
+        Notes
         -----
-        UserWarning
-            If the file holds catchments beside its reaches, which the network
-            leaves out with their quantities, or nodes that end no reach, which
-            it leaves out too.
+        A ``UserWarning`` is raised if the file holds catchments beside its
+        reaches, which the network leaves out with their quantities, or nodes
+        that end no reach, which it leaves out too.
 
         Examples
         --------
