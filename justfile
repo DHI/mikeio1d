@@ -16,7 +16,7 @@ lint:
 
 # Check the public API (__all__) against the source and the docs
 api:
-    python scripts/lint_public_api.py
+    uv run python scripts/lint_public_api.py
 
 # Stricter rules (annotations, Returns/Raises sections) on files changed since `base`
 lint-changed base="main":
