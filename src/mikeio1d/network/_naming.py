@@ -136,8 +136,9 @@ class _Naming:
         a measured position onto the model's, and means the closest.
         """
         window = _window(position_tol)
+        if isinstance(address, tuple) and not math.isfinite(address[1]):
+            raise ValueError(f"breakpoint position must be finite, got {address[1]!r}.")
         named = self.named(address)
-        if named is not None:
             return named if self._carries(named, quantity) else None
         if not _is_breakpoint(address):
             return None
