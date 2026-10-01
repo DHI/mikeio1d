@@ -39,7 +39,14 @@ class ResultLocation(ABC):
         self._creator: ResultLocationCreator = None
 
     def __repr__(self) -> str:
-        """Return a string representation of the object."""
+        """Return a string representation of the object.
+
+        Returns
+        -------
+        str
+            String representation of the location.
+
+        """
         return f"<{self.__class__.__name__}>"
 
     def _repr_html_(self) -> str:
@@ -66,7 +73,9 @@ class ResultLocation(ABC):
         return list(self._creator.result_quantity_derived_map.keys())
 
     @abstractmethod
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DDataSet:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DDataSet:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultLocation.
 
         Parameters
@@ -83,11 +92,11 @@ class ResultLocation(ABC):
         ...
 
     @abstractmethod
-    def get_query(self, data_item: IDataItem) -> QueryData:
+    def get_query(self, data_item: IDataItem) -> QueryData:  # api: allow-leaked-type
         """Create a query for given data item."""
         ...
 
-    def add_query(self, data_item: IDataItem):
+    def add_query(self, data_item: IDataItem) -> None:  # api: allow-leaked-type
         """Add a query to ResultNetwork.queries list."""
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
@@ -131,6 +140,11 @@ class ResultLocation(ABC):
         ------
         ValueError
             If a quantity is not available at this location.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data for all quantities at this location.
 
         """
         timeseries_ids = self._get_timeseries_ids(quantities)
@@ -358,12 +372,19 @@ class ResultLocationCreator(ABC):
         self.static_attributes: list[str] = []
 
     @abstractmethod
-    def create(self):
+    def create(self) -> None:
         """Perform ResultLocation creation steps."""
         ...
 
     def repr_html(self) -> str:
-        """HTML representation."""
+        """HTML representation.
+
+        Returns
+        -------
+        str
+            HTML representation of the result location.
+
+        """
         result_location = self.result_location
         attributes = {k: getattr(result_location, k) for k in self.static_attributes}
         total_attributes = len(attributes)
@@ -385,11 +406,11 @@ class ResultLocationCreator(ABC):
         repr = build_html_repr_from_sections(header, sections)
         return repr
 
-    def set_static_attribute(self, name: str):
+    def set_static_attribute(self, name: str) -> None:
         """Add static attribute. This shows up in the html repr."""
         self.static_attributes.append(name)
 
-    def set_quantities(self):
+    def set_quantities(self) -> None:
         """Set all quantity attributes."""
         element_indices = self.element_indices
         data_items = list(self.data_items)
@@ -404,7 +425,7 @@ class ResultLocationCreator(ABC):
         obj: ResultLocation,
         data_item: IDataItem,
         element_index: int = 0,
-    ):
+    ) -> None:
         """Set a single quantity attribute on the obj."""
         if not self.res1d.filter.is_data_item_included(data_item):
             return
@@ -424,19 +445,26 @@ class ResultLocationCreator(ABC):
         self.add_to_result_quantity_maps(quantity_id, result_quantity)
 
     def can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
-        """Check if a derived quantity can be added to the result locations."""
+        """Check if a derived quantity can be added to the result locations.
+
+        Returns
+        -------
+        bool
+            True if the derived quantity applies to this location's group and source quantity.
+
+        """
         result_location = self.result_location
         return (
             result_location.group in derived_quantity.groups
             and derived_quantity.source_quantity in result_location.quantities
         )
 
-    def add_derived_quantity(self, derived_quantity: DerivedQuantity):
+    def add_derived_quantity(self, derived_quantity: DerivedQuantity) -> None:
         """Add a derived quantity to the result location."""
         if self.can_add_derived_quantity(derived_quantity):
             self.set_quantity_derived(derived_quantity)
 
-    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str) -> None:
         """Remove a derived quantity from the result location."""
         if isinstance(derived_quantity, DerivedQuantity):
             derived_quantity = derived_quantity.name
@@ -449,7 +477,7 @@ class ResultLocationCreator(ABC):
         if hasattr(self.result_location, result_quantity_attribute_string):
             delattr(self.result_location, result_quantity_attribute_string)
 
-    def set_quantity_derived(self, derived_quantity: DerivedQuantity):
+    def set_quantity_derived(self, derived_quantity: DerivedQuantity) -> None:
         """Set a single derived quantity attribute on the obj."""
         result_quantity_derived = ResultQuantityDerived(
             derived_quantity, self.result_location, self.res1d
@@ -464,7 +492,9 @@ class ResultLocationCreator(ABC):
         setattr(self.result_location, result_quantity_attribute_string, result_quantity_derived)
 
     @abstractmethod
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add to result quantity maps.
 
         Result quantity map is a dictionary from quantity id to a list of result quantities corresponding to that quantity id.
@@ -484,7 +514,7 @@ class ResultLocationCreator(ABC):
         quantity_id: str,
         result_quantity: ResultQuantity,
         result_quantity_map: dict[str, list[ResultQuantity]],
-    ):
+    ) -> None:
         """Add to a given result quantity map.
 
         Parameters

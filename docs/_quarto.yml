@@ -115,6 +115,8 @@ quartodoc:
     - result_network.ResultCatchments
     - result_network.ResultGlobalData
     - result_network.ResultGlobalDatas
+    - result_network.ResultStructure
+    - result_network.ResultStructures
   - title: Quantities
     desc: ''
     contents:
@@ -125,6 +127,29 @@ quartodoc:
     contents:
     - cross_sections.CrossSection
     - cross_sections.CrossSectionCollection
+    - cross_sections.Marker
+    - cross_sections.ProcessLevelsMethod
+    - cross_sections.RadiusType
+    - cross_sections.ResistanceDistribution
+    - cross_sections.ResistanceType
+  - title: Geometry
+    desc: 'Returned by the `geometry` property of locations and cross sections.'
+    contents:
+    - geometry.NodePoint
+    - geometry.ReachPoint
+    - geometry.ReachGeometry
+    - geometry.CatchmentGeometry
+    - geometry.CrossSectionGeometry
+  - title: Pandas extension
+    desc: 'Available on DataFrames as the `m1d` accessor once mikeio1d is imported.'
+    contents:
+    - pandas_extension.Mikeio1dAccessor
+    - pandas_extension.ResultFrameAggregator
+    - pandas_extension.TransposedGroupBy
+    - pandas_extension.agg_chainage
+    - pandas_extension.groupby_chainage
+    - pandas_extension.compact_dataframe
+    - pandas_extension.groupby_level
   - title: Network
     desc: 'Needs the network extra.'
     contents:
@@ -132,6 +157,12 @@ quartodoc:
     - network.Address
     - network.NetworkLocation
     - network.NetworkReach
+  - title: Experimental
+    desc: 'Not part of the stable API: may change or be removed at any time.'
+    contents:
+    - experimental.to_networkx
+    - experimental.to_dataarray
+    - experimental.to_dataarray_xvec
     
 format:
   html:

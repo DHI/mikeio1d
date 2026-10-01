@@ -8,7 +8,6 @@ if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
 
     from ..res1d import Res1D
-    from ..result_reader_writer.result_reader import ColumnMode
     from ..quantities import TimeSeriesIdGroup
 
     from .result_location import ResultLocation
@@ -41,7 +40,14 @@ class ResultLocations(ABC, dict[str, ResultLocation]):
         self._creator: ResultLocationsCreator = None
 
     def __repr__(self) -> str:
-        """Return a string representation of the object."""
+        """Return a string representation of the object.
+
+        Returns
+        -------
+        str
+            The class name and the number of locations.
+
+        """
         return f"<{self.__class__.__name__}> ({len(self)})"
 
     def _repr_html_(self) -> str:
@@ -80,14 +86,14 @@ class ResultLocations(ABC, dict[str, ResultLocation]):
 
     def read(
         self,
-        column_mode: str | ColumnMode | None = None,
+        column_mode: str | None = None,
         include_derived: bool = False,
     ) -> pd.DataFrame:
         """Read the time series data for all quantities at these locations into a DataFrame.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
@@ -95,6 +101,11 @@ class ResultLocations(ABC, dict[str, ResultLocation]):
 
         include_derived: bool, default False
             Include derived quantities.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data of every quantity at these locations.
 
         """
         qlists = self._creator.result_quantity_map.values()
@@ -118,7 +129,7 @@ class ResultLocations(ABC, dict[str, ResultLocation]):
 
     def to_dataframe(
         self,
-        column_mode: str | ColumnMode | None = None,
+        column_mode: str | None = None,
         include_derived: bool = False,
     ) -> pd.DataFrame:
         """Read the time series data for all quantities at these locations into a DataFrame.
@@ -127,7 +138,7 @@ class ResultLocations(ABC, dict[str, ResultLocation]):
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
@@ -135,6 +146,12 @@ class ResultLocations(ABC, dict[str, ResultLocation]):
 
         include_derived: bool, default False
             Include derived quantities.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data of every quantity at these locations.
+
         """
         return self.read(column_mode, include_derived)
 
@@ -176,12 +193,19 @@ class ResultLocationsCreator(ABC):
         self.result_quantity_derived_map: dict[str, list[ResultQuantityDerived]] = {}
 
     @abstractmethod
-    def create(self):
+    def create(self) -> None:
         """Perform ResultLocations creation steps."""
         ...
 
     def repr_html(self) -> str:
-        """HTML representation."""
+        """HTML representation.
+
+        Returns
+        -------
+        str
+            HTML listing the quantities and derived quantities of the locations.
+
+        """
         locations = self.result_locations
         total_quantities = len(locations.quantities)
         total_derived_quantities = len(locations.derived_quantities)
@@ -197,7 +221,7 @@ class ResultLocationsCreator(ABC):
         repr = build_html_repr_from_sections(header, sections)
         return repr
 
-    def set_quantity_collections(self, result_locations: ResultLocations = None):
+    def set_quantity_collections(self, result_locations: ResultLocations | None = None) -> None:
         """Set all quantity collection attributes."""
         result_locations = self.result_locations if result_locations is None else result_locations
 
@@ -210,13 +234,20 @@ class ResultLocationsCreator(ABC):
             setattr(result_locations, result_quantity_attribute_string, result_quantity_collection)
 
     def can_add_derived_quantity(self, derived_quantity: DerivedQuantity) -> bool:
-        """Check if a derived quantity can be added to the result locations."""
+        """Check if a derived quantity can be added to the result locations.
+
+        Returns
+        -------
+        bool
+            Whether the locations have the group and source quantity it needs.
+
+        """
         return (
             self.result_locations.group in derived_quantity.groups
             and derived_quantity.source_quantity in self.result_quantity_map
         )
 
-    def add_derived_quantity(self, derived_quantity: DerivedQuantity):
+    def add_derived_quantity(self, derived_quantity: DerivedQuantity) -> None:
         """Add a derived quantity to the result network.
 
         Parameters
@@ -231,7 +262,7 @@ class ResultLocationsCreator(ABC):
         for location in self.result_locations.values():
             location._creator.add_derived_quantity(derived_quantity)
 
-    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str):
+    def remove_derived_quantity(self, derived_quantity: DerivedQuantity | str) -> None:
         """Remove a derived quantity from the result network.
 
         Parameters
@@ -255,7 +286,7 @@ class ResultLocationsCreator(ABC):
         for location in self.result_locations.values():
             location._creator.remove_derived_quantity(derived_quantity)
 
-    def set_quantity_derived(self, derived_quantity: DerivedQuantity):
+    def set_quantity_derived(self, derived_quantity: DerivedQuantity) -> None:
         """Set a single derived quantity attribute on the obj."""
         result_quantity_derived = ResultQuantityDerivedCollection(
             derived_quantity, self.result_locations, self.res1d
@@ -269,7 +300,7 @@ class ResultLocationsCreator(ABC):
         )
         setattr(self.result_locations, result_quantity_attribute_string, result_quantity_derived)
 
-    def set_res1d_object_to_dict(self, dict_key: str, obj):
+    def set_res1d_object_to_dict(self, dict_key: str, obj: object) -> None:
         """Create a dict entry from a key name to an object or a list of objects."""
         obj = impl(obj)
         result_locations = self.result_locations

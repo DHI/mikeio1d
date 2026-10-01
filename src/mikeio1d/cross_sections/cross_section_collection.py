@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import geopandas as gpd
+    from matplotlib.axes import Axes
+
+    from DHI.Mike1D.CrossSectionModule import XSInterpolationType
 
 from warnings import warn
 
@@ -64,7 +67,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
     >>> csc.to_xns11("cross_sections.xns11")
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self, cross_sections: Collection[CrossSection] | CrossSectionData | Path | str = None
     ):
         self._cross_section_map: dict[tuple[LocationId, Chainage, TopoId], CrossSection] = {}
@@ -99,7 +102,13 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
             self._cross_section_map[(location_id, chainage, topo_id)] = xs
 
     def _init_from_xns11(self, file_name: str | Path):
-        """Initialize the collection from an Xns11 file."""
+        """Initialize the collection from an Xns11 file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file does not exist.
+        """
         file_name = self._validate_file_name(file_name)
         if not file_name.exists():
             raise FileNotFoundError(f"File not found: {file_name}")
@@ -119,13 +128,25 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         return file_name
 
     def __repr__(self) -> str:
-        """Return a string representation of the collection."""
+        """Return a string representation of the collection.
+
+        Returns
+        -------
+        str
+            The class name and the number of cross sections.
+        """
         return f"<mikeio1d.{type(self).__name__} ({len(self)})>"
 
     def __getitem__(
         self, key: tuple[LocationId, Chainage, TopoId]
     ) -> CrossSection | list[CrossSection]:
-        """Get a cross section or a collection of cross sections."""
+        """Get a cross section or a collection of cross sections.
+
+        Returns
+        -------
+        CrossSection or list[CrossSection]
+            A CrossSection for a full key, or a list of CrossSection for a partial key.
+        """
         if isinstance(key, str):
             return self.__getitem__((key, ..., ...))
 
@@ -142,7 +163,18 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
     def _validate_key(
         self, key: tuple[LocationId, Chainage, TopoId]
     ) -> tuple[LocationId, Chainage, TopoId]:
-        """Validate a key."""
+        """Validate a key.
+
+        Returns
+        -------
+        tuple[LocationId, Chainage, TopoId]
+            The key with the chainage converted to a string with 3 decimals.
+
+        Raises
+        ------
+        ValueError
+            If the key does not have exactly three elements.
+        """
         if len(key) != 3:
             raise ValueError("Key must be a tuple of Location ID, Chainage and Topo ID.")
 
@@ -168,12 +200,23 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         if key in self._cross_section_map:
             del self[key]
         self._cross_section_data.Add(value._m1d_cross_section)
-        return self._cross_section_map.__setitem__(key, value)
+        self._cross_section_map[key] = value
 
     def _validate_key_value_pair(
         self, key: tuple[LocationId, Chainage, TopoId], value: CrossSection
     ) -> tuple[LocationId, Chainage, TopoId]:
-        """Validate a key and CrossSection pair."""
+        """Validate a key and CrossSection pair.
+
+        Returns
+        -------
+        tuple[LocationId, Chainage, TopoId]
+            The validated key.
+
+        Raises
+        ------
+        ValueError
+            If the value is not a CrossSection, or the key does not match the cross section.
+        """
         location_id, chainage, topo_id = self._validate_key(key)
         if not isinstance(value, CrossSection):
             raise ValueError("Value must be a CrossSection object.")
@@ -193,29 +236,64 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         return (location_id, chainage, topo_id)
 
     def _convert_chainage_to_str(self, chainage: float) -> str:
-        """Convert a chainage to a string with 3 decimals."""
+        """Convert a chainage to a string with 3 decimals.
+
+        Returns
+        -------
+        str
+            The chainage formatted with 3 decimals.
+        """
         return f"{float(chainage):.3f}"
 
     def __delitem__(self, key: tuple[LocationId, Chainage, TopoId]):
-        """Delete a cross section from the collection."""
+        """Delete a cross section from the collection.
+
+        Raises
+        ------
+        ValueError
+            If the cross section could not be removed from the underlying cross section data.
+        """
         key = self._validate_key(key)
         xs = self.get(key)
         if xs is not None:
             deleted = self._cross_section_data.RemoveCrossSection(xs.location, xs.topo_id)
             if not deleted:
                 raise ValueError(f"Cross section not found: {key}")
-        return self._cross_section_map.__delitem__(key)
+        del self._cross_section_map[key]
 
     def __iter__(self):
-        """Iterate over the collection."""
+        """Iterate over the collection.
+
+        Returns
+        -------
+        Iterator[tuple[LocationId, Chainage, TopoId]]
+            An iterator over the keys of the collection.
+        """
         return iter(self._cross_section_map)
 
     def __len__(self):
-        """Return the length of the collection."""
+        """Return the length of the collection.
+
+        Returns
+        -------
+        int
+            The number of cross sections in the collection.
+        """
         return len(self._cross_section_map)
 
-    def __or__(self, other) -> CrossSectionCollection:
-        """Merge two collections."""
+    def __or__(self, other: CrossSectionCollection) -> CrossSectionCollection:
+        """Merge two collections.
+
+        Returns
+        -------
+        CrossSectionCollection
+            This collection, updated in place with the cross sections of other.
+
+        Raises
+        ------
+        ValueError
+            If other is not a CrossSectionCollection.
+        """
         if isinstance(other, CrossSectionCollection):
             self.update(other)
             return self
@@ -223,23 +301,29 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
             raise ValueError("Can only merge with another CrossSectionCollection.")
 
     def _ipython_key_completions_(self):
-        """Enable key completions in IPython."""
+        """Enable key completions in IPython.
+
+        Returns
+        -------
+        KeysView[tuple[LocationId, Chainage, TopoId]]
+            The keys of the collection.
+        """
         return self.keys()
 
     @property
-    def cross_section_data(self) -> CrossSectionData:
+    def cross_section_data(self) -> CrossSectionData:  # api: allow-leaked-type
         """The DHI.Mike1D.CrossSectionModule.CrossSectionData object."""
         return self._cross_section_data
 
     @property
-    def data(self) -> CrossSectionData:
+    def data(self) -> CrossSectionData:  # api: allow-leaked-type
         """The DHI.Mike1D.CrossSectionModule.CrossSectionData object.
 
         Alias for 'cross_section_data' property.
         """
         return self._cross_section_data
 
-    def add(self, cross_section: CrossSection):
+    def add(self, cross_section: CrossSection) -> None:
         """Add a cross section to the collection.
 
         Parameters
@@ -252,7 +336,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         topo_id = cross_section.topo_id
         self[location_id, chainage, topo_id] = cross_section
 
-    def remove(self, cross_section: CrossSection):
+    def remove(self, cross_section: CrossSection) -> None:
         """Remove a cross section from the collection.
 
         Parameters
@@ -305,7 +389,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
             chainage = self._convert_chainage_to_str(chainage)
         return self[location_id, chainage, topo_id]
 
-    def to_xns11(self, file_name: str | Path, **kwargs):
+    def to_xns11(self, file_name: str | Path, **kwargs) -> None:
         """Save the collection to an Xns11 file.
 
         Parameters
@@ -321,15 +405,29 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         self._cross_section_data.Connection = Connection.Create(str(file_name))
         self._cross_section_data_factory.Save(self._cross_section_data)
 
-    def plot(self, *args, **kwargs):
-        """Plot all cross sections in the collection."""
+    def plot(self, *args, **kwargs) -> Axes:
+        """Plot all cross sections in the collection.
+
+        Arguments are passed to CrossSection.plot.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            The axes that was plotted to.
+        """
         for xs in self.values():
             ax = xs.plot(*args, **kwargs)
             kwargs["ax"] = ax
         return ax
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Convert the collection to a DataFrame."""
+        """Convert the collection to a DataFrame.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame indexed by location ID, chainage and topo ID, with a cross_section column.
+        """
         location_ids = [k[0] for k in self.keys()]
         chainages = [k[1] for k in self.keys()]
         topo_ids = [k[2] for k in self.keys()]
@@ -357,6 +455,11 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         -------
         gpd.GeoDataFrame
             GeoDataFrame with the cross sections or markers.
+
+        Raises
+        ------
+        ValueError
+            If mode is not "sections" or "markers".
 
         Note:
         ----
@@ -388,7 +491,13 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         return gdf
 
     def _to_geopandas_markers(self) -> gpd.GeoDataFrame:
-        """Convert the collection to a GeoDataFrame of the markers as points."""
+        """Convert the collection to a GeoDataFrame of the markers as points.
+
+        Returns
+        -------
+        gpd.GeoDataFrame
+            GeoDataFrame with one point per cross section point that has markers.
+        """
         try_import_geopandas()
         import geopandas as gpd
 
@@ -422,7 +531,7 @@ class CrossSectionCollection(MutableMapping[tuple[LocationId, Chainage, TopoId],
         return gdf
 
     @property
-    def interpolation_type(self):
+    def interpolation_type(self) -> XSInterpolationType:  # api: allow-leaked-type
         """Defines how an interpolated cross section is interpolated.
 
         Returns

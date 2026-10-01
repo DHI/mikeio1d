@@ -50,5 +50,9 @@ import sys
 
 from .library_loaders import LibraryLoaders
 
+# The public API is the load functions, which are added to this module at import time.
+__all__: list[str] = []
+
 mikenet_module = sys.modules[__name__]
 library_loaders = LibraryLoaders(mikenet_module)
+__all__ += [name for name in sorted(vars(mikenet_module)) if name.startswith("load")]

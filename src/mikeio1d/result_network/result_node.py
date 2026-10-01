@@ -34,7 +34,7 @@ class ResultNode(ResultLocation):
 
     """
 
-    def __init__(self, node, res1d):
+    def __init__(self, node: IRes1DNode, res1d: Res1D):  # api: allow-leaked-type
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.NODE
@@ -44,11 +44,18 @@ class ResultNode(ResultLocation):
         self._creator.create()
 
     def __repr__(self) -> str:
-        """Return a string representation of the object."""
+        """Return a string representation of the object.
+
+        Returns
+        -------
+        str
+            String representation of the node.
+
+        """
         return f"<{self.type}: {self.id}>"
 
     @property
-    def res1d_node(self) -> IRes1DNode:
+    def res1d_node(self) -> IRes1DNode:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DNode corresponding to this result location."""
         return self._creator.node
 
@@ -133,7 +140,9 @@ class ResultNode(ResultLocation):
             return self.res1d_node.Diameter
         return None
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DNode:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DNode:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultNode.
 
         Parameters
@@ -149,8 +158,15 @@ class ResultNode(ResultLocation):
         """
         return self.res1d_node
 
-    def get_query(self, data_item: IDataItem) -> QueryDataNode:
-        """Get a QueryDataNode for given data item."""
+    def get_query(self, data_item: IDataItem) -> QueryDataNode:  # api: allow-leaked-type
+        """Get a QueryDataNode for given data item.
+
+        Returns
+        -------
+        QueryDataNode
+            Query for the given data item at this location.
+
+        """
         quantity_id = data_item.Quantity.Id
         node_id = self.res1d_node.ID
         query = QueryDataNode(quantity_id, node_id)
@@ -180,12 +196,12 @@ class ResultNodeCreator(ResultLocationCreator):
         ResultLocationCreator.__init__(self, result_location, node.DataItems, res1d)
         self.node = node
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultNode creation steps."""
         self.set_quantities()
         self.set_static_attributes()
 
-    def set_static_attributes(self):
+    def set_static_attributes(self) -> None:
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("id")
         self.set_static_attribute("type")
@@ -196,7 +212,9 @@ class ResultNodeCreator(ResultLocationCreator):
         self.set_static_attribute("critical_level")
         self.set_static_attribute("diameter")
 
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add node result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 

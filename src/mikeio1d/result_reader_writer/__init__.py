@@ -9,3 +9,6 @@ from .result_reader_query import ResultReaderQuery
 from .result_writer import ResultWriter
 
 from .result_merger import ResultMerger
+
+# Internal machinery: nothing here is public API.
+__all__: list[str] = []

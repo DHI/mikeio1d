@@ -36,7 +36,7 @@ class ResultGlobalData(ResultLocation):
 
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self,
         data_item: IDataItem,
         global_datas: ResultGlobalDatas,
@@ -49,7 +49,9 @@ class ResultGlobalData(ResultLocation):
         self._creator = ResultGlobalDataCreator(self, data_item, global_datas, res1d)
         self._creator.create()
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DGlobalData:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DGlobalData:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultGlobalData.
 
         Parameters
@@ -65,8 +67,15 @@ class ResultGlobalData(ResultLocation):
         """
         return self.res1d.result_data.GlobalData
 
-    def get_query(self, data_item: IDataItem) -> QueryDataGlobal:
-        """Get a QueryDataGlobal for given data item."""
+    def get_query(self, data_item: IDataItem) -> QueryDataGlobal:  # api: allow-leaked-type
+        """Get a QueryDataGlobal for given data item.
+
+        Returns
+        -------
+        QueryDataGlobal
+            Query for the given data item at this location.
+
+        """
         quantity_id = data_item.Quantity.Id
         query = QueryDataGlobal(quantity_id)
         return query
@@ -99,11 +108,11 @@ class ResultGlobalDataCreator(ResultLocationCreator):
         self.global_datas = global_datas
         self.data_item = data_item
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultCatchment creation steps."""
         self.set_quantities()
 
-    def set_quantities(self):
+    def set_quantities(self) -> None:
         """Set quantities for ResultGlobalData.
 
         Here only a single data item is used for ResultGlobalData.
@@ -111,6 +120,8 @@ class ResultGlobalDataCreator(ResultLocationCreator):
         """
         self.set_quantity(self.global_datas, self.data_item)
 
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add global data result quantity to result quantity maps."""
         self.add_to_network_result_quantity_map(result_quantity)
