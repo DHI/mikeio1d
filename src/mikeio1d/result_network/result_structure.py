@@ -44,7 +44,7 @@ class ResultStructure(ResultLocation):
 
     """
 
-    def __init__(
+    def __init__(  # api: allow-leaked-type
         self,
         structure_id: str,
         reach: IRes1DReach,
@@ -63,11 +63,17 @@ class ResultStructure(ResultLocation):
         self._creator.create()
 
     def __repr__(self) -> str:
-        """Return a string representation of ResultStructure."""
+        """Return a string representation of ResultStructure.
+
+        Returns
+        -------
+        str
+            String representation.
+        """
         return f"<{self.type}: {self.id}>"
 
     @property
-    def res1d_reach(self) -> IRes1DReach:
+    def res1d_reach(self) -> IRes1DReach:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result structure."""
         return self._creator.reach
 
@@ -86,7 +92,9 @@ class ResultStructure(ResultLocation):
         """Chainage of the structure."""
         return self._chainage
 
-    def get_m1d_dataset(self, m1d_dataitem=None):
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DReach:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultStructure.
 
         This is the reach IRes1DDataSet object because ResultStructure objects do not
@@ -105,8 +113,14 @@ class ResultStructure(ResultLocation):
         """
         return self.res1d_reach
 
-    def get_query(self, data_item):
-        """Get a QueryDataStructure for given data item."""
+    def get_query(self, data_item: IDataItem) -> QueryDataStructure:  # api: allow-leaked-type
+        """Get a QueryDataStructure for given data item.
+
+        Returns
+        -------
+        QueryDataStructure
+            Query for the data item on this structure.
+        """
         quantity_id = data_item.Quantity.Id
         structure_id = self.id
         query = QueryDataStructure(quantity_id, structure_id, self.res1d_reach.Name, self._chainage)
@@ -115,7 +129,7 @@ class ResultStructure(ResultLocation):
     # region Deprecated methods and attributes of ResultStructure.
 
     @property
-    def reach(self) -> IRes1DReach:
+    def reach(self) -> IRes1DReach:  # api: allow-leaked-type
         """IRes1DReach corresponding to this result structure."""
         return self.res1d_reach
 
@@ -163,20 +177,22 @@ class ResultStructureCreator(ResultLocationCreator):
         self.reach = reach
         self.data_items_dict: dict[str, IDataItem] = {}
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultGridPoint creation steps."""
         for data_item in self.data_items_intial:
             self.add_res1d_structure_data_item(data_item)
 
         self.set_static_attributes()
 
-    def set_static_attributes(self):
+    def set_static_attributes(self) -> None:
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("id")
         self.set_static_attribute("type")
         self.set_static_attribute("chainage")
 
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add structure result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
@@ -185,7 +201,7 @@ class ResultStructureCreator(ResultLocationCreator):
 
         self.add_to_network_result_quantity_map(result_quantity)
 
-    def add_res1d_structure_data_item(self, data_item: IDataItem):
+    def add_res1d_structure_data_item(self, data_item: IDataItem) -> None:
         """Add a IDataItem to ResultStructure.
 
         Parameters
@@ -205,8 +221,14 @@ class ResultStructureCreator(ResultLocationCreator):
         self.set_quantity(self.result_location, data_item)
 
     @staticmethod
-    def get_structure_id(reach, data_item: IDataItem) -> str | None:
-        """Get structure ID either from IDataItem.ItemId or for structure reaches from actual Res1DStructureGridPoint structure."""
+    def get_structure_id(reach: IRes1DReach, data_item: IDataItem) -> str | None:
+        """Get structure ID either from IDataItem.ItemId or for structure reaches from actual Res1DStructureGridPoint structure.
+
+        Returns
+        -------
+        str or None
+            Structure ID, or None if it cannot be determined.
+        """
         if data_item.ItemId is not None:
             return data_item.ItemId
 
@@ -219,5 +241,11 @@ class ResultStructureCreator(ResultLocationCreator):
         return None
 
     def get_data_item(self, quantity_id: str) -> IDataItem:
-        """Retrieve a data item for given quantity id."""
+        """Retrieve a data item for given quantity id.
+
+        Returns
+        -------
+        IDataItem
+            The data item for the quantity id.
+        """
         return self.data_items_dict[quantity_id]

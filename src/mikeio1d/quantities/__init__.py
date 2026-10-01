@@ -9,5 +9,4 @@ __all__ = [
     "DerivedQuantity",
     "TimeSeriesId",
     "TimeSeriesIdGroup",
-    "get_default_derived_quantity_classes",
 ]

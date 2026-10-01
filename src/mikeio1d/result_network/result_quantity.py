@@ -7,9 +7,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
     from ..result_network import ResultLocation
-    from ..result_reader_writer.result_reader import ColumnMode
+    from ..result_query import QueryData
 
     import pandas as pd
+    from matplotlib.axes import Axes
+
+    from DHI.Mike1D.ResultDataAccess import IDataItem
+    from DHI.Mike1D.ResultDataAccess import IRes1DDataSet
 
 from .data_entry import DataEntry
 from ..quantities import TimeSeriesId
@@ -51,11 +55,11 @@ class ResultQuantity:
     def __init__(
         self,
         result_location: ResultLocation,
-        data_item,
+        data_item: IDataItem,
         res1d: Res1D,
-        m1d_dataset=None,
-        element_index=0,
-    ):
+        m1d_dataset: IRes1DDataSet | None = None,
+        element_index: int = 0,
+    ):  # api: allow-leaked-type
         self.result_location = result_location
         self.data_item = data_item
         self.res1d: Res1D = res1d
@@ -65,11 +69,20 @@ class ResultQuantity:
         self._name = data_item.Quantity.Id
 
     def __repr__(self) -> str:
-        """Return a string representation of the object."""
+        """Return a string representation of the object.
+
+        Returns
+        -------
+        str
+            String representation of the quantity.
+
+        """
         return f"<Quantity: {ResultQuantity.prettify_quantity(self)}>"
 
     @staticmethod
-    def prettify_quantity(quantity: ResultQuantity | IQuantity, latex_format=False) -> str:
+    def prettify_quantity(
+        quantity: ResultQuantity | IQuantity, latex_format: bool = False
+    ) -> str:  # api: allow-leaked-type
         """Get a pretty string representation of a ResultQuantity's type and unit.
 
         Parameters
@@ -83,6 +96,11 @@ class ResultQuantity:
         -------
         str
             A string representation of the quantity type and unit.
+
+        Raises
+        ------
+        ValueError
+            If quantity is neither a ResultQuantity nor an IQuantity.
 
         """
         if isinstance(quantity, ResultQuantity):
@@ -105,26 +123,31 @@ class ResultQuantity:
         """Name of the quantity id assosciated with collection."""
         return self._name
 
-    def add(self):
+    def add(self) -> None:
         """Add a ResultQuantity to ResultNetwork.read_queue based on the data item."""
         self.res1d.network.queue.append(self.timeseries_id)
 
-    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
+    def read(self, column_mode: str | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
 
+        Returns
+        -------
+        pd.DataFrame
+            Time series data of the quantity.
+
         """
         return self.res1d.read(self.timeseries_id, column_mode=column_mode)
 
-    def plot(self, ax=None, **kwargs):
+    def plot(self, ax: Axes | None = None, **kwargs) -> Axes:
         """Plot the time series data.
 
         Parameters
@@ -146,40 +169,75 @@ class ResultQuantity:
         ax.grid(True)
         return ax
 
-    def to_dataframe(self):
-        """Get a time series as a data frame."""
+    def to_dataframe(self) -> pd.DataFrame:
+        """Get a time series as a data frame.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data of the quantity.
+
+        """
         return self.read()
 
-    def to_csv(self, file_path, time_step_skipping_number=1):
+    def to_csv(self, file_path: str, time_step_skipping_number: int = 1) -> None:
         """Extract time series data into a csv file."""
         query = self.get_query()
         self.res1d.to_csv(file_path, query, time_step_skipping_number)
 
-    def to_dfs0(self, file_path, time_step_skipping_number=1):
+    def to_dfs0(self, file_path: str, time_step_skipping_number: int = 1) -> None:
         """Extract time series data into a dfs0 file."""
         query = self.get_query()
         self.res1d.to_dfs0(file_path, query, time_step_skipping_number)
 
-    def to_txt(self, file_path, time_step_skipping_number=1):
+    def to_txt(self, file_path: str, time_step_skipping_number: int = 1) -> None:
         """Extract time series data into a txt file."""
         query = self.get_query()
         self.res1d.to_txt(file_path, query, time_step_skipping_number)
 
-    def get_query(self):
-        """Get query corresponding to ResultQuantity."""
+    def get_query(self) -> QueryData:
+        """Get query corresponding to ResultQuantity.
+
+        Returns
+        -------
+        QueryData
+            Query for the time series of this quantity.
+
+        """
         return QueryDataCreator.from_timeseries_id(self._timeseries_id)
 
-    def get_data_entry(self):
-        """Get DataEntry corresponding to ResultQuantity."""
+    def get_data_entry(self) -> DataEntry:
+        """Get DataEntry corresponding to ResultQuantity.
+
+        Returns
+        -------
+        DataEntry
+            Data item, element index and data set of this quantity.
+
+        """
         return DataEntry(self.data_item, self.element_index, self.m1d_dataset)
 
-    def get_data_entry_net(self):
-        """Get DataEntryNet corresponding to ResultQuantity."""
+    def get_data_entry_net(self) -> DataEntryNet:  # api: allow-leaked-type
+        """Get DataEntryNet corresponding to ResultQuantity.
+
+        Returns
+        -------
+        DHI.Mike1D.MikeIO.DataEntry
+            .NET data entry for the data item and element index of this quantity.
+
+        """
         return DataEntryNet(self.data_item, self.element_index)
 
     @property
     def timeseries_id(self) -> TimeSeriesId:
-        """TimeSeriesId corresponding to ResultQuantity."""
+        """TimeSeriesId corresponding to ResultQuantity.
+
+        Raises
+        ------
+        ValueError
+            If the ResultQuantity has not been added to a ResultNetwork.
+
+        """
         if self._timeseries_id is None:
             message = "ResultQuantity must be added to a ResultNetwork before TimeSeriesId can be accessed."
             raise ValueError(message)

@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import NoReturn
 
 if TYPE_CHECKING:  # pragma: no cover
     from .result_location import ResultLocation
     from ..res1d import Res1D
-    from ..result_reader_writer.result_reader import ColumnMode
 
     import pandas as pd
+    from matplotlib.axes import Axes
 
 from ..quantities import DerivedQuantity
 
@@ -28,7 +29,14 @@ class ResultQuantityDerived:
         self.res1d: Res1D = res1d
 
     def __repr__(self) -> str:
-        """Return a string representation of the object."""
+        """Return a string representation of the object.
+
+        Returns
+        -------
+        str
+            The name of the derived quantity.
+
+        """
         return f"<DerivedQuantity: {self.name}>"
 
     @property
@@ -36,44 +44,55 @@ class ResultQuantityDerived:
         """Return the name of the derived quantity."""
         return self.derived_quantity.name
 
-    def add(self):
+    def add(self) -> NoReturn:
         """Add a ResultQuantity to ResultNetwork.read_queue."""
         raise NotImplementedError("Derived quantities cannot be added to a network.")
 
-    def read(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
+    def read(self, column_mode: str | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data of the derived quantity.
 
         """
         df_source = self._create_source_dataframe()
         df_derived = self.derived_quantity.generate(df_source)
         return df_derived.droplevel("derived", axis=1)
 
-    def to_dataframe(self, column_mode: str | ColumnMode | None = None) -> pd.DataFrame:
+    def to_dataframe(self, column_mode: str | None = None) -> pd.DataFrame:
         """Read the time series data into a data frame.
 
         Alias for read() method.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
             'str' - column index of str representations of QueryData objects
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data of the derived quantity.
+
         """
         return self.read(column_mode)
 
-    def plot(self, ax=None, **kwargs):
+    def plot(self, ax: Axes | None = None, **kwargs) -> Axes:
         """Plot the time series data.
 
         Parameters
@@ -96,5 +115,12 @@ class ResultQuantityDerived:
         return ax
 
     def _create_source_dataframe(self) -> pd.DataFrame:
-        """Create the source DataFrame used to calculate the derived quantity."""
+        """Create the source DataFrame used to calculate the derived quantity.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series of the source quantity at this location.
+
+        """
         return self.derived_quantity.create_source_dataframe_for_location(self.result_location)

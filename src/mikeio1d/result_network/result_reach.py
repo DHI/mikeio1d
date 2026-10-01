@@ -5,6 +5,7 @@ from __future__ import annotations
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import NoReturn
 
 if TYPE_CHECKING:  # pragma: no cover
     from ..res1d import Res1D
@@ -47,7 +48,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
 
     """
 
-    def __init__(self, reaches: list[IRes1DReach], res1d: Res1D):
+    def __init__(self, reaches: list[IRes1DReach], res1d: Res1D):  # api: allow-leaked-type
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.REACH
@@ -56,11 +57,23 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         self._creator.create()
 
     def __repr__(self) -> str:
-        """Return a string representation of ResultReach."""
+        """Return a string representation of ResultReach.
+
+        Returns
+        -------
+        str
+            String representation.
+        """
         return f"<Reach: {self.name}>"
 
-    def _format_chainage_index_error_message(self, key) -> str:
-        """Format a consistent error message for chainage not found errors."""
+    def _format_chainage_index_error_message(self, key: str | float) -> str:
+        """Format a consistent error message for chainage not found errors.
+
+        Returns
+        -------
+        str
+            Error message listing the available chainages.
+        """
         key_desc = f"Index {key}" if isinstance(key, int) else f"Chainage '{key}'"
         return (
             f"{key_desc} not found in reach. "
@@ -117,7 +130,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         raise KeyError(self._format_chainage_index_error_message(key)) from None
 
     @property
-    def res1d_reaches(self) -> list[IRes1DReach]:
+    def res1d_reaches(self) -> list[IRes1DReach]:  # api: allow-leaked-type
         """List of DHI.Mike1D.ResultDataAccess.IRes1DReach corresponding to this result location."""
         return self._creator.reaches
 
@@ -206,7 +219,9 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         """Full flow discharge of the reach."""
         return self._creator._get_full_flow_discharge()
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None):
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DReach:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultReach.
 
         A ResultReach may consist of several IRes1DDataSet objects. Therefore,
@@ -222,6 +237,11 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
         IRes1DDataSet
             IRes1DDataSet object associated with ResultReach.
 
+        Raises
+        ------
+        ValueError
+            If m1d_dataitem is not provided, or no reach of this ResultReach contains it.
+
         """
         if m1d_dataitem is None:
             raise ValueError("m1d_dataitem must be provided for ResultReach.")
@@ -233,7 +253,7 @@ class ResultReach(ResultLocation, dict[str, ResultGridPoint]):
             f"No IRes1DDataSet found on reach for specified IRes1DDataItem: {m1d_dataitem}"
         )
 
-    def get_query(self, data_item: IDataItem):
+    def get_query(self, data_item: IDataItem) -> NoReturn:  # api: allow-leaked-type
         """Get a query for a data item."""
         raise NotImplementedError("get_query not implemented for ResultReach. Use ResultGridPoint.")
 
@@ -314,14 +334,14 @@ class ResultReachCreator(ResultLocationCreator):
         self.result_gridpoints: list[list[ResultGridPoint]] = []
         self.current_reach_result_gridpoints: list[ResultGridPoint] = None
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultReach creation steps."""
         for reach in self.reaches_initial:
             self.add_res1d_reach(reach)
 
         self.set_static_attributes()
 
-    def set_static_attributes(self):
+    def set_static_attributes(self) -> None:
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("name")
         self.set_static_attribute("length")
@@ -333,7 +353,7 @@ class ResultReachCreator(ResultLocationCreator):
         self.set_static_attribute("height")
         self.set_static_attribute("full_flow_discharge")
 
-    def add_res1d_reach(self, reach: IRes1DReach):
+    def add_res1d_reach(self, reach: IRes1DReach) -> None:
         """Add a IRes1DReach to ResultReach.
 
         Parameters
@@ -349,7 +369,7 @@ class ResultReachCreator(ResultLocationCreator):
         for result_gridpoint in self.current_reach_result_gridpoints:
             result_gridpoint._creator.set_quantities()
 
-    def set_gridpoints(self, reach: IRes1DReach):
+    def set_gridpoints(self, reach: IRes1DReach) -> None:
         """Assign chainage attributes to a current ResultReach object from a data provided by IRes1DReach.
 
         Parameters
@@ -375,8 +395,14 @@ class ResultReachCreator(ResultLocationCreator):
             gridpoint = gridpoints[i]
             self.set_gridpoint(reach, gridpoint, tag)
 
-    def create_reach_span_tag(self, gridpoints: list[IRes1DGridPoint]):
-        """Create reach span tag to be set on ResultGridPoint."""
+    def create_reach_span_tag(self, gridpoints: list[IRes1DGridPoint]) -> str:
+        """Create reach span tag to be set on ResultGridPoint.
+
+        Returns
+        -------
+        str
+            Reach span tag, or an empty string if there are no grid points.
+        """
         if len(gridpoints) == 0:
             return ""
 
@@ -385,7 +411,7 @@ class ResultReachCreator(ResultLocationCreator):
         tag = TimeSeriesId.create_reach_span_tag_from_gridpoints(start_gp, end_gp)
         return tag
 
-    def set_gridpoint(self, reach: IRes1DReach, gridpoint: IRes1DGridPoint, tag: str = ""):
+    def set_gridpoint(self, reach: IRes1DReach, gridpoint: IRes1DGridPoint, tag: str = "") -> None:
         """Assign chainage attribute to a current ResultReach object from a data provided by IRes1DReach and IRes1DGridPoint.
 
         Parameters
@@ -412,7 +438,7 @@ class ResultReachCreator(ResultLocationCreator):
         chainage_str = f"{gridpoint.Chainage:.3f}"
         self.result_location[chainage_str] = result_gridpoint
 
-    def set_gridpoint_data_items(self, reach: IRes1DReach):
+    def set_gridpoint_data_items(self, reach: IRes1DReach) -> None:
         """Assign data items to ResultGridPoint object belonging to current ResultReach from IRes1DReach data items.
 
         Parameters
@@ -433,7 +459,9 @@ class ResultReachCreator(ResultLocationCreator):
                 else:
                     result_gridpoint._creator.add_structure_data_item(data_item)
 
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> NoReturn:
         """Add a quantity to the result quantity maps."""
         raise NotImplementedError(
             "add_to_result_quantity_maps not implemented for ResultReachCreatpr. Use ResultGridPointCreator."
@@ -467,7 +495,18 @@ class ResultReachCreator(ResultLocationCreator):
             return np.nan
 
     def _get_reach_for_chainage(self, chainage: float) -> IRes1DReach:
-        """Return the relevant .NET Res1DReach for the specified chainage."""
+        """Return the relevant .NET Res1DReach for the specified chainage.
+
+        Returns
+        -------
+        IRes1DReach
+            The reach whose location span contains the chainage.
+
+        Raises
+        ------
+        ValueError
+            If no reach contains the chainage.
+        """
         for reach in self.reaches:
             start_chainage = reach.LocationSpan.StartChainage
             end_chainage = reach.LocationSpan.EndChainage
@@ -477,15 +516,33 @@ class ResultReachCreator(ResultLocationCreator):
         raise ValueError(f"Invalid chainage of {chainage} for reach {self.name}")
 
     def _get_start_node(self) -> str:
-        """Return the start node of the reach."""
+        """Return the start node of the reach.
+
+        Returns
+        -------
+        str
+            ID of the start node.
+        """
         return self.res1d.result_data.Nodes[self.reaches[0].StartNodeIndex].Id
 
     def _get_end_node(self) -> str:
-        """Return the end node of the reach."""
+        """Return the end node of the reach.
+
+        Returns
+        -------
+        str
+            ID of the end node.
+        """
         return self.res1d.result_data.Nodes[self.reaches[-1].EndNodeIndex].Id
 
     def _get_full_flow_discharge(self) -> float:
-        """Return the full flow discharge of the reach."""
+        """Return the full flow discharge of the reach.
+
+        Returns
+        -------
+        float
+            Full flow discharge, or NaN if not available.
+        """
         ffd_quantity_type = Quantity.Create(PredefinedQuantity.FullReachDischarge)
 
         ffd_network_data = None

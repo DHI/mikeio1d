@@ -7,3 +7,6 @@ from .query_data_node import QueryDataNode
 from .query_data_reach import QueryDataReach
 from .query_data_structure import QueryDataStructure
 from .query_data_creator import QueryDataCreator
+
+# Internal machinery: nothing here is public API.
+__all__: list[str] = []

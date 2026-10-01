@@ -74,7 +74,9 @@ class Network:
     Time: 1994-08-07 16:35:00 - 1994-08-07 18:35:00
     """
 
-    def __init__(self, reaches: Sequence[NetworkReach], results: _Results):
+    def __init__(
+        self, reaches: Sequence[NetworkReach], results: _Results
+    ):  # api: allow-leaked-type
         self._results = results
         # Before the graph, whose error for a duplicate id would not name it.
         self._reaches = self._generate_reaches_dict(reaches)
@@ -482,6 +484,11 @@ class Network:
         One error for all of them: how many fail, and the first ones by name.
         Kept to one line, since a KeyError renders its message through repr
         and would show newlines raw.
+
+        Returns
+        -------
+        KeyError
+            The error for the caller to raise, naming the items that cannot be read.
         """
         faults = []
         for address, quantity in items:

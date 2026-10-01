@@ -32,7 +32,7 @@ class ResultCatchment(ResultLocation):
         Res1D object the catchment belongs to.
     """
 
-    def __init__(self, catchment: IRes1DCatchment, res1d: Res1D):
+    def __init__(self, catchment: IRes1DCatchment, res1d: Res1D):  # api: allow-leaked-type
         ResultLocation.__init__(self)
 
         self._group = TimeSeriesIdGroup.CATCHMENT
@@ -42,11 +42,18 @@ class ResultCatchment(ResultLocation):
         self._creator.create()
 
     def __repr__(self) -> str:
-        """Return a string representation of the ResultCatchment object."""
+        """Return a string representation of the ResultCatchment object.
+
+        Returns
+        -------
+        str
+            String representation of the catchment.
+
+        """
         return f"<Catchment: {self.id}>"
 
     @property
-    def res1d_catchment(self) -> IRes1DCatchment:
+    def res1d_catchment(self) -> IRes1DCatchment:  # api: allow-leaked-type
         """DHI.Mike1D.ResultDataAccess.IRes1DCatchment corresponding to this result location."""
         return self._creator.catchment
 
@@ -73,7 +80,9 @@ class ResultCatchment(ResultLocation):
 
         return CatchmentGeometry.from_res1d_catchment(self.res1d_catchment)
 
-    def get_m1d_dataset(self, m1d_dataitem: IDataItem = None) -> IRes1DCatchment:
+    def get_m1d_dataset(
+        self, m1d_dataitem: IDataItem = None
+    ) -> IRes1DCatchment:  # api: allow-leaked-type
         """Get IRes1DDataSet object associated with ResultCatchment.
 
         Parameters
@@ -89,8 +98,15 @@ class ResultCatchment(ResultLocation):
         """
         return self.res1d_catchment
 
-    def get_query(self, data_item: IDataItem) -> QueryDataCatchment:
-        """Get a QueryDataCatchment for given data item."""
+    def get_query(self, data_item: IDataItem) -> QueryDataCatchment:  # api: allow-leaked-type
+        """Get a QueryDataCatchment for given data item.
+
+        Returns
+        -------
+        QueryDataCatchment
+            Query for the given data item at this location.
+
+        """
         quantity_id = data_item.Quantity.Id
         catchment_id = self.res1d_catchment.Id
         query = QueryDataCatchment(quantity_id, catchment_id)
@@ -120,18 +136,20 @@ class ResultCatchmentCreator(ResultLocationCreator):
         ResultLocationCreator.__init__(self, result_location, catchment.DataItems, res1d)
         self.catchment: IRes1DCatchment = catchment
 
-    def create(self):
+    def create(self) -> None:
         """Perform ResultCatchment creation steps."""
         self.set_quantities()
         self.set_static_attributes()
 
-    def set_static_attributes(self):
+    def set_static_attributes(self) -> None:
         """Set static attributes. These show up in the html repr."""
         self.set_static_attribute("id")
         self.set_static_attribute("area")
         self.set_static_attribute("type")
 
-    def add_to_result_quantity_maps(self, quantity_id: str, result_quantity: ResultQuantity):
+    def add_to_result_quantity_maps(
+        self, quantity_id: str, result_quantity: ResultQuantity
+    ) -> None:
         """Add catchment result quantity to result quantity maps."""
         self.add_to_result_quantity_map(quantity_id, result_quantity, self.result_quantity_map)
 
