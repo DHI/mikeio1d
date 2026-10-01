@@ -519,7 +519,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="odd">
 <td><a href="#mikeio1d.Res1D.structures">structures</a></td>
-<td>Structures of the result file. See <code>ResultStructures</code>.</td>
+<td>Structures of the result file. See <a href="../api/result_network.ResultStructures.html#mikeio1d.result_network.ResultStructures"><code>ResultStructures</code></a>.</td>
 </tr>
 <tr class="even">
 <td><a href="#mikeio1d.Res1D.time_index">time_index</a></td>
@@ -688,6 +688,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.get_supported_file_extensions">get_supported_file_extensions</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Res1D.get_supported_file_extensions()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get supported file extensions for Res1D.</p>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>set[str]</td>
+<td>The supported file extensions, including the leading dot.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="mikeio1d.Res1D.info" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.Res1D.info">info</h3>
@@ -765,7 +789,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>file_path</td>
-<td>str</td>
+<td>str | Path</td>
 <td>File path for the new res1d file. Optional.</td>
 <td><code>None</code></td>
 </tr>
@@ -821,8 +845,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -964,8 +988,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">

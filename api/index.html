@@ -270,7 +270,10 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#locations" id="toc-locations" class="nav-link" data-scroll-target="#locations">Locations</a></li>
   <li><a href="#quantities" id="toc-quantities" class="nav-link" data-scroll-target="#quantities">Quantities</a></li>
   <li><a href="#cross-sections" id="toc-cross-sections" class="nav-link" data-scroll-target="#cross-sections">Cross sections</a></li>
+  <li><a href="#geometry" id="toc-geometry" class="nav-link" data-scroll-target="#geometry">Geometry</a></li>
+  <li><a href="#pandas-extension" id="toc-pandas-extension" class="nav-link" data-scroll-target="#pandas-extension">Pandas extension</a></li>
   <li><a href="#network" id="toc-network" class="nav-link" data-scroll-target="#network">Network</a></li>
+  <li><a href="#experimental" id="toc-experimental" class="nav-link" data-scroll-target="#experimental">Experimental</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
@@ -350,6 +353,14 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="../api/result_network.ResultGlobalDatas.html#mikeio1d.result_network.ResultGlobalDatas">result_network.ResultGlobalDatas</a></td>
 <td>Class for wrapping ResultData global data items.</td>
 </tr>
+<tr class="even">
+<td><a href="../api/result_network.ResultStructure.html#mikeio1d.result_network.ResultStructure">result_network.ResultStructure</a></td>
+<td>Class for wrapping a list of ResultData structure data items belonging to the same structure.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/result_network.ResultStructures.html#mikeio1d.result_network.ResultStructures">result_network.ResultStructures</a></td>
+<td>Class for wrapping ResultData structure data items.</td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -380,6 +391,90 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="../api/cross_sections.CrossSectionCollection.html#mikeio1d.cross_sections.CrossSectionCollection">cross_sections.CrossSectionCollection</a></td>
 <td>A collection of CrossSection objects.</td>
 </tr>
+<tr class="odd">
+<td><a href="../api/cross_sections.Marker.html#mikeio1d.cross_sections.Marker">cross_sections.Marker</a></td>
+<td>The standard markers used in cross sections.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/cross_sections.ProcessLevelsMethod.html#mikeio1d.cross_sections.ProcessLevelsMethod">cross_sections.ProcessLevelsMethod</a></td>
+<td>How to generate processing levels.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/cross_sections.RadiusType.html#mikeio1d.cross_sections.RadiusType">cross_sections.RadiusType</a></td>
+<td>The type of hydraulic radius to use in the cross section.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/cross_sections.ResistanceDistribution.html#mikeio1d.cross_sections.ResistanceDistribution">cross_sections.ResistanceDistribution</a></td>
+<td>The type of resistance distribution used in the cross section.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/cross_sections.ResistanceType.html#mikeio1d.cross_sections.ResistanceType">cross_sections.ResistanceType</a></td>
+<td>The type of resistance used in the cross section.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="geometry" class="level2">
+<h2 class="anchored" data-anchor-id="geometry">Geometry</h2>
+<p>Returned by the <code>geometry</code> property of locations and cross sections.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="../api/geometry.NodePoint.html#mikeio1d.geometry.NodePoint">geometry.NodePoint</a></td>
+<td>A utility class for working with node geometries.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/geometry.ReachPoint.html#mikeio1d.geometry.ReachPoint">geometry.ReachPoint</a></td>
+<td>A utility class for working with points along a reach.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/geometry.ReachGeometry.html#mikeio1d.geometry.ReachGeometry">geometry.ReachGeometry</a></td>
+<td>A utility class for working with reach geometries.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/geometry.CatchmentGeometry.html#mikeio1d.geometry.CatchmentGeometry">geometry.CatchmentGeometry</a></td>
+<td>A utility class for working with catchment geometries.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/geometry.CrossSectionGeometry.html#mikeio1d.geometry.CrossSectionGeometry">geometry.CrossSectionGeometry</a></td>
+<td>A utility class for working with cross section geometries.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pandas-extension" class="level2">
+<h2 class="anchored" data-anchor-id="pandas-extension">Pandas extension</h2>
+<p>Available on DataFrames as the <code>m1d</code> accessor once mikeio1d is imported.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="../api/pandas_extension.Mikeio1dAccessor.html#mikeio1d.pandas_extension.Mikeio1dAccessor">pandas_extension.Mikeio1dAccessor</a></td>
+<td>Uses Pandas Extension API to register a custom accessor for DataFrames.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/pandas_extension.ResultFrameAggregator.html#mikeio1d.pandas_extension.ResultFrameAggregator">pandas_extension.ResultFrameAggregator</a></td>
+<td>Aggregates a MIKE IO 1D result DataFrame with hierarchical columns along specific levels.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/pandas_extension.TransposedGroupBy.html#mikeio1d.pandas_extension.TransposedGroupBy">pandas_extension.TransposedGroupBy</a></td>
+<td>Same as pandas.DataFrameGroupBy, but returns the transpose of the result.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/pandas_extension.agg_chainage.html#mikeio1d.pandas_extension.agg_chainage">pandas_extension.agg_chainage</a></td>
+<td>Aggregate results along the chainage axis.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/pandas_extension.groupby_chainage.html#mikeio1d.pandas_extension.groupby_chainage">pandas_extension.groupby_chainage</a></td>
+<td>Group results for aggregation along the chainage axis.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/pandas_extension.compact_dataframe.html#mikeio1d.pandas_extension.compact_dataframe">pandas_extension.compact_dataframe</a></td>
+<td>Convert a DataFrame with a hierarchical column index to a compact DataFrame.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/pandas_extension.groupby_level.html#mikeio1d.pandas_extension.groupby_level">pandas_extension.groupby_level</a></td>
+<td>Group DataFrame for aggregations along the specific level name.</td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -403,6 +498,26 @@ ul.task-list li input[type="checkbox"] {
 <tr class="even">
 <td><a href="../api/network.NetworkReach.html#mikeio1d.network.NetworkReach">network.NetworkReach</a></td>
 <td>A directed connection between two nodes, and the breakpoints along it.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="experimental" class="level2">
+<h2 class="anchored" data-anchor-id="experimental">Experimental</h2>
+<p>Not part of the stable API: may change or be removed at any time.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td><a href="../api/experimental.to_networkx.html#mikeio1d.experimental.to_networkx">experimental.to_networkx</a></td>
+<td>Convert a Res1D object to a networkx Graph.</td>
+</tr>
+<tr class="even">
+<td><a href="../api/experimental.to_dataarray.html#mikeio1d.experimental.to_dataarray">experimental.to_dataarray</a></td>
+<td>Convert a Res1D object to an xarray DataArray.</td>
+</tr>
+<tr class="odd">
+<td><a href="../api/experimental.to_dataarray_xvec.html#mikeio1d.experimental.to_dataarray_xvec">experimental.to_dataarray_xvec</a></td>
+<td>Convert a Res1D object to an xarray DataArray with an xvec GeometryIndex.</td>
 </tr>
 </tbody>
 </table>

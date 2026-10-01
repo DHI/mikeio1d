@@ -416,8 +416,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 5%">
-<col style="width: 9%">
-<col style="width: 81%">
+<col style="width: 5%">
+<col style="width: 85%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -431,7 +431,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>column_mode</td>
-<td>str | ColumnMode(optional)</td>
+<td>str(optional)</td>
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
 <td><code>None</code></td>
 </tr>
@@ -440,6 +440,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>bool</td>
 <td>Include derived quantities.</td>
 <td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 17%">
+<col style="width: 71%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time series data of every quantity at these locations.</td>
 </tr>
 </tbody>
 </table>
@@ -458,8 +482,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 5%">
-<col style="width: 9%">
-<col style="width: 81%">
+<col style="width: 5%">
+<col style="width: 85%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -473,7 +497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>column_mode</td>
-<td>str | ColumnMode(optional)</td>
+<td>str(optional)</td>
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
 <td><code>None</code></td>
 </tr>
@@ -482,6 +506,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>bool</td>
 <td>Include derived quantities.</td>
 <td><code>False</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 17%">
+<col style="width: 71%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time series data of every quantity at these locations.</td>
 </tr>
 </tbody>
 </table>
@@ -531,8 +579,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 -  np.max : maximum value of all quantities</code></pre>
 <p>agg_kwargs : dict, default None Aggregation function for specific column levels (e.g.&nbsp;{time=‘min’, chainage=‘first’}). segmented : bool, (default=True) True - one LineString per IRes1DReach object. False - one LineString per reach name. include_derived : bool, default False Include derived quantities.</p>
 </section>
-<section id="returns" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 8%">

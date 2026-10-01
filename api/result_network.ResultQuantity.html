@@ -343,8 +343,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 12%">
-<col style="width: 11%">
-<col style="width: 66%">
+<col style="width: 16%">
+<col style="width: 63%">
 <col style="width: 8%">
 </colgroup>
 <thead>
@@ -364,7 +364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>data_item</td>
-<td></td>
+<td>IDataItem</td>
 <td>MIKE 1D IDataItem object.</td>
 <td><em>required</em></td>
 </tr>
@@ -376,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>m1d_dataset</td>
-<td></td>
+<td>IRes1DDataSet | None</td>
 <td>IRes1DDataSet object the quantity is associated with.</td>
 <td><code>None</code></td>
 </tr>
@@ -477,16 +477,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.get_data_entry">get_data_entry</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantity.get_data_entry()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get DataEntry corresponding to ResultQuantity.</p>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>DataEntry</td>
+<td>Data item, element index and data set of this quantity.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="mikeio1d.result_network.ResultQuantity.get_data_entry_net" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.get_data_entry_net">get_data_entry_net</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantity.get_data_entry_net()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get DataEntryNet corresponding to ResultQuantity.</p>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 26%">
+<col style="width: 65%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>DHI.Mike1D.MikeIO.DataEntry</td>
+<td>.NET data entry for the data item and element index of this quantity.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="mikeio1d.result_network.ResultQuantity.get_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.get_query">get_query</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantity.get_query()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get query corresponding to ResultQuantity.</p>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>QueryData</td>
+<td>Query for the time series of this quantity.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="mikeio1d.result_network.ResultQuantity.plot" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.plot">plot</h3>
@@ -525,8 +592,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="returns" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<section id="returns-3" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -575,15 +642,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>latex_format</td>
-<td></td>
+<td>bool</td>
 <td>If True, the unit abbreviation will use LaTeX-formatted text.</td>
 <td><code>False</code></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="returns-1" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<section id="returns-4" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 11%">
@@ -606,6 +673,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
+<section id="raises" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>ValueError</td>
+<td>If quantity is neither a ResultQuantity nor an IQuantity.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="mikeio1d.result_network.ResultQuantity.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.read">read</h3>
@@ -616,8 +707,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 3%">
-<col style="width: 7%">
-<col style="width: 85%">
+<col style="width: 4%">
+<col style="width: 88%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -631,9 +722,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>column_mode</td>
-<td>str | ColumnMode(optional)</td>
+<td>str(optional)</td>
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects ‘str’ - column index of str representations of QueryData objects</td>
 <td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-5" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-5">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time series data of the quantity.</td>
 </tr>
 </tbody>
 </table>
@@ -648,6 +758,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.to_dataframe">to_dataframe</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultQuantity.to_dataframe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get a time series as a data frame.</p>
+<section id="returns-6" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-6">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time series data of the quantity.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="mikeio1d.result_network.ResultQuantity.to_dfs0" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultQuantity.to_dfs0">to_dfs0</h3>
