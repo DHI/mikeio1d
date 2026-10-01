@@ -11,7 +11,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from matplotlib.axes import Axes
 
     from ..res1d import Res1D
-    from ..result_reader_writer.result_reader import ColumnMode
     from ..query import QueryData
 
     from DHI.Mike1D.ResultDataAccess import IRes1DDataSet
@@ -107,14 +106,15 @@ class ResultLocation(ABC):
 
     def read(
         self,
-        column_mode: str | ColumnMode | None = None,
+        column_mode: str | None = None,
+        *,
         quantities: str | list[str] | None = None,
     ) -> pd.DataFrame:
         """Read the time series data for quantities at this location into a DataFrame.
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
@@ -138,7 +138,8 @@ class ResultLocation(ABC):
 
     def to_dataframe(
         self,
-        column_mode: str | ColumnMode | None = None,
+        column_mode: str | None = None,
+        *,
         quantities: str | list[str] | None = None,
     ) -> pd.DataFrame:
         """Read the time series data for quantities at this location into a DataFrame.
@@ -147,7 +148,7 @@ class ResultLocation(ABC):
 
         Parameters
         ----------
-        column_mode : str | ColumnMode (optional)
+        column_mode : str (optional)
             Specifies the type of column index of returned DataFrame.
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
@@ -161,11 +162,12 @@ class ResultLocation(ABC):
             Time series data with one column per time series.
 
         """
-        return self.read(column_mode, quantities)
+        return self.read(column_mode, quantities=quantities)
 
     def plot(
         self,
         ax: Axes | None = None,
+        *,
         quantities: str | list[str] | None = None,
         **kwargs,
     ) -> Axes:
@@ -203,6 +205,7 @@ class ResultLocation(ABC):
         self,
         file_path: str | Path,
         time_step_skipping_number: int = 1,
+        *,
         quantities: str | list[str] | None = None,
     ) -> None:
         """Extract time series data for quantities at this location into a csv file.
@@ -224,6 +227,7 @@ class ResultLocation(ABC):
         self,
         file_path: str | Path,
         time_step_skipping_number: int = 1,
+        *,
         quantities: str | list[str] | None = None,
     ) -> None:
         """Extract time series data for quantities at this location into a dfs0 file.
@@ -245,6 +249,7 @@ class ResultLocation(ABC):
         self,
         file_path: str | Path,
         time_step_skipping_number: int = 1,
+        *,
         quantities: str | list[str] | None = None,
     ) -> None:
         """Extract time series data for quantities at this location into a txt file.

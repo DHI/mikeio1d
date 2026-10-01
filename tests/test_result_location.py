@@ -91,7 +91,11 @@ class TestRead:
     def test_to_dataframe_is_an_alias(self, reach):
         expected = reach.read("all", quantities="WaterLevel")
         assert_frame_equal(reach.to_dataframe("all", quantities="WaterLevel"), expected)
-        assert_frame_equal(reach.to_dataframe("all", "WaterLevel"), expected)
+
+    @pytest.mark.parametrize("method", ["read", "to_dataframe"])
+    def test_quantities_is_keyword_only(self, reach, method):
+        with pytest.raises(TypeError):
+            getattr(reach, method)("all", "WaterLevel")
 
 
 class TestUnknownQuantities:
@@ -172,6 +176,11 @@ class TestPlot:
 
     def test_leaves_the_y_axis_unlabelled_with_mixed_quantities(self, reach):
         ax = reach.plot()
+        assert ax.get_ylabel() == ""
+
+    def test_clears_a_stale_y_axis_label_with_mixed_quantities(self, reach):
+        ax = reach.plot(quantities="WaterLevel")
+        reach.plot(ax=ax)
         assert ax.get_ylabel() == ""
 
     def test_passes_keyword_arguments_to_pandas(self, reach):

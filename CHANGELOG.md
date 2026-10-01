@@ -20,7 +20,7 @@
 - Every public member of `mikeio1d.network` has an example that runs as a doctest (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
   mapping and a note on why a zero-length boundary edge is free to cross.
-- A single location (node, reach, catchment, structure) takes a `quantities` argument on
+- A single location (node, reach, catchment, structure) takes a keyword-only `quantities` argument on
   `read`/`to_dataframe`, and gains `add`, `plot`, `to_csv`, `to_dfs0` and `to_txt` taking the
   same argument. An unknown quantity raises `ValueError` rather than falling back to every
   queued series (#155).
