@@ -35,7 +35,8 @@ A package is internal when users get its behaviour through `Res1D` or the networ
 
 Public signatures must not expose .NET (`DHI.*`, `System.*`) or private types, but some do on purpose, and those carry the comment `# api: allow-leaked-type`:
 
-- Deliberate access to the underlying .NET object: `Res1D.data`, `result_data`, `query`, `searcher`; the `res1d_*` properties on result locations; `CrossSection.m1d_cross_section`; `CrossSectionCollection.data`.
+- Deliberate access to the underlying .NET object: `Res1D.data`, `result_data`, `query`, `searcher`; the `res1d_*` properties on result locations; `ResultQuantity.get_data_entry_net`; `CrossSection.m1d_cross_section`, `location`; `CrossSectionCollection.data`, `cross_section_data`, `interpolation_type`.
+- Deprecated aliases of those properties, kept until they are removed: `ResultGridPoint.gridpoint` and `ResultStructure.reach` (use `res1d_gridpoint` and `res1d_reach`).
 - Plumbing on a public class that cannot be renamed without breaking callers: `get_m1d_dataset`, `get_query`, `add_query`, `prettify_quantity`.
 - Constructors only the package calls: the `Result*` and `CrossSection*` `__init__`s, and `Network.__init__` (users call `Network.open()`).
 
