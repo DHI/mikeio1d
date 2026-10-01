@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-01
+
 ### Added
 - `mikeio1d.network`: build a graph-shaped `Network` from a result file, with
   `Network.open`, `Network.reaches`, `to_networkx`, `to_dataframe`/`to_dataset`, and the
@@ -14,8 +16,7 @@
   series (#250).
 - `Network.read(quantity=...)` reads one quantity at every location that carries it (#250).
 - `Network.open` takes a `Res1D` opened with `nodes=`, `reaches=` or `quantities=` as the
-  whole network, carrying only the series its filter lets through. It used to fail with a
-  bare `KeyError` on the first reach whose end node the filter left out. A `Res1D` opened with
+  whole network, carrying only the series its filter lets through. A `Res1D` opened with
   `time=` or `step_every=` raises `NotImplementedError` (#250).
 - Every public member of `mikeio1d.network` has an example that runs as a doctest (#250).
 - Network user guide section covering how a result file becomes a graph, with a diagram of the
@@ -34,62 +35,14 @@
 - `Res1D.to_txt` and `Res1D.to_csv` no longer leave the output file open when a write fails (#248).
 
 ### Changed
-- `Network.open` reads the header and the topology and no timeseries. `to_dataframe` and
-  `to_dataset` read every location when they are called. The
-  `nodes`, `reaches` and `quantities` options are gone: read the locations you need with
-  `Network.read` instead (#250).
-- `Network.quantities` now names what can be read somewhere in the network, mapped to its
-  unit. Membership and `sorted()` read as before; indexing does not (#250).
-- A `.resx` carrying a quantity its `.res` already has at the same location is refused
-  however the network is read. It used to be refused only where a frame was built, and
-  otherwise read silently from the `.resx` (#250).
-- `Network.resolve` answers with a `NetworkLocation` - its `address`, the `quantities`
-  readable there and its graph integer `graph_node` - or `None`. It is the one lookup by name;
-  `graph.nodes[graph_node]["address"]` goes back (#250).
-- `Network.period` is a property, like `Network.quantities` (#250).
-- `Network.to_dataframe` labels its columns `(address, quantity)`, as `Network.read` does,
-  and its `sel` option is gone: read one quantity with `Network.read(quantity=...)`. `to_dataset`'s integer dimension is named
-  `graph_node`, and its coordinate for a model node's id `node_id` (#250).
-- `Network.graph` is now the method `Network.to_networkx()`, which builds a new graph the
-  caller is free to edit on each call. `Network.copy` and `Network.release` are gone (#250).
-- A place along a reach is a `position`, not a `distance`:
-  `NetworkReach.start_position` and `end_position`, the `position_tol` argument of `resolve`
-  and `read`, and `to_dataset`'s `position` coordinate (#250).
-- A reach's `start` and `end` are its end nodes' ids; `NetworkNode` is gone.
-  `NetworkLocation` and `NetworkReach` are exported from `mikeio1d.network` (#250).
-- `ReachBreakpoint` is gone: `NetworkReach.breakpoints` holds the breakpoints' addresses,
-  `(reach_id, position)` pairs that `Network.read` takes as they are (#250).
-- A position past the last breakpoint of a reach of unknown length, such as an EPANET pump's
-  far end, is refused with a message saying why, rather than one inviting a wider
-  `position_tol` (#250).
-- A reach of unknown length has one breakpoint, at its start, rather than one at each end:
-  its far end has no known position. The EPANET test network has 36 graph nodes where it had
-  37, since pump `9` has no length (#250).
-- EPANET reach lengths are read from the `.res` itself, so a pipe has its end address without
-  the `.inp`. The `.inp` is no longer a companion: `Network.open` does not look for it, and
-  refuses one passed in `companions` with a `ValueError` (#250).
-- `Network.read` snaps each item's position only onto a breakpoint carrying the item's
-  quantity, so a caller need not know the grid is staggered to choose a `position_tol`.
-  `Network.resolve` takes `quantity=` to do the same, and answers `None` exactly when `read`
-  would refuse. A position within 1e-3 of a breakpoint names it, is given back in the file's
-  spelling, and is never snapped away from it; `position_tol` only widens that window, and is
-  checked on every call (#250).
-- `Network.open` refuses a result holding catchments and no reaches, which used to open as an
-  empty network. Catchments beside a network are left out with a warning naming their
-  quantities, since a catchment has no address in a network (#250).
+- `mikeio1d.network` changed substantially since the `1.3.2a1` pre-release; see the user
+  guide for the current API.
 - Linting is pinned to ruff 0.16 and type hints use built-in generics throughout (#248).
 - The `docs` and `experimental` dependency groups no longer repeat `xarray` and `networkx`;
   both are synced with `--extra network`, which is now the only place the pair is declared.
 
 ### Removed
 - `experimental.NetworkMapper` and `experimental.GenericNetwork`, replaced by `mikeio1d.network`.
-- `network.BasicNode`, `network.BasicReach`, and building a `Network` from a sequence of reaches.
-  A `Network` is now built with `Network.open`, which is how anything ever used it. The
-  abstract element classes are gone too: `Network.reaches` holds plain frozen records with the
-  same attributes (#250; #257 tracks bringing it back).
-- `Network.find` and `Network.recall`. Every member takes the model's names, `resolve` gives the
-  graph integer for one, and each graph node's `address` attribute names it. A reach's end nodes
-  are `reaches[reach_id].start` and `.end`, rather than `distance="start"`/`"end"` (#250).
 
 ## [1.3.1] - 2026-07-15
 
