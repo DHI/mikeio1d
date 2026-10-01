@@ -110,6 +110,16 @@ df = res.reaches.read()
 df.head()
 ```
 
+A single location can also be narrowed down to some of its quantities. The same `quantities`
+argument is taken by `add`, `plot`, `to_csv`, `to_dfs0` and `to_txt`.
+```{python}
+df = res.reaches['100l1'].read(quantities='Discharge')
+df.head()
+```
+```{python}
+res.reaches['100l1'].plot(quantities='WaterLevel')
+```
+
 ## GeoDataFrames
 
 Locations collections can be extracted into a GeoDataFrame, both with and without quantities.

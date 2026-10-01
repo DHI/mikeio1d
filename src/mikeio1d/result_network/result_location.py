@@ -5,7 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
+    from pathlib import Path
+
     import pandas as pd
+    from matplotlib.axes import Axes
 
     from ..res1d import Res1D
     from ..query import QueryData
@@ -98,8 +101,25 @@ class ResultLocation(ABC):
         query = self.get_query(data_item)
         self.res1d.network.add_query(query)
 
-    def read(self, column_mode: str | None = None) -> pd.DataFrame:
-        """Read the time series data for all quantities at this location into a DataFrame.
+    def add(self, quantities: str | list[str] | None = None) -> None:
+        """Add quantities at this location to ResultNetwork.queue for reading later.
+
+        Parameters
+        ----------
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to add. If None, all quantities are added.
+
+        """
+        for result_quantity in self._get_result_quantities(quantities):
+            result_quantity.add()
+
+    def read(
+        self,
+        column_mode: str | None = None,
+        *,
+        quantities: str | list[str] | None = None,
+    ) -> pd.DataFrame:
+        """Read the time series data for quantities at this location into a DataFrame.
 
         Parameters
         ----------
@@ -108,6 +128,18 @@ class ResultLocation(ABC):
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to read. If None, all quantities are read.
+
+        Returns
+        -------
+        pd.DataFrame
+            Time series data with one column per time series.
+
+        Raises
+        ------
+        ValueError
+            If a quantity is not available at this location.
 
         Returns
         -------
@@ -115,15 +147,16 @@ class ResultLocation(ABC):
             Time series data for all quantities at this location.
 
         """
-        qlists = self._creator.result_quantity_map.values()
-        result_quantities = [q for qlist in qlists for q in qlist]
-        timesries_ids = [q.timeseries_id for q in result_quantities]
-        reader = self.res1d.reader
-        df = reader.read(timesries_ids, column_mode=column_mode)
-        return df
+        timeseries_ids = self._get_timeseries_ids(quantities)
+        return self.res1d.reader.read(timeseries_ids, column_mode=column_mode)
 
-    def to_dataframe(self, column_mode: str | None = None) -> pd.DataFrame:
-        """Read the time series data for all quantities at this location into a DataFrame.
+    def to_dataframe(
+        self,
+        column_mode: str | None = None,
+        *,
+        quantities: str | list[str] | None = None,
+    ) -> pd.DataFrame:
+        """Read the time series data for quantities at this location into a DataFrame.
 
         Alias for read() method.
 
@@ -134,14 +167,162 @@ class ResultLocation(ABC):
             'all' - column MultiIndex with levels matching TimeSeriesId objects.
             'compact' - same as 'all', but removes levels with default values.
             'timeseries' - column index of TimeSeriesId objects
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to read. If None, all quantities are read.
 
         Returns
         -------
         pd.DataFrame
-            Time series data for all quantities at this location.
+            Time series data with one column per time series.
 
         """
-        return self.read(column_mode)
+        return self.read(column_mode, quantities=quantities)
+
+    def plot(
+        self,
+        ax: Axes | None = None,
+        *,
+        quantities: str | list[str] | None = None,
+        **kwargs,
+    ) -> Axes:
+        """Plot the time series data for quantities at this location.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes object to plot on.
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to plot. If None, all quantities are plotted.
+        **kwargs
+            Additional keyword arguments passed to pandas.DataFrame.plot.
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+            Axes object with the plot.
+
+        """
+        result_quantities = self._get_result_quantities(quantities)
+        timeseries_ids = [q.timeseries_id for q in result_quantities]
+        df = self.res1d.reader.read(timeseries_ids)
+        ax = df.plot(ax=ax, **kwargs)
+        ax.set_xlabel("Time")
+        if len({q.name for q in result_quantities}) == 1:
+            ylabel = ResultQuantity.prettify_quantity(result_quantities[0], latex_format=True)
+            ax.set_ylabel(ylabel)
+        else:
+            ax.set_ylabel("")
+        ax.grid(True)
+        return ax
+
+    def to_csv(
+        self,
+        file_path: str | Path,
+        time_step_skipping_number: int = 1,
+        *,
+        quantities: str | list[str] | None = None,
+    ) -> None:
+        """Extract time series data for quantities at this location into a csv file.
+
+        Parameters
+        ----------
+        file_path : str | Path
+            Output file path.
+        time_step_skipping_number : int, default=1
+            Number specifying the time step frequency to output.
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to extract. If None, all quantities are extracted.
+
+        """
+        timeseries_ids = self._get_timeseries_ids(quantities)
+        self.res1d.to_csv(file_path, timeseries_ids, time_step_skipping_number)
+
+    def to_dfs0(
+        self,
+        file_path: str | Path,
+        time_step_skipping_number: int = 1,
+        *,
+        quantities: str | list[str] | None = None,
+    ) -> None:
+        """Extract time series data for quantities at this location into a dfs0 file.
+
+        Parameters
+        ----------
+        file_path : str | Path
+            Output file path.
+        time_step_skipping_number : int, default=1
+            Number specifying the time step frequency to output.
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to extract. If None, all quantities are extracted.
+
+        """
+        timeseries_ids = self._get_timeseries_ids(quantities)
+        self.res1d.to_dfs0(file_path, timeseries_ids, time_step_skipping_number)
+
+    def to_txt(
+        self,
+        file_path: str | Path,
+        time_step_skipping_number: int = 1,
+        *,
+        quantities: str | list[str] | None = None,
+    ) -> None:
+        """Extract time series data for quantities at this location into a txt file.
+
+        Parameters
+        ----------
+        file_path : str | Path
+            Output file path.
+        time_step_skipping_number : int, default=1
+            Number specifying the time step frequency to output.
+        quantities : str | list[str] | None
+            Quantity id or list of quantity ids to extract. If None, all quantities are extracted.
+
+        """
+        timeseries_ids = self._get_timeseries_ids(quantities)
+        self.res1d.to_txt(file_path, timeseries_ids, time_step_skipping_number)
+
+    def _get_timeseries_ids(self, quantities: str | list[str] | None = None) -> list[TimeSeriesId]:
+        return [q.timeseries_id for q in self._get_result_quantities(quantities)]
+
+    def _get_result_quantities(
+        self, quantities: str | list[str] | None = None
+    ) -> list[ResultQuantity]:
+        """Get the ResultQuantity objects at this location for the given quantity ids.
+
+        Returns
+        -------
+        list[ResultQuantity]
+            The ResultQuantity objects, in the order the quantity ids were given. A quantity id
+            given more than once is only included once.
+
+        Raises
+        ------
+        ValueError
+            If a quantity id is unknown, rather than returning an empty list, because the
+            readers and extractors treat an empty list as 'read everything queued'.
+
+        """
+        result_quantity_map = self._creator.result_quantity_map
+        if quantities is None:
+            if len(result_quantity_map) == 0:
+                raise ValueError(f"{self!r} has no quantities.")
+            quantities = list(result_quantity_map)
+        elif isinstance(quantities, str):
+            quantities = [quantities]
+
+        if len(quantities) == 0:
+            raise ValueError("At least one quantity must be given.")
+
+        quantities = list(dict.fromkeys(quantities))
+
+        unknown = [q for q in quantities if q not in result_quantity_map]
+        if unknown:
+            raise ValueError(
+                f"Quantities {unknown} not found for {self!r}. Available quantities: "
+                f"{list(result_quantity_map)}"
+            )
+
+        return [rq for q in quantities for rq in result_quantity_map[q]]
 
 
 class ResultLocationCreator(ABC):
