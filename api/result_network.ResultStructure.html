@@ -304,11 +304,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
   <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
+  <li><a href="#mikeio1d.result_network.ResultStructure.add" id="toc-mikeio1d.result_network.ResultStructure.add" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.add">add</a></li>
   <li><a href="#mikeio1d.result_network.ResultStructure.add_query" id="toc-mikeio1d.result_network.ResultStructure.add_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.add_query">add_query</a></li>
   <li><a href="#mikeio1d.result_network.ResultStructure.get_m1d_dataset" id="toc-mikeio1d.result_network.ResultStructure.get_m1d_dataset" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.get_m1d_dataset">get_m1d_dataset</a></li>
   <li><a href="#mikeio1d.result_network.ResultStructure.get_query" id="toc-mikeio1d.result_network.ResultStructure.get_query" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.get_query">get_query</a></li>
+  <li><a href="#mikeio1d.result_network.ResultStructure.plot" id="toc-mikeio1d.result_network.ResultStructure.plot" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.plot">plot</a></li>
   <li><a href="#mikeio1d.result_network.ResultStructure.read" id="toc-mikeio1d.result_network.ResultStructure.read" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.read">read</a></li>
+  <li><a href="#mikeio1d.result_network.ResultStructure.to_csv" id="toc-mikeio1d.result_network.ResultStructure.to_csv" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.to_csv">to_csv</a></li>
   <li><a href="#mikeio1d.result_network.ResultStructure.to_dataframe" id="toc-mikeio1d.result_network.ResultStructure.to_dataframe" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.to_dataframe">to_dataframe</a></li>
+  <li><a href="#mikeio1d.result_network.ResultStructure.to_dfs0" id="toc-mikeio1d.result_network.ResultStructure.to_dfs0" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.to_dfs0">to_dfs0</a></li>
+  <li><a href="#mikeio1d.result_network.ResultStructure.to_txt" id="toc-mikeio1d.result_network.ResultStructure.to_txt" class="nav-link" data-scroll-target="#mikeio1d.result_network.ResultStructure.to_txt">to_txt</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -409,39 +414,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultStructure.add">add</a></td>
+<td>Add quantities at this location to ResultNetwork.queue for reading later.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultStructure.add_query">add_query</a></td>
 <td>Add a query to ResultNetwork.queries list.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="#mikeio1d.result_network.ResultStructure.get_m1d_dataset">get_m1d_dataset</a></td>
 <td>Get IRes1DDataSet object associated with ResultStructure.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultStructure.get_query">get_query</a></td>
 <td>Get a QueryDataStructure for given data item.</td>
 </tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultStructure.plot">plot</a></td>
+<td>Plot the time series data for quantities at this location.</td>
+</tr>
 <tr class="even">
 <td><a href="#mikeio1d.result_network.ResultStructure.read">read</a></td>
-<td>Read the time series data for all quantities at this location into a DataFrame.</td>
+<td>Read the time series data for quantities at this location into a DataFrame.</td>
 </tr>
 <tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultStructure.to_csv">to_csv</a></td>
+<td>Extract time series data for quantities at this location into a csv file.</td>
+</tr>
+<tr class="even">
 <td><a href="#mikeio1d.result_network.ResultStructure.to_dataframe">to_dataframe</a></td>
-<td>Read the time series data for all quantities at this location into a DataFrame.</td>
+<td>Read the time series data for quantities at this location into a DataFrame.</td>
+</tr>
+<tr class="odd">
+<td><a href="#mikeio1d.result_network.ResultStructure.to_dfs0">to_dfs0</a></td>
+<td>Extract time series data for quantities at this location into a dfs0 file.</td>
+</tr>
+<tr class="even">
+<td><a href="#mikeio1d.result_network.ResultStructure.to_txt">to_txt</a></td>
+<td>Extract time series data for quantities at this location into a txt file.</td>
 </tr>
 </tbody>
 </table>
+<section id="mikeio1d.result_network.ResultStructure.add" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.add">add</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.add(quantities<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Add quantities at this location to ResultNetwork.queue for reading later.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 21%">
+<col style="width: 61%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to add. If None, all quantities are added.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="mikeio1d.result_network.ResultStructure.add_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.add_query">add_query</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.add_query(data_item)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.add_query(data_item)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Add a query to ResultNetwork.queries list.</p>
 </section>
 <section id="mikeio1d.result_network.ResultStructure.get_m1d_dataset" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.get_m1d_dataset">get_m1d_dataset</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.get_m1d_dataset(m1d_dataitem<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.get_m1d_dataset(m1d_dataitem<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get IRes1DDataSet object associated with ResultStructure.</p>
 <p>This is the reach IRes1DDataSet object because ResultStructure objects do not have a corresonding IRes1DDataSet object.</p>
-<section id="parameters-1" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -488,7 +545,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="mikeio1d.result_network.ResultStructure.get_query" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.get_query">get_query</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.get_query(data_item)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.get_query(data_item)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Get a QueryDataStructure for given data item.</p>
 <section id="returns-1" class="level4 doc-section doc-section-returns">
 <h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
@@ -515,17 +572,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </section>
 </section>
+<section id="mikeio1d.result_network.ResultStructure.plot" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.plot">plot</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.plot(ax<span class="op">=</span><span class="va">None</span>, <span class="op">*</span>, quantities<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the time series data for quantities at this location.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 20%">
+<col style="width: 61%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ax</td>
+<td>matplotlib.axes.Axes</td>
+<td>Axes object to plot on.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to plot. If None, all quantities are plotted.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>**kwargs</td>
+<td></td>
+<td>Additional keyword arguments passed to pandas.DataFrame.plot.</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>matplotlib.axes.Axes</td>
+<td>Axes object with the plot.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 <section id="mikeio1d.result_network.ResultStructure.read" class="level3">
 <h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.read">read</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.read(column_mode<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Read the time series data for all quantities at this location into a DataFrame.</p>
-<section id="parameters-2" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.read(column_mode<span class="op">=</span><span class="va">None</span>, <span class="op">*</span>, quantities<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read the time series data for quantities at this location into a DataFrame.</p>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 86%">
+<col style="width: 9%">
+<col style="width: 82%">
 <col style="width: 3%">
 </colgroup>
 <thead>
@@ -543,61 +663,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
 <td><code>None</code></td>
 </tr>
-</tbody>
-</table>
-</section>
-<section id="returns-2" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 18%">
-<col style="width: 71%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td>pd.DataFrame</td>
-<td>Time series data for all quantities at this location.</td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="mikeio1d.result_network.ResultStructure.to_dataframe" class="level3">
-<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.to_dataframe">to_dataframe</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.to_dataframe(column_mode<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Read the time series data for all quantities at this location into a DataFrame.</p>
-<p>Alias for read() method.</p>
-<section id="parameters-3" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 86%">
-<col style="width: 3%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>column_mode</td>
-<td>str(optional)</td>
-<td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
+<tr class="even">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to read. If None, all quantities are read.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>
@@ -608,6 +677,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 10%">
+<col style="width: 19%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time series data with one column per time series.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="raises" class="level4 doc-section doc-section-raises">
+<h4 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 71%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>ValueError</td>
+<td>If a quantity is not available at this location.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-4" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
 <col style="width: 18%">
 <col style="width: 71%">
 </colgroup>
@@ -623,6 +740,220 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td></td>
 <td>pd.DataFrame</td>
 <td>Time series data for all quantities at this location.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultStructure.to_csv" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.to_csv">to_csv</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.to_csv(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    file_path,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    time_step_skipping_number<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    quantities<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Extract time series data for quantities at this location into a csv file.</p>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 18%">
+<col style="width: 56%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>file_path</td>
+<td>str | Path</td>
+<td>Output file path.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>time_step_skipping_number</td>
+<td>int</td>
+<td>Number specifying the time step frequency to output.</td>
+<td><code>1</code></td>
+</tr>
+<tr class="odd">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to extract. If None, all quantities are extracted.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultStructure.to_dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.to_dataframe">to_dataframe</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.to_dataframe(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    column_mode<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    quantities<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read the time series data for quantities at this location into a DataFrame.</p>
+<p>Alias for read() method.</p>
+<section id="parameters-6" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 9%">
+<col style="width: 82%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>column_mode</td>
+<td>str(optional)</td>
+<td>Specifies the type of column index of returned DataFrame. ‘all’ - column MultiIndex with levels matching TimeSeriesId objects. ‘compact’ - same as ‘all’, but removes levels with default values. ‘timeseries’ - column index of TimeSeriesId objects</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to read. If None, all quantities are read.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-5" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-5">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 19%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>pd.DataFrame</td>
+<td>Time series data with one column per time series.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultStructure.to_dfs0" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.to_dfs0">to_dfs0</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.to_dfs0(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    file_path,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    time_step_skipping_number<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    quantities<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Extract time series data for quantities at this location into a dfs0 file.</p>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 18%">
+<col style="width: 56%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>file_path</td>
+<td>str | Path</td>
+<td>Output file path.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>time_step_skipping_number</td>
+<td>int</td>
+<td>Number specifying the time step frequency to output.</td>
+<td><code>1</code></td>
+</tr>
+<tr class="odd">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to extract. If None, all quantities are extracted.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="mikeio1d.result_network.ResultStructure.to_txt" class="level3">
+<h3 class="anchored" data-anchor-id="mikeio1d.result_network.ResultStructure.to_txt">to_txt</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>result_network.ResultStructure.to_txt(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    file_path,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    time_step_skipping_number<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    quantities<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Extract time series data for quantities at this location into a txt file.</p>
+<section id="parameters-8" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 18%">
+<col style="width: 56%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>file_path</td>
+<td>str | Path</td>
+<td>Output file path.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>time_step_skipping_number</td>
+<td>int</td>
+<td>Number specifying the time step frequency to output.</td>
+<td><code>1</code></td>
+</tr>
+<tr class="odd">
+<td>quantities</td>
+<td>str | list[str] | None</td>
+<td>Quantity id or list of quantity ids to extract. If None, all quantities are extracted.</td>
+<td><code>None</code></td>
 </tr>
 </tbody>
 </table>
