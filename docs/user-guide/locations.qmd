@@ -2,7 +2,7 @@
 title: Locations
 ---
 
-Locations are where model results exist in the [Network](network.qmd). The main location types are [nodes](`mikeio1d.result_network.ResultNodes`), [reaches](`mikeio1d.result_network.ResultReaches`), and [catchments](`mikeio1d.result_network.ResultCatchments`). [Structures](#structures) on reaches, such as weirs and gates, are locations too.
+Locations are where model results exist in the [Network](network.qmd). The main location types are [nodes](`mikeio1d.result_network.ResultNodes`), [reaches](`mikeio1d.result_network.ResultReaches`), and [catchments](`mikeio1d.result_network.ResultCatchments`). [Structures](#structures) are locations too.
 
 ::: {.hidden}
 ```{python}
@@ -123,19 +123,19 @@ res.reaches['100l1'].plot(quantities='WaterLevel')
 ```
 
 ## Structures
-Structures such as weirs, gates, culverts, bridges and pumps sit at a chainage on a reach. Several structures can share the same chainage, for example a dam crest next to two sets of gates. A reach's discharge at that chainage can't tell them apart, so read structure results from the [structure collection](`mikeio1d.result_network.ResultStructures`) instead.
+Structure results are accessed through the [structure collection](`mikeio1d.result_network.ResultStructures`), keyed by structure ID. Each structure is its own location, so structures at the same reach chainage stay apart.
 
 ```{python}
 res_river.structures
 ```
 
-Access a [single structure](`mikeio1d.result_network.ResultStructure`) by indexing the collection with its ID. The header and `type` attribute show the reach it sits on (`river`), and `chainage` its position along it. Here `DamCrest`, `Outer Gates` and `Inner Gates` all sit on reach `river` at chainage 53727.17.
+Access a [single structure](`mikeio1d.result_network.ResultStructure`) by indexing the collection with its ID. The header and `type` attribute show its reach (`river`), and `chainage` its position on it. Here `DamCrest`, `Outer Gates` and `Inner Gates` share chainage 53727.17.
 
 ```{python}
 res_river.structures['Outer Gates']
 ```
 
-Reading a quantity from the collection gives one column per structure, so the three structures at chainage 53727.17 stay apart. Of those three, only `Inner Gates` carries flow.
+Reading a quantity from the collection gives one column per structure.
 
 ```{python}
 df = res_river.structures.DischargeInStructure.read()
@@ -148,7 +148,7 @@ A structure can also be accessed as an attribute. Characters that aren't valid i
 res_river.structures.Inner_Gates.FlowVelocityInStructure.plot()
 ```
 
-Structure IDs that start with a digit get an `s_` prefix when accessed as an attribute. Weir `119w1` in the collection system file `network.res1d` is an example, and like many collection system structures it only outputs `Discharge`.
+Structure IDs that start with a digit get an `s_` prefix when accessed as an attribute. For example, weir `119w1` in `network.res1d`:
 
 ```{python}
 res.structures.s_119w1.Discharge.plot()  # same as res.structures['119w1'].Discharge.plot()
@@ -163,7 +163,7 @@ df.tail()
 ```
 
 ::: callout-note
-Which quantities a structure has depends on the outputs chosen before the simulation ran. Flow area and velocity in structures (`FlowAreaInStructure`, `FlowVelocityInStructure`) only appear if that additional output was enabled. A pump's discharge is its `Discharge` quantity, available both as a structure (`res.structures['115p1']`) and on its structure reach (`res.reaches['Pump:115p1']`); see [issue #13](https://github.com/DHI/mikeio1d/issues/13).
+In collection system files, each structure also has its own reach, named by type and ID. For example, pump `115p1` is both `res.structures['115p1']` and `res.reaches['Pump:115p1']`.
 :::
 
 ## GeoDataFrames
