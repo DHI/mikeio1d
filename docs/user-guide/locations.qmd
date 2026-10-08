@@ -2,13 +2,14 @@
 title: Locations
 ---
 
-Locations are where model results exist in the [Network](network.qmd). The main location types are [nodes](`mikeio1d.result_network.ResultNodes`), [reaches](`mikeio1d.result_network.ResultReaches`), and [catchments](`mikeio1d.result_network.ResultCatchments`)
+Locations are where model results exist in the [Network](network.qmd). The main location types are [nodes](`mikeio1d.result_network.ResultNodes`), [reaches](`mikeio1d.result_network.ResultReaches`), and [catchments](`mikeio1d.result_network.ResultCatchments`). [Structures](#structures) are locations too.
 
 ::: {.hidden}
 ```{python}
 from mikeio1d import Res1D
 res = Res1D('../data/network.res1d')
 res_catchments = Res1D('../data/catchments.res1d')
+res_river = Res1D('../data/network_river.res1d')
 ```
 :::
 
@@ -16,7 +17,7 @@ res_catchments = Res1D('../data/catchments.res1d')
 There are two main data structures for locations: location collections ([](`~mikeio1d.result_network.ResultLocations`)) and single locations ([](`~mikeio1d.result_network.ResultLocation`)).
 
 ### Location collections
-Access location collections from a [Res1D](res1d.qmd) object. Each collection shows available quantities and location IDs.
+Access location collections from a [Res1D](res1d.qmd) object. Each collection shows available quantities and location IDs. Structures have a collection too, covered [below](#structures).
 
 ```{python}	
 res.nodes
@@ -80,9 +81,10 @@ The [Network](network.qmd) structure is generic and applies across different dom
 | Location  | Example quantities |
 |-----------|--------------------|
 |Nodes      | Water level (e.g. manhole, basin, outlet, junction) |
-|           | Pump discharge in structure |
 |Reaches    | Discharge (e.g. pipes, pumps, weirs) |
-|           | Water level (e.g. at specific chainges) |
+|           | Water level (e.g. at specific chainages) |
+|Structures | Discharge (e.g. weirs, gates, bridges, pumps) |
+|           | Flow area and velocity in structure |
 |Catchments | Catchment discharge |
 |           | Total runoff |
 |Global     | Water balance |
@@ -119,6 +121,50 @@ df.head()
 ```{python}
 res.reaches['100l1'].plot(quantities='WaterLevel')
 ```
+
+## Structures
+Structure results are accessed through the [structure collection](`mikeio1d.result_network.ResultStructures`), keyed by structure ID. Each structure is its own location, so structures at the same reach chainage stay apart.
+
+```{python}
+res_river.structures
+```
+
+Access a [single structure](`mikeio1d.result_network.ResultStructure`) by indexing the collection with its ID. The header and `type` attribute show its reach (`river`), and `chainage` its position on it. Here `DamCrest`, `Outer Gates` and `Inner Gates` share chainage 53727.17.
+
+```{python}
+res_river.structures['Outer Gates']
+```
+
+Reading a quantity from the collection gives one column per structure.
+
+```{python}
+df = res_river.structures.DischargeInStructure.read()
+df.describe().T
+```
+
+A structure can also be accessed as an attribute. Characters that aren't valid in a Python name are replaced by underscores, so `Inner Gates` becomes `Inner_Gates`. Indexing with the ID always works, whatever characters it contains.
+
+```{python}
+res_river.structures.Inner_Gates.FlowVelocityInStructure.plot()
+```
+
+Structure IDs that start with a digit get an `s_` prefix when accessed as an attribute. For example, weir `119w1` in `network.res1d`:
+
+```{python}
+res.structures.s_119w1.Discharge.plot()  # same as res.structures['119w1'].Discharge.plot()
+```
+
+Structure results are also part of a full read, in the `Structure` group. With `column_mode='compact'` the columns are a MultiIndex of quantity, group, name, chainage and tag, which the [`m1d` accessor](`mikeio1d.pandas_extension.Mikeio1dAccessor`) can filter.
+
+```{python}
+df = res_river.read(column_mode='compact')
+df = df.m1d.query("group == 'Structure' and quantity == 'DischargeInStructure'")
+df.tail()
+```
+
+::: callout-note
+In collection system files, each structure also has its own reach, named by type and ID. For example, pump `115p1` is both `res.structures['115p1']` and `res.reaches['Pump:115p1']`.
+:::
 
 ## GeoDataFrames
 
