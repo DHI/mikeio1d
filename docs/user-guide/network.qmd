@@ -22,7 +22,7 @@ Grid points are the computational points along a reach. A flow model has differe
 * Q grid point: contains discharge or flow velocity.
 * Structure grid point: calculates discharge over a structure depending on the water levels on each side of the structure.
 
-Results for structures are read as their own location type, see [Structures](locations.qmd#structures).
+Results for structures are read as their own location type (see [Structures](locations.qmd#structures)).
 
 ## Nodes
 Nodes are connected together by reaches. Nodes can represent different entities: manholes, basins, outlets, and junction nodes. They may or may not have a volume.

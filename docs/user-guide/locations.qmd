@@ -17,7 +17,7 @@ res_river = Res1D('../data/network_river.res1d')
 There are two main data structures for locations: location collections ([](`~mikeio1d.result_network.ResultLocations`)) and single locations ([](`~mikeio1d.result_network.ResultLocation`)).
 
 ### Location collections
-Access location collections from a [Res1D](res1d.qmd) object. Each collection shows available quantities and location IDs.
+Access location collections from a [Res1D](res1d.qmd) object. Each collection shows available quantities and location IDs. Structures have a collection too, covered [below](#structures).
 
 ```{python}	
 res.nodes
@@ -81,10 +81,9 @@ The [Network](network.qmd) structure is generic and applies across different dom
 | Location  | Example quantities |
 |-----------|--------------------|
 |Nodes      | Water level (e.g. manhole, basin, outlet, junction) |
-|           | Pump discharge in structure |
 |Reaches    | Discharge (e.g. pipes, pumps, weirs) |
-|           | Water level (e.g. at specific chainges) |
-|Structures | Discharge in structure (e.g. weirs, gates, bridges) |
+|           | Water level (e.g. at specific chainages) |
+|Structures | Discharge (e.g. weirs, gates, bridges, pumps) |
 |           | Flow area and velocity in structure |
 |Catchments | Catchment discharge |
 |           | Total runoff |
@@ -130,13 +129,13 @@ Structures such as weirs, gates, culverts, bridges and pumps sit at a chainage o
 res_river.structures
 ```
 
-Access a [single structure](`mikeio1d.result_network.ResultStructure`) by indexing the collection with its ID. Each structure shows its chainage on the reach. Here `DamCrest`, `Outer Gates` and `Inner Gates` all sit on reach `river` at chainage 53727.17.
+Access a [single structure](`mikeio1d.result_network.ResultStructure`) by indexing the collection with its ID. The header and `type` attribute show the reach it sits on (`river`), and `chainage` its position along it. Here `DamCrest`, `Outer Gates` and `Inner Gates` all sit on reach `river` at chainage 53727.17.
 
 ```{python}
 res_river.structures['Outer Gates']
 ```
 
-Reading a quantity from the collection gives one column per structure, so the three structures at chainage 53727.17 stay apart. Here only `Inner Gates` carries flow.
+Reading a quantity from the collection gives one column per structure, so the three structures at chainage 53727.17 stay apart. Of those three, only `Inner Gates` carries flow.
 
 ```{python}
 df = res_river.structures.DischargeInStructure.read()
@@ -149,13 +148,13 @@ A structure can also be accessed as an attribute. Characters that aren't valid i
 res_river.structures.Inner_Gates.FlowVelocityInStructure.plot()
 ```
 
-Structure IDs that start with a digit get an `s_` prefix when accessed as an attribute.
+Structure IDs that start with a digit get an `s_` prefix when accessed as an attribute. Weir `119w1` in the collection system file `network.res1d` is an example, and like many collection system structures it only outputs `Discharge`.
 
 ```{python}
 res.structures.s_119w1.Discharge.plot()  # same as res.structures['119w1'].Discharge.plot()
 ```
 
-Structure results are also part of a full read, in the `Structure` group.
+Structure results are also part of a full read, in the `Structure` group. With `column_mode='compact'` the columns are a MultiIndex of quantity, group, name, chainage and tag, which the [`m1d` accessor](`mikeio1d.pandas_extension.Mikeio1dAccessor`) can filter.
 
 ```{python}
 df = res_river.read(column_mode='compact')
@@ -164,7 +163,7 @@ df.tail()
 ```
 
 ::: callout-note
-Which quantities a structure has depends on the outputs chosen before the simulation ran. Flow area and velocity in structures (`FlowAreaInStructure`, `FlowVelocityInStructure`) only appear if that additional output was enabled. Pump discharge may be reported as a node quantity instead of under structures (see [issue #13](https://github.com/DHI/mikeio1d/issues/13)).
+Which quantities a structure has depends on the outputs chosen before the simulation ran. Flow area and velocity in structures (`FlowAreaInStructure`, `FlowVelocityInStructure`) only appear if that additional output was enabled. A pump's discharge is its `Discharge` quantity, available both as a structure (`res.structures['115p1']`) and on its structure reach (`res.reaches['Pump:115p1']`); see [issue #13](https://github.com/DHI/mikeio1d/issues/13).
 :::
 
 ## GeoDataFrames
