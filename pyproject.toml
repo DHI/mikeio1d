@@ -19,7 +19,7 @@ packages = ["src/mikeio1d"]
 
 [project]
 name = "mikeio1d"
-version = "1.5.0"
+version = "1.5.1"
 description = "A package that uses the DHI MIKE1D .NET libraries to read res1d and xns11 files."
 readme = "README.md"
 requires-python = ">=3.13,<3.16"

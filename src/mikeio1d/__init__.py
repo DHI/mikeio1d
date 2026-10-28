@@ -7,6 +7,7 @@ import warnings
 import platform
 from pathlib import Path
 from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 from importlib.metadata import metadata
 
@@ -28,13 +29,13 @@ from .mikepath import MikePath
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 
 # UV may ignore requires-python upper bounds for local installs, potentially causing
 # compatibility issues with dependencies like 'pythonnet'. Adding this warning to help
 # identify such problems early.
 # For more info see https://docs.astral.sh/uv/reference/internals/resolver/#requires-python .
-current_python_version = ".".join(map(str, sys.version_info[:3]))
+current_python_version = Version(".".join(map(str, sys.version_info[:3])))
 requires_python = metadata("mikeio1d").get("Requires-Python")
 if current_python_version not in SpecifierSet(requires_python):
     warnings.warn(

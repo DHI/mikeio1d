@@ -1,5 +1,23 @@
-import pytest
+import importlib
+import sys
 import warnings
+
+import pytest
+
+
+def test_python_patch_version_is_supported(monkeypatch):
+    import mikeio1d
+
+    original_version_info = sys.version_info
+    try:
+        monkeypatch.setattr(sys, "version_info", (3, 15, 2))
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            importlib.reload(mikeio1d)
+        assert not any("officially supports Python" in str(w.message) for w in caught)
+    finally:
+        monkeypatch.setattr(sys, "version_info", original_version_info)
+        importlib.reload(mikeio1d)
 
 
 def test_imports_without_warning():
