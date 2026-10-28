@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Support for Python 3.15 and dropped support for Python 3.12, following [Scientific Python SPEC 0](https://scientific-python.org/specs/spec-0000/).
+
 ## [1.4.0] - 2026-10-01
 
 ### Added

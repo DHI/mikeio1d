@@ -8,7 +8,7 @@ MIKE IO 1D is a Python package for reading and manipulating MIKE 1D result files
 
 The package is fundamentally a Python wrapper around the [DHI MIKE 1D .NET library](https://docs.mikepoweredbydhi.com/engine_libraries/mike1d/mike1d_api/). The key .NET namespaces are `DHI.Mike1D.ResultDataAccess`, `DHI.Mike1D.Generic`, and `DHI.Mike1D.CrossSectionModule`. The .NET assemblies (version 23.0.3) are downloaded from NuGet at install time and placed in `src/mikeio1d/bin/`.
 
-**Requirements:** Python 3.12–3.14 (64-bit only), `uv` package manager, .NET 8.0 Runtime (Linux) or VC++ redistributables (Windows).
+**Requirements:** Python 3.13–3.15 (64-bit only), `uv` package manager, .NET 8.0 Runtime (Linux) or VC++ redistributables (Windows).
 
 ## Commands
 
@@ -17,13 +17,13 @@ The package is fundamentally a Python wrapper around the [DHI MIKE 1D .NET libra
 If the binaries have been removed (e.g. via `git clean -dxf src/mikeio1d/bin`), `uv sync` alone won't re-download them — use `--reinstall` to force the hook to run again:
 
 ```bash
-uv sync --reinstall --group dev --group test --group notebooks --python 3.13
+uv sync --reinstall --group dev --group test --group notebooks --python 3.15
 ```
 
 ```bash
-# Install dev dependencies (use highest supported version, currently 3.14)
+# Install dev dependencies (use highest supported version, currently 3.15)
 # Uses --group (PEP 735 dependency-groups), not --extra
-uv sync --group dev --group test --group notebooks --python 3.13
+uv sync --group dev --group test --group notebooks --python 3.15
 ```
 
 Everything else goes through the [`just`](https://just.systems) command runner. Call the
@@ -145,7 +145,7 @@ an import, follow the file you are editing.
 Some files in `src/mikeio1d/bin/` (e.g. `DHI.Chart.Map.dll`) are native (non-.NET) DLLs. `mikenet.load_all()` skips them with a warning; individual `load_*` calls on a native DLL will also warn and skip. If a _managed_ assembly fails to load, the most common cause is stale or mismatched DLLs — force a clean reinstall:
 
 ```bash
-uv sync --reinstall --group dev --group test --python 3.13
+uv sync --reinstall --group dev --group test --python 3.15
 ```
 
 **`DHI.Mike1D.MikeIO` import error**
@@ -159,4 +159,4 @@ python scripts/install_dependencies.py  # copies DLL to correct location
 
 **pythonnet / Python version issues**
 
-Use Python 3.12–3.14 (64-bit). Check `pythonnet>=3.0.0` is installed.
+Use Python 3.13–3.15 (64-bit). Check `pythonnet>=3.0.0` is installed.
