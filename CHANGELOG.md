@@ -1,5 +1,10 @@
 # mikeio1d Changelog
 
+## [1.5.1] - 2026-10-28
+
+### Fixed
+- Python support warning now correctly recognizes patch versions within a supported minor range (e.g., Python 3.15.2).
+
 ## [1.5.0]
 
 ### Added
